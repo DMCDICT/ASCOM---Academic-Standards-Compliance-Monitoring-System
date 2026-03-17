@@ -1,0 +1,1329 @@
+/*
+ * user-account-management.css
+ * Styles specific to the user-account-management.php content fragment.
+ * Path to assets: From super_admin-mis/styles/ to DataDrift/ASCOM Monitoring System/src/assets/
+ */
+
+.user-account-page-container { 
+    /* This container relies on content-wrapper for main padding. */
+    /* Add any specific margin/padding needed for the whole page fragment that's unique. */
+    /* Added this comment to make the ruleset non-empty for linter. */
+}
+
+.user-account-page-container .header-row { 
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px; /* Space below header row */
+    padding-top: 0; 
+}
+
+.user-account-page-container .header-row .main-page-title { 
+    margin-bottom: 0; 
+}
+
+.user-account-page-container .header-buttons {
+    display: flex;
+    gap: 10px;
+}
+
+.user-account-page-container .activity-button {
+    background-color: #739AFF;
+    border: none;
+    color: white;
+    font-size: 18px;
+    padding: 8px 16px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: bold;
+}
+
+.user-account-page-container .activity-button:hover {
+    opacity: 0.9;
+}
+
+/* .content { -- This class was in the original HTML but is removed/redundant as content-wrapper provides padding. */
+
+.stats-container { 
+    display: flex;
+    gap: 20px;
+    flex-wrap: wrap;
+    justify-content: flex-start;
+    margin-bottom: 20px; 
+}
+
+.user-account-page-container .stat-box {
+    background-color: #fff;
+    flex: 1 1 240px;
+    max-width: 100%;
+    padding: 14px 16px;
+    border-radius: 8px;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+    display: flex !important;
+    flex-direction: row !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    user-select: none;
+    min-width: 180px;
+    margin: 0;
+    min-height: unset !important;
+    height: auto !important;
+}
+
+.user-account-page-container .label-icon {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    font-weight: bold;
+    font-size: 16px;
+    white-space: nowrap;
+}
+
+.user-account-page-container .label-icon img {
+    width: 24px;
+    height: 24px;
+    object-fit: contain;
+}
+
+.user-account-page-container .stat-amount {
+    font-size: 22px;
+    font-weight: bold;
+    color: #111;
+    min-width: 40px;
+    text-align: right;
+    user-select: text;
+    margin: 0;
+    white-space: nowrap;
+}
+
+.search-filter-row { 
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: nowrap;
+    gap: 10px;
+    margin-bottom: 20px; 
+}
+
+.search-left { 
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex: 1;
+    min-width: 0;
+}
+
+.search-right { 
+    margin-left: auto;
+    flex-shrink: 0;
+}
+
+.user-search-bar { 
+    display: flex;
+    align-items: center;
+    background-color: #FFFFFF;
+    height: 38px;
+    width: 345px;
+    border-radius: 6px;
+    padding: 0 10px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    position: relative;
+}
+
+.user-search-bar .magnifier-icon { /* Image paths in HTML fragments are handled directly */
+    width: 20px;
+    height: 20px;
+    margin-right: 8px;
+}
+
+.user-search-bar input { 
+    border: none;
+    outline: none;
+    font-size: 16px;
+    color: #333;
+    flex: 1;
+    background: transparent;
+}
+
+.user-search-bar input::placeholder { 
+    color: #D9D9D9;
+    font-size: 16px;
+}
+
+.clear-search-btn {
+    background: none;
+    border: none;
+    color: #999;
+    font-size: 18px;
+    font-weight: bold;
+    cursor: pointer;
+    padding: 0;
+    width: 20px;
+    height: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-left: 8px;
+    transition: color 0.2s ease;
+}
+
+.clear-search-btn:hover {
+    color: #666;
+}
+
+.clear-search-btn:active {
+    color: #333;
+}
+
+.search-button { 
+    background-color: #0077FF;
+    color: #FFFFFF;
+    font-size: 16px;
+    padding: 8px 16px;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: bold;
+}
+
+.search-button:hover {
+    opacity: 0.9;
+}
+
+.refresh-button {
+    background-color: #28a745;
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 500;
+    margin-left: 10px;
+    transition: background-color 0.3s ease;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    position: relative;
+}
+
+.refresh-button:hover {
+    background-color: #218838;
+}
+
+.refresh-button:active {
+    background-color: #1e7e34;
+}
+
+.filter-button { 
+    background-color: #FFFFFF;
+    border: 1px solid #ccc;
+    padding: 8px 16px;
+    border-radius: 6px;
+    font-size: 16px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+    font-weight: bold;
+}
+
+.filter-button img { /* Image paths in HTML fragments are handled directly */
+    width: 20px;
+    height: 20px;
+    filter: none; 
+}
+
+.user-table-section { 
+    background-color: #fff;
+    margin-top: 0px; 
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
+    overflow-x: auto;
+}
+
+.user-account-page-container table { 
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 16px;
+}
+
+.user-account-page-container th, .user-account-page-container td { 
+    padding: 12px;
+    text-align: left;
+    border-bottom: 1px solid #e0e0e0;
+    font-size: 14px;
+    vertical-align: middle;
+}
+
+.user-account-page-container th { 
+    background-color: #f5f5f5;
+    font-weight: bold;
+    color: #333;
+}
+
+.pagination { 
+    display: flex;
+    justify-content: center;
+    gap: 6px;
+    margin-top: 10px;
+}
+
+.pagination button { 
+    padding: 6px 12px;
+    border: 1px solid #ccc;
+    background-color: white;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.pagination button.active { 
+    background-color: #0077FF;
+    color: white;
+    font-weight: bold;
+}
+
+.user-account-page-container tbody tr {
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+    min-height: 48px;
+}
+
+.user-account-page-container tbody tr:hover {
+    background-color: #f0f6ff;
+}
+
+.user-account-page-container tbody tr.clickable {
+    cursor: pointer;
+}
+
+.user-account-page-container tbody tr.clickable:hover {
+    background-color: #e3f2fd;
+    transform: translateY(-1px);
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+.user-account-page-container .action-btn {
+    color: #1976d2;
+    background: none;
+    border: none;
+    font-weight: 600;
+    font-size: 14px;
+    cursor: pointer;
+    margin: 0 4px;
+    padding: 0;
+    transition: color 0.2s;
+}
+.user-account-page-container .action-btn:hover {
+    color: #0d47a1;
+    text-decoration: underline;
+}
+
+.user-account-page-container .edit-btn {
+    background: #1976d2;
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    padding: 10px 24px;
+    margin: 0;
+    font-weight: 600;
+    font-size: 14px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    line-height: 1;
+    display: inline-block;
+    vertical-align: middle;
+}
+.user-account-page-container .edit-btn:hover {
+    background: #0d47a1;
+}
+
+.user-account-page-container .delete-btn {
+    background: #d32f2f;
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    padding: 10px 24px;
+    margin: 0;
+    font-weight: 600;
+    font-size: 14px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    line-height: 1;
+    display: inline-block;
+    vertical-align: middle;
+}
+.user-account-page-container .delete-btn:hover {
+    background: #b71c1c;
+}
+
+.user-account-page-container .edit-btn,
+.user-account-page-container .delete-btn {
+    width: auto;
+    min-width: auto;
+    max-width: none;
+    text-align: center;
+    color: #fff !important;
+    text-decoration: none !important;
+    height: auto;
+    box-sizing: border-box;
+}
+.user-account-page-container .edit-btn:hover,
+.user-account-page-container .edit-btn:focus,
+.user-account-page-container .edit-btn:active,
+.user-account-page-container .delete-btn:hover,
+.user-account-page-container .delete-btn:focus,
+.user-account-page-container .delete-btn:active {
+    color: #fff !important;
+    text-decoration: none !important;
+}
+
+.user-account-page-container td:last-child,
+.user-account-page-container .action-cell {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
+    padding: 8px 12px;
+    text-align: center;
+    vertical-align: middle;
+}
+
+.user-account-page-container .action-cell {
+    position: relative;
+    z-index: 10;
+    white-space: nowrap;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 48px;
+}
+
+.user-account-page-container .action-separator {
+    color: #ccc;
+    font-weight: normal;
+    margin: 0 8px;
+    font-size: 14px;
+    line-height: 1;
+    display: inline-block;
+    vertical-align: middle;
+}
+
+/* Button styling for modals - matching standard modal buttons */
+#userDetailsModal .edit-btn {
+    width: 125px;
+    background-color: #1976d2;
+    color: white;
+    border: none;
+    border-radius: 10px;
+    font-size: 14px;
+    font-weight: bold;
+    height: 50px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+    text-transform: uppercase;
+}
+
+#userDetailsModal .edit-btn:hover {
+    background-color: #0d47a1;
+}
+
+#userDetailsModal .delete-btn {
+    width: 125px;
+    background-color: #d32f2f;
+    color: white;
+    border: none;
+    border-radius: 10px;
+    font-size: 14px;
+    font-weight: bold;
+    height: 50px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+    text-transform: uppercase;
+}
+
+#userDetailsModal .delete-btn:hover {
+    background-color: #b71c1c;
+}
+
+/* User Details Modal Styles */
+#userDetailsModal {
+    overflow: hidden;
+}
+
+#userDetailsModal .modal-header {
+    flex-shrink: 0;
+    margin-bottom: 0;
+}
+
+#userDetailsModal #userDetailsContent {
+    padding: 15px 0;
+}
+
+/* Ensure modal is hidden by default */
+#userDetailsModal.modal-overlay {
+    display: none !important;
+    visibility: hidden !important;
+}
+
+#userDetailsModal.modal-overlay.show {
+    display: flex !important;
+    visibility: visible !important;
+}
+
+/* Override any conflicting rules */
+#userDetailsModal {
+    display: none !important;
+}
+
+#userDetailsModal.show {
+    display: flex !important;
+}
+
+/* Force hide by default - highest priority */
+#userDetailsModal.modal-overlay:not(.show) {
+    display: none !important;
+    visibility: hidden !important;
+    opacity: 0 !important;
+}
+
+#userDetailsModal .user-details-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+}
+
+.detail-section {
+    background: #f8f9fa;
+    padding: 8px;
+    border-radius: 8px;
+    border: 1px solid #e9ecef;
+    height: auto;
+    min-height: fit-content;
+}
+
+.detail-section h3 {
+    color: #333;
+    margin: 0 0 8px 0;
+    font-size: 13px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    border-bottom: 2px solid #dee2e6;
+    padding-bottom: 4px;
+}
+
+.detail-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 4px 0;
+    border-bottom: 1px solid #e9ecef;
+    font-size: 12px;
+}
+
+.detail-item:last-child {
+    border-bottom: none;
+}
+
+.detail-item label {
+    font-weight: 600;
+    color: #495057;
+    min-width: 80px;
+    margin-right: 8px;
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+}
+
+.detail-item span {
+    color: #212529;
+    text-align: right;
+    flex: 1;
+    font-size: 13px;
+}
+
+/* Removed conflicting status-badge styles that were causing green backgrounds */
+
+/* Discord-style status system */
+.discord-status {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex: none;
+}
+
+.status-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    display: inline-block;
+    flex-shrink: 0;
+}
+
+.status-online {
+    background-color: #43a047;
+    box-shadow: 0 0 0 2px rgba(67, 160, 71, 0.2);
+}
+
+.status-active {
+    background-color: #ff9800;
+    box-shadow: 0 0 0 2px rgba(255, 152, 0, 0.2);
+}
+
+.status-inactive {
+    background-color: #9e9e9e;
+    box-shadow: 0 0 0 2px rgba(158, 158, 158, 0.2);
+}
+
+.status-text {
+    font-size: 13px;
+    font-weight: 500;
+    color: #212529;
+}
+
+/* Table status styling */
+.user-account-page-container td .discord-status {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    justify-content: flex-start;
+}
+
+.user-account-page-container td .status-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    display: inline-block;
+    flex-shrink: 0;
+}
+
+.user-account-page-container td .status-text {
+    font-size: 12px;
+    font-weight: 500;
+    color: #212529;
+}
+
+.status-info-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 2px;
+    border-radius: 4px;
+    transition: background-color 0.2s;
+    opacity: 0.7;
+}
+
+.status-info-btn:hover {
+    background-color: #f0f0f0;
+    opacity: 1;
+}
+
+/* Status Info Modal Styles */
+.status-info-content {
+    margin-bottom: 20px;
+}
+
+.status-info-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    padding: 12px 0;
+    border-bottom: 1px solid #f0f0f0;
+}
+
+.status-info-item:last-child {
+    border-bottom: none;
+}
+
+.status-info-dot {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    min-width: 80px;
+    flex-shrink: 0;
+}
+
+.status-info-text {
+    font-weight: 600;
+    color: #333;
+    font-size: 14px;
+}
+
+.status-info-item p {
+    margin: 0;
+    color: #666;
+    font-size: 13px;
+    line-height: 1.4;
+}
+
+/* Responsive design for details modal */
+@media (max-width: 768px) {
+    #userDetailsModal .modal-box {
+        width: 95vw !important;
+        max-width: 95vw !important;
+        margin: 10px !important;
+        padding: 20px !important;
+    }
+    
+    .user-details-grid {
+        grid-template-columns: 1fr;
+        gap: 12px;
+    }
+    
+    .detail-item {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 2px;
+        padding: 4px 0;
+    }
+    
+    .detail-item label {
+        min-width: auto;
+        margin-right: 0;
+        font-size: 11px;
+    }
+    
+    .detail-item span {
+        text-align: left;
+        font-size: 12px;
+    }
+    
+    .detail-section {
+        padding: 10px;
+    }
+    
+    .detail-section h3 {
+        font-size: 13px;
+        margin-bottom: 10px;
+    }
+}
+
+@media (max-width: 600px) {
+    .user-account-page-container td:last-child {
+        flex-direction: column;
+        align-items: flex-end;
+        gap: 4px;
+    }
+}
+
+@media (max-width: 600px) {
+    .user-account-page-container .search-filter-row {
+        flex-wrap: wrap;
+    }
+
+    .user-account-page-container .search-left, .user-account-page-container .search-right {
+        flex: 1 1 100%;
+        justify-content: flex-start;
+    }
+
+    .user-account-page-container .search-right {
+        display: flex;
+        justify-content: flex-end;
+        margin-left: 0;
+    }
+}
+
+.search-suggestions-panel {
+    position: absolute;
+    top: 38px;
+    left: 0;
+    width: 100%;
+    background: #fff;
+    border: 1px solid #d0d0d0;
+    border-radius: 0 0 8px 8px;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.08);
+    z-index: 10;
+    max-height: 220px;
+    overflow-y: auto;
+    display: none;
+}
+.search-suggestion-item {
+    padding: 10px 16px;
+    cursor: pointer;
+    font-size: 15px;
+    color: #222;
+    background: #fff;
+    border-bottom: 1px solid #f0f0f0;
+    transition: background 0.2s;
+}
+.search-suggestion-item:last-child {
+    border-bottom: none;
+}
+.search-suggestion-item:hover, .search-suggestion-item.active {
+    background: #f0f6ff;
+    color: #1976d2;
+}
+
+.user-details-modal .toggle-password,
+#editUserModal .toggle-password {
+    filter: brightness(0) invert(0);
+}
+
+/* Remove old password field styles that are no longer needed */
+
+/* Refresh status icon styling */
+.refresh-status-icon {
+    font-size: 14px;
+    margin-left: 4px;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    animation: spin 1s linear infinite;
+}
+
+.refresh-status-icon.show {
+    opacity: 1;
+}
+
+@keyframes spin {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+}
+
+/* Auto-refresh indicator styling */
+.auto-refresh-indicator {
+    font-size: 14px;
+    margin-left: 6px;
+    opacity: 0.7;
+    animation: spin 2s linear infinite;
+    cursor: pointer;
+    transition: opacity 0.3s ease;
+    display: none; /* Hidden by default */
+}
+
+.auto-refresh-indicator.active {
+    display: inline;
+}
+
+.auto-refresh-indicator:hover {
+    opacity: 1;
+}
+
+.auto-refresh-indicator.inactive {
+    opacity: 0.3;
+    animation: none;
+    display: none;
+}
+
+/* Countdown timer styling */
+.countdown-timer {
+    font-size: 12px;
+    margin-left: 6px;
+    color: #fff;
+    font-weight: bold;
+    opacity: 0.8;
+    transition: opacity 0.3s ease;
+}
+
+.countdown-timer.show {
+    opacity: 1;
+}
+
+/* Refresh indicator styling */
+#refreshIndicator {
+    display: none;
+    margin-left: 10px;
+    font-size: 12px;
+    color: #666;
+    font-style: italic;
+    padding: 4px 8px;
+    border-radius: 4px;
+    background-color: #f8f9fa;
+    border: 1px solid #e9ecef;
+    transition: all 0.3s ease;
+}
+
+#refreshIndicator:not([style*="display: none"]) {
+    animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+    0% { opacity: 1; }
+    50% { opacity: 0.7; }
+    100% { opacity: 1; }
+}
+
+/* Refresh indicator styles */
+.refresh-indicator {
+    display: inline-flex;
+    align-items: center;
+    margin-left: 10px;
+}
+
+.refresh-icon {
+    font-size: 16px;
+    /* No animation, just show/hide */
+}
+
+/* Remove the rotating animation */
+/* .refresh-indicator.updating .refresh-icon {
+    animation: spin 1s linear infinite;
+} */
+
+/* @keyframes spin { ... } -- also not needed */
+
+/* Status styling improvements */
+
+/* User Details Modal Styles */
+.user-details-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+    max-height: 60vh;
+    overflow-y: auto;
+    padding: 0 4px;
+}
+
+.detail-section {
+    background: #f8f9fa;
+    padding: 16px;
+    border-radius: 8px;
+    border: 1px solid #e9ecef;
+    height: fit-content;
+}
+
+.detail-section h3 {
+    color: #333;
+    margin: 0 0 16px 0;
+    font-size: 14px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    border-bottom: 2px solid #dee2e6;
+    padding-bottom: 8px;
+}
+
+.detail-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 8px 0;
+    border-bottom: 1px solid #e9ecef;
+    font-size: 13px;
+}
+
+.detail-row:last-child {
+    border-bottom: none;
+}
+
+.detail-label {
+    font-weight: 600;
+    color: #495057;
+    min-width: 100px;
+    margin-right: 12px;
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+}
+
+.detail-value {
+    color: #212529;
+    text-align: right;
+    flex: 1;
+    font-size: 13px;
+    font-weight: 500;
+}
+
+/* Status dot in details */
+.detail-value .status-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    display: inline-block;
+    margin-right: 6px;
+    vertical-align: middle;
+}
+
+/* Responsive design for details modal */
+@media (max-width: 768px) {
+    .user-details-grid {
+        grid-template-columns: 1fr;
+        gap: 16px;
+    }
+    
+    .detail-row {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 4px;
+        padding: 6px 0;
+    }
+    
+    .detail-label {
+        min-width: auto;
+        margin-right: 0;
+        font-size: 11px;
+    }
+    
+    .detail-value {
+        text-align: left;
+        font-size: 12px;
+    }
+    
+    .detail-section {
+        padding: 12px;
+    }
+    
+    .detail-section h3 {
+        font-size: 13px;
+        margin-bottom: 12px;
+    }
+}
+
+/* Modal overlay improvements - Only for user details modal, not add user modal */
+#userDetailsModal.modal-overlay {
+    position: fixed !important;
+    top: 0 !important;
+    left: 0 !important;
+    width: 100vw !important;
+    height: 100vh !important;
+    background: rgba(0, 0, 0, 0.7) !important;
+    z-index: 9999 !important;
+    backdrop-filter: none !important;
+    align-items: center !important;
+    justify-content: center !important;
+    padding: 0 !important;
+    box-sizing: border-box !important;
+    display: flex !important;
+    overflow: hidden !important;
+    visibility: visible !important;
+}
+
+#userDetailsModal .modal-box {
+    background: #fff !important;
+    border-radius: 18px !important;
+    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.25) !important;
+    position: relative !important;
+    width: 450px !important;
+    max-width: 90vw !important;
+    animation: fadeIn 0.3s ease !important;
+    padding: 32px !important;
+    margin: 20px !important;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(-20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Status Info Modal */
+#statusInfoModal.modal-overlay {
+    position: fixed !important;
+    top: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+    bottom: 0 !important;
+    width: 100% !important;
+    height: 100% !important;
+    background: rgba(0, 0, 0, 0.5) !important;
+    z-index: 1000 !important;
+    backdrop-filter: blur(4px) !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    padding: 20px !important;
+    box-sizing: border-box !important;
+}
+
+#statusInfoModal .modal-box {
+    background: #fff !important;
+    border-radius: 12px !important;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2) !important;
+    position: relative !important;
+    max-height: 90vh !important;
+    overflow: hidden !important;
+    animation: fadeIn 0.3s ease !important;
+    padding: 24px !important;
+}
+
+/* Form actions styling - Only for user details modal, not add user modal */
+#userDetailsModal .form-actions {
+    display: flex;
+    gap: 12px;
+    justify-content: flex-end;
+    padding-top: 20px;
+    border-top: 1px solid #e0e0e0;
+    margin-top: 0;
+}
+
+#userDetailsModal .form-actions button {
+    padding: 10px 24px;
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 14px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    border: none;
+}
+
+#userDetailsModal .form-actions .edit-btn {
+    background: #1976d2;
+    color: white;
+}
+
+#userDetailsModal .form-actions .edit-btn:hover {
+    background: #0d47a1;
+}
+
+#userDetailsModal .form-actions .delete-btn {
+    background: #d32f2f;
+    color: white;
+}
+
+#userDetailsModal .form-actions .delete-btn:hover {
+    background: #b71c1c;
+}
+
+#userDetailsModal .form-actions .cancel-btn {
+    background: #f5f5f5;
+    color: #333;
+    border: 1px solid #ccc;
+}
+
+#userDetailsModal .form-actions .cancel-btn:hover {
+    background: #e0e0e0;
+}
+
+#editUserModal .password-input-container {
+    position: relative;
+    display: flex;
+    align-items: center;
+    width: 100%;
+}
+
+#editUserModal .password-input-container input[type="password"],
+#editUserModal .password-input-container input[type="text"] {
+    width: 100%;
+    padding-right: 40px;
+    box-sizing: border-box;
+}
+
+#editUserModal .toggle-password-btn {
+    position: absolute;
+    right: 8px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: none;
+    border: none;
+    padding: 4px;
+    cursor: pointer;
+    height: 24px;
+    width: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 2;
+}
+
+#editUserModal #edit_password {
+    height: 40px;
+    line-height: 40px;
+    padding-right: 40px;
+    box-sizing: border-box;
+}
+
+#editUserModal #reset_default_password_btn {
+    margin-top: 0;
+    height: 32px;
+    padding: 8px 16px;
+    font-size: 13px;
+    font-weight: 600;
+    border-radius: 6px;
+    background: #f5f5f5;
+    color: #333;
+    border: 1px solid #ccc;
+    cursor: pointer;
+    transition: background 0.2s, color 0.2s;
+    white-space: nowrap;
+}
+
+/* Edit User Modal Specific Styles */
+#editUserModal.modal-overlay {
+    position: fixed !important;
+    top: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+    bottom: 0 !important;
+    background-color: rgba(0, 0, 0, 0.5) !important;
+    z-index: 9999 !important;
+    align-items: center !important;
+    justify-content: center !important;
+
+}
+
+/* Only show the modal when it has display: flex or display: block */
+#editUserModal.modal-overlay[style*="display: flex"],
+#editUserModal.modal-overlay[style*="display: block"] {
+    display: flex !important;
+}
+
+#editUserModal .modal-box {
+    max-height: 90vh;
+    overflow-y: auto;
+}
+
+#editUserModal .form-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+#editUserModal .form-row {
+    display: flex;
+    gap: 16px;
+    align-items: flex-start;
+}
+
+#editUserModal .form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+#editUserModal .form-group label {
+    font-size: 13px;
+    font-weight: 600;
+    color: #333;
+    margin-bottom: 2px;
+}
+
+#editUserModal .form-group input,
+#editUserModal .form-group select {
+    height: 40px;
+    padding: 8px 12px;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    font-size: 14px;
+    box-sizing: border-box;
+}
+
+#editUserModal .form-group input:focus,
+#editUserModal .form-group select:focus {
+    outline: none;
+    border-color: #007bff;
+    box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.25);
+}
+
+#editUserModal .form-actions {
+    display: flex;
+    gap: 12px;
+    justify-content: flex-end;
+    margin-top: 20px;
+    padding-top: 16px;
+    border-top: 1px solid #eee;
+}
+
+#editUserModal .form-actions button {
+    padding: 10px 24px;
+    font-size: 14px;
+    font-weight: 600;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+#editUserModal .form-actions .cancel-btn {
+    background: #f8f9fa;
+    color: #6c757d;
+    border: 1px solid #dee2e6;
+}
+
+#editUserModal .form-actions .cancel-btn:hover {
+    background: #e9ecef;
+    color: #495057;
+}
+
+#editUserModal .form-actions .create-btn {
+    background: #007bff;
+    color: white;
+    border: 1px solid #007bff;
+}
+
+#editUserModal .form-actions .create-btn:hover {
+    background: #0056b3;
+    border-color: #0056b3;
+}
+
+#editUserModal .form-actions .create-btn:disabled {
+    background: #6c757d;
+    border-color: #6c757d;
+    cursor: not-allowed;
+    opacity: 0.6;
+}
+
+/* Success and Error Modal Button Styles */
+#editUserSuccessModal .create-btn,
+#editUserErrorModal .cancel-btn {
+    background: #007bff;
+    color: white;
+    border: 1px solid #007bff;
+    padding: 10px 24px;
+    font-size: 14px;
+    font-weight: 600;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    min-width: 120px;
+}
+
+#editUserSuccessModal .create-btn:hover,
+#editUserErrorModal .cancel-btn:hover {
+    background: #0056b3;
+    border-color: #0056b3;
+}
+
+/* Responsive Design for Edit Modal */
+@media (max-width: 768px) {
+    #editUserModal .modal-box {
+        width: 95%;
+        max-height: 95vh;
+        margin: 20px;
+    }
+    
+    #editUserModal .form-row {
+        flex-direction: column;
+        gap: 12px;
+    }
+    
+    #editUserModal .form-group {
+        min-width: 100% !important;
+    }
+    
+    #editUserModal .form-actions {
+        flex-direction: column;
+        gap: 8px;
+    }
+    
+    #editUserModal .form-actions button {
+        width: 100%;
+    }
+}
+
+@media (max-width: 480px) {
+    #editUserModal .modal-box {
+        width: 98%;
+        margin: 10px;
+        padding: 20px;
+    }
+    
+    #editUserModal .form-grid {
+        gap: 12px;
+    }
+    
+    #editUserModal .form-group label {
+        font-size: 12px;
+    }
+    
+    #editUserModal .form-group input,
+    #editUserModal .form-group select {
+        height: 36px;
+        font-size: 13px;
+    }
+}

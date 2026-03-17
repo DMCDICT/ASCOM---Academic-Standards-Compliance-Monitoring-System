@@ -1,0 +1,739 @@
+/*
+ * modal-add-user.css
+ * Contains specific, scoped styles for the #addUserModal.
+ * Path to assets: From super_admin-mis/styles/ go up two levels (../../), then into src/assets/
+ */
+
+/* Modal Animation */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(-20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+#addUserModal.modal-overlay {
+    display: none;
+    position: fixed;
+    z-index: 9999;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    background-color: rgba(0, 0, 0, 0.6);
+    justify-content: center;
+    align-items: center;
+}
+
+#addUserModal .modal-box {
+    background-color: #EFEFEF;
+    margin: auto;
+    padding: 25px;
+    border: 1px solid #888;
+    border-radius: 15px;
+    width: 90%;
+    max-width: 600px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+    animation: fadeIn 0.3s;
+}
+
+/* Modal Header with Close Button */
+#addUserModal .modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid #e5e5e5;
+    padding-bottom: 15px;
+    margin-bottom: 20px;
+}
+
+#addUserModal .modal-header h2 {
+    margin: 0;
+    font-size: 22px;
+    font-weight: 700;
+    color: #333;
+}
+
+#addUserModal .close-button {
+    color: #aaa;
+    font-size: 28px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: color 0.2s;
+    line-height: 1;
+    padding: 0;
+    background: none;
+    border: none;
+    width: 30px;
+    height: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+#addUserModal .close-button:focus,
+#addUserModal .close-button:hover {
+    color: #000;
+}
+
+
+
+#addUserModal .form-group label { /* Scope label */
+    margin-bottom: 6px; 
+}
+
+#addUserModal .form-group input,
+#addUserModal .form-group select { /* Scope inputs/select */
+    border-radius: 12px; /* Specific border-radius for user modal inputs */
+    height: 50px; /* Specific height */
+    padding: 0 12px; /* Specific padding */
+    box-sizing: border-box;
+    width: 100%;
+}
+
+/* Ensure consistent alignment for all form groups - Override general modal styles */
+#addUserModal .form-group {
+    display: flex !important;
+    flex-direction: column !important;
+    justify-content: flex-end !important;
+    min-height: 75px !important; /* Reduced height for tighter spacing */
+    position: relative !important;
+    flex-grow: 1 !important;
+}
+
+/* Override any conflicting styles from other CSS files */
+#addUserModal .form-group.password-group {
+    position: relative !important;
+    display: flex !important;
+    flex-direction: column !important;
+    justify-content: flex-end !important;
+    min-height: 75px !important;
+}
+
+/* Ensure consistent styling for department select */
+#addUserModal .form-group .custom-select-wrapper {
+    width: 100%;
+}
+
+#addUserModal .form-group .custom-select-wrapper select {
+    height: 50px;
+    border-radius: 12px;
+    padding: 0 12px;
+    box-sizing: border-box;
+    width: 100%;
+}
+
+/* Ensure confirm password group is hidden by default */
+#addUserModal #confirm_password_group {
+    display: none !important;
+}
+
+/* Align the password action button properly */
+#addUserModal .form-group button {
+    height: 50px;
+    border-radius: 12px;
+    font-size: 14px;
+    font-weight: bold;
+    text-transform: uppercase;
+    transition: background-color 0.3s ease;
+    box-sizing: border-box;
+    width: 100%;
+}
+
+/* Specific style for the @sccpag.edu.ph part */
+#addUserModal .form-group label span {
+    font-weight: normal; 
+    color: #777; 
+    margin-left: 5px; 
+}
+
+/* --- FIX: Attempt to hide native password reveal button --- */
+/* This is crucial for fixing the double-icon issue */
+input[type="password"]::-webkit-reveal {
+    display: none !important;
+    -webkit-appearance: none !important; /* Remove any native styling */
+}
+/* Fallback/additional for other browsers, though -webkit-reveal is primary */
+input[type="password"]::-ms-reveal {
+    display: none !important;
+}
+
+
+/* Style for custom password toggle icon */
+#addUserModal .form-group.password-group {
+    position: relative !important;
+}
+
+#addUserModal .form-group.password-group input[type="password"],
+#addUserModal .form-group.password-group input[type="text"] {
+    padding-right: 40px; 
+    padding-left: 12px; 
+}
+
+#addUserModal .toggle-password {
+    position: absolute !important;
+    right: 12px !important; 
+    top: calc(50% + 10px) !important; 
+    transform: translateY(-50%) !important;
+    width: 24px !important; 
+    height: 24px !important; 
+    cursor: pointer !important;
+    z-index: 10 !important; 
+    /* Make icon BLACK for visibility */
+    filter: invert(0%) sepia(0%) saturate(0%) hue-rotate(0deg) brightness(0%) contrast(100%) !important; 
+    pointer-events: auto !important;
+    user-select: none !important;
+    -webkit-user-select: none !important;
+    -moz-user-select: none !important;
+    -ms-user-select: none !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    transition: filter 0.2s ease !important;
+}
+
+/* ULTIMATE FORCE: Make icon PURE BLACK */
+#addUserModal .form-group.password-group .toggle-password {
+    filter: invert(0%) sepia(0%) saturate(0%) hue-rotate(0deg) brightness(0%) contrast(100%) !important;
+}
+
+#addUserModal .form-group.password-group .toggle-password:hover {
+    filter: invert(0%) sepia(0%) saturate(0%) hue-rotate(0deg) brightness(0%) contrast(100%) !important;
+}
+
+/* Hover effect for better UX */
+#addUserModal .toggle-password:hover {
+    filter: invert(0%) sepia(0%) saturate(0%) hue-rotate(0deg) brightness(0%) contrast(100%) !important;
+}
+
+
+/* Ensure consistent form row alignment */
+#addUserModal .form-row {
+    display: flex !important;
+    gap: 15px !important;
+    align-items: flex-end !important;
+    margin-bottom: 8px !important;
+}
+
+/* Specific alignment for the password row */
+#addUserModal .form-row:has(#password_action_btn) {
+    display: flex !important;
+    gap: 15px !important;
+    align-items: flex-end !important;
+    margin-bottom: 8px !important;
+}
+
+/* Target the specific form-row that contains both password field and button */
+#addUserModal .form-row:has(#password) {
+    display: flex !important;
+    gap: 15px !important;
+    align-items: flex-end !important;
+    margin-bottom: 8px !important;
+}
+
+/* Ensure both password field and button are in the same row and aligned */
+#addUserModal .form-row:has(#password) .form-group {
+    display: flex !important;
+    flex-direction: column !important;
+    justify-content: flex-end !important;
+    min-height: 75px !important;
+    align-items: stretch !important;
+}
+
+/* Fix alignment for password row - ensure all elements align properly */
+#addUserModal .form-row .form-group {
+    display: flex !important;
+    flex-direction: column !important;
+    justify-content: flex-end !important;
+    min-height: 75px !important;
+    align-items: stretch !important;
+}
+
+/* Ensure the password action button aligns with password fields - Override general button styles */
+#addUserModal .form-row .form-group button {
+    height: 50px !important;
+    border-radius: 12px !important;
+    font-size: 14px !important;
+    font-weight: bold !important;
+    text-transform: uppercase !important;
+    transition: background-color 0.3s ease !important;
+    box-sizing: border-box !important;
+    width: 100% !important;
+    margin-top: 0 !important; /* Remove any top margin that might affect alignment */
+    align-self: flex-end !important; /* Force alignment to bottom of form-group */
+    padding: 10px 20px !important;
+    cursor: pointer !important;
+    position: relative !important;
+    top: 0 !important; /* Force top alignment */
+}
+
+/* SIMPLE FIX: Just align the button to the bottom of its container */
+#addUserModal #password_action_btn {
+    margin-top: auto !important;
+    align-self: flex-end !important;
+}
+
+/* OVERRIDE INLINE STYLES: Force button alignment */
+#addUserModal .form-row .form-group[style*="flex:1"] #password_action_btn {
+    margin-top: auto !important;
+    align-self: flex-end !important;
+    height: 50px !important;
+    border-radius: 12px !important;
+    font-size: 14px !important;
+    font-weight: bold !important;
+    text-transform: uppercase !important;
+    transition: background-color 0.3s ease !important;
+    box-sizing: border-box !important;
+    width: 100% !important;
+    padding: 10px 20px !important;
+    cursor: pointer !important;
+}
+
+/* ULTIMATE FIX: Force perfect alignment with password field */
+#addUserModal .form-row .form-group:has(#password_action_btn) {
+    display: flex !important;
+    flex-direction: column !important;
+    justify-content: flex-end !important;
+    min-height: 75px !important;
+    align-items: stretch !important;
+}
+
+#addUserModal .form-row .form-group:has(#password_action_btn) #password_action_btn {
+    margin-top: auto !important;
+    align-self: flex-end !important;
+    height: 50px !important;
+    border-radius: 12px !important;
+    font-size: 14px !important;
+    font-weight: bold !important;
+    text-transform: uppercase !important;
+    transition: background-color 0.3s ease !important;
+    box-sizing: border-box !important;
+    width: 100% !important;
+    padding: 10px 20px !important;
+    cursor: pointer !important;
+    position: relative !important;
+    top: 0 !important;
+}
+
+/* ULTIMATE FORCE: Button alignment with maximum specificity */
+#addUserModal .form-row .form-group[style*="flex:1"]:has(#password_action_btn) {
+    display: flex !important;
+    flex-direction: column !important;
+    justify-content: flex-end !important;
+    min-height: 75px !important;
+    align-items: stretch !important;
+}
+
+#addUserModal .form-row .form-group[style*="flex:1"]:has(#password_action_btn) #password_action_btn {
+    margin-top: auto !important;
+    align-self: flex-end !important;
+    height: 50px !important;
+    border-radius: 12px !important;
+    font-size: 14px !important;
+    font-weight: bold !important;
+    text-transform: uppercase !important;
+    transition: background-color 0.3s ease !important;
+    box-sizing: border-box !important;
+    width: 100% !important;
+    padding: 10px 20px !important;
+    cursor: pointer !important;
+    position: relative !important;
+    top: 0 !important;
+}
+
+/* Specific targeting for the password action button */
+#addUserModal #password_action_btn {
+    height: 50px !important;
+    border-radius: 12px !important;
+    font-size: 14px !important;
+    font-weight: bold !important;
+    text-transform: uppercase !important;
+    transition: background-color 0.3s ease !important;
+    box-sizing: border-box !important;
+    width: 100% !important;
+    margin-top: 0 !important;
+    align-self: flex-end !important;
+    padding: 10px 20px !important;
+    cursor: pointer !important;
+    position: relative !important;
+    top: 0 !important;
+}
+
+/* Specific alignment for the password action button */
+#addUserModal .form-row .form-group:last-child {
+    display: flex !important;
+    flex-direction: column !important;
+    justify-content: flex-end !important;
+    min-height: 75px !important;
+    align-items: stretch !important;
+}
+
+#addUserModal .form-row .form-group:last-child button {
+    margin-top: auto !important; /* Push button to bottom */
+    align-self: flex-end !important; /* Force bottom alignment */
+}
+
+/* Force alignment for the password action button specifically */
+#addUserModal .form-row .form-group:has(#password_action_btn) {
+    display: flex !important;
+    flex-direction: column !important;
+    justify-content: flex-end !important;
+    min-height: 75px !important;
+    align-items: stretch !important;
+}
+
+#addUserModal .form-row .form-group:has(#password_action_btn) #password_action_btn {
+    margin-top: auto !important;
+    align-self: flex-end !important;
+    height: 50px !important;
+    border-radius: 12px !important;
+    font-size: 14px !important;
+    font-weight: bold !important;
+    text-transform: uppercase !important;
+    transition: background-color 0.3s ease !important;
+    box-sizing: border-box !important;
+    width: 100% !important;
+    padding: 10px 20px !important;
+    cursor: pointer !important;
+}
+
+/* Alternative approach - target the button directly with maximum specificity */
+#addUserModal .form-row .form-group button#password_action_btn {
+    height: 50px !important;
+    border-radius: 12px !important;
+    font-size: 14px !important;
+    font-weight: bold !important;
+    text-transform: uppercase !important;
+    transition: background-color 0.3s ease !important;
+    box-sizing: border-box !important;
+    width: 100% !important;
+    margin-top: auto !important;
+    align-self: flex-end !important;
+    padding: 10px 20px !important;
+    cursor: pointer !important;
+    position: relative !important;
+    top: 0 !important;
+}
+
+/* Force the form-group containing the button to align properly */
+#addUserModal .form-row .form-group:has(button#password_action_btn) {
+    display: flex !important;
+    flex-direction: column !important;
+    justify-content: flex-end !important;
+    min-height: 75px !important;
+    align-items: stretch !important;
+}
+
+/* SIMPLE FIX: Ensure the button container has the same height as other form groups */
+#addUserModal .form-row .form-group:has(#password_action_btn) {
+    min-height: 75px !important;
+    display: flex !important;
+    flex-direction: column !important;
+    justify-content: flex-end !important;
+}
+
+/* OVERRIDE INLINE STYLES: Force the button container to align properly */
+#addUserModal .form-row .form-group[style*="flex:1"] {
+    min-height: 75px !important;
+    display: flex !important;
+    flex-direction: column !important;
+    justify-content: flex-end !important;
+    align-items: stretch !important;
+}
+
+/* Target the specific button container */
+#addUserModal .form-row .form-group:has(#password_action_btn)[style*="flex:1"] {
+    min-height: 75px !important;
+    display: flex !important;
+    flex-direction: column !important;
+    justify-content: flex-end !important;
+    align-items: stretch !important;
+}
+
+#addUserModal .form-actions { /* Scoped form-actions */
+    margin-top: 15px;
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+}
+
+#addUserModal .cancel-btn {
+    width: 125px;
+    background-color: #C9C9C9;
+    color: black;
+    border: none;
+    border-radius: 10px; /* Specific border-radius */
+}
+
+#addUserModal .cancel-btn:hover {
+    background-color: #B9B9B9;
+}
+
+#addUserModal .create-btn {
+    width: 142px;
+    background-color: #0f7a53;
+    color: white;
+    border: none;
+    border-radius: 10px; /* Specific border-radius */
+}
+
+#addUserModal .create-btn:hover {
+    background-color: #0a5f42;
+}
+
+#addUserModal .create-btn:disabled {
+    background-color: #A5A5A5;
+    color: black;
+    cursor: not-allowed;
+}
+
+/* Specific style for the error/success buttons (from modal-add-user.js original CSS) */
+#addUserSuccessModal .create-btn, #addUserErrorModal .create-btn {
+    background-color: #4A7DFF; /* Reusing create-btn color */
+    color: white;
+    border: none;
+}
+
+#addUserErrorModal .create-btn.error-btn {
+    background-color: #f44336; 
+}
+
+#addUserErrorModal .create-btn.error-btn:hover {
+    background-color: #d32f2f;
+}
+
+/* Hide spinner arrows for Employee No. field */
+#employee_no::-webkit-outer-spin-button,
+#employee_no::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+#employee_no[type=number] {
+    -moz-appearance: textfield; /* Firefox */
+}
+
+
+
+/* Domain info and clear button styles */
+.domain-info {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    color: #666;
+    font-size: 0.9em;
+}
+
+.info-icon {
+    cursor: help;
+    font-size: 14px;
+    opacity: 0.7;
+    transition: opacity 0.2s;
+}
+
+.info-icon:hover {
+    opacity: 1;
+}
+
+#addUserModal .input-with-clear {
+    position: relative !important;
+    display: flex !important;
+    align-items: center !important;
+    width: 100% !important;
+}
+
+#addUserModal .input-with-clear input {
+    padding-right: 45px !important;
+    position: relative !important;
+}
+
+/* Force clear button positioning with maximum specificity */
+#addUserModal .input-with-clear .clear-btn,
+#addUserModal .input-with-clear #clear_email_btn,
+#addUserModal .form-group .input-with-clear .clear-btn,
+#addUserModal .form-group .input-with-clear #clear_email_btn {
+    position: absolute !important;
+    right: 5px !important; 
+    top: 50% !important;
+    transform: translateY(-50%) !important;
+    background: none !important;
+    border: none !important;
+    color: #999 !important;
+    font-size: 20px !important;
+    font-weight: bold !important;
+    cursor: pointer !important;
+    padding: 0 5px !important;
+    line-height: 1 !important;
+    transition: color 0.2s ease !important;
+    opacity: 1 !important;
+    pointer-events: auto !important;
+    z-index: 100 !important;
+    display: inline-block !important;
+    visibility: visible !important;
+    width: auto !important;
+    height: auto !important;
+    min-width: auto !important;
+    min-height: auto !important;
+}
+
+#addUserModal .input-with-clear .clear-btn:hover,
+#addUserModal .input-with-clear #clear_email_btn:hover {
+    color: #333 !important;
+}
+
+/* Dark Mode - Add User Modal */
+html[data-theme="dark"] #addUserModal.modal-overlay,
+html[data-theme="dark"] #completeUserModal,
+html[data-theme="dark"] #fallbackUserModal {
+    background-color: rgba(0, 0, 0, 0.8) !important;
+}
+
+html[data-theme="dark"] #addUserModal .modal-box,
+html[data-theme="dark"] #completeUserModal > div,
+html[data-theme="dark"] #fallbackUserModal > div {
+    background-color: #252525 !important;
+    color: #e0e0e0 !important;
+    border-color: #404040 !important;
+}
+
+html[data-theme="dark"] #addUserModal .modal-header,
+html[data-theme="dark"] #completeUserModal .modal-header,
+html[data-theme="dark"] #completeUserModal > div > div:first-child {
+    border-bottom-color: #404040 !important;
+}
+
+html[data-theme="dark"] #addUserModal .modal-header h2,
+html[data-theme="dark"] #completeUserModal h2,
+html[data-theme="dark"] #completeUserModal > div > div:first-child h2 {
+    color: #e0e0e0 !important;
+}
+
+html[data-theme="dark"] #addUserModal .close-button,
+html[data-theme="dark"] #completeUserModal .close-button,
+html[data-theme="dark"] #completeUserModal > div > div:first-child span,
+html[data-theme="dark"] #completeUserModal > div > div > div:first-child span {
+    color: #e0e0e0 !important;
+}
+
+html[data-theme="dark"] #addUserModal .close-button:hover,
+html[data-theme="dark"] #completeUserModal .close-button:hover,
+html[data-theme="dark"] #completeUserModal > div > div:first-child span:hover,
+html[data-theme="dark"] #completeUserModal > div > div > div:first-child span:hover {
+    color: #ffffff !important;
+}
+
+html[data-theme="dark"] #addUserModal .form-group label,
+html[data-theme="dark"] #completeUserModal label {
+    color: #e0e0e0 !important;
+}
+
+html[data-theme="dark"] #addUserModal .form-group input,
+html[data-theme="dark"] #addUserModal .form-group select,
+html[data-theme="dark"] #completeUserModal input,
+html[data-theme="dark"] #completeUserModal select {
+    background-color: #2d2d2d !important;
+    color: #e0e0e0 !important;
+    border-color: #404040 !important;
+}
+
+html[data-theme="dark"] #addUserModal .form-group input::placeholder,
+html[data-theme="dark"] #completeUserModal input::placeholder {
+    color: #999 !important;
+}
+
+html[data-theme="dark"] #addUserModal .toggle-password,
+html[data-theme="dark"] #completeUserModal .toggle-password {
+    filter: invert(100%) sepia(0%) saturate(0%) hue-rotate(0deg) brightness(100%) contrast(100%) !important;
+}
+
+html[data-theme="dark"] #addUserModal .clear-btn,
+html[data-theme="dark"] #addUserModal #clear_email_btn,
+html[data-theme="dark"] #completeUserModal .clear-btn,
+html[data-theme="dark"] #completeUserModal #clear_email_btn {
+    color: #e0e0e0 !important;
+}
+
+html[data-theme="dark"] #addUserModal .clear-btn:hover,
+html[data-theme="dark"] #addUserModal #clear_email_btn:hover,
+html[data-theme="dark"] #completeUserModal .clear-btn:hover,
+html[data-theme="dark"] #completeUserModal #clear_email_btn:hover {
+    color: #ffffff !important;
+}
+
+html[data-theme="dark"] #addUserModal #password_action_btn,
+html[data-theme="dark"] #completeUserModal #password_action_btn {
+    background-color: #2d2d2d !important;
+    color: #e0e0e0 !important;
+    border-color: #404040 !important;
+}
+
+html[data-theme="dark"] #addUserModal #password_action_btn:hover,
+html[data-theme="dark"] #completeUserModal #password_action_btn:hover {
+    background-color: #3d3d3d !important;
+}
+
+html[data-theme="dark"] #addUserModal .cancel-btn,
+html[data-theme="dark"] #completeUserModal .cancel-btn,
+html[data-theme="dark"] #completeUserModal button[style*="background-color: #C9C9C9"] {
+    background-color: #2d2d2d !important;
+    color: #e0e0e0 !important;
+    border-color: #404040 !important;
+}
+
+html[data-theme="dark"] #addUserModal .cancel-btn:hover,
+html[data-theme="dark"] #completeUserModal .cancel-btn:hover,
+html[data-theme="dark"] #completeUserModal button[style*="background-color: #C9C9C9"]:hover {
+    background-color: #3d3d3d !important;
+}
+
+html[data-theme="dark"] #addUserModal .create-btn,
+html[data-theme="dark"] #completeUserModal .create-btn,
+html[data-theme="dark"] #completeUserModal button[style*="background-color: #0f7a53"] {
+    background-color: #0f7a53 !important;
+    color: white !important;
+}
+
+html[data-theme="dark"] #addUserModal .create-btn:hover,
+html[data-theme="dark"] #completeUserModal .create-btn:hover,
+html[data-theme="dark"] #completeUserModal button[style*="background-color: #0f7a53"]:hover {
+    background-color: #0a5f42 !important;
+}
+
+html[data-theme="dark"] #addUserModal .create-btn:disabled,
+html[data-theme="dark"] #completeUserModal .create-btn:disabled {
+    background-color: #404040 !important;
+    color: #999 !important;
+}
+
+/* Dark mode for inline styles in dynamically created modal */
+html[data-theme="dark"] #completeUserModal [style*="background-color: #EFEFEF"],
+html[data-theme="dark"] #completeUserModal [style*="background-color:#EFEFEF"] {
+    background-color: #252525 !important;
+}
+
+html[data-theme="dark"] #completeUserModal [style*="color: #333"],
+html[data-theme="dark"] #completeUserModal [style*="color:#333"] {
+    color: #e0e0e0 !important;
+}
+
+html[data-theme="dark"] #completeUserModal [style*="color: #aaa"],
+html[data-theme="dark"] #completeUserModal [style*="color:#aaa"] {
+    color: #e0e0e0 !important;
+}
+
+html[data-theme="dark"] #completeUserModal input[style*="background-color: #FFFFFF"],
+html[data-theme="dark"] #completeUserModal select[style*="background-color: #FFFFFF"] {
+    background-color: #2d2d2d !important;
+    color: #e0e0e0 !important;
+    border-color: #404040 !important;
+}
+
+html[data-theme="dark"] #completeUserModal [style*="border-bottom: 1px solid #e5e5e5"] {
+    border-bottom-color: #404040 !important;
+}
+

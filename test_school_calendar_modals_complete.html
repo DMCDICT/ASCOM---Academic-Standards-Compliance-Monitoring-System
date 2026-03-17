@@ -1,0 +1,493 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>School Calendar Modals - Complete Test</title>
+    <style>
+        body {
+            font-family: 'TT Interphases', sans-serif;
+            margin: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #333;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .test-section {
+            margin-bottom: 30px;
+            padding: 20px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            background: #f9f9f9;
+        }
+        .test-section h2 {
+            color: #1976d2;
+            margin-bottom: 15px;
+        }
+        .test-buttons {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        .test-button {
+            display: block;
+            padding: 15px;
+            background: #1976d2;
+            color: white;
+            text-decoration: none;
+            border-radius: 8px;
+            text-align: center;
+            font-weight: bold;
+            border: none;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        .test-button:hover {
+            background: #0d47a1;
+        }
+        .status-section {
+            background: #e8f5e8;
+            padding: 15px;
+            border-radius: 8px;
+            border-left: 4px solid #4caf50;
+            margin-top: 20px;
+        }
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.6);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+        .modal-content {
+            background-color: #EFEFEF;
+            padding: 25px;
+            border: 1px solid #888;
+            border-radius: 15px;
+            width: 90%;
+            max-width: 500px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+        }
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #e5e5e5;
+            padding-bottom: 15px;
+            margin-bottom: 20px;
+        }
+        .modal-header h3 {
+            margin: 0;
+            font-size: 22px;
+            font-weight: 700;
+            color: #333;
+        }
+        .close-button {
+            color: #aaa;
+            font-size: 28px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: color 0.2s;
+        }
+        .close-button:hover {
+            color: #000;
+        }
+        .form-actions {
+            margin-top: 20px;
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+        }
+        .form-btn-cancel, .form-btn-save {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+        .form-btn-cancel {
+            background-color: #C9C9C9;
+            color: #333;
+        }
+        .form-btn-save {
+            background-color: #0f7a53;
+            color: #fff;
+        }
+        .form-btn-save:hover {
+            background-color: #0a5f42;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+            color: #333;
+        }
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            font-size: 14px;
+            box-sizing: border-box;
+        }
+        .form-row {
+            display: flex;
+            gap: 15px;
+        }
+        .form-row .form-group {
+            flex: 1;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🎯 School Calendar Modals - Complete Test</h1>
+        
+        <div class="test-section">
+            <h2>📋 Test Instructions</h2>
+            <p>Click each button below to test the different School Calendar modals. All modals should open and close properly.</p>
+            
+            <div class="test-buttons">
+                <button class="test-button" onclick="testAddTermModal()">
+                    📚 Test Add Term Modal
+                </button>
+                <button class="test-button" onclick="testAddSchoolYearModal()">
+                    🏫 Test Add School Year Modal
+                </button>
+                <button class="test-button" onclick="testAddHolidayModal()">
+                    🎉 Test Add Holiday Modal
+                </button>
+                <button class="test-button" onclick="testScheduleMaintenanceModal()">
+                    🔧 Test Schedule Maintenance Modal
+                </button>
+            </div>
+        </div>
+
+        <div class="status-section">
+            <h3>✅ Expected Results</h3>
+            <p><strong>All modals should:</strong></p>
+            <ul>
+                <li>✅ Open when clicking the test buttons</li>
+                <li>✅ Close when clicking the X button</li>
+                <li>✅ Close when clicking the Cancel button</li>
+                <li>✅ Close when clicking outside the modal</li>
+                <li>✅ Have proper form validation (Save button disabled until required fields are filled)</li>
+                <li>✅ Display success message when form is submitted</li>
+            </ul>
+        </div>
+
+        <div class="test-section">
+            <h2>🔗 Test the Actual School Calendar</h2>
+            <p>After testing these modals, try the actual School Calendar page:</p>
+            <a href="super_admin-mis/content.php?page=school-calendar" class="test-button" target="_blank" style="text-decoration: none; display: inline-block;">
+                🎯 Open School Calendar Page
+            </a>
+        </div>
+    </div>
+
+    <!-- Add Term Modal -->
+    <div id="addTermModal" class="modal-overlay">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Add New Term</h3>
+                <span class="close-button" onclick="closeModal('addTermModal')">&times;</span>
+            </div>
+            <div class="modal-body">
+                <form id="addTermForm">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="termTitle">Term Title</label>
+                            <select id="termTitle" name="termTitle" required>
+                                <option value="" disabled selected>-- Select a Term --</option>
+                                <option value="1st Semester">1st Semester</option>
+                                <option value="2nd Semester">2nd Semester</option>
+                                <option value="Summer Semester">Summer Semester</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="schoolYearId">School Year</label>
+                            <select id="schoolYearId" name="schoolYearId" required>
+                                <option value="" disabled selected>-- Select a School Year --</option>
+                                <option value="1">2024-2025</option>
+                                <option value="2">2023-2024</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="startDate">Start Date</label>
+                            <input type="date" id="startDate" name="startDate" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="endDate">End Date</label>
+                            <input type="date" id="endDate" name="endDate" required>
+                        </div>
+                    </div>
+                    <div class="form-actions">
+                        <button type="button" class="form-btn-cancel" onclick="closeModal('addTermModal')">Cancel</button>
+                        <button type="submit" class="form-btn-save" disabled>Save Term</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add School Year Modal -->
+    <div id="addSchoolYearModal" class="modal-overlay">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Add New School Year</h3>
+                <span class="close-button" onclick="closeModal('addSchoolYearModal')">&times;</span>
+            </div>
+            <div class="modal-body">
+                <form id="addSchoolYearForm">
+                    <div class="form-group">
+                        <label for="schoolYearLabel">School Year Label</label>
+                        <input type="text" id="schoolYearLabel" name="schoolYearLabel" placeholder="e.g., 2025 - 2026" required>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="syStartDate">Start Date</label>
+                            <input type="date" id="syStartDate" name="syStartDate" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="syEndDate">End Date</label>
+                            <input type="date" id="syEndDate" name="syEndDate" required>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="syStatus">Status</label>
+                        <select id="syStatus" name="syStatus" required>
+                            <option value="Active">Active</option>
+                            <option value="Inactive" selected>Inactive</option>
+                        </select>
+                    </div>
+                    <div class="form-actions">
+                        <button type="button" class="form-btn-cancel" onclick="closeModal('addSchoolYearModal')">Cancel</button>
+                        <button type="submit" class="form-btn-save" disabled>Save School Year</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add Holiday Modal -->
+    <div id="addHolidayModal" class="modal-overlay">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Add New Holiday</h3>
+                <span class="close-button" onclick="closeModal('addHolidayModal')">&times;</span>
+            </div>
+            <div class="modal-body">
+                <form id="addHolidayForm">
+                    <div class="form-group">
+                        <label for="holidayTitle">Holiday Title</label>
+                        <input type="text" id="holidayTitle" name="holidayTitle" placeholder="e.g., Independence Day" required>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="holidayStartDate">Start Date</label>
+                            <input type="date" id="holidayStartDate" name="holidayStartDate" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="holidayEndDate">End Date</label>
+                            <input type="date" id="holidayEndDate" name="holidayEndDate" required>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="holidayType">Holiday Type</label>
+                        <select id="holidayType" name="holidayType" required>
+                            <option value="" disabled selected>-- Select Holiday Type --</option>
+                            <option value="National Holiday">National Holiday</option>
+                            <option value="School Holiday">School Holiday</option>
+                            <option value="Religious Holiday">Religious Holiday</option>
+                            <option value="Special Event">Special Event</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="holidayDescription">Description (Optional)</label>
+                        <textarea id="holidayDescription" name="holidayDescription" rows="3" placeholder="Brief description of the holiday..."></textarea>
+                    </div>
+                    <div class="form-actions">
+                        <button type="button" class="form-btn-cancel" onclick="closeModal('addHolidayModal')">Cancel</button>
+                        <button type="submit" class="form-btn-save" disabled>Save Holiday</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Schedule Maintenance Modal -->
+    <div id="scheduleMaintenanceModal" class="modal-overlay">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Schedule Maintenance</h3>
+                <span class="close-button" onclick="closeModal('scheduleMaintenanceModal')">&times;</span>
+            </div>
+            <div class="modal-body">
+                <form id="scheduleMaintenanceForm">
+                    <div class="form-group">
+                        <label for="maintenanceTitle">Maintenance Title</label>
+                        <input type="text" id="maintenanceTitle" name="maintenanceTitle" placeholder="e.g., System Maintenance" required>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="maintenanceStartDate">Start Date</label>
+                            <input type="date" id="maintenanceStartDate" name="maintenanceStartDate" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="maintenanceEndDate">End Date</label>
+                            <input type="date" id="maintenanceEndDate" name="maintenanceEndDate" required>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="maintenanceStartTime">Start Time</label>
+                            <input type="time" id="maintenanceStartTime" name="maintenanceStartTime" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="maintenanceEndTime">End Time</label>
+                            <input type="time" id="maintenanceEndTime" name="maintenanceEndTime" required>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="maintenanceType">Maintenance Type</label>
+                        <select id="maintenanceType" name="maintenanceType" required>
+                            <option value="" disabled selected>-- Select Maintenance Type --</option>
+                            <option value="System Maintenance">System Maintenance</option>
+                            <option value="Database Maintenance">Database Maintenance</option>
+                            <option value="Network Maintenance">Network Maintenance</option>
+                            <option value="Security Update">Security Update</option>
+                            <option value="Hardware Maintenance">Hardware Maintenance</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="maintenancePriority">Priority</label>
+                        <select id="maintenancePriority" name="maintenancePriority" required>
+                            <option value="" disabled selected>-- Select Priority --</option>
+                            <option value="Low">Low</option>
+                            <option value="Medium">Medium</option>
+                            <option value="High">High</option>
+                            <option value="Critical">Critical</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="maintenanceDescription">Description</label>
+                        <textarea id="maintenanceDescription" name="maintenanceDescription" rows="4" placeholder="Detailed description of the maintenance work..." required></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label for="maintenanceImpact">Impact Level</label>
+                        <select id="maintenanceImpact" name="maintenanceImpact" required>
+                            <option value="" disabled selected>-- Select Impact Level --</option>
+                            <option value="No Impact">No Impact - System remains fully operational</option>
+                            <option value="Minimal Impact">Minimal Impact - Minor service interruptions</option>
+                            <option value="Moderate Impact">Moderate Impact - Some services temporarily unavailable</option>
+                            <option value="High Impact">High Impact - System partially unavailable</option>
+                            <option value="Full Outage">Full Outage - Complete system shutdown</option>
+                        </select>
+                    </div>
+                    <div class="form-actions">
+                        <button type="button" class="form-btn-cancel" onclick="closeModal('scheduleMaintenanceModal')">Cancel</button>
+                        <button type="submit" class="form-btn-save" disabled>Schedule Maintenance</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Modal functions
+        function openModal(modalId) {
+            document.getElementById(modalId).style.display = 'flex';
+        }
+        
+        function closeModal(modalId) {
+            document.getElementById(modalId).style.display = 'none';
+        }
+        
+        // Test functions
+        function testAddTermModal() {
+            openModal('addTermModal');
+        }
+        
+        function testAddSchoolYearModal() {
+            openModal('addSchoolYearModal');
+        }
+        
+        function testAddHolidayModal() {
+            openModal('addHolidayModal');
+        }
+        
+        function testScheduleMaintenanceModal() {
+            openModal('scheduleMaintenanceModal');
+        }
+        
+        // Form validation
+        document.addEventListener('DOMContentLoaded', function() {
+            const forms = ['addTermForm', 'addSchoolYearForm', 'addHolidayForm', 'scheduleMaintenanceForm'];
+            
+            forms.forEach(formId => {
+                const form = document.getElementById(formId);
+                if (form) {
+                    const saveBtn = form.querySelector('.form-btn-save');
+                    const requiredInputs = form.querySelectorAll('input[required], select[required], textarea[required]');
+                    
+                    const validate = () => {
+                        let isValid = true;
+                        requiredInputs.forEach(input => {
+                            if (input.value.trim() === '') isValid = false;
+                        });
+                        saveBtn.disabled = !isValid;
+                    };
+                    
+                    form.addEventListener('input', validate);
+                    form.addEventListener('change', validate);
+                    
+                    form.addEventListener('submit', (event) => {
+                        event.preventDefault();
+                        if (saveBtn.disabled) return;
+                        
+                        // Show success message
+                        alert('Form submitted successfully! (This is a test)');
+                        closeModal(form.closest('.modal-overlay').id);
+                    });
+                }
+            });
+        });
+        
+        // Close modals when clicking outside
+        document.addEventListener('click', function(event) {
+            const modals = ['addTermModal', 'addSchoolYearModal', 'addHolidayModal', 'scheduleMaintenanceModal'];
+            modals.forEach(modalId => {
+                const modal = document.getElementById(modalId);
+                if (event.target === modal) {
+                    closeModal(modalId);
+                }
+            });
+        });
+    </script>
+</body>
+</html> 

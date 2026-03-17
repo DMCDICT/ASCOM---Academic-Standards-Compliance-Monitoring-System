@@ -1,0 +1,3 @@
+This is a placeholder for the back arrow icon.
+In a real implementation, this would be a PNG image file.
+For now, the CSS will fall back to the text arrow (←) when this image fails to load.

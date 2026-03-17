@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Edit User JavaScript</title>
+</head>
+<body>
+    <h1>Test Edit User JavaScript</h1>
+    
+    <button onclick="testEditUserJS()">Test JavaScript Function</button>
+    <button onclick="openEditUserModal('123')">Test Open Modal</button>
+    
+    <div id="testOutput"></div>
+    
+    <script>
+        // Test if basic JavaScript is working
+        console.log('Basic test page loaded');
+        document.getElementById('testOutput').innerHTML = '<p>Page loaded successfully</p>';
+        
+        // Test if our functions exist
+        if (typeof window.testEditUserJS === 'function') {
+            console.log('✅ testEditUserJS function exists');
+        } else {
+            console.log('❌ testEditUserJS function does not exist');
+        }
+        
+        if (typeof window.openEditUserModal === 'function') {
+            console.log('✅ openEditUserModal function exists');
+        } else {
+            console.log('❌ openEditUserModal function does not exist');
+        }
+    </script>
+    
+    <!-- Include the JavaScript file -->
+    <script src="./scripts/modal-edit-user.js"></script>
+    
+    <script>
+        // Test again after loading the file
+        setTimeout(() => {
+            console.log('After loading modal-edit-user.js:');
+            
+            if (typeof window.testEditUserJS === 'function') {
+                console.log('✅ testEditUserJS function exists after loading');
+                document.getElementById('testOutput').innerHTML += '<p>✅ testEditUserJS function loaded successfully</p>';
+            } else {
+                console.log('❌ testEditUserJS function still does not exist');
+                document.getElementById('testOutput').innerHTML += '<p>❌ testEditUserJS function failed to load</p>';
+            }
+            
+            if (typeof window.openEditUserModal === 'function') {
+                console.log('✅ openEditUserModal function exists after loading');
+                document.getElementById('testOutput').innerHTML += '<p>✅ openEditUserModal function loaded successfully</p>';
+            } else {
+                console.log('❌ openEditUserModal function still does not exist');
+                document.getElementById('testOutput').innerHTML += '<p>❌ openEditUserModal function failed to load</p>';
+            }
+        }, 1000);
+    </script>
+</body>
+</html>

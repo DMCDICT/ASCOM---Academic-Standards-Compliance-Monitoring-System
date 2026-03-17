@@ -1,0 +1,256 @@
+/* Course Modal Styles */
+
+/* Program Selection Modal Layout */
+#programSelectModal {
+    z-index: 10001 !important;
+}
+#programSelectModal .modal-box {
+  max-width: 600px !important; /* Extended width */
+  max-height: 80vh !important; /* Limit height to viewport */
+  display: flex !important;
+  flex-direction: column !important;
+}
+
+#programSelectModal .modal-header {
+  flex-shrink: 0 !important; /* Keep header fixed */
+}
+
+#programSelectModal .form-grid {
+  display: flex !important;
+  flex-direction: column !important;
+  height: 100% !important;
+  max-height: calc(80vh - 120px) !important; /* Account for header and buttons */
+}
+
+#programSelectModal .form-group {
+  flex: 1 !important;
+  overflow-y: auto !important; /* Add scroll to program list */
+  max-height: calc(80vh - 200px) !important; /* Leave space for buttons */
+  padding: 10px 0 !important;
+  border: 1px solid #e0e0e0 !important;
+  border-radius: 8px !important;
+  margin: 10px 0 !important;
+}
+
+/* Custom scrollbar styling for program list */
+#programSelectModal .form-group::-webkit-scrollbar {
+  width: 8px;
+}
+
+#programSelectModal .form-group::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 4px;
+}
+
+#programSelectModal .form-group::-webkit-scrollbar-thumb {
+  background: #c1c1c1;
+  border-radius: 4px;
+}
+
+#programSelectModal .form-group::-webkit-scrollbar-thumb:hover {
+  background: #a8a8a8;
+}
+
+#programSelectModal .form-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 30px;
+  padding-top: 20px;
+  border-top: 1px solid #eee;
+  margin-right: 0;
+  padding-right: 0;
+}
+
+/* Improved checkbox styling for program selection - SPECIFIC TO PROGRAM MODAL ONLY */
+#programSelectModal .form-group input[type='checkbox'] {
+  width: 4px;
+  height: 4px;
+  margin: 0;
+  padding: 0;
+  cursor: pointer;
+  flex-shrink: 0;
+  accent-color: #1976d2;
+  transform: scale(0.5);
+}
+
+#programSelectModal .form-group label {
+  font-size: 0.8rem;
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  margin-bottom: 0px;
+  padding: 0px;
+  cursor: pointer;
+  font-family: 'TT Interphases', sans-serif;
+  transition: all 0.2s ease;
+  user-select: none;
+}
+
+#programSelectModal .form-group label:hover {
+  background-color: #f8f9fa;
+}
+
+#programSelectModal .form-group label:active {
+  background-color: #e9ecef;
+}
+
+/* Target the form-group container to remove any default spacing */
+#programSelectModal .form-group {
+  margin: 0 !important;
+  padding: 0 !important;
+  line-height: 1 !important;
+  min-height: auto !important;
+  height: auto !important;
+}
+
+/* Make the form itself more compact */
+#programSelectForm {
+  margin: 0 !important;
+  padding: 0 !important;
+  min-height: auto !important;
+}
+
+/* Override any global form styling */
+
+/* Override any global label styles for program selection modal */
+#programSelectModal .form-group label {
+  font-size: 1.1rem !important;
+  font-weight: normal !important;
+  margin-bottom: 8px !important;
+  display: flex !important;
+  align-items: center !important;
+  gap: 12px !important;
+  padding: 8px 12px !important;
+  cursor: pointer !important;
+  font-family: 'TT Interphases', sans-serif !important;
+  transition: all 0.2s ease !important;
+  user-select: none !important;
+  line-height: 1.4 !important;
+  height: auto !important;
+  min-height: unset !important;
+  border-radius: 4px !important;
+  margin-left: 8px !important;
+  margin-right: 8px !important;
+}
+
+#programSelectModal .form-group label:hover {
+  background-color: #f8f9fa !important;
+}
+
+#programSelectModal .form-group label:active {
+  background-color: #e9ecef !important;
+}
+
+/* Override any global input styles for program selection modal */
+#programSelectModal .form-group input[type='checkbox'] {
+  width: 20px !important;
+  height: 20px !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  cursor: pointer !important;
+  flex-shrink: 0 !important;
+  accent-color: #1976d2 !important;
+  transform: scale(1) !important;
+  border: none !important;
+  background: none !important;
+  border-radius: 0 !important;
+  box-sizing: border-box !important;
+  min-width: unset !important;
+  max-width: unset !important;
+}
+
+/* Force minimal spacing on all elements */
+#programSelectModal * {
+  box-sizing: border-box;
+}
+
+/* Reset button styling */
+#programSelectModal .reset-btn {
+  background-color: #ff6b6b !important;
+  color: white !important;
+  border: none !important;
+  border-radius: 10px !important;
+  padding: 10px 20px !important;
+  font-size: 14px !important;
+  font-weight: bold !important;
+  text-transform: uppercase !important;
+  cursor: pointer !important;
+  transition: background-color 0.3s ease !important;
+  height: 50px !important;
+}
+
+#programSelectModal .reset-btn:hover {
+  background-color: #ff5252 !important;
+}
+
+#programSelectModal .reset-btn:disabled {
+  background-color: #ccc !important;
+  color: #999 !important;
+  cursor: not-allowed !important;
+}
+
+/* Confirm button styling */
+#programSelectModal .create-btn {
+  background-color: #4CAF50 !important;
+  color: white !important;
+  border: none !important;
+  border-radius: 5px !important;
+  padding: 12px 20px !important;
+  font-size: 14px !important;
+  font-weight: bold !important;
+  cursor: pointer !important;
+  transition: background-color 0.3s ease !important;
+  height: 50px !important;
+  min-height: 50px !important;
+  max-height: 50px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  line-height: 1 !important;
+}
+
+#programSelectModal .create-btn:hover:not(:disabled) {
+  background-color: #45a049 !important;
+}
+
+/* Cancel button styling for program select modal */
+#programSelectModal .cancel-btn {
+  background-color: #6c757d !important;
+  color: white !important;
+  border: none !important;
+  border-radius: 5px !important;
+  padding: 12px 20px !important;
+  font-size: 14px !important;
+  font-weight: bold !important;
+  cursor: pointer !important;
+  transition: background-color 0.3s ease !important;
+  height: 50px !important;
+  min-height: 50px !important;
+  max-height: 50px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  line-height: 1 !important;
+}
+
+#programSelectModal .create-btn:disabled {
+  background-color: #ccc !important;
+  color: #999 !important;
+  cursor: not-allowed !important;
+}
+
+/* Override global form-group styles specifically for program selection modal */
+#programSelectModal .form-group {
+  display: block !important;
+  flex-direction: unset !important;
+  flex-grow: unset !important;
+  position: static !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  min-height: unset !important;
+  height: auto !important;
+  line-height: 1 !important;
+}
+
+/* Course Success and Error Modals now use the same styling as program management modals */

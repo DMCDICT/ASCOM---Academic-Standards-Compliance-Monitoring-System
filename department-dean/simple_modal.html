@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Simple Modal Test</title>
+    <style>
+        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); }
+        .modal-content { background: white; margin: 50px auto; padding: 20px; width: 400px; border-radius: 8px; }
+        .form-row { display: flex; gap: 10px; margin: 10px 0; }
+        .form-group { flex: 1; }
+        .form-group.small { flex: 0 0 30%; }
+        .form-group.large { flex: 0 0 60%; }
+        input, select { width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px; }
+        button { background: #4CAF50; color: white; padding: 10px 20px; border: none; border-radius: 4px; cursor: pointer; margin: 5px; }
+    </style>
+</head>
+<body>
+    <h1>Simple Modal Test</h1>
+    <button onclick="openModal()">Open Modal</button>
+    <button onclick="testAPI()">Test API</button>
+    
+    <div id="result" style="background: #f0f0f0; padding: 10px; margin: 10px 0; white-space: pre-wrap;"></div>
+
+    <div id="modal" class="modal">
+        <div class="modal-content">
+            <h2>New Course</h2>
+            <button onclick="closeModal()" style="float: right;">&times;</button>
+            
+            <div class="form-row">
+                <div class="form-group small">
+                    <label>Course Code</label>
+                    <input type="text" id="courseCode" placeholder="IT101">
+                </div>
+                <div class="form-group large">
+                    <label>Course Name</label>
+                    <input type="text" id="courseName" placeholder="Introduction to Programming">
+                </div>
+            </div>
+            
+            <div class="form-row">
+                <div class="form-group large">
+                    <label>Programs</label>
+                    <select id="programs">
+                        <option value="">Select Program</option>
+                    </select>
+                </div>
+                <div class="form-group small">
+                    <label>Units</label>
+                    <input type="number" id="units" placeholder="3">
+                </div>
+            </div>
+            
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Academic Term</label>
+                    <select id="term">
+                        <option value="">Select Term</option>
+                        <option value="1st Semester">1st Semester</option>
+                        <option value="2nd Semester">2nd Semester</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Academic Year</label>
+                    <select id="year">
+                        <option value="">Select Year</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Year Level</label>
+                    <select id="level">
+                        <option value="">Select Level</option>
+                        <option value="1">1st Year</option>
+                        <option value="2">2nd Year</option>
+                        <option value="3">3rd Year</option>
+                        <option value="4">4th Year</option>
+                    </select>
+                </div>
+            </div>
+            
+            <div style="text-align: right; margin-top: 20px;">
+                <button onclick="closeModal()">Cancel</button>
+                <button onclick="submitForm()">Create</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function log(msg) {
+            document.getElementById('result').textContent += new Date().toLocaleTimeString() + ': ' + msg + '\n';
+        }
+        
+        function openModal() {
+            log('Opening modal...');
+            document.getElementById('modal').style.display = 'block';
+            loadSchoolYears();
+        }
+        
+        function closeModal() {
+            log('Closing modal...');
+            document.getElementById('modal').style.display = 'none';
+        }
+        
+        function loadSchoolYears() {
+            log('Loading school years...');
+            fetch('api/get_school_years.php')
+                .then(response => {
+                    log('Response status: ' + response.status);
+                    return response.json();
+                })
+                .then(data => {
+                    log('Response data: ' + JSON.stringify(data));
+                    if (data.success && data.school_years) {
+                        const select = document.getElementById('year');
+                        select.innerHTML = '<option value="">Select Year</option>';
+                        data.school_years.forEach(year => {
+                            const option = document.createElement('option');
+                            option.value = year.id;
+                            option.textContent = year.school_year;
+                            select.appendChild(option);
+                        });
+                        log('School years loaded: ' + data.school_years.length);
+                    } else {
+                        log('Failed to load school years: ' + data.message);
+                    }
+                })
+                .catch(error => {
+                    log('Error: ' + error.message);
+                });
+        }
+        
+        function testAPI() {
+            log('Testing API...');
+            fetch('api/get_school_years.php')
+                .then(response => response.text())
+                .then(data => {
+                    log('API Response: ' + data);
+                })
+                .catch(error => {
+                    log('API Error: ' + error.message);
+                });
+        }
+        
+        function submitForm() {
+            log('Form submitted!');
+            closeModal();
+        }
+        
+        log('Simple modal test loaded');
+    </script>
+</body>
+</html>

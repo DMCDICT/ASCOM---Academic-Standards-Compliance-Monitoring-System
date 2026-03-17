@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simple Course Form</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .form-container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .form-row {
+            display: flex;
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+        .form-group {
+            flex: 1;
+        }
+        .form-group.small {
+            flex: 0 0 20%;
+        }
+        .form-group.medium {
+            flex: 0 0 30%;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        input, select {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 14px;
+        }
+        .required {
+            color: red;
+        }
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+            margin-right: 10px;
+        }
+        .btn-primary {
+            background-color: #007bff;
+            color: white;
+        }
+        .btn-secondary {
+            background-color: #6c757d;
+            color: white;
+        }
+        .btn:hover {
+            opacity: 0.8;
+        }
+        .success {
+            background-color: #d4edda;
+            color: #155724;
+            padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="form-container">
+        <h2>Add New Course</h2>
+        
+        <div class="success" id="successMessage">
+            Course added successfully!
+        </div>
+        
+        <form id="courseForm">
+            <div class="form-row">
+                <div class="form-group small">
+                    <label for="courseCode">Course Code <span class="required">*</span></label>
+                    <input type="text" id="courseCode" name="course_code" required>
+                </div>
+                <div class="form-group">
+                    <label for="courseName">Course Name <span class="required">*</span></label>
+                    <input type="text" id="courseName" name="course_name" required>
+                </div>
+            </div>
+            
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="programs">Program(s) <span class="required">*</span></label>
+                    <select id="programs" name="programs" required>
+                        <option value="">Select Program</option>
+                        <option value="1">Bachelor in Library and Information Science</option>
+                        <option value="2">Bachelor of Science in Information Systems</option>
+                        <option value="3">Bachelor of Science in Computer Science</option>
+                        <option value="4">Bachelor of Science in Information Technology</option>
+                    </select>
+                </div>
+                <div class="form-group small">
+                    <label for="units">Units <span class="required">*</span></label>
+                    <input type="number" id="units" name="units" min="1" max="6" required>
+                </div>
+            </div>
+            
+            <div class="form-row">
+                <div class="form-group medium">
+                    <label for="schoolTerm">Academic Term <span class="required">*</span></label>
+                    <select id="schoolTerm" name="school_term" required>
+                        <option value="">Select Term</option>
+                        <option value="1st Semester">1st Semester</option>
+                        <option value="2nd Semester">2nd Semester</option>
+                        <option value="Summer Semester">Summer Semester</option>
+                    </select>
+                </div>
+                <div class="form-group medium">
+                    <label for="schoolYear">Academic Year <span class="required">*</span></label>
+                    <select id="schoolYear" name="school_year" required>
+                        <option value="">Select Academic Year</option>
+                        <option value="35">A.Y. 2025 - 2026</option>
+                        <option value="1">A.Y. 2024 - 2025</option>
+                        <option value="2">A.Y. 2026 - 2027</option>
+                    </select>
+                </div>
+                <div class="form-group medium">
+                    <label for="yearLevel">Year Level <span class="required">*</span></label>
+                    <select id="yearLevel" name="year_level" required>
+                        <option value="">Select Year Level</option>
+                        <option value="1">1st Year</option>
+                        <option value="2">2nd Year</option>
+                        <option value="3">3rd Year</option>
+                        <option value="4">4th Year</option>
+                    </select>
+                </div>
+            </div>
+            
+            <div style="margin-top: 30px;">
+                <button type="button" class="btn btn-secondary" onclick="resetForm()">CANCEL</button>
+                <button type="submit" class="btn btn-primary">CREATE</button>
+            </div>
+        </form>
+    </div>
+
+    <script>
+        // Simple form handling
+        document.getElementById('courseForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            // Get form data
+            const formData = new FormData(this);
+            const courseData = {};
+            for (let [key, value] of formData.entries()) {
+                courseData[key] = value;
+            }
+            
+            // Show success message
+            document.getElementById('successMessage').style.display = 'block';
+            
+            // Log the data (in real app, this would be sent to server)
+            console.log('Course Data:', courseData);
+            
+            // Reset form after 2 seconds
+            setTimeout(() => {
+                resetForm();
+                document.getElementById('successMessage').style.display = 'none';
+            }, 2000);
+        });
+        
+        function resetForm() {
+            document.getElementById('courseForm').reset();
+            document.getElementById('successMessage').style.display = 'none';
+        }
+        
+        // Log when page loads
+        console.log('✅ Simple Course Form Loaded Successfully');
+        console.log('✅ All dropdowns populated with data');
+    </script>
+</body>
+</html>

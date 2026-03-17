@@ -1,0 +1,28 @@
+# Logs
+*.log
+*_log.txt
+debug_*.txt
+login_debug.txt
+logout_log.txt
+super_admin_debug.txt
+super_admin_login_debug.txt
+super_admin_logout_log.txt
+
+# OS-specific files
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Dependencies
+vendor/
+
+# Local configuration
+.env
+
+# XAMPP/Temp files
+*.tmp
+*.bak
+*.swp
+*.zip
+*.rar
+*.7z

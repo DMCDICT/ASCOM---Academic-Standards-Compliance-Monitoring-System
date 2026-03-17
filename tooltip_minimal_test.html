@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Minimal Tooltip Test</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 20px;
+            font-family: Arial, sans-serif;
+            background-color: #f0f0f0;
+        }
+
+        .sidebar {
+            width: 300px;
+            background-color: #0C4B34;
+            height: 400px;
+            position: relative;
+            border-radius: 10px;
+            transition: width 0.4s ease;
+        }
+
+        .sidebar.collapsed {
+            width: 100px;
+        }
+
+        .nav-button {
+            width: 100%;
+            height: 60px;
+            border-radius: 15px;
+            display: flex;
+            align-items: center;
+            padding: 0 15px;
+            box-sizing: border-box;
+            color: #FFFFFF;
+            font-size: 18px;
+            font-weight: bold;
+            cursor: pointer;
+            margin-bottom: 20px;
+            position: relative;
+            background-color: #0F7A53;
+        }
+
+        .nav-icon-wrapper {
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-width: 45px;
+            height: 45px;
+        }
+
+        .nav-tooltip {
+            position: absolute;
+            opacity: 0;
+            visibility: hidden;
+            display: none;
+            pointer-events: none;
+            z-index: 9999;
+        }
+
+        .test-controls {
+            margin-bottom: 20px;
+        }
+
+        .test-btn {
+            padding: 10px 20px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-right: 10px;
+        }
+
+        .debug-info {
+            background-color: white;
+            padding: 15px;
+            border-radius: 5px;
+            margin-top: 20px;
+            font-family: monospace;
+            font-size: 12px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Minimal Tooltip Test</h1>
+    
+    <div class="test-controls">
+        <button class="test-btn" onclick="toggleSidebar()">Toggle Sidebar</button>
+        <button class="test-btn" onclick="testTooltips()">Test Tooltips</button>
+        <button class="test-btn" onclick="forceTooltips()">Force Tooltips</button>
+    </div>
+
+    <nav class="sidebar" id="sidebar">
+        <div style="padding: 20px;">
+            <div class="nav-button" onclick="log('Button 1 clicked')">
+                <span class="nav-icon-wrapper">
+                    <span class="nav-tooltip">Dashboard Tooltip</span>
+                </span>
+                <span>Dashboard</span>
+            </div>
+            
+            <div class="nav-button" onclick="log('Button 2 clicked')">
+                <span class="nav-icon-wrapper">
+                    <span class="nav-tooltip">Users Tooltip</span>
+                </span>
+                <span>Users</span>
+            </div>
+            
+            <div class="nav-button" onclick="log('Button 3 clicked')">
+                <span class="nav-icon-wrapper">
+                    <span class="nav-tooltip">Settings Tooltip</span>
+                </span>
+                <span>Settings</span>
+            </div>
+        </div>
+    </nav>
+
+    <div class="debug-info" id="debugInfo">
+        <strong>Debug Info:</strong><br>
+        Sidebar State: <span id="sidebarState">Expanded</span><br>
+        Tooltip Count: <span id="tooltipCount">0</span><br>
+        Last Action: <span id="lastAction">None</span><br>
+        <br>
+        <strong>Instructions:</strong><br>
+        1. Click "Toggle Sidebar" to collapse it<br>
+        2. Hover over the buttons to see tooltips<br>
+        3. Use "Force Tooltips" to manually show them
+    </div>
+
+    <script>
+        function log(message) {
+            document.getElementById('lastAction').textContent = message;
+            console.log(message);
+        }
+
+        function toggleSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            sidebar.classList.toggle('collapsed');
+            const isCollapsed = sidebar.classList.contains('collapsed');
+            document.getElementById('sidebarState').textContent = isCollapsed ? 'Collapsed' : 'Expanded';
+            log(`Sidebar toggled to: ${isCollapsed ? 'collapsed' : 'expanded'}`);
+        }
+
+        function testTooltips() {
+            const sidebar = document.getElementById('sidebar');
+            const isCollapsed = sidebar.classList.contains('collapsed');
+            log(`Testing tooltips (sidebar ${isCollapsed ? 'collapsed' : 'expanded'})`);
+            
+            const buttons = document.querySelectorAll('.nav-button');
+            buttons.forEach((button, index) => {
+                const tooltip = button.querySelector('.nav-tooltip');
+                if (tooltip) {
+                    const computedStyle = window.getComputedStyle(tooltip);
+                    log(`Button ${index + 1}: opacity=${computedStyle.opacity}, visibility=${computedStyle.visibility}, display=${computedStyle.display}`);
+                }
+            });
+        }
+
+        function forceTooltips() {
+            const sidebar = document.getElementById('sidebar');
+            const isCollapsed = sidebar.classList.contains('collapsed');
+            
+            if (!isCollapsed) {
+                log('Please collapse the sidebar first');
+                return;
+            }
+            
+            const buttons = document.querySelectorAll('.nav-button');
+            buttons.forEach((button, index) => {
+                const tooltip = button.querySelector('.nav-tooltip');
+                if (tooltip) {
+                    log(`Forcing tooltip ${index + 1}: "${tooltip.textContent}"`);
+                    
+                    tooltip.style.cssText = `
+                        position: absolute !important;
+                        left: 100% !important;
+                        top: 50% !important;
+                        transform: translateY(-50%) !important;
+                        background: #222 !important;
+                        color: #fff !important;
+                        padding: 7px 16px !important;
+                        border-radius: 18px !important;
+                        font-size: 15px !important;
+                        font-weight: 500 !important;
+                        white-space: nowrap !important;
+                        opacity: 1 !important;
+                        visibility: visible !important;
+                        display: block !important;
+                        pointer-events: none !important;
+                        z-index: 9999 !important;
+                        margin-left: 15px !important;
+                        box-shadow: 0 4px 16px rgba(0,0,0,0.18) !important;
+                        transition: none !important;
+                    `;
+                }
+            });
+            
+            log('All tooltips forced to show');
+        }
+
+        // Add hover listeners
+        document.addEventListener('DOMContentLoaded', function() {
+            const buttons = document.querySelectorAll('.nav-button');
+            
+            buttons.forEach((button, index) => {
+                const tooltip = button.querySelector('.nav-tooltip');
+                
+                button.addEventListener('mouseenter', function() {
+                    const sidebar = document.getElementById('sidebar');
+                    const isCollapsed = sidebar.classList.contains('collapsed');
+                    log(`HOVER ENTER: Button ${index + 1} (sidebar ${isCollapsed ? 'collapsed' : 'expanded'})`);
+                    
+                    if (isCollapsed && tooltip) {
+                        log(`Showing tooltip ${index + 1}: "${tooltip.textContent}"`);
+                        
+                        tooltip.style.cssText = `
+                            position: absolute !important;
+                            left: 100% !important;
+                            top: 50% !important;
+                            transform: translateY(-50%) !important;
+                            background: #222 !important;
+                            color: #fff !important;
+                            padding: 7px 16px !important;
+                            border-radius: 18px !important;
+                            font-size: 15px !important;
+                            font-weight: 500 !important;
+                            white-space: nowrap !important;
+                            opacity: 1 !important;
+                            visibility: visible !important;
+                            display: block !important;
+                            pointer-events: none !important;
+                            z-index: 9999 !important;
+                            margin-left: 15px !important;
+                            box-shadow: 0 4px 16px rgba(0,0,0,0.18) !important;
+                            transition: none !important;
+                        `;
+                    }
+                });
+                
+                button.addEventListener('mouseleave', function() {
+                    log(`HOVER LEAVE: Button ${index + 1}`);
+                    
+                    if (tooltip) {
+                        tooltip.style.opacity = '0';
+                        tooltip.style.visibility = 'hidden';
+                        tooltip.style.display = 'none';
+                    }
+                });
+            });
+            
+            // Initial count
+            const tooltips = document.querySelectorAll('.nav-tooltip');
+            document.getElementById('tooltipCount').textContent = tooltips.length;
+            
+            log('Minimal tooltip test initialized');
+        });
+    </script>
+</body>
+</html>

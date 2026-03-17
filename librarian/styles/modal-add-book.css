@@ -1,0 +1,467 @@
+/*
+ * modal-add-book.css
+ * Contains specific, scoped styles for the #addBookModal.
+ * Path to assets: From librarian/styles/ go up two levels (../../), then into src/assets/
+ */
+
+/* Modal Animation */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(-20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+#addBookModal.modal-overlay {
+    display: none;
+    position: fixed;
+    z-index: 1003;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: hidden !important;
+    background-color: rgba(0, 0, 0, 0.6);
+    justify-content: center;
+    align-items: center;
+}
+
+/* When modal is shown, use flex but keep overflow hidden */
+#addBookModal.modal-overlay[style*="flex"],
+#addBookModal.modal-overlay[style*="block"] {
+    display: flex !important;
+    overflow: hidden !important;
+}
+
+/* Override any global modal-overlay styles that might add overflow */
+#addBookModal.modal-overlay {
+    overflow: hidden !important;
+}
+
+/* NUCLEAR OPTION - HIDE ALL SCROLLING */
+body.modal-open,
+html.modal-open {
+    overflow: hidden !important;
+    position: fixed !important;
+    width: 100% !important;
+    height: 100% !important;
+    top: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+    bottom: 0 !important;
+}
+
+/* FORCE HIDE SCROLL ON ALL MODALS */
+.modal-overlay {
+    position: fixed !important;
+    z-index: 9999 !important;
+}
+
+/* When any modal is open, lock the body */
+body:has(.modal-overlay[style*="flex"]) {
+    overflow: hidden !important;
+    position: fixed !important;
+    width: 100% !important;
+    height: 100% !important;
+    top: 0 !important;
+    left: 0 !important;
+}
+
+/* NUCLEAR OPTION - Override ALL possible conflicting styles */
+body.modal-open,
+html.modal-open,
+body[style*="overflow"],
+html[style*="overflow"] {
+    overflow: hidden !important;
+    position: fixed !important;
+    width: 100% !important;
+    height: 100% !important;
+    top: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+    bottom: 0 !important;
+    margin: 0 !important;
+    padding: 0 !important;
+}
+
+/* FORCE HIDE SCROLL ON ALL ELEMENTS WHEN MODAL IS OPEN */
+body.modal-open *,
+html.modal-open * {
+    overflow: hidden !important;
+}
+
+/* Target specific elements that might have scroll */
+body.modal-open .content,
+body.modal-open .main-content,
+body.modal-open .page-content,
+body.modal-open .container,
+body.modal-open .wrapper {
+    overflow: hidden !important;
+    position: relative !important;
+}
+
+/* SIMPLE TEST - Make body completely fixed when modal is open */
+body.modal-open {
+    position: fixed !important;
+    top: 0 !important;
+    left: 0 !important;
+    width: 100% !important;
+    height: 100% !important;
+    overflow: hidden !important;
+    z-index: 1 !important;
+}
+
+/* Hide background scroll when modal is open */
+body.modal-open {
+    overflow: hidden !important;
+    position: fixed !important;
+    width: 100% !important;
+    height: 100% !important;
+    top: 0 !important;
+    left: 0 !important;
+}
+
+html.modal-open {
+    overflow: hidden !important;
+}
+
+#addBookModal .modal-box {
+    margin: auto;
+    padding: 0;
+    border: 1px solid #888;
+    border-radius: 15px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+    animation: fadeIn 0.3s;
+}
+
+/* Modal Header with Close Button */
+#addBookModal .modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid #e5e5e5;
+    padding: 25px 25px 15px 25px;
+    margin-bottom: 0;
+}
+
+#addBookModal .modal-header h2 {
+    margin: 0;
+    font-size: 22px;
+    font-weight: 700;
+    color: #333;
+}
+
+#addBookModal .close-button {
+    color: #aaa;
+    font-size: 28px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: color 0.2s;
+    line-height: 1;
+    padding: 0;
+    background: none;
+    border: none;
+    width: 30px;
+    height: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+#addBookModal .close-button:focus,
+#addBookModal .close-button:hover {
+    color: #000;
+}
+
+#addBookModal .form-group label {
+    margin-bottom: 6px;
+    font-weight: 600;
+    color: #333;
+    font-family: 'TT Interphases', sans-serif;
+}
+
+#addBookModal .form-group input,
+#addBookModal .form-group select {
+    border-radius: 12px;
+    height: 50px;
+    padding: 0 12px;
+    box-sizing: border-box;
+    width: 100%;
+    border: 1px solid #ccc;
+    font-family: 'TT Interphases', sans-serif;
+    font-size: 14px;
+}
+
+#addBookModal .form-group input:focus,
+#addBookModal .form-group select:focus {
+    outline: none;
+    border-color: #0f7a53;
+    box-shadow: 0 0 0 2px rgba(15, 122, 83, 0.2);
+}
+
+/* Limit dropdown height to show only 5 options */
+#addBookModal .form-group select {
+    height: 50px;
+}
+
+/* For browsers that support it, limit the dropdown panel height */
+#addBookModal .form-group select option {
+    padding: 8px 12px;
+}
+
+
+
+
+
+/* AUTOCOMPLETE FIELD WITH SUGGESTIONS PANEL */
+#addBookModal .autocomplete-container {
+    position: relative;
+    width: 100%;
+}
+
+#addBookModal #course_search {
+    width: 100%;
+    height: 50px;
+    padding: 0 12px;
+    border: 1px solid #ccc;
+    border-radius: 12px;
+    font-family: 'TT Interphases', sans-serif;
+    font-size: 14px;
+    background-color: white;
+    box-sizing: border-box;
+}
+
+#addBookModal #course_search:focus {
+    outline: none;
+    border-color: #0f7a53;
+    box-shadow: 0 0 0 2px rgba(15, 122, 83, 0.2);
+}
+
+#addBookModal .suggestions-panel {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    background: white;
+    border: 1px solid #ccc;
+    border-radius: 12px;
+    margin-top: 4px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    z-index: 1000;
+    display: none;
+    max-height: 320px;   /* exactly 10 items * 32px each */
+    overflow-y: auto;
+    padding: 8px 0;
+}
+
+/* Debug: Make suggestions panel visible for testing */
+#addBookModal .suggestions-panel.debug {
+    display: block !important;
+    background: #f0f0f0;
+    border: 2px solid red;
+}
+
+#addBookModal .suggestions-panel.show {
+    display: block;
+}
+
+#addBookModal .suggestion-item {
+    display: block;
+    padding: 8px 16px;
+    color: #333;
+    text-decoration: none;
+    font-family: 'TT Interphases', sans-serif;
+    font-size: 14px;
+    cursor: pointer;
+    height: 32px;
+    line-height: 16px;
+    box-sizing: border-box;
+    border: none;
+    background: none;
+    width: 100%;
+    text-align: left;
+}
+
+#addBookModal .suggestion-item:hover {
+    background-color: #f0f0f0;
+}
+
+#addBookModal .suggestion-item.selected {
+    background-color: #0f7a53;
+    color: white;
+}
+
+/* For browsers that support this (limited support) */
+#addBookModal .form-group select::-webkit-scrollbar {
+    width: 8px;
+}
+
+#addBookModal .form-group select::-webkit-scrollbar-track {
+    background: #f1f1f1;
+}
+
+#addBookModal .form-group select::-webkit-scrollbar-thumb {
+    background: #888;
+    border-radius: 4px;
+}
+
+#addBookModal .form-group select::-webkit-scrollbar-thumb:hover {
+    background: #555;
+}
+
+#addBookModal .form-group select option {
+    padding: 4px 12px;
+}
+
+/* Ensure consistent alignment for all form groups */
+#addBookModal .form-group {
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    min-height: 75px;
+    position: relative;
+}
+
+/* Ensure consistent form row alignment */
+#addBookModal .form-row {
+    display: flex;
+    gap: 15px;
+    align-items: flex-end;
+    margin-bottom: 8px;
+    width: 100%;
+}
+
+/* Fix alignment issues by ensuring all form groups have the same baseline */
+#addBookModal .form-group label {
+    margin-bottom: 6px;
+    font-weight: 600;
+    color: #333;
+    font-family: 'TT Interphases', sans-serif;
+    line-height: 1.2;
+    height: auto;
+}
+
+#addBookModal .form-group input,
+#addBookModal .form-group select {
+    border-radius: 12px;
+    height: 50px;
+    padding: 0 12px;
+    box-sizing: border-box;
+    width: 100%;
+    border: 1px solid #ccc;
+    font-family: 'TT Interphases', sans-serif;
+    font-size: 14px;
+    margin: 0;
+    line-height: 1;
+}
+
+/* Form content styles are now inline in HTML to match department dean modal */
+/* Batch list container - no overflow, let parent scroll */
+#addBookModal #batchListContainer {
+    overflow: visible;
+}
+
+/* Ensure form element doesn't create scrollbars - only form-content scrolls */
+#addBookModal form,
+#addBookModal .form-grid {
+    overflow: visible !important;
+    max-height: none !important;
+    flex: none !important;
+}
+
+/* Copyright Year input spinner buttons - HIDE native spinners */
+#addBookModal #copyright::-webkit-inner-spin-button,
+#addBookModal #copyright::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  opacity: 0;
+  cursor: default;
+}
+
+#addBookModal #copyright {
+  -moz-appearance: textfield;
+}
+
+#addBookModal #copyright::-webkit-outer-spin-button,
+#addBookModal #copyright::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  opacity: 0;
+  cursor: default;
+}
+
+/* Copyright spinner button hover effects */
+#addBookModal #copyright_up:hover,
+#addBookModal #copyright_down:hover {
+  background: #e0e0e0;
+}
+
+#addBookModal #copyright_up:active,
+#addBookModal #copyright_down:active {
+  background: #d0d0d0;
+}
+
+#addBookModal .form-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+}
+
+#addBookModal .cancel-btn {
+    width: 125px;
+    background-color: #C9C9C9;
+    color: black;
+    border: none;
+    border-radius: 10px;
+    height: 45px;
+    font-size: 14px;
+    font-weight: bold;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+#addBookModal .cancel-btn:hover {
+    background-color: #B9B9B9;
+}
+
+#addBookModal .create-btn {
+    width: 142px;
+    background-color: #0f7a53;
+    color: white;
+    border: none;
+    border-radius: 10px;
+    height: 45px;
+    font-size: 14px;
+    font-weight: bold;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+#addBookModal .create-btn:hover {
+    background-color: #0a5f42;
+}
+
+#addBookModal .create-btn:disabled {
+    background-color: #A5A5A5;
+    color: black;
+    cursor: not-allowed;
+}
+
+/* Success and Error Modal Styles */
+#addBookSuccessModal .create-btn, #addBookErrorModal .create-btn {
+    background-color: #4A7DFF;
+    color: white;
+    border: none;
+}
+
+#addBookErrorModal .create-btn.error-btn {
+    background-color: #f44336;
+}
+
+#addBookErrorModal .create-btn.error-btn:hover {
+    background-color: #d32f2f;
+}

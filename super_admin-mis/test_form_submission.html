@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Test Form Submission</title>
+</head>
+<body>
+    <h2>Test Form Submission to process_add_user.php</h2>
+    
+    <form id="testForm">
+        <div>
+            <label>Employee No:</label>
+            <input type="text" name="employee_no" value="123456" required>
+        </div>
+        <div>
+            <label>First Name:</label>
+            <input type="text" name="first_name" value="Test" required>
+        </div>
+        <div>
+            <label>Last Name:</label>
+            <input type="text" name="last_name" value="User" required>
+        </div>
+        <div>
+            <label>Institutional Email:</label>
+            <input type="email" name="institutional_email" value="test.user@sccpag.edu.ph" required>
+        </div>
+        <div>
+            <label>Password:</label>
+            <input type="password" name="password" value="password123" required>
+        </div>
+        <div>
+            <label>Role ID:</label>
+            <input type="text" name="role_id" value="4" required>
+        </div>
+        <div>
+            <label>Department ID:</label>
+            <input type="text" name="department_id" value="1" required>
+        </div>
+        <button type="submit">Test Submit</button>
+    </form>
+    
+    <div id="result"></div>
+    
+    <script>
+        document.getElementById('testForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const formData = new FormData(this);
+            
+            console.log('Testing form submission...');
+            console.log('Form data:', Object.fromEntries(formData));
+            
+            fetch('./process_add_user.php', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => {
+                console.log('Response status:', response.status);
+                return response.text();
+            })
+            .then(data => {
+                console.log('Response data:', data);
+                document.getElementById('result').innerHTML = '<pre>' + data + '</pre>';
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                document.getElementById('result').innerHTML = '<pre>Error: ' + error.message + '</pre>';
+            });
+        });
+    </script>
+</body>
+</html> 

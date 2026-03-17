@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF Nav">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Navigation Button Test</title>
+    <style>
+        body {
+            font-family: 'TT Interphases', sans-serif;
+            margin: 0;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .test-container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .nav-button {
+            width: 100%;
+            height: 60px;
+            border-radius: 15px;
+            display: flex;
+            align-items: center, 0 15px;
+            box-sizing: border-box;
+            text-decoration: none;
+            color: #FFFFFF;
+            font-size: 18px;
+            font-weight: bold;
+            transition: background-color 0.3s;
+            white-space: nowrap;
+            overflow: hidden;
+            cursor: pointer !important;
+            pointer-events: auto !important;
+            margin: 10px 0;
+        }
+        .nav-button:hover {
+            background-color: rgba(15, 122, 83, 0.5);
+        }
+        .nav-button.active {
+            background-color: #0F7A53;
+        }
+        .success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+            padding: 15px;
+            border-radius: 6px;
+            margin: 20px 0;
+        }
+        .info {
+            background: #d1ecf1;
+            color: #0c5460;
+            border: 1px solid #bee5eb;
+            padding: 15px;
+            border-radius: 6px;
+            margin: 20px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="test-container">
+        <h1>🧪 Navigation Button Test</h1>
+        
+        <div class="info">
+            <strong>Test Instructions:</strong>
+            <ul>
+                <li>Click each button below</li>
+                <li>Check if you see console messages</li>
+                <li>Verify buttons are clickable</li>
+            </ul>
+        </div>
+        
+        <h3>Test Navigation Buttons:</h3>
+        
+        <a href="#" class="nav-button" data-page="dashboard">
+            <span>Dashboard</span>
+        </a>
+        
+        <a href="#" class="nav-button" data-page="user-account-management">
+            <span>User Account Management</span>
+        </a>
+        
+        <a href="#" class="nav-button" data-page="school-calendar">
+            <span>School Calendar</span>
+        </a>
+        
+        <a href="#" class="nav-button" data-page="settings">
+            <span>Settings</span>
+        </a>
+        
+        <div id="results"></div>
+    </div>
+
+    <script>
+        // Simple navigation function for testing
+        function handleSidebarNavigation(page) {
+            console.log('Navigation clicked:', page);
+            addResult(`✅ Navigation clicked: ${page}`);
+        }
+        
+        function addResult(message) {
+            const resultsDiv = document.getElementById('results');
+            const resultItem = document.createElement('div');
+            resultItem.style.margin = '10px 0';
+            resultItem.style.padding = '10px';
+            resultItem.style.background = '#f8f9fa';
+            resultItem.style.borderRadius = '4px';
+            resultItem.innerHTML = `<strong>${new Date().toLocaleTimeString()}:</strong> ${message}`;
+            resultsDiv.appendChild(resultItem);
+        }
+        
+        // Add event listeners when DOM is ready
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('DOM ready, adding event listeners...');
+            
+            const navButtons = document.querySelectorAll('.nav-button[data-page]');
+            console.log('Found', navButtons.length, 'navigation buttons');
+            
+            navButtons.forEach(button => {
+                button.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    const page = this.getAttribute('data-page');
+                    console.log('Button clicked:', page);
+                    handleSidebarNavigation(page);
+                });
+                console.log('Added event listener to:', button.getAttribute('data-page'));
+            });
+            
+            addResult(`✅ Added event listeners to ${navButtons.length} buttons`);
+        });
+        
+        // Test button clickability
+        setTimeout(() => {
+            const navButtons = document.querySelectorAll('.nav-button[data-page]');
+            navButtons.forEach(button => {
+                const page = button.getAttribute('data-page');
+                const isClickable = button.style.pointerEvents !== 'none' && 
+                                  button.style.cursor !== 'default';
+                console.log(`Button ${page}: Clickable = ${isClickable}`);
+                addResult(`Button ${page}: Clickable = ${isClickable}`);
+            });
+        }, 1000);
+    </script>
+</body>
+</html> 

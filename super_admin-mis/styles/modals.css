@@ -1,0 +1,629 @@
+/*
+ * modals.css
+ * Contains general styles for all modals (overlay, modal-box, and common buttons not specific to a modal ID).
+ */
+
+/* Generic modal styles - exclude specific modals that have their own styles */
+.modal-overlay:not(#addUserModal):not(#addDepartmentModal):not(#userDetailsModal):not(#addTermModal):not(#addSchoolYearModal):not(#scheduleMaintenanceModal):not(#successModal):not(#editUserSuccessModal):not(#editUserErrorModal):not(#editUserModal):not(#errorModal):not(#dayDetailsModal), 
+.department-modal-overlay {
+    position: fixed;
+    inset: 0;
+    background-color: rgba(0, 0, 0, 0.8);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 2000; /* For general modals */
+}
+
+.department-modal-overlay { /* Specific for department modal */
+    z-index: 3000; /* Higher z-index for department modal over user modal */
+}
+
+/* Generic modal box styles - exclude specific modals that have their own styles */
+.modal-box:not(#addUserModal .modal-box):not(#addDepartmentModal .modal-box):not(#userDetailsModal .modal-box):not(#editUserModal .modal-box), 
+.department-modal-box {
+    background-color: #EFEFEF;
+    padding: 30px;
+    border-radius: 15px;
+    width: 620px; /* Default width for add user modal */
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+}
+
+.modal-box:not(#addUserModal .modal-box):not(#addDepartmentModal .modal-box):not(#userDetailsModal .modal-box) {
+  padding-top: 30px;
+}
+
+.department-modal-box { /* Specific for department modal */
+    padding: 20px 30px; /* Slightly different padding */
+    border-radius: 15px; /* Slightly different border-radius */
+    width: 650px; /* Default width for add department modal */
+}
+
+/* Common form styles - exclude specific modals that have their own styles */
+.form-grid:not(#addUserModal .form-grid):not(#addDepartmentModal .form-grid):not(#userDetailsModal .form-grid):not(#editUserModal .form-grid) {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.form-row:not(#addUserModal .form-row):not(#addDepartmentModal .form-row):not(#userDetailsModal .form-row):not(#editUserModal .form-row) {
+    display: flex;
+    gap: 20px;
+    flex-wrap: wrap;
+    width: 100%;
+}
+
+.form-group:not(#addUserModal .form-group):not(#addDepartmentModal .form-group):not(#userDetailsModal .form-group):not(#editUserModal .form-group) {
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1;
+    position: relative;
+}
+
+.form-group:not(#addUserModal .form-group):not(#addDepartmentModal .form-group):not(#userDetailsModal .form-group):not(#editUserModal .form-group) label {
+    font-size: 14px;
+    font-weight: bold;
+    margin-bottom: 6px;
+}
+
+.form-group:not(#addUserModal .form-group):not(#addDepartmentModal .form-group):not(#userDetailsModal .form-group):not(#editUserModal .form-group) input,
+.form-group:not(#addUserModal .form-group):not(#addDepartmentModal .form-group):not(#userDetailsModal .form-group):not(#editUserModal .form-group) select {
+    background-color: #FFFFFF;
+    border: 1px solid #ccc;
+    border-radius: 12px;
+    height: 50px;
+    padding: 0 12px;
+    font-size: 14px;
+    box-sizing: border-box;
+    width: 100%;
+}
+
+/* Disabled form fields styling */
+.form-group:not(#addUserModal .form-group):not(#addDepartmentModal .form-group):not(#userDetailsModal .form-group):not(#editUserModal .form-group) input:disabled,
+.form-group:not(#addUserModal .form-group):not(#addDepartmentModal .form-group):not(#userDetailsModal .form-group):not(#editUserModal .form-group) select:disabled {
+    background-color: #f5f5f5;
+    color: #999;
+    cursor: not-allowed;
+    opacity: 0.6;
+}
+
+/* Common form action buttons - exclude specific modals that have their own styles */
+.form-actions:not(#addUserModal .form-actions):not(#addDepartmentModal .form-actions):not(#userDetailsModal .form-actions):not(#editUserModal .form-actions) {
+    margin-top: 10px;
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+}
+
+.cancel-btn:not(#addUserModal .cancel-btn):not(#addDepartmentModal .cancel-btn):not(#userDetailsModal .cancel-btn):not(#editUserModal .cancel-btn), 
+.create-btn:not(#addUserModal .create-btn):not(#addDepartmentModal .create-btn):not(#userDetailsModal .create-btn):not(#editUserModal .create-btn) {
+    padding: 10px 20px;
+    border-radius: 10px;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: bold;
+    text-transform: uppercase;
+    transition: background-color 0.3s ease;
+    height: 50px;
+}
+
+/* Global modal button styles - exclude specific modals that have their own styles */
+.cancel-btn:not(#addUserModal .cancel-btn):not(#addDepartmentModal .cancel-btn):not(#userDetailsModal .cancel-btn):not(#editUserModal .cancel-btn) {
+    width: 125px;
+    background-color: #C9C9C9;
+    color: black;
+    border: none;
+    border-radius: 10px;
+    font-size: 14px;
+    font-weight: bold;
+    height: 50px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+.cancel-btn:not(#addUserModal .cancel-btn):not(#addDepartmentModal .cancel-btn):not(#userDetailsModal .cancel-btn):hover {
+    background-color: #B9B9B9;
+}
+.create-btn:not(#addUserModal .create-btn):not(#addDepartmentModal .create-btn):not(#userDetailsModal .create-btn):not(#editUserModal .create-btn) {
+    width: 142px;
+    background-color: #0f7a53;
+    color: white;
+    border: none;
+    border-radius: 10px;
+    font-size: 14px;
+    font-weight: bold;
+    height: 50px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+.create-btn:not(#addUserModal .create-btn):not(#addDepartmentModal .create-btn):not(#userDetailsModal .create-btn):disabled {
+    background-color: #A5A5A5;
+    color: black;
+    cursor: not-allowed;
+}
+.create-btn:not(#addUserModal .create-btn):not(#addDepartmentModal .create-btn):not(#userDetailsModal .create-btn):hover:enabled {
+    background-color: #0a5f42;
+}
+
+/* Modern Switch style for All Day toggle */
+.switch {
+  position: relative;
+  display: inline-block;
+  width: 40px;
+  height: 22px;
+  margin-left: 0;
+  margin-top: 0;
+  vertical-align: middle;
+}
+.switch input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+.slider {
+  position: absolute;
+  cursor: pointer;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background-color: #ccc;
+  transition: background 0.3s;
+  border-radius: 32px;
+}
+.slider:before {
+  position: absolute;
+  content: "";
+  height: 16px;
+  width: 16px;
+  left: 3px;
+  top: 3px;
+  background-color: #fff;
+  transition: transform 0.3s, background 0.3s;
+  border-radius: 50%;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.12);
+}
+.switch input:checked + .slider {
+  background-color: #0f7a53;
+}
+.switch input:checked + .slider:before {
+  transform: translateX(18px);
+  background: #fff;
+}
+
+/* Consistent vertical spacing for modal form fields - exclude specific modals that have their own styles */
+.modal-box:not(#addUserModal .modal-box):not(#addDepartmentModal .modal-box):not(#userDetailsModal .modal-box) .form-group,
+.modal-box:not(#addUserModal .modal-box):not(#addDepartmentModal .modal-box):not(#userDetailsModal .modal-box) .form-row {
+  margin-bottom: 5px;
+}
+.modal-box:not(#addUserModal .modal-box):not(#addDepartmentModal .modal-box):not(#userDetailsModal .modal-box) .form-group:last-child,
+.modal-box:not(#addUserModal .modal-box):not(#addDepartmentModal .modal-box):not(#userDetailsModal .modal-box) .form-row:last-child {
+  margin-bottom: 0;
+}
+
+.modal-box:not(#addUserModal .modal-box):not(#addDepartmentModal .modal-box):not(#userDetailsModal .modal-box) .form-row .form-group:nth-child(2) {
+  margin-left: 18px;
+}
+.color-inline-group {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.color-label {
+  margin-bottom: 0;
+  white-space: nowrap;
+}
+#eventRepeat, #eventColorHex {
+  width: 100%;
+  max-width: none;
+  box-sizing: border-box;
+}
+.custom-event-row {
+  display: grid;
+  grid-template-columns: 110px 1fr 1.2fr;
+  gap: 18px;
+  align-items: end;
+}
+.custom-event-row .form-group label {
+  margin-bottom: 4px;
+}
+.custom-event-row .form-group {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+}
+.switch {
+  margin-top: 6px;
+  align-self: flex-start;
+}
+.all-day-row {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 8px;
+  height: 100%;
+}
+.modal-box:not(#addUserModal .modal-box):not(#addDepartmentModal .modal-box):not(#userDetailsModal .modal-box) .form-row .form-group input[type='date'],
+.modal-box:not(#addUserModal .modal-box):not(#addDepartmentModal .modal-box):not(#userDetailsModal .modal-box) .form-row .form-group input[type='time'] {
+  width: 100%;
+}
+#customRecurrenceOptions {
+    margin-top: 18px;
+    padding: 16px 0 0 0;
+    border-top: 1px solid #e0e0e0;
+    /* Remove max-height and overflow-y so only the form scrolls */
+}
+#customRecurrenceOptions label:first-child {
+  display: block;
+  font-family: 'TT Interphases', sans-serif;
+  font-size: 15px;
+  margin-bottom: 10px;
+}
+#customRecurrenceOptions,
+#customRecurrenceOptions * {
+  font-family: 'TT Interphases', sans-serif !important;
+}
+.custom-ends-options input[type="date"] {
+  width: 130px;
+  min-width: 0;
+  font-family: 'TT Interphases', sans-serif;
+  font-size: 14px;
+}
+.custom-recurrence-row {
+  display: flex;
+  gap: 32px;
+  flex-wrap: wrap;
+  margin-top: 8px;
+}
+.custom-recurrence-row > div {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.custom-recurrence-row > div:first-child {
+  flex-direction: row;
+  align-items: center;
+  gap: 8px;
+}
+.custom-recurrence-row > div:first-child label {
+  margin-bottom: 0;
+  margin-right: 8px;
+  white-space: nowrap;
+}
+.custom-recurrence-row > div:nth-child(2) {
+  flex-direction: row;
+  align-items: center;
+  gap: 8px;
+}
+.custom-recurrence-row > div:nth-child(2) label {
+  margin-bottom: 0;
+  margin-right: 8px;
+  white-space: nowrap;
+}
+.custom-days {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+.custom-days label {
+  margin-right: 4px;
+  font-weight: 500;
+}
+.day-btn {
+  border: 1px solid #bbb;
+  background: #fff;
+  color: #222;
+  border-radius: 6px;
+  width: 32px;
+  height: 32px;
+  margin-right: 4px;
+  font-size: 16px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.2s, color 0.2s, border 0.2s;
+}
+.day-btn.selected,
+.day-btn:active {
+  background: #0f7a53;
+  color: #fff;
+  border-color: #0f7a53;
+}
+.day-btn:last-child {
+  margin-right: 0;
+}
+input[type="radio"][name="customEnds"] {
+  width: 1.2em;
+  height: 1.2em;
+  accent-color: #0f7a53;
+  vertical-align: middle;
+  margin-right: 8px;
+}
+
+/* Custom select arrow for all modal dropdowns */
+.custom-select-wrapper {
+    position: relative;
+}
+.custom-select-wrapper select {
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+    padding-right: 30px;
+    width: 100%;
+    background: #fff;
+    background-color: #fff;
+}
+.custom-select-wrapper::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    right: 15px;
+    transform: translateY(-50%);
+    width: 0;
+    height: 0;
+    border-left: 5px solid transparent;
+    border-right: 5px solid transparent;
+    border-top: 6px solid #555;
+    pointer-events: none;
+}
+
+/* Modal fadeIn animation for all modals */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(-20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+
+.modal-overlay:not(#addUserModal):not(#addDepartmentModal):not(#userDetailsModal):not(#editUserModal) .modal-box:not(#addUserModal .modal-box):not(#addDepartmentModal .modal-box):not(#userDetailsModal .modal-box):not(#editUserModal .modal-box) {
+    display: flex;
+    flex-direction: column;
+    max-height: 80vh;
+    /* animation: fadeIn 0.3s; already present */
+}
+/* Only apply scrollable form to modal-box forms that are NOT inside #addUserModal or #editUserModal */
+.modal-box form:not(#addUserForm):not(#editUserForm):not(#addBookForm):not(#addBookReferenceForm) {
+    flex: 1 1 auto;
+    overflow-y: auto;
+    max-height: 65vh;
+}
+/* Remove scroll from Create New Account form */
+#addUserForm {
+    overflow-y: visible !important;
+    max-height: none !important;
+}
+/* Removed conflicting #addUserModal styles - these are handled by modal-add-user.css */
+.custom-recurrence-header-row {
+  display: flex;
+  gap: 32px;
+  margin-bottom: 2px;
+}
+.custom-recurrence-header-row > div {
+  flex: 1 1 0;
+  text-align: left;
+}
+.custom-recurrence-fields-row {
+  display: flex;
+  gap: 32px;
+  margin-bottom: 12px;
+}
+.custom-recurrence-fields-row > div {
+  flex: 1 1 0;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.custom-recurrence-ends-row {
+  margin-top: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.custom-ends-options {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin-left: 8px;
+}
+#eventDescription {
+  font-family: 'TT Interphases', sans-serif !important;
+  font-size: 15px;
+}
+#addCourseModal .modal-box {
+  max-width: 700px;
+  min-width: 420px;
+  padding: 25px;
+}
+#addCourseModal .modal-box .form-row,
+#addCourseModal .modal-box .form-group {
+  margin-bottom: 3px;
+}
+#addCourseModal .modal-box .form-row:last-child,
+#addCourseModal .modal-box .form-group:last-child {
+  margin-bottom: 0;
+}
+#addCourseModal .cancel-btn, #addCourseModal .create-btn {
+  border-radius: 10px !important;
+}
+#addCourseModal .modal-box {
+  max-width: 700px;
+  min-width: 420px;
+  padding: 25px;
+  animation: fadeIn 0.3s;
+}
+
+/* Department Details Modal Redesign */
+.dept-modal-header {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 18px;
+}
+.dept-modal-code {
+  display: inline-block;
+  color: #fff;
+  font-weight: bold;
+  font-size: 1.1rem;
+  border-radius: 6px;
+  padding: 6px 16px;
+  letter-spacing: 1px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+}
+.dept-modal-title {
+  font-size: 1.3rem;
+  font-weight: bold;
+  color: #222;
+  font-family: 'TT Interphases', sans-serif;
+}
+.dept-modal-section {
+  background: #f8f9fa;
+  border-radius: 8px;
+  padding: 14px 18px;
+  margin-bottom: 16px;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.03);
+}
+.dept-modal-row {
+  display: flex;
+  align-items: center;
+  margin-bottom: 8px;
+  font-size: 1rem;
+}
+.dept-modal-label {
+  font-weight: 600;
+  color: #1976d2;
+  min-width: 120px;
+  display: inline-block;
+}
+.dept-modal-courses {
+  margin: 0;
+  padding-left: 18px;
+  font-size: 0.98rem;
+}
+.dept-modal-courses li {
+  margin-bottom: 4px;
+  color: #333;
+}
+
+/* Redesigned Department Details Modal */
+.dept-modal-topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: none !important;
+  box-shadow: none !important;
+  padding: 0 !important;
+  min-height: unset !important;
+  position: relative;
+}
+.dept-modal-topbar-content {
+  display: flex;
+  align-items: center;
+  gap: 0;
+  padding: 0 !important;
+  height: auto !important;
+}
+.dept-modal-code {
+  background: var(--dept-color, #1976d2);
+  color: #fff;
+  font-weight: bold;
+  font-size: 1.1rem;
+  border-radius: 6px;
+  padding: 6px 16px;
+  letter-spacing: 1px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+  margin-right: 6px;
+}
+.dept-modal-dash {
+  color: #222;
+  font-size: 1.2rem;
+  margin-right: 6px;
+}
+.dept-modal-title {
+  font-size: 1.3rem;
+  font-weight: bold;
+  color: #222;
+  font-family: 'TT Interphases', sans-serif;
+}
+.dept-modal-close-btn {
+  background: #fff;
+  color: #222;
+  border: none;
+  border-radius: 50%;
+  width: 36px;
+  height: 36px;
+  font-size: 1.5rem;
+  font-weight: bold;
+  cursor: pointer;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: absolute;
+  right: 18px;
+  top: 10px;
+  transition: background 0.2s;
+}
+.dept-modal-close-btn:hover {
+  background: #f2f2f2;
+}
+.dept-modal-body {
+  background: #fff;
+  border-radius: 0 0 15px 15px;
+  padding: 28px 32px 24px 32px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.03);
+}
+.dept-modal-info-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 12px;
+  font-size: 1rem;
+}
+.dept-modal-icon {
+  font-size: 1.2em;
+  margin-right: 4px;
+}
+.dept-modal-label {
+  font-weight: 600;
+  color: #1976d2;
+  min-width: 120px;
+  display: inline-block;
+}
+.dept-modal-value {
+  font-weight: 500;
+  color: #333;
+  flex: 1;
+}
+.dept-modal-section-divider {
+  border-bottom: 1px solid #e0e0e0;
+  margin: 18px 0 12px 0;
+}
+.dept-modal-courses {
+  margin: 0;
+  padding-left: 18px;
+  font-size: 0.98rem;
+  max-height: 120px;
+  overflow-y: auto;
+}
+.dept-modal-courses li {
+  margin-bottom: 4px;
+  color: #333;
+}
+
+/* Mobile number validation styles for Edit User Modal */
+#edit_mobile_no.invalid {
+  border-color: #dc3545;
+  box-shadow: 0 0 0 0.2rem rgba(220, 53, 69, 0.25);
+}
+
+#edit_mobile_no.valid {
+  border-color: #28a745;
+  box-shadow: 0 0 0 0.2rem rgba(40, 167, 69, 0.25);
+}
+
+#edit_mobile_no:focus {
+  outline: none;
+  border-color: #007bff;
+  box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+}
+

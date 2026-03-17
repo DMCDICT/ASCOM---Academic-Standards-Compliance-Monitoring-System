@@ -1,0 +1,590 @@
+/*
+ * program-management.css
+ * Contains specific, scoped styles for the program management page.
+ */
+
+.content-wrapper,
+.dashboard-container,
+.departments-section,
+.dashboard-bottom {
+    font-family: 'TT Interphases', sans-serif;
+}
+
+/* Modal Animation */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(-20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+#addProgramModal.department-modal-overlay {
+    display: none;
+    position: fixed;
+    z-index: 1003;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    background-color: rgba(0, 0, 0, 0.6);
+    justify-content: center;
+    align-items: center;
+    /* Prevent background scrolling */
+    overscroll-behavior: contain;
+}
+
+#addProgramModal .department-modal-box {
+    background-color: #EFEFEF;
+    margin: auto;
+    padding: 25px;
+    border: 1px solid #888;
+    border-radius: 15px;
+    width: 90%;
+    max-width: 650px;
+    min-height: 300px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+    animation: fadeIn 0.3s;
+}
+
+/* Modal Header with Close Button */
+#addProgramModal .modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid #e5e5e5;
+    padding-bottom: 15px;
+    margin-bottom: 20px;
+}
+
+#addProgramModal .modal-header h2 {
+    margin: 0;
+    font-size: 22px;
+    font-weight: 700;
+    color: #333;
+}
+
+#addProgramModal .close-button {
+    color: #aaa;
+    font-size: 28px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: color 0.2s;
+    line-height: 1;
+    padding: 0;
+    background: none;
+    border: none;
+    width: 30px;
+    height: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+#addProgramModal .close-button:focus,
+#addProgramModal .close-button:hover {
+    color: #000;
+}
+
+/* Form Styles */
+#addProgramModal .form-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    padding-bottom: 0;
+    margin-bottom: 0;
+}
+
+#addProgramModal .form-row {
+    display: flex;
+    gap: 20px;
+    align-items: flex-start;
+}
+
+#addProgramModal .form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+
+#addProgramModal .form-group label {
+    font-size: 14px;
+    font-weight: bold;
+    color: #333;
+    margin-bottom: 6px;
+}
+
+#addProgramModal .form-group input[type="text"],
+#addProgramModal .form-group input[type="email"],
+#addProgramModal .form-group input[type="password"],
+#addProgramModal .form-group select,
+#addProgramModal .form-group textarea {
+    border-radius: 12px;
+    font-size: 16px;
+    height: 50px;
+    padding: 10px;
+    border: 1px solid #ccc;
+    transition: border-color 0.2s ease;
+}
+
+#addProgramModal .form-group textarea {
+    height: auto;
+    min-height: 80px;
+    resize: vertical;
+}
+
+#addProgramModal .form-group input:focus,
+#addProgramModal .form-group select:focus,
+#addProgramModal .form-group textarea:focus {
+    outline: none;
+    border-color: #4A7DFF;
+    box-shadow: 0 0 0 2px rgba(74, 125, 255, 0.2);
+}
+
+/* Button Styles */
+#addProgramModal .form-actions {
+    display: flex;
+    gap: 10px;
+    justify-content: flex-end;
+    margin-top: 10px;
+    margin-bottom: 0;
+}
+
+#addProgramModal .cancel-btn,
+#addProgramModal .create-btn {
+    border-radius: 10px !important;
+}
+
+#addProgramModal .create-btn:disabled {
+    background-color: #ccc !important;
+    color: #666 !important;
+    cursor: not-allowed !important;
+    opacity: 0.6 !important;
+}
+
+#addProgramModal .create-btn:disabled:hover {
+    background-color: #ccc !important;
+    transform: none !important;
+}
+
+/* Color Input Styles */
+#addProgramModal .color-input-wrapper { 
+    display: flex;
+    align-items: center;
+    gap: 8px; 
+    position: relative; 
+    width: 100%; 
+}
+
+#addProgramModal .color-swatch-display { 
+    width: 36px; 
+    height: 36px;
+    border-radius: 50%; 
+    border: 2px solid #ccc; 
+    cursor: pointer;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.2); 
+    flex-shrink: 0; 
+    z-index: 1;
+    transition: border-color 0.2s ease, transform 0.1s ease;
+}
+
+#addProgramModal .color-swatch-display:hover {
+    border-color: #888; 
+    transform: scale(1.05);
+}
+
+#addProgramModal #colorPicker { 
+    position: absolute; 
+    top: 0; 
+    left: 0; 
+    width: 36px; 
+    height: 36px;
+    opacity: 0; 
+    cursor: pointer;
+    z-index: -1; 
+    border: none; 
+    padding: 0;
+    margin: 0; 
+    pointer-events: none;
+}
+
+#addProgramModal #colorPicker::-webkit-color-swatch-wrapper { padding: 0; }
+#addProgramModal #colorPicker::-webkit-color-swatch { border: none; border-radius: 50%; }
+#addProgramModal #colorPicker::-moz-color-swatch-wrapper { padding: 0; }
+#addProgramModal #colorPicker::-moz-color-swatch { border: none; border-radius: 50%; }
+
+#addProgramModal .color-input-wrapper input[type="text"] { 
+    flex-grow: 1; 
+    padding-right: 30px; 
+    width: auto; 
+    position: relative;
+    z-index: 1;
+    /* Disable browser autocomplete and suggestions */
+    -webkit-autocomplete: off;
+    -moz-autocomplete: off;
+    autocomplete: off;
+    -webkit-text-security: none;
+    /* Additional properties to disable suggestions */
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+    /* Disable spellcheck and autocorrect */
+    spellcheck: false;
+    autocorrect: off;
+    autocapitalize: off;
+}
+
+/* Disable browser color suggestions dropdown */
+#addProgramModal .color-input-wrapper input[type="text"]::-webkit-calendar-picker-indicator {
+    display: none !important;
+}
+
+#addProgramModal .color-input-wrapper input[type="text"]::-webkit-list-button {
+    display: none !important;
+}
+
+#addProgramModal .color-input-wrapper input[type="text"]::-webkit-search-cancel-button {
+    display: none !important;
+}
+
+#addProgramModal .clear-input-btn { 
+    position: absolute;
+    right: 5px; 
+    top: 50%;
+    transform: translateY(-50%);
+    background: none;
+    border: none;
+    color: #999;
+    font-size: 20px;
+    font-weight: bold;
+    cursor: pointer;
+    padding: 0 5px;
+    line-height: 1;
+    transition: color 0.2s ease;
+    z-index: 10;
+}
+
+#addProgramModal .clear-input-btn:hover {
+    color: #333;
+}
+
+#addProgramModal .color-field-container {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+#addProgramModal .color-input-wrapper {
+    flex: 1;
+}
+
+#addProgramModal .color-buttons-wrapper {
+    display: flex;
+    gap: 4px;
+    flex-shrink: 0;
+}
+
+#addProgramModal .random-color-btn { 
+    background: #f8f9fa;
+    border: 1px solid #dee2e6;
+    color: #6c757d;
+    font-size: 14px;
+    cursor: pointer;
+    padding: 8px 10px;
+    border-radius: 4px;
+    transition: all 0.2s ease;
+    font-family: 'TT Interphases', sans-serif;
+    min-width: 36px;
+    height: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+#addProgramModal .random-color-btn:hover {
+    color: #1976d2;
+    background: #e3f2fd;
+    border-color: #1976d2;
+}
+
+#addProgramModal .clear-color-btn { 
+    background: #f8f9fa;
+    border: 1px solid #dee2e6;
+    color: #6c757d;
+    font-size: 14px;
+    cursor: pointer;
+    padding: 8px 10px;
+    border-radius: 4px;
+    transition: all 0.2s ease;
+    font-family: 'TT Interphases', sans-serif;
+    min-width: 36px;
+    height: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+#addProgramModal .clear-color-btn:hover {
+    color: #dc3545;
+    background: #f8d7da;
+    border-color: #dc3545;
+}
+
+/* Color suggestions dropdown styling */
+.color-suggestions-dropdown {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    background: white;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    z-index: 1000;
+    max-height: 200px;
+    overflow-y: auto;
+    margin-top: 4px;
+}
+
+.color-suggestion {
+    display: flex;
+    align-items: center;
+    padding: 8px 12px;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+    border-bottom: 1px solid #f0f0f0;
+}
+
+.color-suggestion:last-child {
+    border-bottom: none;
+}
+
+.color-suggestion:hover {
+    background-color: #f5f5f5;
+}
+
+.color-suggestion .color-swatch {
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    border: 2px solid #fff;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+    margin-right: 12px;
+    flex-shrink: 0;
+}
+
+.color-suggestion .color-name {
+    font-weight: 500;
+    color: #333;
+    margin-right: 8px;
+    min-width: 80px;
+}
+
+.color-suggestion .color-hex {
+    color: #666;
+    font-family: monospace;
+    font-size: 12px;
+}
+
+/* Success Modal Styles */
+#successModal.department-modal-overlay {
+    display: none;
+    position: fixed;
+    z-index: 1004;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    background-color: rgba(0, 0, 0, 0.6);
+    justify-content: center;
+    align-items: center;
+}
+
+#successModal .department-modal-box {
+    background-color: #EFEFEF;
+    margin: auto;
+    padding: 25px;
+    border: 1px solid #888;
+    border-radius: 15px;
+    width: 400px;
+    text-align: center;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+    animation: fadeIn 0.3s;
+}
+
+#successModal h2 {
+    color: green;
+    margin-bottom: 10px;
+    font-size: 20px;
+    font-weight: 700;
+}
+
+#successModal p {
+    font-size: 16px;
+    margin-bottom: 20px;
+    color: #333;
+}
+
+#successModal img {
+    width: 60px;
+    height: 60px;
+    margin-bottom: 15px;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    #addProgramModal .form-row {
+        flex-direction: column;
+        gap: 15px;
+    }
+    
+    #addProgramModal .form-group {
+        width: 100% !important;
+    }
+    
+    #addProgramModal .form-actions {
+        flex-direction: column;
+        align-items: stretch;
+    }
+    
+    #addProgramModal .cancel-btn,
+    #addProgramModal .create-btn {
+        width: 100%;
+    }
+} 
+
+#editProgramModal .color-input-wrapper input[type="text"] {
+    flex-grow: 1;
+    padding-right: 30px;
+    width: auto;
+    position: relative;
+    z-index: 2;
+    /* Disable browser autocomplete and suggestions */
+    -webkit-autocomplete: off;
+    -moz-autocomplete: off;
+    autocomplete: off;
+    -webkit-text-security: none;
+    /* Additional properties to disable suggestions */
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+    /* Disable spellcheck and autocorrect */
+    spellcheck: false;
+    autocorrect: off;
+    autocapitalize: off;
+}
+
+#editProgramModal #editColorPicker { 
+    position: absolute; 
+    top: 0; 
+    left: 0; 
+    width: 36px; 
+    height: 36px;
+    opacity: 0; 
+    cursor: pointer;
+    z-index: -1; 
+    border: none; 
+    padding: 0;
+    margin: 0; 
+    /* Behind the text field but functional for events */
+}
+
+#editProgramModal .color-input-wrapper {
+    display: flex;
+    align-items: center;
+    gap: 8px; 
+    position: relative; 
+    width: 100%;
+}
+
+#editProgramModal .color-swatch-display { 
+    width: 36px; 
+    height: 36px;
+    border-radius: 50%; 
+    border: 2px solid #ccc; 
+    cursor: pointer;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.2); 
+    flex-shrink: 0; 
+    z-index: 3;
+    transition: border-color 0.2s ease, transform 0.1s ease;
+}
+
+#editProgramModal .color-swatch-display:hover {
+    border-color: #888; 
+    transform: scale(1.05);
+}
+
+#editProgramModal .clear-input-btn { 
+    position: absolute;
+    right: 5px; 
+    top: 50%;
+    transform: translateY(-50%);
+    background: none;
+    border: none;
+    color: #999;
+    font-size: 20px;
+    font-weight: bold;
+    cursor: pointer;
+    padding: 0 5px;
+    line-height: 1;
+    transition: color 0.2s ease;
+    z-index: 10;
+} 
+
+#editProgramModal .create-btn:disabled {
+    background-color: #ccc !important;
+    color: #666 !important;
+    cursor: not-allowed !important;
+    opacity: 0.6 !important;
+}
+
+#editProgramModal .create-btn:disabled:hover {
+    background-color: #ccc !important;
+    transform: none !important;
+} 
+
+/* Info icon styling */
+#editProgramModal .info-icon {
+    position: absolute;
+    right: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #007bff;
+    font-size: 16px;
+    cursor: help;
+    font-weight: bold;
+    transition: color 0.2s ease;
+    user-select: none;
+    z-index: 2;
+}
+
+#editProgramModal .info-icon:hover {
+    color: #0056b3;
+    transform: translateY(-50%) scale(1.1);
+}
+
+/* References column styling */
+.references-count {
+    text-align: center;
+    font-weight: 500;
+    color: #333;
+}
+
+.references-count:empty::before {
+    content: "0";
+    color: #999;
+}
+
+/* Units column styling */
+.units-count {
+    text-align: center;
+    font-weight: 500;
+    color: #333;
+}
+
+/* Removed conflicting CSS rules that were interfering with individual program table */ 

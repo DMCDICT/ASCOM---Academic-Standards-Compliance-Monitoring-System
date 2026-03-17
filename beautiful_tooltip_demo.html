@@ -1,0 +1,433 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Beautiful Tooltip Design Demo</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+        
+        body {
+            margin: 0;
+            padding: 20px;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #333;
+        }
+
+        .demo-container {
+            display: flex;
+            gap: 40px;
+            align-items: flex-start;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .sidebar {
+            width: 298px;
+            background: linear-gradient(135deg, #0C4B34 0%, #0F7A53 100%);
+            height: 600px;
+            position: relative;
+            border-radius: 20px;
+            transition: width 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+            overflow: hidden;
+        }
+
+        .sidebar.collapsed {
+            width: 115px;
+        }
+
+        .nav-buttons {
+            display: flex;
+            flex-direction: column;
+            padding: 30px 20px;
+            gap: 15px;
+        }
+
+        .nav-button {
+            width: 100%;
+            height: 65px;
+            border-radius: 18px;
+            display: flex;
+            align-items: center;
+            padding: 0 20px;
+            box-sizing: border-box;
+            color: #FFFFFF;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            margin-bottom: 15px;
+            position: relative;
+            background: rgba(255,255,255,0.1);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255,255,255,0.2);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            overflow: hidden;
+        }
+
+        .nav-button:hover {
+            background: rgba(255,255,255,0.2);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.2);
+        }
+
+        .nav-button.active {
+            background: rgba(255,255,255,0.25);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.3);
+        }
+
+        .nav-icon-wrapper {
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-width: 50px;
+            height: 50px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 12px;
+            margin-right: 15px;
+        }
+
+        .nav-icon {
+            width: 24px;
+            height: 24px;
+            filter: brightness(0) invert(1);
+        }
+
+        .nav-tooltip {
+            position: absolute;
+            opacity: 0;
+            visibility: hidden;
+            display: none;
+            pointer-events: none;
+            z-index: 9999;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            transform: translateY(-50%) scale(0.95);
+        }
+
+        /* Hide text when collapsed */
+        .sidebar.collapsed .nav-button > span:not(.nav-icon-wrapper) {
+            opacity: 0;
+            width: 0;
+            margin-left: 0;
+            pointer-events: none;
+            user-select: none;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .sidebar.collapsed .nav-icon-wrapper {
+            margin-right: 0;
+        }
+
+        .demo-panel {
+            background: rgba(255,255,255,0.95);
+            backdrop-filter: blur(20px);
+            padding: 30px;
+            border-radius: 20px;
+            border: 1px solid rgba(255,255,255,0.3);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            min-width: 400px;
+        }
+
+        .demo-panel h2 {
+            margin-top: 0;
+            color: #2c3e50;
+            font-weight: 700;
+            font-size: 24px;
+        }
+
+        .demo-panel h3 {
+            color: #34495e;
+            font-weight: 600;
+            margin-bottom: 15px;
+        }
+
+        .feature-list {
+            list-style: none;
+            padding: 0;
+        }
+
+        .feature-list li {
+            padding: 8px 0;
+            color: #555;
+            position: relative;
+            padding-left: 25px;
+        }
+
+        .feature-list li::before {
+            content: '✨';
+            position: absolute;
+            left: 0;
+            top: 8px;
+        }
+
+        .controls {
+            margin-top: 30px;
+        }
+
+        .btn {
+            padding: 12px 24px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            cursor: pointer;
+            font-weight: 600;
+            margin: 5px;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
+        }
+
+        .status {
+            background: rgba(52, 152, 219, 0.1);
+            padding: 15px;
+            border-radius: 12px;
+            margin-top: 20px;
+            border-left: 4px solid #3498db;
+        }
+
+        .status h4 {
+            margin: 0 0 10px 0;
+            color: #2c3e50;
+            font-weight: 600;
+        }
+
+        .status-item {
+            display: flex;
+            justify-content: space-between;
+            margin: 5px 0;
+            font-size: 14px;
+            color: #555;
+        }
+
+        .status-value {
+            font-weight: 600;
+            color: #2c3e50;
+        }
+    </style>
+</head>
+<body>
+    <div class="demo-container">
+        <div class="demo-panel">
+            <h2>🎨 Beautiful Tooltip Design</h2>
+            
+            <h3>✨ Features</h3>
+            <ul class="feature-list">
+                <li>Gradient background with glassmorphism effect</li>
+                <li>Smooth scale and fade animations</li>
+                <li>Elegant arrow with drop shadow</li>
+                <li>TT Interphases font with letter spacing</li>
+                <li>Backdrop blur and subtle borders</li>
+                <li>Professional color scheme</li>
+                <li>Micro-interactions on hover</li>
+                <li>Responsive positioning</li>
+            </ul>
+
+            <div class="controls">
+                <button class="btn" onclick="toggleSidebar()">Toggle Sidebar</button>
+                <button class="btn" onclick="showAllTooltips()">Show All Tooltips</button>
+                <button class="btn" onclick="hideAllTooltips()">Hide All Tooltips</button>
+            </div>
+
+            <div class="status">
+                <h4>📊 Status</h4>
+                <div class="status-item">
+                    <span>Sidebar State:</span>
+                    <span class="status-value" id="sidebarState">Expanded</span>
+                </div>
+                <div class="status-item">
+                    <span>Tooltips Found:</span>
+                    <span class="status-value" id="tooltipCount">6</span>
+                </div>
+                <div class="status-item">
+                    <span>Animation:</span>
+                    <span class="status-value">Smooth</span>
+                </div>
+            </div>
+        </div>
+
+        <nav class="sidebar" id="sidebar">
+            <div class="nav-buttons">
+                <div class="nav-button active" data-test="button1">
+                    <span class="nav-icon-wrapper">
+                        <span class="nav-tooltip">Dashboard Overview</span>
+                    </span>
+                    <span>Dashboard</span>
+                </div>
+                
+                <div class="nav-button" data-test="button2">
+                    <span class="nav-icon-wrapper">
+                        <span class="nav-tooltip">User Account Management</span>
+                    </span>
+                    <span>User Management</span>
+                </div>
+                
+                <div class="nav-button" data-test="button3">
+                    <span class="nav-icon-wrapper">
+                        <span class="nav-tooltip">School Calendar System</span>
+                    </span>
+                    <span>Calendar</span>
+                </div>
+                
+                <div class="nav-button" data-test="button4">
+                    <span class="nav-icon-wrapper">
+                        <span class="nav-tooltip">System Settings</span>
+                    </span>
+                    <span>Settings</span>
+                </div>
+                
+                <div class="nav-button" data-test="button5">
+                    <span class="nav-icon-wrapper">
+                        <span class="nav-tooltip">Create New Account</span>
+                    </span>
+                    <span>New Account</span>
+                </div>
+                
+                <div class="nav-button" data-test="button6">
+                    <span class="nav-icon-wrapper">
+                        <span class="nav-tooltip">Sign Out</span>
+                    </span>
+                    <span>Logout</span>
+                </div>
+            </div>
+        </nav>
+    </div>
+
+    <script>
+        function updateStatus() {
+            const sidebar = document.getElementById('sidebar');
+            const isCollapsed = sidebar.classList.contains('collapsed');
+            
+            document.getElementById('sidebarState').textContent = isCollapsed ? 'Collapsed' : 'Expanded';
+            
+            const tooltips = document.querySelectorAll('.nav-tooltip');
+            document.getElementById('tooltipCount').textContent = tooltips.length;
+        }
+
+        function toggleSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            sidebar.classList.toggle('collapsed');
+            updateStatus();
+        }
+
+        function showAllTooltips() {
+            const sidebar = document.getElementById('sidebar');
+            if (!sidebar.classList.contains('collapsed')) {
+                toggleSidebar();
+                setTimeout(showAllTooltips, 400);
+                return;
+            }
+            
+            const tooltips = document.querySelectorAll('.nav-tooltip');
+            tooltips.forEach((tooltip, index) => {
+                setTimeout(() => {
+                    showTooltip(tooltip);
+                }, index * 100);
+            });
+        }
+
+        function hideAllTooltips() {
+            const tooltips = document.querySelectorAll('.nav-tooltip');
+            tooltips.forEach(tooltip => {
+                hideTooltip(tooltip);
+            });
+        }
+
+        function showTooltip(tooltip) {
+            tooltip.style.cssText = `
+                position: absolute !important;
+                left: 100% !important;
+                top: 50% !important;
+                transform: translateY(-50%) !important;
+                background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%) !important;
+                color: #ffffff !important;
+                padding: 12px 20px !important;
+                border-radius: 12px !important;
+                font-size: 14px !important;
+                font-weight: 600 !important;
+                white-space: nowrap !important;
+                opacity: 0 !important;
+                visibility: visible !important;
+                display: block !important;
+                pointer-events: none !important;
+                z-index: 9999 !important;
+                margin-left: 20px !important;
+                box-shadow: 0 8px 32px rgba(0,0,0,0.3), 0 4px 16px rgba(0,0,0,0.2) !important;
+                border: 1px solid rgba(255,255,255,0.1) !important;
+                backdrop-filter: blur(10px) !important;
+                transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+                font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important;
+                letter-spacing: 0.5px !important;
+                text-shadow: 0 1px 2px rgba(0,0,0,0.3) !important;
+            `;
+            
+            // Add arrow
+            tooltip.innerHTML = `
+                <div style="
+                    position: absolute;
+                    left: -8px;
+                    top: 50%;
+                    transform: translateY(-50%);
+                    width: 0;
+                    height: 0;
+                    border-top: 8px solid transparent;
+                    border-bottom: 8px solid transparent;
+                    border-right: 8px solid #2c3e50;
+                    filter: drop-shadow(-2px 0 4px rgba(0,0,0,0.2));
+                "></div>
+                ${tooltip.textContent}
+            `;
+            
+            // Smooth fade-in animation
+            setTimeout(() => {
+                tooltip.style.opacity = '1';
+                tooltip.style.transform = 'translateY(-50%) scale(1)';
+            }, 10);
+        }
+
+        function hideTooltip(tooltip) {
+            tooltip.style.opacity = '0';
+            tooltip.style.transform = 'translateY(-50%) scale(0.95)';
+            
+            setTimeout(() => {
+                tooltip.style.visibility = 'hidden';
+                tooltip.style.display = 'none';
+                tooltip.innerHTML = tooltip.textContent;
+            }, 300);
+        }
+
+        // Add hover listeners
+        document.addEventListener('DOMContentLoaded', function() {
+            const buttons = document.querySelectorAll('.nav-button');
+            
+            buttons.forEach((button, index) => {
+                const tooltip = button.querySelector('.nav-tooltip');
+                
+                button.addEventListener('mouseenter', function() {
+                    const sidebar = document.getElementById('sidebar');
+                    const isCollapsed = sidebar.classList.contains('collapsed');
+                    
+                    if (isCollapsed && tooltip) {
+                        showTooltip(tooltip);
+                    }
+                });
+                
+                button.addEventListener('mouseleave', function() {
+                    if (tooltip) {
+                        hideTooltip(tooltip);
+                    }
+                });
+            });
+            
+            updateStatus();
+        });
+    </script>
+</body>
+</html>

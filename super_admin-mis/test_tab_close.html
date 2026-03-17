@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tab Close Logout Test</title>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; }
+        .test-section { margin: 20px 0; padding: 15px; border: 1px solid #ccc; }
+        button { padding: 10px 15px; margin: 5px; cursor: pointer; }
+        .log { background: #f5f5f5; padding: 10px; margin: 10px 0; border-radius: 5px; }
+    </style>
+</head>
+<body>
+    <h1>Tab Close Logout Test</h1>
+    
+    <div class="test-section">
+        <h3>Test Tab Close Logout</h3>
+        <p>This page tests the tab close logout functionality.</p>
+        <button onclick="testTabClose()">Test Tab Close Logout</button>
+        <button onclick="clearLog()">Clear Log</button>
+        <div id="log" class="log"></div>
+    </div>
+
+    <script>
+        // Simulate the getCurrentUserEmployeeNo function
+        function getCurrentUserEmployeeNo() {
+            console.log('🔍 Getting current user employee number...');
+            
+            // For testing, return a test employee number
+            const testEmployeeNo = 'TEST001';
+            console.log('✅ Test user:', testEmployeeNo);
+            return testEmployeeNo;
+        }
+
+        // Simulate the tab close logout
+        function testTabClose() {
+            console.log('🚪 Testing tab close logout...');
+            
+            const currentUser = getCurrentUserEmployeeNo();
+            console.log('👤 Current user for logout:', currentUser);
+            
+            if (currentUser && currentUser !== 'SUPER_ADMIN') {
+                const logoutData = {
+                    employee_no: currentUser
+                };
+                
+                console.log('📤 Sending logout data:', logoutData);
+                
+                // Use fetch instead of sendBeacon for testing
+                fetch('./logout_on_tab_close.php', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(logoutData)
+                })
+                .then(response => response.json())
+                .then(data => {
+                    console.log('📡 Logout response:', data);
+                    addToLog('✅ Logout test completed: ' + JSON.stringify(data));
+                })
+                .catch(error => {
+                    console.error('❌ Logout test failed:', error);
+                    addToLog('❌ Logout test failed: ' + error.message);
+                });
+            } else {
+                console.log('⚠️ No valid user found for logout');
+                addToLog('⚠️ No valid user found for logout');
+            }
+        }
+
+        function addToLog(message) {
+            const log = document.getElementById('log');
+            const timestamp = new Date().toLocaleTimeString();
+            log.innerHTML += `<div>[${timestamp}] ${message}</div>`;
+        }
+
+        function clearLog() {
+            document.getElementById('log').innerHTML = '';
+        }
+
+        // Add beforeunload event listener for testing
+        window.addEventListener('beforeunload', function(e) {
+            console.log('🚪 Tab closing, logging out user...');
+            
+            const currentUser = getCurrentUserEmployeeNo();
+            console.log('👤 Current user for logout:', currentUser);
+            
+            if (currentUser && currentUser !== 'SUPER_ADMIN') {
+                const logoutData = {
+                    employee_no: currentUser
+                };
+                
+                console.log('📤 Sending logout data:', logoutData);
+                
+                // Use sendBeacon for reliable delivery during page unload
+                if (navigator.sendBeacon) {
+                    const blob = new Blob([JSON.stringify(logoutData)], {type: 'application/json'});
+                    const success = navigator.sendBeacon('./logout_on_tab_close.php', blob);
+                    console.log('📡 SendBeacon result:', success);
+                } else {
+                    // Fallback for older browsers
+                    const xhr = new XMLHttpRequest();
+                    xhr.open('POST', './logout_on_tab_close.php', false);
+                    xhr.setRequestHeader('Content-Type', 'application/json');
+                    xhr.send(JSON.stringify(logoutData));
+                    console.log('📡 XHR fallback used');
+                }
+                
+                console.log('✅ Logout request sent for user:', currentUser);
+            } else {
+                console.log('⚠️ No valid user found for logout or user is SUPER_ADMIN');
+            }
+        });
+
+        addToLog('🚀 Tab close logout test page loaded');
+    </script>
+</body>
+</html> 

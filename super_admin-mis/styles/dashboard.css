@@ -1,0 +1,726 @@
+/*
+ * dashboard.css
+ * Styles specific to the dashboard.php content fragment.
+ *
+ * Organized by dashboard section for better readability.
+ */
+
+/* -------------------------------------- */
+/* 1. General Dashboard Layout & Overrides */
+/* -------------------------------------- */
+/* The .dashboard-container wraps the top overview boxes */
+.dashboard-container { 
+    display: flex; 
+    flex-wrap: wrap; 
+    gap: 20px; 
+    padding: 0; /* Padding is handled by content-wrapper */
+    margin-bottom: 20px; /* Space below the overview boxes section */
+    margin-top: 0; /* Remove top margin to eliminate gap */
+}
+
+/* Common h2 for content sections (like 'Overview') within dashboard containers */
+/* Note: main-page-title in global.css also styles h2. This is more specific if h2 is inside .dashboard-container */
+.dashboard-container h2 { 
+    margin-top: 5px;
+    font-size: 20px; 
+    font-family: 'TT Interphases Bold', sans-serif;
+    /* Other h2 styles (color, margin-top, margin-bottom) are inherited from .main-page-title in global.css */
+}
+
+/* Style for total amounts in overview boxes */
+.dashboard-container .amount { 
+    margin-top: -10px; 
+    font-size: 30px; 
+    font-weight: bold; 
+    font-family: 'TT Interphases', sans-serif; 
+}
+
+/* The .dashboard-bottom wraps Recent Activities and Active Users */
+.dashboard-bottom { 
+    display: flex; 
+    margin-top: 20px; /* Space above this section */
+    gap: 20px; 
+    flex-wrap: wrap; 
+    padding: 0 0px; /* Assuming padding is handled by content-wrapper */
+}
+
+
+/* -------------------------------------- */
+/* 2. Overview Boxes */
+/* -------------------------------------- */
+.box { 
+    background-color: #fff; 
+    padding: 20px; 
+    border-radius: 8px; 
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1); 
+    flex: 1 1 calc(25% - 20px); /* Four boxes per row minus gap */
+    min-width: 220px; 
+    box-sizing: border-box; 
+}
+
+/* Dark Mode - Overview Cards */
+html[data-theme="dark"] .box {
+    background-color: #252525 !important;
+    color: #ffffff !important;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3) !important;
+}
+
+html[data-theme="dark"] .box h2 {
+    color: #ffffff !important;
+}
+
+html[data-theme="dark"] .dashboard-container .amount {
+    color: #ffffff !important;
+}
+
+/* Keep Development text green in dark mode - target by inline style attribute */
+html[data-theme="dark"] .box .amount[style*="color: green"],
+html[data-theme="dark"] .box .amount[style*="color:green"],
+html[data-theme="dark"] .box .amount[style*="color:#4CAF50"],
+html[data-theme="dark"] .box .amount[style*="color: green;"],
+html[data-theme="dark"] .box .amount[style*="color:green;"],
+html[data-theme="dark"] .box .amount[style*="green"] {
+    color: #4CAF50 !important; /* Keep green color */
+}
+
+.stat-box {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: flex-start;
+  padding: 24px 20px 20px 20px;
+  border-radius: 15px;
+  background: #fff;
+  box-shadow: 0 10px 25px rgba(0,0,0,0.08);
+  min-width: 200px;
+  min-height: 120px;
+  margin: 0 10px 20px 0;
+}
+.stat-box-header {
+  width: 100%;
+}
+.stat-title {
+  font-family: 'TT Interphases', sans-serif;
+  font-size: 18px;
+  font-weight: 600;
+  color: #222;
+}
+.stat-icon {
+  width: 38px;
+  height: 38px;
+  object-fit: contain;
+  flex-shrink: 0;
+}
+.stat-amount {
+  width: 100%;
+  text-align: center;
+  margin-top: 10px;
+}
+
+.stat-box-row {
+    min-height: unset !important;
+    height: auto !important;
+    white-space: nowrap;
+}
+
+.stat-box-row .stat-title {
+    white-space: nowrap;
+}
+
+.stat-box-row .stat-amount {
+    white-space: nowrap;
+}
+
+.stat-box-row .stat-icon {
+  width: 38px;
+  height: 38px;
+  vertical-align: middle;
+  display: flex;
+  align-items: center;
+}
+
+.stat-box.stat-box-row {
+    display: flex !important;
+    flex-direction: row !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    padding: 14px 16px !important;
+    min-height: unset !important;
+    height: auto !important;
+    border-radius: 8px !important;
+    margin: 0 !important;
+    white-space: nowrap;
+}
+
+.stat-box.stat-box-row .stat-title,
+.stat-box.stat-box-row .stat-amount {
+    white-space: nowrap;
+}
+
+.stat-box.stat-box-row .stat-title {
+    margin-right: auto !important;
+    white-space: nowrap;
+}
+
+.stat-box.stat-box-row .stat-amount {
+    text-align: right !important;
+    margin: 0 !important;
+    white-space: nowrap;
+}
+
+
+/* -------------------------------------- */
+/* 3. Department Management Section */
+/* -------------------------------------- */
+.departments-section { 
+    padding: 0 0px 10px; /* Assuming padding is handled by content-wrapper */
+    margin-top: 0px; /* Aligns with previous section if needed */
+} 
+
+.departments-header { 
+    display: flex; 
+    justify-content: space-between; 
+    align-items: center; 
+    margin-bottom: 10px; 
+}
+.departments-header h3 { 
+    font-size: 20px; 
+    color: #333; 
+    margin-bottom: 5px; 
+    font-family: 'TT Interphases', sans-serif; 
+}
+.departments-header p { 
+    font-size: 14px; 
+    color: #777; 
+    font-family: 'TT Interphases', sans-serif; 
+    margin-top: 0; 
+}
+.add-dept-btn { 
+    background-color: #2196F3; 
+    color: white; 
+    border: none; 
+    padding: 10px 16px; 
+    border-radius: 4px; 
+    cursor: pointer; 
+    font-size: 14px; 
+}
+.add-dept-btn:hover { 
+    background-color: #1976D2; 
+}
+
+.departments-container { 
+    display: flex; 
+    gap: 20px; 
+    flex-wrap: wrap; 
+    margin-top: 10px; 
+    margin-right: -20px; 
+} 
+
+.department-card {
+  background-color: #fff;
+  border-radius: 8px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+  padding: 18px;
+  flex: 0 0 calc(33.333% - 20px);
+  box-sizing: border-box;
+  min-width: 260px;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  position: relative;
+  height: 100%;
+}
+.department-card h3 { 
+    font-size: 18px; 
+    margin: 0px 0 4px; 
+    font-family: 'TT Interphases', sans-serif; 
+}
+.department-card p { 
+    font-size: 14px; 
+    margin: 2px 0; 
+    font-weight: normal; 
+    font-family: 'TT Interphases', sans-serif; 
+}
+.department-card.hidden { 
+    display: none; 
+}
+.dept-code {
+  display: inline-block !important;
+  width: auto !important;
+  min-width: 0 !important;
+  max-width: none !important;
+  align-self: flex-start !important;
+  padding: 4px 12px;
+  border-radius: 4px;
+  color: #fff;
+  font-weight: bold;
+  margin-bottom: 8px;
+  font-size: 1rem;
+  box-sizing: border-box;
+  background-clip: padding-box;
+}
+
+.view-all-btn { 
+    margin-top: 15px; 
+    background-color: transparent; 
+    color: #2196F3; 
+    border: none; 
+    font-size: 14px; 
+    cursor: pointer; 
+    text-decoration: underline; 
+    display: block; 
+    margin-left: auto; 
+}
+.view-details-btn {
+  margin-top: auto;
+  align-self: flex-end;
+  background: #1976d2;
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  padding: 6px 18px;
+  font-size: 1rem;
+  font-family: 'TT Interphases', sans-serif;
+  font-weight: bold;
+  cursor: pointer;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.07);
+  position: relative;
+}
+
+.dept-indicator-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 8px;
+  margin-bottom: 0;
+  gap: 10px;
+}
+.dept-indicator-row span {
+  font-size: 14px;
+  font-family: 'TT Interphases', sans-serif;
+}
+.dept-indicator-row .view-details-btn {
+  margin-top: 0;
+  align-self: unset;
+  margin-left: auto;
+}
+.staff-row-only {
+  justify-content: flex-start;
+  margin-top: 2px;
+  margin-bottom: 0;
+}
+.staff-row-only span {
+  margin-left: 0;
+}
+
+.dean-indicator {
+  margin-bottom: 0 !important;
+  margin-top: 0 !important;
+}
+.dean-indicator + .dept-indicator-row {
+  margin-top: 0 !important;
+}
+
+
+/* -------------------------------------- */
+/* 4. Recent Activities & Active Users Tables */
+/* -------------------------------------- */
+.recent-activities { 
+    flex: 2; 
+    background-color: #fff; 
+    padding: 20px; 
+    border-radius: 8px; 
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1); 
+    overflow-x: auto; 
+}
+.active-users { 
+    flex: 1; 
+    background-color: #fff; 
+    padding: 20px; 
+    border-radius: 8px; 
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1); 
+    max-height: 400px; 
+    overflow-y: auto; 
+}
+
+/* FIX: Corrected table selectors to apply to tables within .recent-activities */
+.recent-activities table { 
+    width: 100%; 
+    border-collapse: collapse; 
+} 
+.recent-activities table th, .recent-activities table td { 
+    padding: 10px; 
+    text-align: left; 
+    border-bottom: 1px solid #ddd; 
+    font-size: 14px; 
+}
+.recent-activities table th { 
+    background-color: #f2f2f2; 
+    font-weight: bold; 
+    color: #555; 
+}
+
+/* Dark Mode - Recent Activities */
+html[data-theme="dark"] .recent-activities {
+    background-color: #252525 !important;
+    color: #e0e0e0 !important;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3) !important;
+}
+
+html[data-theme="dark"] .recent-activities h3 {
+    color: #e0e0e0 !important;
+}
+
+html[data-theme="dark"] .recent-activities table {
+    background-color: #252525 !important;
+    color: #e0e0e0 !important;
+}
+
+html[data-theme="dark"] .recent-activities table th {
+    background-color: #2d2d2d !important;
+    color: #e0e0e0 !important;
+    border-bottom-color: #404040 !important;
+}
+
+html[data-theme="dark"] .recent-activities table td {
+    color: #e0e0e0 !important;
+    border-bottom-color: #404040 !important;
+}
+
+html[data-theme="dark"] .recent-activities table tbody tr:hover {
+    background-color: #2d2d2d !important;
+}
+
+.staff-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 2px;
+  margin-bottom: 0;
+}
+.staff-row span {
+  text-align: left;
+  margin-right: 0;
+  margin-bottom: 0;
+}
+
+
+/* -------------------------------------- */
+/* 5. Responsive Adjustments (Media Queries) */
+/* -------------------------------------- */
+@media (max-width: 1200px) { 
+    .department-card { 
+        flex: 0 0 calc(50% - 20px); 
+    } 
+}
+@media (max-width: 768px) { 
+    .box { 
+        flex: 1 1 100%; 
+    } 
+    .department-card { 
+        flex: 1 1 100%; 
+    } 
+    .dashboard-bottom > div { 
+        flex: 1 1 100%; 
+    } 
+}
+
+/* Department Details Modal Styles */
+.dept-info-section,
+.dean-assignment-section,
+.dept-teachers-section {
+    margin-bottom: 25px;
+    padding: 20px;
+    background-color: #f8f9fa;
+    border-radius: 10px;
+    border: 1px solid #e9ecef;
+}
+
+.dept-info-section h3,
+.dean-assignment-section h3,
+.dept-teachers-section h3 {
+    margin: 0 0 15px 0;
+    color: #333;
+    font-size: 18px;
+    font-weight: 600;
+}
+
+.dept-info-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 15px;
+}
+
+.info-item {
+    display: flex;
+    flex-direction: column;
+}
+
+.info-item label {
+    font-weight: 600;
+    color: #666;
+    font-size: 12px;
+    margin-bottom: 5px;
+    text-transform: uppercase;
+}
+
+.info-item span {
+    font-size: 14px;
+    color: #333;
+    font-weight: 500;
+}
+
+.current-dean {
+    margin-bottom: 20px;
+    padding: 15px;
+    background-color: #e8f5e8;
+    border-radius: 8px;
+    border-left: 4px solid #28a745;
+}
+
+.current-dean label {
+    font-weight: 600;
+    color: #333;
+    margin-bottom: 5px;
+    display: block;
+}
+
+.current-dean span {
+    font-size: 16px;
+    color: #28a745;
+    font-weight: 600;
+}
+
+.dean-assignment-form label {
+    font-weight: 600;
+    color: #333;
+    margin-bottom: 8px;
+    display: block;
+}
+
+.dean-actions {
+    display: flex;
+    gap: 10px;
+    margin-top: 15px;
+}
+
+.dean-actions button {
+    flex: 1;
+    padding: 12px 20px;
+    border: none;
+    border-radius: 8px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.dean-actions button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+}
+
+#assignDeanBtn {
+    background-color: #739AFF;
+    color: white;
+}
+
+#assignDeanBtn:hover {
+    background-color: #5a7cff;
+}
+
+#removeDeanBtn {
+    background-color: #FF6B6B;
+    color: white;
+}
+
+#removeDeanBtn:hover {
+    background-color: #ff5252;
+}
+
+.teacher-item {
+    padding: 15px;
+    border: 1px solid #e9ecef;
+    border-radius: 8px;
+    margin-bottom: 10px;
+    background-color: white;
+    transition: all 0.3s ease;
+}
+
+.teacher-item:hover {
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    border-color: #739AFF;
+}
+
+.teacher-item strong {
+    color: #333;
+    font-size: 16px;
+}
+
+.teacher-item small {
+    color: #666;
+    font-size: 12px;
+    line-height: 1.4;
+}
+
+/* Add bottom padding to the department teachers list */
+.dept-teachers-section {
+    padding-bottom: 30px;
+}
+
+/* Add extra bottom margin to the last teacher item */
+.teacher-item:last-child {
+    margin-bottom: 15px;
+}
+
+/* Add bottom padding to the teachers list container */
+#deptTeachersList {
+    padding-bottom: 15px;
+}
+
+/* Account Access Management Styles */
+.account-access-section {
+    margin: 30px 0;
+}
+
+.account-access-header {
+    margin-bottom: 25px;
+}
+
+.account-access-header h3 {
+    margin: 0 0 10px 0;
+    color: #333;
+    font-size: 20px;
+    font-weight: 600;
+}
+
+.account-access-header p {
+    margin: 0;
+    color: #666;
+    font-size: 14px;
+}
+
+.account-access-cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 20px;
+}
+
+.access-card {
+    background: white;
+    padding: 20px;
+    border-radius: 12px;
+    border: 1px solid #e0e0e0;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    transition: all 0.3s ease;
+}
+
+.access-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 16px rgba(0,0,0,0.15);
+}
+
+.access-card-header {
+    display: flex;
+    align-items: center;
+    margin-bottom: 15px;
+}
+
+.access-card-icon {
+    width: 50px;
+    height: 50px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: 15px;
+}
+
+.access-card-icon img {
+    width: 30px;
+    height: 30px;
+    filter: brightness(0) invert(1);
+}
+
+.librarian-icon {
+    background: #00674b;
+}
+
+.qa-icon {
+    background: #00674b;
+}
+
+.access-card-header h4 {
+    margin: 0;
+    color: #333;
+    font-size: 16px;
+    font-weight: 600;
+}
+
+.access-card-header p {
+    margin: 5px 0 0 0;
+    color: #666;
+    font-size: 12px;
+}
+
+.access-card-description {
+    margin: 0 0 15px 0;
+    color: #555;
+    font-size: 13px;
+    line-height: 1.4;
+}
+
+.access-card-button {
+    width: 100%;
+    padding: 12px;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 600;
+    font-size: 14px;
+    transition: all 0.3s ease;
+    color: white;
+}
+
+.librarian-button {
+    background: #00674b;
+}
+
+.qa-button {
+    background: #00674b;
+}
+
+/* Dark Mode - Preserve green backgrounds for Librarian and QA icons and buttons */
+html[data-theme="dark"] .librarian-icon,
+html[data-theme="dark"] .qa-icon {
+    background: #00674b !important;
+}
+
+html[data-theme="dark"] .librarian-button,
+html[data-theme="dark"] .qa-button {
+    background: #00674b !important;
+    color: white !important;
+}
+
+.access-card-button:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .dept-info-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .dean-actions {
+        flex-direction: column;
+    }
+    
+    .dean-actions button {
+        width: 100%;
+    }
+    
+    .account-access-cards {
+        grid-template-columns: 1fr;
+    }
+}

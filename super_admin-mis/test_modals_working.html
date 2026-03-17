@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Modals Working</title>
+    <style>
+        body {
+            font-family: 'TT Interphases', sans-serif;
+            margin: 0;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .test-container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .test-button {
+            background: #1976d2;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 6px;
+            cursor: pointer;
+            margin: 10px;
+            font-size: 14px;
+        }
+        .test-button:hover {
+            background: #0d47a1;
+        }
+        .status {
+            margin: 20px 0;
+            padding: 10px;
+            border-radius: 6px;
+            font-weight: bold;
+        }
+        .success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        .error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+    </style>
+</head>
+<body>
+    <div class="test-container">
+        <h1>Modal Functionality Test</h1>
+        <p>This page tests if the modal functions are working properly.</p>
+        
+        <div id="status"></div>
+        
+        <h3>Test Buttons:</h3>
+        <button class="test-button" onclick="testUserDetailsModal()">Test User Details Modal</button>
+        <button class="test-button" onclick="testEditUserModal()">Test Edit User Modal</button>
+        <button class="test-button" onclick="testDeleteUserModal()">Test Delete User Modal</button>
+        <button class="test-button" onclick="testStatusInfoModal()">Test Status Info Modal</button>
+        
+        <h3>Test Results:</h3>
+        <div id="results"></div>
+    </div>
+
+    <script>
+        // Mock user data for testing
+        const mockUsers = [
+            {
+                employee_no: '2024-001',
+                first_name: 'John',
+                middle_name: 'A',
+                last_name: 'Doe',
+                institutional_email: 'john.doe@sccpag.edu.ph',
+                mobile_no: '09123456789',
+                role_name: 'Teacher',
+                department_name: 'Computer Science',
+                is_active: 1,
+                last_activity: '2024-01-15 10:30:00',
+                online_status: 'online',
+                last_login: '2024-01-15 09:00:00',
+                last_logout: '2024-01-15 17:00:00'
+            }
+        ];
+
+        // Mock the global variables
+        window.usersData = mockUsers;
+        window.filteredUsers = mockUsers;
+
+        function updateStatus(message, type = 'success') {
+            const statusDiv = document.getElementById('status');
+            statusDiv.innerHTML = `<div class="status ${type}">${message}</div>`;
+        }
+
+        function addResult(message) {
+            const resultsDiv = document.getElementById('results');
+            const resultItem = document.createElement('div');
+            resultItem.style.margin = '10px 0';
+            resultItem.style.padding = '10px';
+            resultItem.style.background = '#f8f9fa';
+            resultItem.style.borderRadius = '4px';
+            resultItem.innerHTML = `<strong>${new Date().toLocaleTimeString()}:</strong> ${message}`;
+            resultsDiv.appendChild(resultItem);
+        }
+
+        function testUserDetailsModal() {
+            addResult('Testing User Details Modal...');
+            
+            if (typeof window.openUserDetailsModal === 'function') {
+                try {
+                    window.openUserDetailsModal('2024-001');
+                    addResult('✅ User Details Modal function exists and called successfully');
+                    updateStatus('User Details Modal test passed!', 'success');
+                } catch (error) {
+                    addResult(`❌ Error in User Details Modal: ${error.message}`);
+                    updateStatus('User Details Modal test failed!', 'error');
+                }
+            } else {
+                addResult('❌ openUserDetailsModal function not found');
+                updateStatus('User Details Modal function not found!', 'error');
+            }
+        }
+
+        function testEditUserModal() {
+            addResult('Testing Edit User Modal...');
+            
+            if (typeof window.openEditUserModal === 'function') {
+                try {
+                    window.openEditUserModal('2024-001');
+                    addResult('✅ Edit User Modal function exists and called successfully');
+                    updateStatus('Edit User Modal test passed!', 'success');
+                } catch (error) {
+                    addResult(`❌ Error in Edit User Modal: ${error.message}`);
+                    updateStatus('Edit User Modal test failed!', 'error');
+                }
+            } else {
+                addResult('❌ openEditUserModal function not found');
+                updateStatus('Edit User Modal function not found!', 'error');
+            }
+        }
+
+        function testDeleteUserModal() {
+            addResult('Testing Delete User Modal...');
+            
+            if (typeof window.openDeleteUserModal === 'function') {
+                try {
+                    window.openDeleteUserModal('2024-001');
+                    addResult('✅ Delete User Modal function exists and called successfully');
+                    updateStatus('Delete User Modal test passed!', 'success');
+                } catch (error) {
+                    addResult(`❌ Error in Delete User Modal: ${error.message}`);
+                    updateStatus('Delete User Modal test failed!', 'error');
+                }
+            } else {
+                addResult('❌ openDeleteUserModal function not found');
+                updateStatus('Delete User Modal function not found!', 'error');
+            }
+        }
+
+        function testStatusInfoModal() {
+            addResult('Testing Status Info Modal...');
+            
+            if (typeof window.showStatusInfo === 'function') {
+                try {
+                    window.showStatusInfo();
+                    addResult('✅ Status Info Modal function exists and called successfully');
+                    updateStatus('Status Info Modal test passed!', 'success');
+                } catch (error) {
+                    addResult(`❌ Error in Status Info Modal: ${error.message}`);
+                    updateStatus('Status Info Modal test failed!', 'error');
+                }
+            } else {
+                addResult('❌ showStatusInfo function not found');
+                updateStatus('Status Info Modal function not found!', 'error');
+            }
+        }
+
+        // Test modal functions on page load
+        window.addEventListener('DOMContentLoaded', function() {
+            addResult('Page loaded, checking modal functions...');
+            
+            const functions = [
+                'openUserDetailsModal',
+                'openEditUserModal', 
+                'openDeleteUserModal',
+                'showStatusInfo',
+                'closeUserDetailsModal',
+                'closeEditUserModal',
+                'closeDeleteUserModal',
+                'closeStatusInfoModal'
+            ];
+            
+            let foundFunctions = 0;
+            functions.forEach(funcName => {
+                if (typeof window[funcName] === 'function') {
+                    addResult(`✅ ${funcName} function found`);
+                    foundFunctions++;
+                } else {
+                    addResult(`❌ ${funcName} function not found`);
+                }
+            });
+            
+            addResult(`Found ${foundFunctions}/${functions.length} modal functions`);
+            
+            if (foundFunctions === functions.length) {
+                updateStatus('All modal functions are available!', 'success');
+            } else {
+                updateStatus('Some modal functions are missing!', 'error');
+            }
+        });
+    </script>
+</body>
+</html> 
