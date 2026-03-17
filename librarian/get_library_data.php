@@ -3,7 +3,11 @@
 // session_start(); // Removed to avoid header issues
 
 // Database connection
-$servername = "localhost";
+if (getenv('DOCKER_ENV') === 'true' || file_exists('/.dockerenv')) {
+    $servername = "db";
+} else {
+    $servername = "localhost";
+}
 $username = "root";
 $password = "";
 $database = "ascom_db";

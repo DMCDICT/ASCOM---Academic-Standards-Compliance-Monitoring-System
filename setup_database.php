@@ -5,7 +5,11 @@
 echo "<h2>Automatic Database Setup</h2>";
 
 // Database connection parameters
-$servername = "localhost";
+if (getenv('DOCKER_ENV') === 'true' || file_exists('/.dockerenv')) {
+    $servername = "db";
+} else {
+    $servername = "localhost";
+}
 $username = "root";
 $password = ""; // Your MySQL root password, likely empty for XAMPP
 $database = "ascom_db";

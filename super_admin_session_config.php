@@ -107,4 +107,3 @@ try {
     // Log error but don't display it to prevent notices
     error_log("Super Admin session configuration error: " . $e->getMessage());
 }
-?> 

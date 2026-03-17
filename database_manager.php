@@ -11,7 +11,11 @@ class DatabaseManager {
     }
     
     private function connect() {
-        $servername = "localhost";
+        if (getenv('DOCKER_ENV') === 'true' || file_exists('/.dockerenv')) {
+            $servername = "db";
+        } else {
+            $servername = "localhost";
+        }
         $username = "root";
         $password = "";
         

@@ -6,7 +6,11 @@ echo "=== ASCOM Monitoring System Database Setup ===\n\n";
 
 try {
     // Database connection parameters
-    $servername = "localhost";
+    if (getenv('DOCKER_ENV') === 'true' || file_exists('/.dockerenv')) {
+        $servername = "db";
+    } else {
+        $servername = "localhost";
+    }
     $username = "root";
     $password = "";
     $database = "ascom_db";

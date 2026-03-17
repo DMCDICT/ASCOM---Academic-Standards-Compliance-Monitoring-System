@@ -1,0 +1,39 @@
+services:
+  app:
+    build: .
+    container_name: ascom_app
+    ports:
+      - "8080:80"
+    volumes:
+      - .:/var/www/html
+    environment:
+      - DOCKER_ENV=true
+    depends_on:
+      - db
+
+  db:
+    image: mariadb:10.4
+    container_name: ascom_db_container
+    restart: always
+    environment:
+      MARIADB_DATABASE: ascom_db
+      MARIADB_ALLOW_EMPTY_ROOT_PASSWORD: "yes"
+    ports:
+      - "3307:3306"
+    volumes:
+      - ascom_db_data:/var/lib/mysql
+      - ./ascom_db_full_export.sql:/docker-entrypoint-initdb.d/import.sql:ro
+
+  phpmyadmin:
+    image: phpmyadmin:latest
+    container_name: ascom_phpmyadmin
+    ports:
+      - "8081:80"
+    environment:
+      PMA_HOST: db
+      PMA_ARBITRARY: 1
+    depends_on:
+      - db
+
+volumes:
+  ascom_db_data:
