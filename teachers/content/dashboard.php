@@ -79,10 +79,9 @@ try {
                 }
             } else {
                 echo "<!-- DEBUG: PDO connection not available -->";
-                // Try to create a new connection
                 try {
-                    $pdo = new PDO("mysql:host=localhost;dbname=ascom_db", "root", "");
-                    $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+                    require_once dirname(__DIR__, 2) . '/bootstrap/database.php';
+                    $pdo = ascom_get_pdo();
                     echo "<!-- DEBUG: Created new PDO connection -->";
                     
                     // Now try the department query again

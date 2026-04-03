@@ -1,54 +1,10 @@
 <?php
-// Enable error reporting for debugging
-error_reporting(E_ALL);
-ini_set('display_errors', 1);
-ini_set('display_startup_errors', 1);
-
 require_once dirname(__FILE__) . '/../super_admin_session_config.php';
+require_once dirname(__FILE__) . '/../bootstrap/auth.php';
 require_once dirname(__FILE__) . '/includes/db_connection.php';
-// REMOVED: require_once dirname(__FILE__) . '/track_user_activity.php'; // Super Admin doesn't need activity tracking
 
-// Start session with Super Admin configuration only if not already started
-if (session_status() === PHP_SESSION_NONE) {
-    session_start();
-}
-
-// Check if Super Admin is authenticated
-$isSuperAdminLoggedIn = isSuperAdminAuthenticated();
-
-// Debug: Log authentication status
-file_put_contents('../super_admin_debug.txt', 'Authentication check result: ' . ($isSuperAdminLoggedIn ? 'true' : 'false') . PHP_EOL, FILE_APPEND);
-file_put_contents('../super_admin_debug.txt', 'Session data: ' . print_r($_SESSION, true) . PHP_EOL, FILE_APPEND);
-
-// For debugging, allow access if session has any data
-if (empty($_SESSION)) {
-    file_put_contents('../super_admin_debug.txt', 'Session is completely empty. Redirecting to login.' . PHP_EOL, FILE_APPEND);
-    header("Location: ../index.php");
-    exit();
-}
-
-// If Super Admin is logged in, secure the session
-if ($isSuperAdminLoggedIn) {
-    // Secure Super Admin session using dedicated function
-    secureSuperAdminSession();
-    
-    // Log successful authentication
-    file_put_contents('../super_admin_debug.txt', 'Super Admin authentication successful. Session secured using dedicated config.' . PHP_EOL, FILE_APPEND);
-    
-} else {
-    file_put_contents('../super_admin_debug.txt', 'Super Admin authentication failed but session exists. Allowing access for debugging.' . PHP_EOL, FILE_APPEND);
-    
-    // For debugging, set the session variables manually
-    $_SESSION['super_admin_logged_in'] = true;
-    $_SESSION['user_role'] = 'super_admin';
-    $_SESSION['employee_no'] = 'SUPER_ADMIN';
-    $_SESSION['username'] = 'super_admin@ascom.edu.ph';
-    $_SESSION['user_id'] = 0;
-    
-    file_put_contents('../super_admin_debug.txt', 'Session manually set for debugging.' . PHP_EOL, FILE_APPEND);
-}
-
-file_put_contents('../super_admin_debug.txt', 'Authentication successful. Proceeding to dashboard.' . PHP_EOL, FILE_APPEND);
+ascom_require_super_admin('../index.php');
+secureSuperAdminSession();
 
 // Check if this is an AJAX request
 $isAjax = isset($_GET['ajax']) && $_GET['ajax'] == '1';
@@ -56,9 +12,6 @@ $isAjax = isset($_GET['ajax']) && $_GET['ajax'] == '1';
 if ($isAjax) {
     // Return only the content for AJAX requests
     $page = isset($_GET['page']) ? $_GET['page'] : 'dashboard';
-    
-    // Debug: log what page is being requested
-    file_put_contents('../super_admin_debug.txt', "AJAX request for page: $page" . PHP_EOL, FILE_APPEND);
     
     // Start output buffering to capture the content
     ob_start();
@@ -84,9 +37,6 @@ if ($isAjax) {
     
     // Get the captured content
     $content = ob_get_clean();
-    
-    // Debug: log the content length
-    file_put_contents('../super_admin_debug.txt', "AJAX content length: " . strlen($content) . PHP_EOL, FILE_APPEND);
     
     // Return the content (modals are already included in the main page)
     echo $content;
@@ -3588,10 +3538,6 @@ $notifRead = array_filter($notifList, function($n) { return ($n['is_read'] ?? fa
 
 <!-- Include Modals -->
 <?php 
-// Enable error reporting
-error_reporting(E_ALL);
-ini_set('display_errors', 1);
-
 // Check if modal files exist and include them
 $modalFiles = [
     './modal_user_details.php',

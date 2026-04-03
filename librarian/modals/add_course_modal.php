@@ -72,8 +72,8 @@
                                 <?php
                                 // Get real database data
                                 try {
-                                    $pdo = new PDO("mysql:host=localhost;dbname=ascom_db;charset=utf8", "root", "");
-                                    $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+                                    require_once dirname(__DIR__, 2) . '/bootstrap/database.php';
+                                    $pdo = ascom_get_pdo();
                                     
                                     $stmt = $pdo->query("SELECT * FROM school_years ORDER BY id DESC LIMIT 10");
                                     $years = $stmt->fetchAll(PDO::FETCH_ASSOC);
@@ -121,8 +121,8 @@
                 <?php
                 // REAL DATABASE DATA ONLY
                 try {
-                    $pdo = new PDO("mysql:host=localhost;dbname=ascom_db;charset=utf8", "root", "");
-                    $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+                    require_once dirname(__DIR__, 2) . '/bootstrap/database.php';
+                    $pdo = ascom_get_pdo();
                     
                     // Get all programs (librarians can see all)
                     $stmt = $pdo->query("SELECT id, program_code, program_name FROM programs ORDER BY program_code ASC");
@@ -588,4 +588,3 @@
     20%, 40%, 60%, 80% { transform: translateX(5px); }
 }
 </style>
-

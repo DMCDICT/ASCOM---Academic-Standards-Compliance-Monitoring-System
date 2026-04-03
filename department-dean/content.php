@@ -1,52 +1,9 @@
 <?php
 require_once dirname(__FILE__) . '/../session_config.php';
+require_once dirname(__FILE__) . '/../bootstrap/auth.php';
 require_once dirname(__FILE__) . '/includes/db_connection.php';
 
-// Ensure session configuration is applied before starting session
-if (session_status() == PHP_SESSION_NONE) {
-    // Configure session before starting
-    session_name('ASCOM_SESSION');
-    session_set_cookie_params([
-        'lifetime' => 30 * 24 * 60 * 60, // 30 days
-        'path' => '/',
-        'domain' => '',
-        'secure' => false,
-        'httponly' => true,
-        'samesite' => 'Lax'
-    ]);
-    session_start();
-}
-
-// Debug: log session information
-file_put_contents('../login_debug.txt', 'department-dean/content.php - session_id=' . session_id() . ' dean_logged_in=' . ($_SESSION['dean_logged_in'] ?? 'NOT_SET') . ' is_authenticated=' . ($_SESSION['is_authenticated'] ?? 'NOT_SET') . PHP_EOL, FILE_APPEND);
-
-// Simplified authentication check - focus on the most reliable method
-$isAuthenticated = false;
-
-// Primary check: dean_logged_in flag
-if (isset($_SESSION['dean_logged_in']) && $_SESSION['dean_logged_in'] === true) {
-    $isAuthenticated = true;
-    file_put_contents('../login_debug.txt', 'department-dean/content.php - dean_logged_in found' . PHP_EOL, FILE_APPEND);
-}
-// Secondary check: selected_role
-elseif (isset($_SESSION['selected_role']) && $_SESSION['selected_role']['type'] === 'dean') {
-    $isAuthenticated = true;
-    $_SESSION['dean_logged_in'] = true; // Set the flag for future requests
-    file_put_contents('../login_debug.txt', 'department-dean/content.php - recovered from selected_role' . PHP_EOL, FILE_APPEND);
-}
-// Tertiary check: user_id and username exist (basic session validation)
-elseif (isset($_SESSION['user_id']) && isset($_SESSION['username'])) {
-    // For now, just check if basic session data exists
-    $isAuthenticated = true;
-    $_SESSION['dean_logged_in'] = true; // Assume dean if we have basic session
-    file_put_contents('../login_debug.txt', 'department-dean/content.php - recovered from basic session data' . PHP_EOL, FILE_APPEND);
-}
-
-if (!$isAuthenticated) {
-    file_put_contents('../login_debug.txt', 'department-dean/content.php - REDIRECTING TO LOGIN - no valid session found' . PHP_EOL, FILE_APPEND);
-    header("Location: ../user_login.php");
-    exit();
-}
+ascom_require_role('dean', '../user_login.php');
 ?>
 <!DOCTYPE html>
 <html lang="en">

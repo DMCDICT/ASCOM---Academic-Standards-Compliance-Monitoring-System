@@ -3575,8 +3575,8 @@ console.log('✅ populateReviewData function defined');
             <div id="programsList">
         <?php
                 try {
-                    $pdo = new PDO("mysql:host=localhost;dbname=ascom_db;charset=utf8", "root", "");
-                    $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+                    require_once dirname(__DIR__, 2) . '/bootstrap/database.php';
+                    $pdo = ascom_get_pdo();
                     
                     $currentDepartmentId = null;
                     if (isset($_SESSION['selected_role']['department_id'])) {
@@ -7887,4 +7887,3 @@ console.log('✅ Multi-step Course Proposal Form Loaded');
 
 // The onclick handlers in the HTML should work - no need for additional event listeners
 </script> 
-

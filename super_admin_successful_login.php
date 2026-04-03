@@ -1,24 +1,18 @@
 <?php
-// Suppress error reporting for clean display
-error_reporting(0);
-ini_set('display_errors', 0);
 
 require_once 'super_admin_session_config.php';
-session_start();
 
-$user_role = $_SESSION['user_role'] ?? '';
-$redirectUrl = 'super_admin-mis/content.php';
-$roleMessage = 'Welcome, Super Admin!';
-
-// Super Admin should always redirect to their dashboard
-if ($user_role === 'super_admin' || isset($_SESSION['super_admin_logged_in'])) {
-    $redirectUrl = 'super_admin-mis/content.php';
-    $roleMessage = 'Welcome, Super Admin!';
-} else {
-    // Fallback to regular user login
-    $redirectUrl = 'user_login.php';
-    $roleMessage = 'Login Successful!';
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
 }
+
+if (!isSuperAdminAuthenticated()) {
+    header('Location: index.php');
+    exit();
+}
+
+secureSuperAdminSession();
+$redirectUrl = 'super_admin-mis/content.php';
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -32,13 +26,9 @@ if ($user_role === 'super_admin' || isset($_SESSION['super_admin_logged_in'])) {
       font-weight: normal;
       font-style: normal;
     }
-    /* Fallback font in case TT Interphases fails to load */
-    body {
-      font-family: 'TT Interphases', Arial, sans-serif;
-    }
     body {
       background: #0C4B34;
-      font-family: 'TT Interphases', sans-serif;
+      font-family: 'TT Interphases', Arial, sans-serif;
       display: flex;
       justify-content: center;
       align-items: center;
@@ -80,37 +70,20 @@ if ($user_role === 'super_admin' || isset($_SESSION['super_admin_logged_in'])) {
       color: white;
       transition: background 0.3s ease;
     }
-    .okay-btn:hover {
-      background: #0bf;
-    }
   </style>
 </head>
 <body>
   <div class="popup-message">
-    <?php 
-    $iconPath = 'src/assets/animated_icons/check-animated-icon.gif';
-    if (file_exists($iconPath)) {
-        echo '<img src="' . $iconPath . '" alt="Success" />';
-    } else {
-        echo '<div style="width: 120px; height: 120px; background: #28a745; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto;">✓</div>';
-    }
-    ?>
-    <h2><?php echo htmlspecialchars($roleMessage); ?></h2>
+    <img src="src/assets/animated_icons/check-animated-icon.gif" alt="Success" />
+    <h2>Welcome, Super Admin!</h2>
     <p>Redirecting to your dashboard...</p>
     <button class="okay-btn" onclick="window.location.href='<?php echo htmlspecialchars($redirectUrl); ?>'">Continue</button>
   </div>
 
   <script>
-    // Auto-redirect after 2 seconds
     setTimeout(function() {
-      try {
-        window.location.href = '<?php echo htmlspecialchars($redirectUrl); ?>';
-      } catch (error) {
-        console.error('Redirect error:', error);
-        // Fallback redirect
-        window.location.href = 'super_admin-mis/content.php';
-      }
+      window.location.href = <?php echo json_encode($redirectUrl); ?>;
     }, 2000);
   </script>
 </body>
-</html> 
+</html>

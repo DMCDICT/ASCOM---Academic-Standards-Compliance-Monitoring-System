@@ -1,14 +1,9 @@
 <?php
 require_once dirname(__FILE__) . '/../session_config.php';
+require_once dirname(__FILE__) . '/../bootstrap/auth.php';
 require_once dirname(__FILE__) . '/includes/db_connection.php';
 
-// Start session with extended configuration
-session_start();
-
-if (!isset($_SESSION['librarian_logged_in']) || $_SESSION['librarian_logged_in'] !== true) {
-    header("Location: ../user_login.php");
-    exit();
-}
+ascom_require_role('librarian', '../user_login.php');
 ?>
 <!DOCTYPE html>
 <html lang="en">

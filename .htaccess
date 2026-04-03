@@ -1,0 +1,9 @@
+Options -Indexes
+
+<FilesMatch "\.(sql|md|bat|log)$">
+    Require all denied
+</FilesMatch>
+
+<FilesMatch "^(test_|debug_|check_|fix_|setup_|cleanup_|assign_test_|simple_user_check|database_manager|create_|add_[A-Za-z0-9_]*\.php|force_|reset_).*$">
+    Require all denied
+</FilesMatch>

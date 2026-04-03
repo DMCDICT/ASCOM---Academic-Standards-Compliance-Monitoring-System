@@ -2,7 +2,11 @@
 // captcha_verification.php
 // CAPTCHA verification for inactive users
 
-session_start();
+require_once 'session_config.php';
+
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
 
 // Generate a simple math CAPTCHA
 function generateCaptcha() {
@@ -268,9 +272,9 @@ $_SESSION['captcha_answer'] = $captcha['answer'];
                     document.getElementById('successMessage').style.display = 'block';
                     document.getElementById('errorMessage').style.display = 'none';
                     
-                    // Redirect to role selection page directly after captcha verification
+                    // Redirect using the server-side CAPTCHA session state only.
                     setTimeout(() => {
-                        window.location.href = `role_selection.php?captcha_verified=true&username=${encodeURIComponent(username)}`;
+                        window.location.href = 'role_selection.php';
                     }, 1500);
                 } else {
                     document.getElementById('errorMessage').textContent = data.message;

@@ -1,98 +1,41 @@
 <?php
+
 require_once 'session_config.php';
-// If session ID is passed via URL (cookie blocked or first-party disabled), adopt it
-if (isset($_GET[session_name()]) && is_string($_GET[session_name()])) {
-    session_id($_GET[session_name()]);
-}
-session_start();
+require_once 'bootstrap/auth.php';
 
-// Debug: track arrival at success page and the selected role
-file_put_contents('login_debug.txt', 'successful_login.php hit. selected_role=' . print_r($_SESSION['selected_role'] ?? null, true) . PHP_EOL, FILE_APPEND);
-
-// Check if user is authenticated; be tolerant and recover if user_id exists
-if (!isset($_SESSION['is_authenticated']) || !$_SESSION['is_authenticated']) {
-    if (isset($_SESSION['user_id'])) {
-        $_SESSION['is_authenticated'] = true;
-        file_put_contents('login_debug.txt', "successful_login: recovered auth using user_id\n", FILE_APPEND);
-    } else {
-        header("Location: user_login.php");
-        exit();
-    }
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
 }
 
-// Get the selected role from session
+if (!ascom_authenticated_for_regular_user()) {
+    header('Location: user_login.php');
+    exit();
+}
+
 $selectedRole = $_SESSION['selected_role'] ?? null;
-$redirectUrl = 'user_login.php';
-$roleMessage = 'Login Successful!';
-
-if ($selectedRole) {
-    $roleType = $selectedRole['type'];
-    
-    // Set role-specific session variables for backward compatibility
-    switch ($roleType) {
-        case 'teacher':
-            $_SESSION['teacher_logged_in'] = true;
-            $redirectUrl = 'teachers/content.php';
-            $roleMessage = 'Welcome, Teacher!';
-            break;
-        case 'dean':
-            $_SESSION['dean_logged_in'] = true;
-            $redirectUrl = 'department-dean/content.php';
-            $roleMessage = 'Welcome, Department Dean!';
-            break;
-        case 'librarian':
-            $_SESSION['librarian_logged_in'] = true;
-            $redirectUrl = 'librarian/content.php';
-            $roleMessage = 'Welcome, Librarian!';
-            break;
-        case 'quality_assurance':
-            $_SESSION['admin_qa_logged_in'] = true;
-            $redirectUrl = 'admin-quality_assurance/content.php';
-            $roleMessage = 'Welcome, Quality Assurance!';
-            break;
-        case 'super_admin':
-            $_SESSION['super_admin_logged_in'] = true;
-            $redirectUrl = 'super_admin-mis/content.php';
-            $roleMessage = 'Welcome, Super Admin!';
-            break;
-        default:
-            $roleMessage = 'Login Successful!';
-            $redirectUrl = 'user_login.php';
-    }
-} else {
-    // Fallback for legacy users
-    $user_role = $_SESSION['user_role'] ?? '';
-    switch ($user_role) {
-        case 'super_admin':
-            $redirectUrl = 'super_admin-mis/content.php';
-            $roleMessage = 'Welcome, Super Admin!';
-            break;
-        case 'Department Dean':
-            $redirectUrl = 'department-dean/content.php';
-            $roleMessage = 'Welcome, Department Dean!';
-            break;
-        case 'Teacher':
-            $redirectUrl = 'teachers/content.php';
-            $roleMessage = 'Welcome, Teacher!';
-            break;
-        case 'Librarian':
-            $redirectUrl = 'librarian/content.php';
-            $roleMessage = 'Welcome, Librarian!';
-            break;
-        case 'Admin - Quality Assurance':
-            $redirectUrl = 'admin-quality_assurance/content.php';
-            $roleMessage = 'Welcome, Admin Quality Assurance!';
-            break;
-        default:
-            $roleMessage = 'Login Successful!';
-            $redirectUrl = 'user_login.php';
-    }
+if (!is_array($selectedRole) || empty($selectedRole['type'])) {
+    header('Location: role_selection.php');
+    exit();
 }
+
+ascom_set_selected_role($selectedRole);
+
+$redirectMap = [
+    'teacher' => ['path' => 'teachers/content.php', 'message' => 'Welcome, Teacher!'],
+    'dean' => ['path' => 'department-dean/content.php', 'message' => 'Welcome, Department Dean!'],
+    'librarian' => ['path' => 'librarian/content.php', 'message' => 'Welcome, Librarian!'],
+    'quality_assurance' => ['path' => 'admin-quality_assurance/content.php', 'message' => 'Welcome, Quality Assurance!'],
+];
+
+$target = $redirectMap[$selectedRole['type']] ?? ['path' => 'user_login.php', 'message' => 'Login Successful!'];
+$redirectUrl = $target['path'];
+$roleMessage = $target['message'];
 ?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Login Successful</title>
   <style>
     @font-face {
@@ -158,8 +101,6 @@ if ($selectedRole) {
     <button class="okay-btn" id="okayBtn">OKAY (<span id="countdown">3</span>)</button>
   </div>
   <script>
-    // Safety: if headers-based redirect didn't happen server-side, enforce it on client too
-    // Gives us resilience if output started earlier unexpectedly
     let seconds = 3;
     const countdownSpan = document.getElementById('countdown');
     const okayBtn = document.getElementById('okayBtn');
@@ -177,13 +118,6 @@ if ($selectedRole) {
     okayBtn.addEventListener('click', function() {
       window.location.href = redirectUrl;
     });
-
-    // Absolute fallback in 5 seconds regardless of countdown state
-    setTimeout(() => {
-      if (window.location.href.indexOf(redirectUrl) === -1) {
-        window.location.href = redirectUrl;
-      }
-    }, 5000);
   </script>
 </body>
 </html>

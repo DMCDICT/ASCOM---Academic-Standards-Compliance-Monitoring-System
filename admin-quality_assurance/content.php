@@ -1,14 +1,9 @@
 <?php
 require_once dirname(__FILE__) . '/../session_config.php';
+require_once dirname(__FILE__) . '/../bootstrap/auth.php';
 require_once dirname(__FILE__) . '/includes/db_connection.php';
 
-// Start session with extended configuration
-session_start();
-
-if (!isset($_SESSION['admin_qa_logged_in']) || $_SESSION['admin_qa_logged_in'] !== true) {
-    header("Location: ../user_login.php");
-    exit();
-}
+ascom_require_role('quality_assurance', '../user_login.php');
 
 include './modals/switch_role_modal.php'; 
 ?>

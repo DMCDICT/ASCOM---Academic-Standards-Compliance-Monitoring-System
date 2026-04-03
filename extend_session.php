@@ -1,7 +1,4 @@
 <?php
-// extend_session.php
-// Endpoint to extend user session
-
 header('Content-Type: application/json');
 
 require_once 'session_config.php';
@@ -12,14 +9,11 @@ if (session_status() == PHP_SESSION_NONE) {
 }
 
 try {
-    // Check if user is authenticated
     if (!isUserActive()) {
         throw new Exception('User not authenticated');
     }
     
-    // Super Admin has unlimited sessions - no timeout restrictions
-    if (isset($_SESSION['super_admin_logged_in']) && $_SESSION['super_admin_logged_in'] === true) {
-        // Use dedicated Super Admin session extension
+    if (!empty($_SESSION['super_admin_logged_in']) && ($_SESSION['user_role'] ?? null) === 'super_admin') {
         require_once 'super_admin_session_config.php';
         extendSuperAdminSession();
         
@@ -33,15 +27,11 @@ try {
         exit;
     }
     
-    // For regular users, extend session normally
     extendSession();
     
-    // Update user activity if employee_no is available and not Super Admin
     if (isset($_SESSION['employee_no']) && $_SESSION['employee_no'] !== 'SUPER_ADMIN') {
-        require_once 'super_admin-mis/includes/db_connection.php';
-        
-        $updateQuery = "UPDATE users SET last_activity = NOW() WHERE employee_no = ?";
-        $updateStmt = $conn->prepare($updateQuery);
+        $conn = ascom_get_mysqli();
+        $updateStmt = $conn->prepare("UPDATE users SET last_activity = NOW() WHERE employee_no = ?");
         $updateStmt->bind_param("s", $_SESSION['employee_no']);
         $updateStmt->execute();
         $updateStmt->close();
