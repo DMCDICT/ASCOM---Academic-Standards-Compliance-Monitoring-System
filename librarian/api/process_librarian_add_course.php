@@ -7,16 +7,10 @@ set_error_handler(function($severity, $message, $file, $line) {
 
 try {
     // Log the incoming POST data for debugging
-    error_log("=== LIBRARIAN COURSE CREATION DEBUG START ===");
-    error_log("File reached: process_librarian_add_course.php");
-    error_log("POST data: " . print_r($_POST, true));
-    error_log("Session status: " . session_status());
     
     // Include session configuration
     $sessionConfigPath = dirname(dirname(__FILE__)) . '/../session_config.php';
-    error_log("Looking for session config at: $sessionConfigPath");
     if (!file_exists($sessionConfigPath)) {
-        error_log("Session config file not found at: $sessionConfigPath");
         throw new Exception('Session configuration file not found');
     }
     require_once $sessionConfigPath;
@@ -27,18 +21,14 @@ try {
     }
     
     // Debug: Log session data
-    error_log("Session data after start: " . print_r($_SESSION, true));
     
     // Check if user is logged in as librarian
     if (!isset($_SESSION['user_id'])) {
-        error_log("ERROR: User not logged in");
         throw new Exception('Unauthorized access - Login required');
     }
     
     // Check if selected role is librarian
     if (!isset($_SESSION['selected_role']) || $_SESSION['selected_role']['type'] !== 'librarian') {
-        error_log("ERROR: Selected role is not librarian");
-        error_log("selected_role: " . print_r($_SESSION['selected_role'] ?? 'not set', true));
         throw new Exception('Unauthorized access - Librarian role required');
     }
     
@@ -47,10 +37,8 @@ try {
     
     // Debug: Check database connection
     if (!isset($pdo) || $pdo === null) {
-        error_log("ERROR: Database connection failed - \$pdo is null");
         throw new Exception('Database connection failed');
     }
-    error_log("Database connection: OK");
     
     // Get form data
     $courseCode = trim($_POST['course_code'] ?? '');
@@ -68,17 +56,6 @@ try {
     $librarianUserId = $_SESSION['user_id'] ?? null;
     
     // Debug: Log form data
-    error_log("Form data received:");
-    error_log("- Course Code: '$courseCode'");
-    error_log("- Course Name: '$courseName'");
-    error_log("- Units: $units");
-    error_log("- Year Level: '$yearLevel'");
-    error_log("- School Term: '$schoolTerm'");
-    error_log("- School Year: '$schoolYear'");
-    error_log("- Location: '$location'");
-    error_log("- Selected Programs: '$selectedPrograms'");
-    error_log("- Status: '$status'");
-    error_log("- Librarian User ID: $librarianUserId");
     
     // Validate required fields
     if (empty($courseCode)) {
@@ -262,9 +239,6 @@ try {
     ob_clean();
     
     // Log the error
-    error_log("=== LIBRARIAN COURSE CREATION ERROR ===");
-    error_log("Error message: " . $e->getMessage());
-    error_log("Error trace: " . $e->getTraceAsString());
     
     // Return error response
     echo json_encode([

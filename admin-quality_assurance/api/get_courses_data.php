@@ -122,7 +122,6 @@ foreach ($courses as $course) {
 // Quality Assurance needs to monitor ALL courses, so we never filter by compliance status
 $compliantCount = count(array_filter($formattedCourses, function($c) { return $c['status'] === 'Compliant'; }));
 $nonCompliantCount = count(array_filter($formattedCourses, function($c) { return $c['status'] === 'Non-Compliant'; }));
-error_log("✅ Quality Assurance - Showing ALL courses. Total: " . count($formattedCourses) . " (Compliant: $compliantCount, Non-Compliant: $nonCompliantCount)");
 
 // NO PRIORITY FILTERING - Show ALL courses
 

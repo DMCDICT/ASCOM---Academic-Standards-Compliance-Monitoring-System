@@ -80,7 +80,6 @@ try {
     ]);
     
 } catch (Exception $e) {
-    error_log("Error in get_available_users.php: " . $e->getMessage());
     echo json_encode([
         'success' => false, 
         'message' => 'Failed to fetch available users: ' . $e->getMessage()

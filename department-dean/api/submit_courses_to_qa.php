@@ -150,7 +150,6 @@ try {
     }
     
 } catch (Exception $e) {
-    error_log("Error in submit_courses_to_qa.php: " . $e->getMessage());
     http_response_code(500);
     echo json_encode([
         'success' => false,

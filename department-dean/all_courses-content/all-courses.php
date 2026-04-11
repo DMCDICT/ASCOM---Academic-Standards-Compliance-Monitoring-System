@@ -1617,9 +1617,6 @@ if (isset($pdo)) {
     const programsCount = <?php echo json_encode(count($programs)); ?>;
     const programs = <?php echo json_encode($programs); ?>;
     
-    console.log('Programs count:', programsCount);
-    console.log('Programs array:', programs);
-    console.log('Has programs:', hasPrograms);
 
     // Global Modal Scroll Prevention - SIMPLE AND EFFECTIVE
     function preventBodyScroll() {
@@ -1654,20 +1651,14 @@ if (isset($pdo)) {
 
     // WORKING FUNCTION - CHECK PROGRAMS AND SHOW APPROPRIATE MODAL
     function simpleModalTest() {
-        console.log('=== CHECKING PROGRAMS AND SHOWING MODAL ===');
-        console.log('Button clicked!');
-        console.log('hasPrograms:', hasPrograms);
         
         // Check if we have programs
         if (!hasPrograms) {
-            console.log('No programs - calling global showNoProgramsModal function');
             
             // Use the global function that creates the original modal
             if (typeof showNoProgramsModal === 'function') {
                 showNoProgramsModal();
-                console.log('Global showNoProgramsModal called!');
             } else {
-                console.log('Global showNoProgramsModal not found - showing test modal');
                 // Fallback to test modal
                 const testModal = document.getElementById('testModal');
                 if (testModal) {
@@ -1679,11 +1670,9 @@ if (isset($pdo)) {
                 }
             }
         } else {
-            console.log('Has programs - trying to show course modal');
             
             // Try to show the original course modal
             const courseModal = document.getElementById('addCourseModal');
-            console.log('Course modal found:', !!courseModal);
             
             if (courseModal) {
                 courseModal.style.display = 'flex';
@@ -1691,9 +1680,7 @@ if (isset($pdo)) {
                 document.body.style.position = 'fixed';
                 document.body.style.width = '100%';
                 document.body.style.height = '100%';
-                console.log('Course modal shown!');
             } else {
-                console.log('Course modal not found - showing test modal');
                 // Fallback to test modal
                 const testModal = document.getElementById('testModal');
                 if (testModal) {
@@ -1717,9 +1704,7 @@ if (isset($pdo)) {
             document.body.style.position = 'fixed';
             document.body.style.width = '100%';
             document.body.style.height = '100%';
-            console.log('Working course modal shown!');
         } else {
-            console.log('Working course modal not found, using test modal');
             // Fallback to test modal
             const testModal = document.getElementById('testModal');
             if (testModal) {
@@ -1728,7 +1713,6 @@ if (isset($pdo)) {
                 document.body.style.position = 'fixed';
                 document.body.style.width = '100%';
                 document.body.style.height = '100%';
-                console.log('Test modal shown as fallback!');
             }
         }
     }
@@ -1744,7 +1728,6 @@ if (isset($pdo)) {
         document.body.style.position = '';
         document.body.style.width = '';
         document.body.style.height = '';
-        console.log('Working course modal closed!');
     }
     
     
@@ -1761,28 +1744,21 @@ if (isset($pdo)) {
         document.body.style.width = '';
         document.body.style.height = '';
         
-        console.log('Test modal closed');
     }
 
     // BULLETPROOF SOLUTION - NO MORE COMPLEXITY
     function openCourseModalFromAllCourses() {
-        console.log('=== BULLETPROOF MODAL OPENING ===');
-        console.log('hasPrograms:', hasPrograms);
         
         if (!hasPrograms) {
-            console.log('No programs - showing no programs modal');
             showNoProgramsModal();
             return;
         }
         
-        console.log('Has programs - opening course modal');
         
         // Method 1: Try to find and open the modal directly
         let courseModal = document.getElementById('addCourseModal');
-        console.log('Modal found (method 1):', !!courseModal);
         
         if (courseModal) {
-            console.log('Opening modal with method 1');
             courseModal.style.display = 'flex';
             courseModal.style.zIndex = '10000';
             
@@ -1796,20 +1772,16 @@ if (isset($pdo)) {
             const form = document.getElementById('addCourseForm');
             if (form) form.reset();
             
-            console.log('Modal should be visible now');
             return;
         }
         
         // Method 2: Try calling the original function
-        console.log('Method 1 failed, trying method 2');
         if (typeof openAddCourseModal === 'function') {
-            console.log('Calling openAddCourseModal function');
             openAddCourseModal();
             return;
         }
         
         // Method 3: Create modal if it doesn't exist
-        console.log('Method 2 failed, creating modal');
         const modalHTML = `
             <div id="addCourseModal" class="modal-overlay" style="display: flex; z-index: 10000;">
                 <div class="modal-box">
@@ -1832,7 +1804,6 @@ if (isset($pdo)) {
         document.body.style.width = '100%';
         document.body.style.height = '100%';
         
-        console.log('Modal created and should be visible');
     }
     
     // Close function for the real modal
@@ -1848,7 +1819,6 @@ if (isset($pdo)) {
         document.body.style.width = '';
         document.body.style.height = '';
         
-        console.log('Real modal closed');
     }
     
     // Search functionality
@@ -1858,24 +1828,13 @@ if (isset($pdo)) {
         const tableRows = document.querySelectorAll('.courses-table tbody tr');
         const courseCount = document.getElementById('courseCountDisplay');
         
-        console.log('DOM loaded');
-        console.log('Search input found:', searchInput);
-        console.log('Clear button found:', clearSearchBtn);
-        console.log('Table rows found:', tableRows);
-        console.log('Course count element found:', courseCount);
         
         function performSearch() {
             alert('Search function called!');
-            console.log('=== PERFORM SEARCH FUNCTION CALLED ===');
-            console.log('=== SEARCH BUTTON WAS CLICKED ===');
             const searchTerm = searchInput.value.toLowerCase().trim();
-            console.log('Searching for:', searchTerm);
-            console.log('Total table rows found:', tableRows.length);
             let visibleCount = 0;
             
             tableRows.forEach((row, index) => {
-                console.log(`Row ${index}:`, row);
-                console.log(`Row cells:`, row.cells);
                 
                 if (row.cells && row.cells.length >= 9) {
                      const courseCode = row.cells[0].textContent.toLowerCase();
@@ -1887,7 +1846,6 @@ if (isset($pdo)) {
                      const faculty = row.cells[6].textContent.toLowerCase();
                      const references = row.cells[7].textContent.toLowerCase();
                      
-                     console.log(`Course Code: ${courseCode}, Title: ${courseTitle}, Units: ${units}, Program: ${program}, Term/Year: ${termYear}, Year Level: ${yearLevel}, Faculty: ${faculty}, References: ${references}`);
                      
                      const matches = courseCode.includes(searchTerm) || 
                                    courseTitle.includes(searchTerm) || 
@@ -1901,19 +1859,15 @@ if (isset($pdo)) {
                     if (matches) {
                         row.style.display = '';
                         visibleCount++;
-                        console.log(`Row ${index} matches - showing`);
                     } else {
                         row.style.display = 'none';
-                        console.log(`Row ${index} doesn't match - hiding`);
                     }
                 } else {
-                    console.log(`Row ${index} has insufficient cells:`, row.cells?.length);
                 }
             });
             
             // Update course count
             courseCount.innerHTML = `<strong>${visibleCount} courses</strong> found`;
-            console.log('Updated count to:', visibleCount);
             
             // Show/hide clear button
             clearSearchBtn.style.display = searchTerm ? 'flex' : 'none';
@@ -1969,7 +1923,6 @@ if (isset($pdo)) {
      
      // Action functions
      function editCourse(courseCode) {
-         console.log('Edit course:', courseCode);
          // Close the current modal first
          closeCourseDetailsModal();
          
@@ -2008,7 +1961,6 @@ if (isset($pdo)) {
 
      // Course Details Modal Functions
      function showCourseDetails(courseCode, courseTitle) {
-         console.log('Showing course details for:', courseCode, courseTitle);
          
          // Find the course data
          const course = courses.find(c => c.course_code === courseCode);
@@ -2801,7 +2753,6 @@ if (isset($pdo)) {
      
      // Function to navigate to course details
      function navigateToCourse(courseCode, courseTitle, courseId) {
-         console.log('Navigating to course:', courseCode, courseTitle, 'ID:', courseId);
          window.location.href = 'content.php?page=course-details&course_code=' + encodeURIComponent(courseCode) + '&course_title=' + encodeURIComponent(courseTitle) + '&course_id=' + encodeURIComponent(courseId);
      }
     
@@ -2828,7 +2779,6 @@ if (isset($pdo)) {
         // Update course count
         courseCount.textContent = visibleCount + ' course' + (visibleCount !== 1 ? 's' : '');
         
-        console.log('Filtered courses:', visibleCount, 'for section:', selectedSection);
     }
     
     // Force column widths with JavaScript
@@ -2864,7 +2814,6 @@ if (isset($pdo)) {
                 if (cells[8]) cells[8].style.width = '100px'; // Actions
             });
             
-            console.log('Column widths forced with JavaScript');
         }
     }
     
@@ -2873,7 +2822,6 @@ if (isset($pdo)) {
         const actionsHeader = document.querySelector('th:nth-child(9)');
         if (actionsHeader) {
             actionsHeader.style.cssText = 'text-align: center !important; width: 100px !important; max-width: 100px !important; min-width: 100px !important;';
-            console.log('FORCED ACTIONS HEADER CENTERING');
         }
         
         // Also try by text content
@@ -2881,7 +2829,6 @@ if (isset($pdo)) {
         allHeaders.forEach(header => {
             if (header.textContent.trim() === 'Actions') {
                 header.style.cssText = 'text-align: center !important; width: 100px !important; max-width: 100px !important; min-width: 100px !important;';
-                console.log('FORCED ACTIONS HEADER BY TEXT CONTENT');
             }
         });
     }
@@ -2929,7 +2876,6 @@ if (isset($pdo)) {
      
      // Function to navigate to program courses
      function navigateToProgramCourses(programCode) {
-         console.log('Navigating to program courses:', programCode);
          window.location.href = 'content.php?page=course-details&program=' + encodeURIComponent(programCode);
      }
  </script>

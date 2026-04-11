@@ -212,7 +212,6 @@ try {
     echo json_encode($response);
     
 } catch (Exception $e) {
-    error_log("Error in get_dashboard_data.php: " . $e->getMessage());
     echo json_encode([
         'success' => false,
         'message' => 'Database error occurred'

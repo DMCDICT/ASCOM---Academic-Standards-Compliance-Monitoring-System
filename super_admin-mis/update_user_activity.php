@@ -19,7 +19,6 @@ if (isset($_SESSION['super_admin_logged_in']) && $_SESSION['super_admin_logged_i
         $conn->query($updateQuery);
         $conn->close();
     } catch (Exception $e) {
-        error_log("Error updating Super Admin activity: " . $e->getMessage());
     }
     
     echo json_encode(['success' => true, 'message' => 'Super Admin activity updated']);
@@ -68,7 +67,6 @@ try {
     
     $conn->close();
 } catch (Exception $e) {
-    error_log("Error updating user activity: " . $e->getMessage());
     echo json_encode(['success' => false, 'message' => 'Database error']);
 }
 ?> 

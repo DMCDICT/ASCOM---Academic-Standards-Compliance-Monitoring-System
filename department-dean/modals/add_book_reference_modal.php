@@ -19,7 +19,6 @@ if ($deanDepartmentCode) {
         $coursesStmt->execute([$deanDepartmentCode]);
         $coursesData = $coursesStmt->fetchAll(PDO::FETCH_ASSOC);
     } catch (Exception $e) {
-        error_log("Error fetching courses for book reference modal: " . $e->getMessage());
     }
 }
 ?>
@@ -878,7 +877,6 @@ function initializeButtonText() {
 
 // Switch between input methods
 window.switchInputMethod = function(method) {
-  console.log('Switching to method:', method);
   
   // Update tabs
   document.querySelectorAll('.tab-button').forEach(btn => btn.classList.remove('active'));
@@ -1167,7 +1165,6 @@ window.addManualBook = function() {
   
   if (addBookToList(bookData)) {
     // Success - form will be cleared by addBookToList
-    console.log('Book added to list:', bookData);
   }
 }
 
@@ -1334,11 +1331,9 @@ document.addEventListener('DOMContentLoaded', function() {
           body: formData
         })
         .then(response => {
-          console.log('Response status:', response.status);
           return response.json();
         })
         .then(data => {
-          console.log('Response data:', data);
           if (data && data.success) {
             window.closeAddBookReferenceModal();
             window.showSuccessModal(data.message || 'Book reference added successfully!');
@@ -1404,7 +1399,6 @@ document.addEventListener('DOMContentLoaded', function() {
         })
         .then(response => response.json())
         .then(data => {
-          console.log('Batch response:', data);
           if (data && data.success) {
             window.closeAddBookReferenceModal();
             window.showSuccessModal(data.message || `Successfully added ${batchBooks.length} books!`);
@@ -1450,7 +1444,6 @@ const bookRefCoursesData = [
   <?php endforeach; ?>
 ];
 
-console.log('Book reference courses data loaded:', bookRefCoursesData);
 
 // Initialize course autocomplete
 function initBookRefCourseAutocomplete() {
@@ -1459,14 +1452,12 @@ function initBookRefCourseAutocomplete() {
     const suggestionsPanel = document.getElementById('bookRefCourseSuggestions');
     
     if (!searchInput || !courseIdInput || !suggestionsPanel) {
-        console.log('Course autocomplete elements not found');
         return;
     }
     
     // Show suggestions when typing
     searchInput.addEventListener('input', function() {
         const query = this.value.toLowerCase().trim();
-        console.log('Typing course search:', query);
         
         // Clear previous suggestions
         suggestionsPanel.innerHTML = '';
@@ -1484,7 +1475,6 @@ function initBookRefCourseAutocomplete() {
             course.display.toLowerCase().includes(query)
         );
         
-        console.log('Found', filtered.length, 'course matches');
         
         if (filtered.length === 0) {
             suggestionsPanel.style.display = 'none';
@@ -1531,7 +1521,6 @@ function initBookRefCourseAutocomplete() {
                 searchInput.value = course.display;
                 courseIdInput.value = course.id;
                 suggestionsPanel.style.display = 'none';
-                console.log('Selected course:', course.display, 'ID:', course.id);
                 
                 // Trigger form validation
                 if (typeof setupFormValidation === 'function') {
@@ -1562,7 +1551,6 @@ if (document.readyState === 'loading') {
 
 // Modal functions - Make them globally accessible
 window.openAddBookReferenceModal = function(courseId, courseCode) {
-  console.log('Opening modal for course:', courseId, 'Course Code:', courseCode);
   
   // Set the course ID and search input if provided
   const courseIdField = document.getElementById('bookRefCourseId');
@@ -1724,7 +1712,6 @@ window.loadFacultyMembers = function() {
   // Check if requested_by field exists in the modal
   const select = document.getElementById('requested_by');
   if (!select) {
-    console.log('requested_by field not found in modal, skipping loadFacultyMembers');
     return;
   }
   
@@ -1743,23 +1730,18 @@ window.loadFacultyMembers = function() {
 
 // Function to attach event listeners
 function attachEventListeners() {
-  console.log('Attaching event listeners...');
   
   // Close modal button
   const closeBtn = document.getElementById('closeBookRefModal');
   if (closeBtn) {
     closeBtn.addEventListener('click', window.closeAddBookReferenceModal);
-    console.log('Close button listener attached');
   }
   
   // Tab buttons
   const tabButtons = document.querySelectorAll('.tab-button');
-  console.log('Found tab buttons:', tabButtons.length);
   tabButtons.forEach(btn => {
     btn.addEventListener('click', function() {
-      console.log('Tab clicked:', this);
       const method = this.getAttribute('data-method');
-      console.log('Method:', method);
       if (method) {
         window.switchInputMethod(method);
       }
@@ -1770,7 +1752,6 @@ function attachEventListeners() {
   const cancelBtn = document.getElementById('cancelBookRefBtn');
   if (cancelBtn) {
     cancelBtn.addEventListener('click', window.closeAddBookReferenceModal);
-    console.log('Cancel button listener attached');
   }
   
   // By Batch checkbox
@@ -2176,7 +2157,6 @@ document.addEventListener('click', function(e) {
   if (e.target.closest('.tab-button')) {
     const button = e.target.closest('.tab-button');
     const method = button.getAttribute('data-method');
-    console.log('Tab clicked via delegation:', method);
     if (method) {
       window.switchInputMethod(method);
     }
@@ -2184,13 +2164,11 @@ document.addEventListener('click', function(e) {
   
   // Handle cancel button clicks
   if (e.target.id === 'cancelBookRefBtn' || e.target.closest('#cancelBookRefBtn')) {
-    console.log('Cancel button clicked via delegation');
     window.closeAddBookReferenceModal();
   }
   
   // Handle close button clicks
   if (e.target.id === 'closeBookRefModal' || e.target.closest('#closeBookRefModal')) {
-    console.log('Close button clicked via delegation');
     window.closeAddBookReferenceModal();
   }
 });
@@ -2202,7 +2180,6 @@ const observer = new MutationObserver(function(mutations) {
       mutation.addedNodes.forEach(function(node) {
         if (node.nodeType === 1) { // Element node
           if (node.id === 'addBookReferenceModal' || node.querySelector && node.querySelector('#addBookReferenceModal')) {
-            console.log('Modal detected in DOM, attaching listeners...');
             setTimeout(attachEventListeners, 50);
           }
         }
@@ -2228,7 +2205,6 @@ const intervalId = setInterval(() => {
   
   const modal = document.getElementById('addBookReferenceModal');
   if (modal) {
-    console.log('Modal found, attaching listeners...');
     attachEventListeners();
     clearInterval(intervalId);
   }

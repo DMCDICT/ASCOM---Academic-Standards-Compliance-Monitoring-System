@@ -4,7 +4,6 @@
  * form validation, color picker logic, and AJAX submission.
  */
 
-console.log('🚀 modal-add-department.js is loading...');
 
 // Define animated icon paths
 const ANIMATED_CHECK_ICON_DEPT = '../src/assets/animated_icons/check-animated-icon.gif';
@@ -12,12 +11,10 @@ const ANIMATED_ERROR_ICON_DEPT = '../src/assets/animated_icons/error2-animated-i
 
 // Make functions globally available immediately
 window.openAddDepartmentModal = function() {
-    console.log('=== openAddDepartmentModal called ===');
     const modal = document.getElementById('addDepartmentModal');
     
     if (modal) {
         modal.style.display = 'flex';
-        console.log('Modal display set to flex');
     } else {
         console.error('Modal element not found');
     }
@@ -25,7 +22,6 @@ window.openAddDepartmentModal = function() {
     const form = document.getElementById('addDepartmentForm');
     if (form) {
         form.reset();
-        console.log('Form reset successfully');
     }
     
     const defaultColor = "#4A7DFF"; 
@@ -37,15 +33,12 @@ window.openAddDepartmentModal = function() {
         colorPicker.value = defaultColor;
         colorHex.value = defaultColor;
         colorSwatchDisplay.style.backgroundColor = defaultColor;
-        console.log('Color elements set successfully');
     }
     
     if (typeof checkFormValidity === 'function') {
         checkFormValidity();
-        console.log('checkFormValidity called successfully');
     }
     
-    console.log('=== openAddDepartmentModal completed ===');
 };
 
 window.closeAddDepartmentModal = function() {
@@ -94,28 +87,18 @@ window.checkFormValidity = function() {
 };
 
 // Test that functions are available
-console.log('=== Modal Functions Test ===');
-console.log('openAddDepartmentModal available:', typeof window.openAddDepartmentModal === 'function');
-console.log('closeAddDepartmentModal available:', typeof window.closeAddDepartmentModal === 'function');
-console.log('openSuccessModal available:', typeof window.openSuccessModal === 'function');
-console.log('closeSuccessModal available:', typeof window.closeSuccessModal === 'function');
-console.log('checkFormValidity available:', typeof window.checkFormValidity === 'function');
 
 if (typeof window.openAddDepartmentModal === 'function') {
-    console.log('✅ openAddDepartmentModal is available and callable');
 } else {
     console.error('❌ openAddDepartmentModal is NOT available');
 }
 
-console.log('=== End Functions Test ===');
 
 // Initialize when DOM is loaded
 document.addEventListener("DOMContentLoaded", function () {
-    console.log('DOMContentLoaded - Initializing modal functionality');
     
     const modal = document.getElementById('addDepartmentModal');
     if (modal) {
-        console.log('Modal found in DOM');
     } else {
         console.error('Modal not found in DOM');
     }
@@ -195,13 +178,10 @@ document.addEventListener("DOMContentLoaded", function () {
     addDepartmentForm.addEventListener("submit", function (event) {
         event.preventDefault(); 
         
-        console.log('🔧 Department form submitted');
         
         // Log form data
         const formData = new FormData(this);
-        console.log('📤 Form data being sent:');
         for (let [key, value] of formData.entries()) {
-            console.log(`${key}: ${value}`);
         }
 
         fetch('./process_add_department.php', { 
@@ -209,8 +189,6 @@ document.addEventListener("DOMContentLoaded", function () {
             body: formData
         })
         .then(response => {
-            console.log('📥 Response status:', response.status);
-            console.log('📥 Response headers:', response.headers);
             
             if (!response.ok) {
                 return response.text().then(text => { 
@@ -221,16 +199,13 @@ document.addEventListener("DOMContentLoaded", function () {
             return response.json(); 
         })
         .then(data => {
-            console.log('📥 Response data:', data);
             
             if (data.success) {
-                console.log('✅ Department created successfully');
                 closeAddDepartmentModal(); 
                 openSuccessModal(data.message); 
 
                 const departmentContainer = document.getElementById('departmentContainer');
                 if (departmentContainer && data.department) {
-                    console.log('🔧 Adding department to UI:', data.department);
                     const newDept = data.department;
                     const newCard = document.createElement('div');
                     newCard.className = 'department-card';
@@ -275,5 +250,3 @@ document.addEventListener("DOMContentLoaded", function () {
     });
 });
 
-console.log('✅ modal-add-department.js loaded successfully');
-console.log('Final check - openAddDepartmentModal available:', typeof window.openAddDepartmentModal === 'function');

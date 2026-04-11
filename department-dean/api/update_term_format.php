@@ -1,7 +1,5 @@
 <?php
 // Script to update existing term values to use full semester names
-error_reporting(E_ALL);
-ini_set('display_errors', 1);
 
 try {
     require_once '../includes/db_connection.php';

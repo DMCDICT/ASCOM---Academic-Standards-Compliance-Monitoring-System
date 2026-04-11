@@ -273,7 +273,6 @@ try {
 // All old modal functions removed - now using dedicated faculty details page
 
 function assignCourse(facultyId) {
-	console.log('Navigate to faculty details page for ID:', facultyId);
 	
 	// Navigate to faculty details page
 	window.location.href = `content.php?page=faculty-details&faculty_id=${facultyId}`;

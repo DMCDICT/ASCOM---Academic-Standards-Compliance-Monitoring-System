@@ -19,7 +19,6 @@ if (isset($conn) && !$conn->connect_error) {
         $totalUsers = $row['total_users'];
         $userCountResult->free();
     } else {
-        error_log("Error fetching total users in user-account-management.php: " . $conn->error);
     }
 
     // Fetch New Accounts count (created in last 7 days, only if created_at exists)

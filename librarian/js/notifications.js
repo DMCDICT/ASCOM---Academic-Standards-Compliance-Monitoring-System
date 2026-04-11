@@ -7,7 +7,6 @@ class NotificationSystem {
         this.notifications = [];
         this.unreadCount = 0;
         
-        console.log('🔔 Notification system elements:', {
             icon: !!this.notificationIcon,
             dropdown: !!this.notificationDropdown,
             count: !!this.notificationCount
@@ -28,12 +27,10 @@ class NotificationSystem {
             return;
         }
         
-        console.log('🔔 Setting up event listeners');
         
         // Toggle notification dropdown
         this.notificationIcon.addEventListener('click', (e) => {
             e.stopPropagation();
-            console.log('🔔 Notification icon clicked');
             this.toggleDropdown();
         });
         
@@ -55,16 +52,13 @@ class NotificationSystem {
     
     async loadNotifications() {
         try {
-            console.log('🔔 Loading notifications...');
             const response = await fetch('../api/get_notifications.php?role=dean&limit=10');
             const data = await response.json();
             
-            console.log('🔔 Notification response:', data);
             
             if (data.success) {
                 this.notifications = data.data;
                 this.unreadCount = this.notifications.filter(n => !n.is_read).length;
-                console.log('🔔 Notifications loaded:', this.notifications.length, 'unread:', this.unreadCount);
                 this.updateUI();
             } else {
                 console.error('🔔 Failed to load notifications:', data.error);
@@ -100,14 +94,12 @@ class NotificationSystem {
     }
     
     updateDropdownContent() {
-        console.log('🔔 Updating dropdown content, notifications:', this.notifications.length);
         
         if (this.notifications.length === 0) {
             this.notificationDropdown.innerHTML = `
                 <h3>Notifications</h3>
                 <div class="notification-empty">No new notifications</div>
             `;
-            console.log('🔔 Dropdown updated with empty state');
             return;
         }
         
@@ -198,8 +190,6 @@ class NotificationSystem {
     }
     
     toggleDropdown() {
-        console.log('🔔 Toggle dropdown clicked');
-        console.log('🔔 Current display:', this.notificationDropdown.style.display);
         
         if (this.notificationDropdown.style.display === 'block') {
             this.closeDropdown();
@@ -209,12 +199,10 @@ class NotificationSystem {
     }
     
     openDropdown() {
-        console.log('🔔 Opening dropdown');
         this.notificationDropdown.style.display = 'block';
     }
     
     closeDropdown() {
-        console.log('🔔 Closing dropdown');
         this.notificationDropdown.style.display = 'none';
     }
     
@@ -310,19 +298,15 @@ async function removeNotification(notificationId) {
 
 // Initialize notification system when DOM is loaded
 document.addEventListener('DOMContentLoaded', () => {
-    console.log('🔔 DOM loaded, initializing notification system');
     window.notificationSystem = new NotificationSystem();
     
     // Add a fallback click handler for testing
     setTimeout(() => {
         const notificationIcon = document.querySelector('.notification-icon');
         if (notificationIcon) {
-            console.log('🔔 Adding fallback click handler');
             notificationIcon.addEventListener('click', (e) => {
-                console.log('🔔 Fallback click handler triggered');
                 const dropdown = document.getElementById('notificationDropdown');
                 if (dropdown) {
-                    console.log('🔔 Toggling dropdown via fallback');
                     if (dropdown.style.display === 'block') {
                         dropdown.style.display = 'none';
                     } else {

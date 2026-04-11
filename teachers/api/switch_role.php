@@ -137,7 +137,6 @@ try {
     $_SESSION['user_title'] = $user['title'];
     
     // Debug: Log session data
-    error_log('Switch role success - User ID: ' . $userId . ', Target Role: ' . $targetRole . ', Session: ' . print_r($_SESSION, true));
     
     echo json_encode([
         'success' => true,
@@ -146,7 +145,6 @@ try {
     ]);
     
 } catch (Exception $e) {
-    error_log('Error in teacher switch role: ' . $e->getMessage());
     echo json_encode(['success' => false, 'error' => 'An error occurred while switching roles']);
 }
 ?>

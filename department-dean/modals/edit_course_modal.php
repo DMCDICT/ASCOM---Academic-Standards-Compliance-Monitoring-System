@@ -298,8 +298,6 @@
 <script>
 // Edit Course Modal Functions - Make this function globally available
 window.openEditCourseModal = async function(courseId, courseData) {
-    console.log('Opening edit course modal for:', courseId, courseData);
-    console.log('Full course data object:', JSON.stringify(courseData, null, 2));
     
     // Store original data for comparison
     window.originalCourseData = {
@@ -320,80 +318,56 @@ window.openEditCourseModal = async function(courseId, courseData) {
     
     // Map term values
     const termValue = courseData.term || '';
-    console.log('Term value from database:', termValue);
     
     const termSelect = document.getElementById('edit_school_term');
     
     // Direct mapping based on database values - now using full semester names
     if (termValue.includes('1st') || termValue.includes('First')) {
         termSelect.value = '1st Semester';
-        console.log('Set term to: 1st Semester');
     } else if (termValue.includes('2nd') || termValue.includes('Second')) {
         termSelect.value = '2nd Semester';
-        console.log('Set term to: 2nd Semester');
     } else if (termValue.includes('Summer') || termValue.includes('summer')) {
         termSelect.value = 'Summer Semester';
-        console.log('Set term to: Summer Semester');
     } else {
-        console.log('No match found for term:', termValue);
     }
     
     // Map academic year values
     const academicYear = courseData.academic_year || '';
-    console.log('=== SCHOOL YEAR DEBUG ===');
-    console.log('Raw academic year value:', `"${academicYear}"`);
-    console.log('Academic year length:', academicYear.length);
-    console.log('Academic year type:', typeof academicYear);
-    console.log('Academic year char codes:', Array.from(academicYear).map(c => c.charCodeAt(0)));
     
     const schoolYearSelect = document.getElementById('edit_school_year');
-    console.log('Available school year options:');
     for (let i = 0; i < schoolYearSelect.options.length; i++) {
-        console.log(`  Option ${i}: value="${schoolYearSelect.options[i].value}", text="${schoolYearSelect.options[i].textContent}"`);
     }
     
     // Try multiple matching strategies
     let yearRange = '';
     
     // Strategy 1: Direct contains check
-    console.log('Strategy 1: Direct contains check');
     if (academicYear.includes('2024-2025')) {
         yearRange = '2024-2025';
-        console.log('Match found via contains 2024-2025');
     } else if (academicYear.includes('2025-2026')) {
         yearRange = '2025-2026';
-        console.log('Match found via contains 2025-2026');
     } else if (academicYear.includes('2026-2027')) {
         yearRange = '2026-2027';
-        console.log('Match found via contains 2026-2027');
     } else if (academicYear.includes('2023-2024')) {
         yearRange = '2023-2024';
-        console.log('Match found via contains 2023-2024');
     } else {
-        console.log('No direct contains match found');
     }
     
     // Strategy 2: Try to extract year pattern with more flexible regex
     if (!yearRange) {
-        console.log('Strategy 2: Regex extraction');
         const yearMatch = academicYear.match(/(\d{4}-\d{4})/);
         if (yearMatch) {
             yearRange = yearMatch[1];
-            console.log('Match found via regex:', yearRange);
         } else {
-            console.log('No regex match found');
         }
     }
     
     // Strategy 3: Check if any option value is contained in the academic year
     if (!yearRange) {
-        console.log('Strategy 3: Option contains check');
         for (let i = 1; i < schoolYearSelect.options.length; i++) { // Skip first empty option
             const optionValue = schoolYearSelect.options[i].value;
-            console.log(`Checking option "${optionValue}" against "${academicYear}"`);
             if (academicYear.includes(optionValue)) {
                 yearRange = optionValue;
-                console.log('Match found via option contains:', yearRange);
                 break;
             }
         }
@@ -401,16 +375,13 @@ window.openEditCourseModal = async function(courseId, courseData) {
     
     // Strategy 4: Try to extract just the year numbers
     if (!yearRange) {
-        console.log('Strategy 4: Extract year numbers');
         const numbers = academicYear.match(/\d{4}/g);
         if (numbers && numbers.length >= 2) {
             const extracted = `${numbers[0]}-${numbers[1]}`;
-            console.log('Extracted year range:', extracted);
             // Check if this extracted range matches any option
             for (let i = 1; i < schoolYearSelect.options.length; i++) {
                 if (schoolYearSelect.options[i].value === extracted) {
                     yearRange = extracted;
-                    console.log('Match found via extracted numbers:', yearRange);
                     break;
                 }
             }
@@ -419,14 +390,12 @@ window.openEditCourseModal = async function(courseId, courseData) {
     
     // Strategy 5: Try to match any part of the academic year
     if (!yearRange) {
-        console.log('Strategy 5: Partial matching');
         const academicYearLower = academicYear.toLowerCase();
         for (let i = 1; i < schoolYearSelect.options.length; i++) {
             const optionValue = schoolYearSelect.options[i].value;
             const optionLower = optionValue.toLowerCase();
             if (academicYearLower.includes(optionLower) || optionLower.includes(academicYearLower)) {
                 yearRange = optionValue;
-                console.log('Match found via partial matching:', yearRange);
                 break;
             }
         }
@@ -434,28 +403,17 @@ window.openEditCourseModal = async function(courseId, courseData) {
     
     if (yearRange) {
         schoolYearSelect.value = yearRange;
-        console.log('✅ Set academic year to:', yearRange);
     } else {
-        console.log('❌ No match found for academic year:', academicYear);
-        console.log('Available options:', Array.from(schoolYearSelect.options).map(opt => opt.value));
-        console.log('Trying to set first available option as fallback...');
         if (schoolYearSelect.options.length > 1) {
             schoolYearSelect.value = schoolYearSelect.options[1].value;
-            console.log('Fallback: Set to first available option:', schoolYearSelect.options[1].value);
         }
     }
     
     // Map year level values
     const yearLevel = courseData.year_level || '';
-    console.log('=== YEAR LEVEL DEBUG ===');
-    console.log('Raw year level value:', `"${yearLevel}"`);
-    console.log('Year level length:', yearLevel.length);
-    console.log('Year level type:', typeof yearLevel);
     
     const yearLevelSelect = document.getElementById('edit_year_level');
-    console.log('Available year level options:');
     for (let i = 0; i < yearLevelSelect.options.length; i++) {
-        console.log(`  Option ${i}: value="${yearLevelSelect.options[i].value}", text="${yearLevelSelect.options[i].textContent}"`);
     }
     
     // Try multiple matching strategies
@@ -464,16 +422,12 @@ window.openEditCourseModal = async function(courseId, courseData) {
     // Strategy 1: Direct contains check
     if (yearLevel.includes('1st Year') || yearLevel.includes('1st')) {
         selectedYearLevel = '1st Year';
-        console.log('Match found via contains 1st');
     } else if (yearLevel.includes('2nd Year') || yearLevel.includes('2nd')) {
         selectedYearLevel = '2nd Year';
-        console.log('Match found via contains 2nd');
     } else if (yearLevel.includes('3rd Year') || yearLevel.includes('3rd')) {
         selectedYearLevel = '3rd Year';
-        console.log('Match found via contains 3rd');
     } else if (yearLevel.includes('4th Year') || yearLevel.includes('4th')) {
         selectedYearLevel = '4th Year';
-        console.log('Match found via contains 4th');
     }
     
     // Strategy 2: Check if any option value is contained in the year level
@@ -482,7 +436,6 @@ window.openEditCourseModal = async function(courseId, courseData) {
             const optionValue = yearLevelSelect.options[i].value;
             if (yearLevel.includes(optionValue) || optionValue.includes(yearLevel)) {
                 selectedYearLevel = optionValue;
-                console.log('Match found via option contains:', selectedYearLevel);
                 break;
             }
         }
@@ -493,12 +446,10 @@ window.openEditCourseModal = async function(courseId, courseData) {
         const yearMatch = yearLevel.match(/(\d+(?:st|nd|rd|th)?\s*Year)/i);
         if (yearMatch) {
             const extracted = yearMatch[1];
-            console.log('Extracted year level:', extracted);
             // Try to match with available options
             for (let i = 1; i < yearLevelSelect.options.length; i++) {
                 if (yearLevelSelect.options[i].value.toLowerCase().includes(extracted.toLowerCase())) {
                     selectedYearLevel = yearLevelSelect.options[i].value;
-                    console.log('Match found via extracted pattern:', selectedYearLevel);
                     break;
                 }
             }
@@ -507,10 +458,7 @@ window.openEditCourseModal = async function(courseId, courseData) {
     
     if (selectedYearLevel) {
         yearLevelSelect.value = selectedYearLevel;
-        console.log('✅ Set year level to:', selectedYearLevel);
     } else {
-        console.log('❌ No match found for year level:', yearLevel);
-        console.log('Available options:', Array.from(yearLevelSelect.options).map(opt => opt.value));
     }
     
     // Handle programs
@@ -531,7 +479,6 @@ window.openEditCourseModal = async function(courseId, courseData) {
         programBtn.parentNode.replaceChild(newProgramBtn, programBtn);
         // Add fresh listener
         newProgramBtn.addEventListener('click', window.openEditProgramSelectModal);
-        console.log('✅ Program selection button event listener attached');
     }
     
     // Show modal
@@ -542,14 +489,8 @@ window.openEditCourseModal = async function(courseId, courseData) {
     document.body.style.height = '100%';
     
     // Debug the course data
-    console.log('🔍 Course data academic_year:', courseData.academic_year);
-    console.log('🔍 Course data keys:', Object.keys(courseData));
-    console.log('🔍 Full course data:', courseData);
     
     // Test if academic_year is actually a string
-    console.log('🔍 Academic year type:', typeof courseData.academic_year);
-    console.log('🔍 Academic year length:', courseData.academic_year ? courseData.academic_year.length : 'null/undefined');
-    console.log('🔍 Academic year char codes:', courseData.academic_year ? courseData.academic_year.split('').map(c => c.charCodeAt(0)) : 'null/undefined');
     
     // Populate school years from database and then set the correct value
     await populateEditSchoolYearsAndSetValue(courseData.academic_year);
@@ -563,7 +504,6 @@ window.openEditCourseModal = async function(courseId, courseData) {
             updateBtn.style.cursor = 'not-allowed';
             updateBtn.style.opacity = '0.6';
             updateBtn.title = 'No changes made';
-            console.log('🔧 FORCED button to be DISABLED');
         }
     }, 300);
     
@@ -575,7 +515,6 @@ window.openEditCourseModal = async function(courseId, courseData) {
         updateBtn.style.cursor = 'not-allowed';
         updateBtn.style.opacity = '0.6';
         updateBtn.title = 'No changes made';
-        console.log('🔧 Initial button state: DISABLED');
     }
 }
 
@@ -597,27 +536,21 @@ window.populateEditSchoolYearsAndSetValue = async function(academicYear) {
     }
     
     try {
-        console.log('🔍 Fetching school years from database...');
         // Fetch school years from the database
         const response = await fetch('api/get_school_years.php');
         const data = await response.json();
         
-        console.log('🔍 API response:', data);
         
         if (data.success && data.school_years) {
-            console.log('🔍 Adding school years to dropdown...');
             // Add school years from database
             data.school_years.forEach(year => {
                 const option = document.createElement('option');
                 option.value = year.school_year;
                 option.textContent = year.display_text;
                 schoolYearSelect.appendChild(option);
-                console.log(`🔍 Added option: value="${year.school_year}", text="${year.display_text}"`);
             });
-            console.log('✅ School years loaded from database:', data.school_years);
             
             // Now set the correct value based on the course's academic year
-            console.log('🔍 About to set school year value for:', academicYear);
             setSchoolYearValue(academicYear);
             
         } else {
@@ -663,8 +596,6 @@ window.populateEditSchoolYearsAndSetValue = async function(academicYear) {
 // Function to set the school year value based on the course's academic year
 window.setSchoolYearValue = function(academicYear) {
     const schoolYearSelect = document.getElementById('edit_school_year');
-    console.log('🔍 Setting school year value for:', academicYear);
-    console.log('🔍 Available options:', Array.from(schoolYearSelect.options).map(opt => ({value: opt.value, text: opt.textContent})));
     
     // Simple direct matching - try exact match first
     let matched = false;
@@ -674,7 +605,6 @@ window.setSchoolYearValue = function(academicYear) {
         const option = schoolYearSelect.options[i];
         if (option.value === academicYear) {
             schoolYearSelect.value = option.value;
-            console.log('✅ Exact match found:', option.value);
             matched = true;
             break;
         }
@@ -686,7 +616,6 @@ window.setSchoolYearValue = function(academicYear) {
             const option = schoolYearSelect.options[i];
             if (academicYear.includes(option.value) || option.value.includes(academicYear)) {
                 schoolYearSelect.value = option.value;
-                console.log('✅ Contains match found:', option.value);
                 matched = true;
                 break;
             }
@@ -697,13 +626,11 @@ window.setSchoolYearValue = function(academicYear) {
     if (!matched) {
         const yearNumbers = academicYear.match(/\d{4}/g);
         if (yearNumbers) {
-            console.log('🔍 Found year numbers:', yearNumbers);
             for (let i = 0; i < schoolYearSelect.options.length; i++) {
                 const option = schoolYearSelect.options[i];
                 for (let j = 0; j < yearNumbers.length; j++) {
                     if (option.value.includes(yearNumbers[j])) {
                         schoolYearSelect.value = option.value;
-                        console.log('✅ Year number match found:', option.value, 'using:', yearNumbers[j]);
                         matched = true;
                         break;
                     }
@@ -714,14 +641,11 @@ window.setSchoolYearValue = function(academicYear) {
     }
     
     if (!matched) {
-        console.log('❌ No match found, using first available option');
         if (schoolYearSelect.options.length > 1) {
             schoolYearSelect.selectedIndex = 1;
-            console.log('✅ Fallback selected:', schoolYearSelect.value);
         }
     }
     
-    console.log('✅ Final selected school year:', schoolYearSelect.value);
     
     // Force update button state after setting school year
     setTimeout(() => {
@@ -732,7 +656,6 @@ window.setSchoolYearValue = function(academicYear) {
 // Function to check if there are any changes
 function hasChanges() {
     if (!window.originalCourseData) {
-        console.log('🔍 No original data - no changes');
         return false;
     }
     
@@ -749,47 +672,34 @@ function hasChanges() {
         { name: 'year_level', current: document.getElementById('edit_year_level').value, original: window.originalCourseData.year_level }
     ];
     
-    console.log('🔍 Checking for changes:');
     
     for (let field of fields) {
         const isDifferent = field.current !== field.original;
-        console.log(`🔍 ${field.name}: current="${field.current}" vs original="${field.original}" = ${isDifferent ? 'DIFFERENT' : 'SAME'}`);
         
         if (isDifferent) {
-            console.log(`✅ Change detected in ${field.name}`);
             hasAnyChanges = true;
         }
     }
     
     // Check for program selection changes
     const currentProgramsInput = document.getElementById('editSelectedProgramsInput');
-    console.log('🔍 Program change check:');
-    console.log('🔍 currentProgramsInput exists:', !!currentProgramsInput);
-    console.log('🔍 originalCourseData.programs exists:', !!window.originalCourseData.programs);
     
     if (currentProgramsInput && window.originalCourseData.programs) {
         const currentPrograms = currentProgramsInput.value;
         const originalPrograms = JSON.stringify(window.originalCourseData.programs);
         
-        console.log(`🔍 programs: current="${currentPrograms}" vs original="${originalPrograms}"`);
-        console.log(`🔍 programs match: ${currentPrograms === originalPrograms}`);
         
         // Compare the program selections
         if (currentPrograms !== originalPrograms) {
-            console.log(`✅ Change detected in programs`);
             hasAnyChanges = true;
         } else {
-            console.log(`🔍 No program changes detected`);
         }
     } else {
-        console.log('🔍 Skipping program check - missing data');
     }
     
     if (hasAnyChanges) {
-        console.log('✅ Overall: CHANGES DETECTED');
         return true;
     } else {
-        console.log('✅ Overall: NO CHANGES - all fields match original');
         return false;
     }
 }
@@ -843,9 +753,6 @@ function checkEditFormValidity() {
     const selectedPrograms = document.getElementById('editSelectedProgramsInput').value;
     const hasPrograms = selectedPrograms && selectedPrograms.trim().length > 0;
     
-    console.log('🔍 Program validation:');
-    console.log('🔍 selectedPrograms value:', selectedPrograms);
-    console.log('🔍 hasPrograms:', hasPrograms);
     
     if (!hasPrograms) {
         missingFields.push('programs');
@@ -853,14 +760,9 @@ function checkEditFormValidity() {
     
     // Check if there are changes
     const hasChangesMade = hasChanges();
-    console.log('🔍 Form validity check:');
-    console.log(`🔍 All fields filled: ${allFilled}`);
-    console.log(`🔍 Has programs: ${hasPrograms}`);
-    console.log(`🔍 Has changes: ${hasChangesMade}`);
     
     // STRICT: Button should ONLY be enabled if ALL conditions are met AND there are actual changes
     const isValid = allFilled && hasPrograms && hasChangesMade;
-    console.log(`🔍 Final isValid: ${isValid}`);
     
     // FORCE disable if no changes
     if (!hasChangesMade) {
@@ -869,7 +771,6 @@ function checkEditFormValidity() {
         updateBtn.style.cursor = 'not-allowed';
         updateBtn.style.opacity = '0.6';
         updateBtn.title = 'No changes made';
-        console.log('🔧 FORCED DISABLE - No changes detected');
         return;
     }
     
@@ -900,7 +801,6 @@ function checkEditFormValidity() {
         updateBtn.style.cursor = 'not-allowed';
         updateBtn.style.opacity = '0.6';
         updateBtn.title = 'No changes made';
-        console.log('🔧 FORCED DISABLE - All fields match original and no program changes');
         return;
     }
     
@@ -913,13 +813,11 @@ function checkEditFormValidity() {
         updateBtn.style.cursor = 'pointer';
         updateBtn.style.opacity = '1';
         updateBtn.title = 'Update course with changes';
-        console.log('✅ Button enabled - blue color');
     } else {
         updateBtn.style.backgroundColor = '#ccc';
         updateBtn.style.cursor = 'not-allowed';
         updateBtn.style.opacity = '0.6';
         updateBtn.title = hasChangesMade ? 'Please fill in all required fields' : 'No changes made';
-        console.log('❌ Button disabled - grey color');
     }
 }
 
@@ -981,7 +879,6 @@ function showUpdateSuccessModal(updatedData = null) {
     `;
     
     document.body.appendChild(modal);
-    console.log('✅ Success modal displayed');
     
     // Add countdown timer to OK button
     let countdown = 3;
@@ -1040,7 +937,6 @@ function showUpdateErrorModal(message = 'There was an error updating the course.
     `;
     
     document.body.appendChild(modal);
-    console.log('❌ Error modal displayed');
 }
 
 // Close functions for the modals
@@ -1052,7 +948,6 @@ function closeUpdateSuccessModal() {
     }
     
     // Auto-refresh the page to show updated data
-    console.log('🔄 Refreshing page to show updated course data...');
     setTimeout(() => {
         window.location.reload();
     }, 500); // Small delay to ensure modal is fully closed
@@ -1069,12 +964,10 @@ function closeUpdateErrorModal() {
 
 // Program Selection Modal Functions
 window.openEditProgramSelectModal = function() {
-    console.log('🔧 Opening Edit Program Selection Modal');
     const programModal = document.getElementById('editProgramSelectModal');
     if (programModal) {
         programModal.style.display = 'flex';
         // Don't change body overflow since Edit Course Modal is already open
-        console.log('✅ Edit Program Selection Modal opened');
         
         // Initialize checkboxes with event listeners and attach confirm button
         setTimeout(() => {
@@ -1089,20 +982,13 @@ window.openEditProgramSelectModal = function() {
                 confirmBtn.parentNode.replaceChild(newConfirmBtn, confirmBtn);
                 // Attach fresh listener
                 newConfirmBtn.addEventListener('click', function(e) {
-                    console.log('🔧 Confirm button CLICKED via event listener');
                     window.confirmEditProgramSelection(e);
                 });
-                console.log('✅ Confirm button event listener attached');
                 
                 // Add test function
                 window.testConfirmButton = function() {
-                    console.log('🔧 Manual test of Confirm button');
                     const btn = document.getElementById('confirmEditProgramSelectBtn');
-                    console.log('🔧 Button found:', btn);
-                    console.log('🔧 Button disabled:', btn ? btn.disabled : 'N/A');
-                    console.log('🔧 Button innerHTML:', btn ? btn.innerHTML : 'N/A');
                     if (btn) {
-                        console.log('🔧 Manually calling confirmEditProgramSelection...');
                         window.confirmEditProgramSelection();
                     }
                 };
@@ -1110,7 +996,6 @@ window.openEditProgramSelectModal = function() {
                 // Update button state immediately after attaching
                 setTimeout(() => {
                     updateEditProgramConfirmButton();
-                    console.log('🔧 Button state after init:', {
                         disabled: document.getElementById('confirmEditProgramSelectBtn').disabled,
                         backgroundColor: document.getElementById('confirmEditProgramSelectBtn').style.backgroundColor
                     });
@@ -1125,12 +1010,10 @@ window.openEditProgramSelectModal = function() {
 }
 
 window.closeEditProgramSelectModal = function() {
-    console.log('🔧 Closing Edit Program Selection Modal');
     const programModal = document.getElementById('editProgramSelectModal');
     if (programModal) {
         programModal.style.display = 'none';
         // Don't restore body overflow since Edit Course Modal should remain open
-        console.log('✅ Edit Program Selection Modal closed');
     }
 }
 
@@ -1175,8 +1058,6 @@ function loadEditProgramList() {
 }
 
 window.confirmEditProgramSelection = function(e) {
-    console.log('🔧 ✨ CONFIRM BUTTON CLICKED! ✨');
-    console.log('🔧 Event:', e);
     
     // Prevent any default behavior
     if (e) {
@@ -1187,7 +1068,6 @@ window.confirmEditProgramSelection = function(e) {
     const checkboxes = document.querySelectorAll('#editProgramCheckboxes input[type="checkbox"]:checked');
     const selectedPrograms = [];
     
-    console.log(`🔧 Found ${checkboxes.length} checked checkboxes`);
     
     checkboxes.forEach(checkbox => {
         const label = checkbox.closest('label');
@@ -1200,18 +1080,15 @@ window.confirmEditProgramSelection = function(e) {
             program_name: programName || programText
         });
         
-        console.log('🔧 Selected program:', programCode, '-', programName);
     });
     
     if (selectedPrograms.length > 0) {
         const programCodes = selectedPrograms.map(p => p.program_code).join(', ');
         document.getElementById('editProgramButtonText').textContent = `Selected: ${programCodes}`;
         document.getElementById('editSelectedProgramsInput').value = JSON.stringify(selectedPrograms);
-        console.log('✅ Programs selected:', selectedPrograms);
     } else {
         document.getElementById('editProgramButtonText').textContent = 'Select Program(s) - No Program Selected';
         document.getElementById('editSelectedProgramsInput').value = '';
-        console.log('✅ No programs selected');
     }
     
     // Trigger change event to update button state
@@ -1228,7 +1105,6 @@ window.confirmEditProgramSelection = function(e) {
 }
 
 window.resetEditProgramSelection = function() {
-    console.log('🔧 Resetting Edit Program Selection');
     const checkboxes = document.querySelectorAll('#editProgramCheckboxes input[type="checkbox"]');
     checkboxes.forEach(checkbox => {
         checkbox.checked = false;
@@ -1237,7 +1113,6 @@ window.resetEditProgramSelection = function() {
     // Update confirm button state
     updateEditProgramConfirmButton();
     
-    console.log('✅ Program selection reset');
 }
 
 // Function to update the confirm button state based on checkbox selection
@@ -1249,8 +1124,6 @@ function updateEditProgramConfirmButton() {
     const currentSelection = Array.from(checkedBoxes).map(cb => cb.value.toString()).sort();
     const originalSelection = (window.originalProgramSelection || []).map(id => id.toString()).sort();
     
-    console.log('🔧 Current selection:', currentSelection);
-    console.log('🔧 Original selection:', originalSelection);
     
     // Check if at least one program is selected
     const hasSelection = currentSelection.length > 0;
@@ -1258,8 +1131,6 @@ function updateEditProgramConfirmButton() {
     // Check if selection has changed from original
     const hasChanges = JSON.stringify(currentSelection) !== JSON.stringify(originalSelection);
     
-    console.log('🔧 Has selection:', hasSelection);
-    console.log('🔧 Has changes:', hasChanges);
     
     if (!hasSelection) {
         // No programs selected - disable
@@ -1268,7 +1139,6 @@ function updateEditProgramConfirmButton() {
         confirmBtn.style.cursor = 'not-allowed';
         confirmBtn.style.opacity = '0.6';
         confirmBtn.title = 'Please select at least one program';
-        console.log('✅ Confirm button DISABLED - no programs selected');
     } else if (!hasChanges) {
         // Programs selected but no changes - disable
         confirmBtn.disabled = true;
@@ -1276,7 +1146,6 @@ function updateEditProgramConfirmButton() {
         confirmBtn.style.cursor = 'not-allowed';
         confirmBtn.style.opacity = '0.6';
         confirmBtn.title = 'No changes to confirm';
-        console.log('✅ Confirm button DISABLED - no changes from original');
     } else {
         // Programs selected AND changes detected - enable
         confirmBtn.disabled = false;
@@ -1284,14 +1153,12 @@ function updateEditProgramConfirmButton() {
         confirmBtn.style.cursor = 'pointer';
         confirmBtn.style.opacity = '1';
         confirmBtn.title = 'Confirm program selection';
-        console.log(`✅ Confirm button ENABLED - ${currentSelection.length} programs selected with changes`);
     }
 }
 
 // Function to initialize program selection checkboxes with event listeners
 function initializeEditProgramCheckboxes() {
     const checkboxes = document.querySelectorAll('#editProgramCheckboxes input[type="checkbox"]');
-    console.log(`🔧 Initializing ${checkboxes.length} program checkboxes with event listeners`);
     
     // First, uncheck all checkboxes
     checkboxes.forEach(checkbox => {
@@ -1306,13 +1173,10 @@ function initializeEditProgramCheckboxes() {
         try {
             const programs = JSON.parse(programsInput.value);
             selectedProgramIds = programs.map(p => p.id.toString());
-            console.log('🔧 Current programs to pre-select:', programs);
-            console.log('🔧 Program IDs:', selectedProgramIds);
         } catch (e) {
             console.error('❌ Failed to parse programs JSON:', e);
         }
     } else {
-        console.log('🔧 No programs data found in hidden input');
     }
     
     // Pre-select checkboxes based on current programs
@@ -1322,7 +1186,6 @@ function initializeEditProgramCheckboxes() {
         
         if (shouldBeChecked) {
             checkbox.checked = true;
-            console.log(`✅ Pre-selected program ID: ${checkboxValue}`);
         }
         
         // Remove existing listeners by cloning
@@ -1334,14 +1197,12 @@ function initializeEditProgramCheckboxes() {
         newCheckbox.addEventListener('change', function(e) {
             // Stop event propagation to prevent interference
             e.stopPropagation();
-            console.log(`🔧 Checkbox changed: ${newCheckbox.value}, checked: ${newCheckbox.checked}`);
             updateEditProgramConfirmButton();
         });
     });
     
     // Store original selection for comparison
     window.originalProgramSelection = [...selectedProgramIds];
-    console.log('🔧 Stored original program selection:', window.originalProgramSelection);
     
     // Initial button state
     updateEditProgramConfirmButton();
@@ -1359,7 +1220,6 @@ document.addEventListener('DOMContentLoaded', function() {
         const formData = new FormData(this);
         const courseData = Object.fromEntries(formData);
         
-        console.log('Updating course:', courseData);
         
         // Show loading state
         updateBtn.disabled = true;
@@ -1372,14 +1232,12 @@ document.addEventListener('DOMContentLoaded', function() {
             body: formData
         })
         .then(response => {
-            console.log('API Response Status:', response.status);
             if (!response.ok) {
                 throw new Error(`HTTP error! status: ${response.status}`);
             }
             return response.json();
         })
         .then(data => {
-            console.log('API Response Data:', data);
             
             if (data.success) {
                 // Close the edit modal immediately
@@ -1446,13 +1304,10 @@ document.addEventListener('DOMContentLoaded', function() {
     formFields.forEach(fieldId => {
         const field = document.getElementById(fieldId);
         if (field) {
-            console.log('Adding listeners to field:', fieldId);
             field.addEventListener('input', function() {
-                console.log('Input event on:', fieldId);
                 updateButtonState();
             });
             field.addEventListener('change', function() {
-                console.log('Change event on:', fieldId);
                 updateButtonState();
             });
         } else {
@@ -1462,7 +1317,6 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Test function to manually trigger button state
     window.testButtonState = function() {
-        console.log('Manual button state test');
         updateButtonState();
     };
     
@@ -1475,7 +1329,6 @@ document.addEventListener('DOMContentLoaded', function() {
             updateBtn.style.backgroundColor = '#ccc';
             updateBtn.style.cursor = 'not-allowed';
             updateBtn.style.opacity = '0.6';
-            console.log('Button force disabled');
         }
     };
     
@@ -1488,7 +1341,6 @@ document.addEventListener('DOMContentLoaded', function() {
             updateBtn.style.backgroundColor = '#007bff';
             updateBtn.style.cursor = 'pointer';
             updateBtn.style.opacity = '1';
-            console.log('Button force enabled');
         }
     };
 });

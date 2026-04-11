@@ -222,16 +222,12 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 // TOOLTIP SYSTEM - Fixed and working
-console.log('🚨 ADMIN: Tooltip system enabled');
 
 function createEmergencyTooltips() {
-    console.log('🚨 ADMIN: Creating tooltips...');
     
     const navButtons = document.querySelectorAll('.nav-button');
-    console.log(`🚨 ADMIN: Found ${navButtons.length} nav buttons`);
     
     if (navButtons.length === 0) {
-        console.log('🚨 ADMIN: No nav buttons found');
         return;
     }
     
@@ -244,13 +240,11 @@ function createEmergencyTooltips() {
             // Get innerHTML and replace <br> tags with spaces
             tooltipText = spanElement.innerHTML.replace(/<br\s*\/?>/gi, ' ').replace(/\s+/g, ' ').trim();
         }
-        console.log(`🚨 ADMIN: Setting up tooltip for button ${index + 1}: "${tooltipText}"`);
         
         button.addEventListener('mouseenter', function() {
             const sidebar = document.getElementById('sidebar');
             const isCollapsed = sidebar ? sidebar.classList.contains('collapsed') : false;
             
-            console.log(`🚨 ADMIN: Hover on button ${index + 1}, sidebar collapsed: ${isCollapsed}`);
             
             if (isCollapsed) {
                 if (emergencyTooltip) {
@@ -258,7 +252,6 @@ function createEmergencyTooltips() {
                 }
                 
                 const buttonRect = button.getBoundingClientRect();
-                console.log(`🚨 ADMIN: Button ${index + 1} position:`, buttonRect);
                 
                 emergencyTooltip = document.createElement('div');
                 emergencyTooltip.innerHTML = `
@@ -302,21 +295,17 @@ function createEmergencyTooltips() {
                 `;
                 
                 document.body.appendChild(emergencyTooltip);
-                console.log(`🚨 ADMIN: Tooltip created for button ${index + 1}`);
             }
         });
         
         button.addEventListener('mouseleave', function() {
-            console.log(`🚨 ADMIN: Leave button ${index + 1}`);
             if (emergencyTooltip) {
                 emergencyTooltip.remove();
                 emergencyTooltip = null;
-                console.log(`🚨 ADMIN: Tooltip removed for button ${index + 1}`);
             }
         });
     });
     
-    console.log('🚨 ADMIN: Emergency tooltips created successfully');
 }
 
 // Create emergency tooltips multiple times
@@ -327,52 +316,40 @@ setTimeout(createEmergencyTooltips, 5000);
 // Make it available globally
 window.createEmergencyTooltips = createEmergencyTooltips;
 
-console.log('🚨 ADMIN: Emergency tooltip system ready');
 
 // CHAT AND NOTIFICATION FUNCTIONALITY
-console.log('🚨 ADMIN: Initializing chat and notification functionality');
 
 // Initialize chats and notifications
 const chatsIcon = document.querySelector('.chats-icon');
 if (chatsIcon) {
-    console.log('🚨 ADMIN: Chats icon found, adding click handler');
     chatsIcon.onclick = function(e) {
         e.preventDefault();
         e.stopPropagation();
-        console.log('🚨 ADMIN: Chats icon clicked');
         const dropdown = document.getElementById('chatsDropdown');
         if (dropdown) {
             const currentDisplay = dropdown.style.display;
             dropdown.style.display = currentDisplay === 'block' ? 'none' : 'block';
-            console.log('🚨 ADMIN: Chats dropdown toggled:', dropdown.style.display);
         }
     };
     chatsIcon.style.cursor = 'pointer';
     chatsIcon.style.pointerEvents = 'auto';
-    console.log('🚨 ADMIN: Chats initialized');
 } else {
-    console.log('🚨 ADMIN: Chats icon not found');
 }
 
 const notificationIcon = document.querySelector('.notification-icon');
 if (notificationIcon) {
-    console.log('🚨 ADMIN: Notification icon found, adding click handler');
     notificationIcon.onclick = function(e) {
         e.preventDefault();
         e.stopPropagation();
-        console.log('🚨 ADMIN: Notification icon clicked');
         const dropdown = document.getElementById('notificationDropdown');
         if (dropdown) {
             const currentDisplay = dropdown.style.display;
             dropdown.style.display = currentDisplay === 'block' ? 'none' : 'block';
-            console.log('🚨 ADMIN: Notification dropdown toggled:', dropdown.style.display);
         }
     };
     notificationIcon.style.cursor = 'pointer';
     notificationIcon.style.pointerEvents = 'auto';
-    console.log('🚨 ADMIN: Notifications initialized');
 } else {
-    console.log('🚨 ADMIN: Notification icon not found');
 }
 
 // Close dropdowns when clicking outside
@@ -392,7 +369,6 @@ document.addEventListener('click', function(e) {
     }
 });
 
-console.log('🚨 ADMIN: Chat and notification functionality ready');
 </script>
 </body>
 </html> 

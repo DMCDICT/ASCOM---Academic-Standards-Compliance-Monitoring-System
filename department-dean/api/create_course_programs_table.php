@@ -1,7 +1,5 @@
 <?php
 // Script to create course_programs table and migrate existing data
-error_reporting(E_ALL);
-ini_set('display_errors', 1);
 
 try {
     require_once '../includes/db_connection.php';

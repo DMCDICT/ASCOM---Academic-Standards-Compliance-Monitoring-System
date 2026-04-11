@@ -106,15 +106,12 @@ try {
     }
     
     // Debug: Log the query and params
-    error_log("Compliance Stats Query: " . $query);
-    error_log("Compliance Stats Params: " . json_encode($params));
     
     $stmt = $pdo->prepare($query);
     $stmt->execute($params);
     $result = $stmt->fetch(PDO::FETCH_ASSOC);
     
     // Debug: Log the raw result
-    error_log("Compliance Stats Raw Result: " . json_encode($result));
     
     $totalCourses = (int)($result['total_courses'] ?? 0);
     $compliantCourses = (int)($result['compliant_courses'] ?? 0);
@@ -127,15 +124,11 @@ try {
     $allCoursesStmt = $pdo->prepare($allCoursesQuery);
     $allCoursesStmt->execute();
     $allCourses = $allCoursesStmt->fetchAll(PDO::FETCH_ASSOC);
-    error_log("DEBUG: Total courses in database: " . count($allCourses));
-    error_log("DEBUG: All courses: " . json_encode($allCourses));
     
     // Get all courses first (this is the source of truth)
     $debugStmt = $pdo->prepare($baseQuery);
     $debugStmt->execute($params);
     $debugCourses = $debugStmt->fetchAll(PDO::FETCH_ASSOC);
-    error_log("DEBUG: Courses found by our query: " . count($debugCourses));
-    error_log("All courses being counted: " . json_encode($debugCourses));
     
     // Calculate counts directly from the courses array (more reliable than SQL aggregation)
     // This ensures we're counting exactly what we see
@@ -153,7 +146,6 @@ try {
     }
     
     // Log for debugging
-    error_log("Calculated from courses array: Total=$totalCourses, Compliant=$compliantCourses, Non-Compliant=$nonCompliantCourses");
     
     // Verify the SQL query result matches (for debugging)
     $sqlTotal = (int)($result['total_courses'] ?? 0);
@@ -161,7 +153,6 @@ try {
     $sqlNonCompliant = (int)($result['non_compliant_courses'] ?? 0);
     
     if ($sqlTotal != $totalCourses || $sqlCompliant != $compliantCourses || $sqlNonCompliant != $nonCompliantCourses) {
-        error_log("SQL query mismatch - SQL: Total=$sqlTotal, Compliant=$sqlCompliant, Non-Compliant=$sqlNonCompliant | Array: Total=$totalCourses, Compliant=$compliantCourses, Non-Compliant=$nonCompliantCourses");
     }
     
     // Calculate compliance percentage

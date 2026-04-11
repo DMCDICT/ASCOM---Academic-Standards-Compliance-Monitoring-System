@@ -43,7 +43,6 @@ try {
     $response['books'] = $books;
     
 } catch (Exception $e) {
-    error_log("Error searching call number: " . $e->getMessage());
     $response['message'] = 'Search failed: ' . $e->getMessage();
 }
 

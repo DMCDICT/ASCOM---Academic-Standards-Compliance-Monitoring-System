@@ -22,13 +22,11 @@ function updateUserActivity($employee_no) {
         if ($updateStmt->execute()) {
             return true;
         } else {
-            error_log("Failed to update user activity: " . $conn->error);
             return false;
         }
         
         $updateStmt->close();
     } catch (Exception $e) {
-        error_log("Error updating user activity: " . $e->getMessage());
         return false;
     }
 }

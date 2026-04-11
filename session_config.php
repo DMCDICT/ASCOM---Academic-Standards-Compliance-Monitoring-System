@@ -79,7 +79,6 @@ function fixMissingEmployeeNo(): void
 
         $stmt->close();
     } catch (Throwable $e) {
-        error_log('Error fixing employee_no: ' . $e->getMessage());
     }
 }
 
@@ -127,7 +126,6 @@ function updateUserForcedLogout(?string $employeeNo): void
         $stmt->execute();
         $stmt->close();
     } catch (Throwable $e) {
-        error_log('Error updating user forced logout status: ' . $e->getMessage());
     }
 }
 

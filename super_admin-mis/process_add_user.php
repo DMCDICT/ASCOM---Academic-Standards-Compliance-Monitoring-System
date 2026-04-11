@@ -4,17 +4,13 @@ ob_start(); // Only one ob_start() needed, right after <?php
 require_once __DIR__ . '/includes/db_connection.php';
 
 // Enable error reporting for debugging
-ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
-error_reporting(E_ALL);
 
 header('Content-Type: application/json');
 
 $response = ['success' => false, 'message' => ''];
 
 // Debug: Log the request
-error_log("process_add_user.php called with method: " . $_SERVER['REQUEST_METHOD']);
-error_log("POST data: " . print_r($_POST, true));
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $employee_no = trim($_POST['employee_no'] ?? '');
@@ -95,13 +91,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $created_by = 'Super Admin MIS'; 
 
         // Debug: Check database structure
-        error_log("Checking database structure...");
         $check_employee_no = $conn->query("SHOW COLUMNS FROM users LIKE 'employee_no'");
-        error_log("employee_no column exists: " . ($check_employee_no->num_rows > 0 ? "YES" : "NO"));
         
         if ($check_employee_no->num_rows > 0) {
             // New structure with employee_no and institutional_email
-            error_log("Using new structure for insert");
             $stmt_insert = $conn->prepare("
                 INSERT INTO users 
                 (employee_no, first_name, middle_name, last_name, name_prefix, institutional_email, mobile_no, password, role_id, department_id, created_by) 
@@ -114,11 +107,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     $institutional_email, $mobile_no, $password, $role_id, $department_id, $created_by
                 );
             } else {
-                error_log("Failed to prepare insert statement: " . $conn->error);
             }
         } else {
             // Old structure - use email field
-            error_log("Using old structure for insert");
             $stmt_insert = $conn->prepare("
                 INSERT INTO users 
                 (email, password, role, department_id, first_name, last_name, is_active) 
@@ -131,18 +122,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     $institutional_email, $password, $role_name, $department_id, $first_name, $last_name
                 );
             } else {
-                error_log("Failed to prepare insert statement: " . $conn->error);
             }
         }
 
         if ($stmt_insert) {
-            error_log("Attempting to execute insert statement...");
             if ($stmt_insert->execute()) {
-                error_log("Insert successful! New user ID: " . $conn->insert_id);
                 $response['success'] = true;
                 $response['message'] = 'User account for ' . htmlspecialchars($first_name . ' ' . $last_name) . ' (' . htmlspecialchars($employee_no) . ') created successfully!';
             } else {
-                error_log("Insert failed: " . $stmt_insert->error);
                 $response['message'] = 'Error creating user account: ' . $stmt_insert->error;
             }
 
@@ -197,7 +184,6 @@ if (!empty($buffered_output)) {
     $response['success'] = false;
 }
 
-error_log("Final response: " . json_encode($response));
 echo json_encode($response); 
 exit;
 ?>

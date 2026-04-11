@@ -63,7 +63,6 @@ try {
     
 } catch (Exception $e) {
     // Use default values if database query fails
-    error_log('Dashboard stats calculation failed: ' . $e->getMessage());
 }
 ?>
 
@@ -1032,12 +1031,10 @@ let classificationsPerPage = 3;
 
 // Initialize both sections
 document.addEventListener('DOMContentLoaded', function() {
-    console.log('Initializing Material Processing section...');
     
     // Load processing materials from database
     loadProcessingMaterials();
     
-    console.log('Initializing Classification Management section...');
     
     // Load classifications from database
     loadClassificationsFromDatabase();
@@ -1100,7 +1097,6 @@ function displayCurrentPage() {
         }
     }
     
-    console.log(`Displaying materials ${startIndex + 1}-${Math.min(endIndex, allMaterials.length)} of ${allMaterials.length} processing materials`);
 }
 
 function updateSectionState() {
@@ -1272,7 +1268,6 @@ function updateNavigationButtons() {
 }
 
 function toggleMaterialSection() {
-    console.log('toggleMaterialSection called');
     
     const section = document.querySelector('.dashboard-section');
     const container = section.querySelector('.material-processing-container');
@@ -1282,21 +1277,14 @@ function toggleMaterialSection() {
     const emptyStateMessage = document.getElementById('emptyStateMessage');
     const existingCollapsedControls = section.querySelector('.collapsed-controls');
     
-    console.log('Section found:', section);
-    console.log('Header actions found:', headerActions);
     
-    console.log('Elements found:', { container, footer, collapseBtn, headerActions });
-    console.log('Container current display:', container.style.display);
-    console.log('allMaterials length:', allMaterials.length);
     
     // Check if container is currently hidden
     const isCurrentlyHidden = container.style.display === 'none';
     
-    console.log('Is currently hidden:', isCurrentlyHidden);
     
     if (isCurrentlyHidden) {
         // Expand - show normal layout
-        console.log('Expanding section...');
         container.style.display = 'block';
         footer.style.display = 'flex';
         
@@ -1313,10 +1301,8 @@ function toggleMaterialSection() {
             emptyStateMessage.style.display = 'block';
         }
         
-        console.log('Restored navigation buttons and removed collapsed controls');
     } else {
         // Collapse - just replace navigation buttons with red badge + expand button
-        console.log('Collapsing section...');
         container.style.display = 'none';
         footer.style.display = 'none';
         
@@ -1346,14 +1332,12 @@ function toggleMaterialSection() {
         const sectionHeader = section.querySelector('.section-header');
         sectionHeader.appendChild(collapsedControls);
         
-        console.log('Replaced navigation with badge + expand button in header');
     }
 }
 
 // Load processing materials from API
 async function loadProcessingMaterials() {
     try {
-        console.log('Loading processing materials from database...');
         
         const response = await fetch('api/get_processing_materials.php?status=processing');
         
@@ -1365,7 +1349,6 @@ async function loadProcessingMaterials() {
         
         if (result.success) {
             allMaterials = result.data;
-            console.log(`Loaded ${allMaterials.length} processing materials from database`);
         } else {
             console.error('Failed to load processing materials:', result.message);
             // Fallback to empty array
@@ -1577,7 +1560,6 @@ function draftRequest(materialId) {
         allMaterials = allMaterials.filter(m => m.id !== materialId);
         displayCurrentPage();
         updateNavigationButtons();
-        console.log(`Drafted request: ${material.materialTitle}`);
         alert('Request has been drafted. Reason: Out of stock, budget constraints, or other issues.');
     }
 }
@@ -1585,7 +1567,6 @@ function draftRequest(materialId) {
 function resumeProcessing(materialId) {
     // This function shouldn't be needed on dashboard since drafted materials don't show
     // But kept for consistency with Material Processing page
-    console.log('Resume processing called');
 }
 
 // Classification Management Functions - Program Management Style
@@ -1607,7 +1588,6 @@ function displayAllClassifications() {
     
     container.innerHTML = toRender.map(classification => createClassificationCard(classification)).join('');
     
-    console.log(`Displaying ${toRender.length} classifications (filter: ${classificationLocationFilter})`);
 }
 
 function createClassificationCard(classification) {
@@ -1638,7 +1618,6 @@ function viewClassificationDetails(classificationId) {
 }
 
 function openAddClassificationModal() {
-    console.log('Opening Add Classification modal...');
     const modal = document.getElementById('addClassificationModal');
     if (modal) {
         // Explicitly set all centering properties
@@ -1682,7 +1661,6 @@ async function loadClassificationsFromDatabase() {
                 lastUpdated: c.lastUpdated || c.updated_at || c.created_at
             }));
             
-            console.log(`Loaded ${allClassifications.length} classifications from database`);
         } else {
             console.warn('Failed to load classifications from database');
             allClassifications = [];

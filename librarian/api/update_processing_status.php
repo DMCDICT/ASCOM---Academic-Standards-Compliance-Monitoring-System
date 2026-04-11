@@ -84,7 +84,6 @@ try {
     $response['message'] = $status === 'completed' ? 'Book reference completed successfully' : ($status === 'drafted' ? 'Book reference drafted successfully' : 'Processing resumed successfully');
     
 } catch (Exception $e) {
-    error_log("Error updating processing status: " . $e->getMessage());
     $response['message'] = 'Failed to update status: ' . $e->getMessage();
 }
 

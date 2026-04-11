@@ -1,14 +1,11 @@
 // global.js - Global navigation and tooltip functionality
-console.log('🌐 GLOBAL.JS: Starting initialization...');
 
 // Sidebar toggle functionality
 function toggleSidebar() {
-    console.log('🔄 Toggle sidebar called');
     const sidebar = document.getElementById('sidebar');
     if (sidebar) {
         sidebar.classList.toggle('collapsed');
         const isCollapsed = sidebar.classList.contains('collapsed');
-        console.log(`📱 Sidebar ${isCollapsed ? 'collapsed' : 'expanded'}`);
         
         // Update navigation links with sidebar state
         updateNavigationLinks(isCollapsed ? 'collapsed' : 'expanded');
@@ -20,12 +17,10 @@ function toggleSidebar() {
 
 // Handle sidebar navigation
 function handleSidebarNavigation(event) {
-    console.log('🧭 Sidebar navigation called');
     const target = event.target.closest('.nav-button');
     if (target) {
         const page = target.getAttribute('data-page');
         if (page) {
-            console.log(`📄 Navigating to: ${page}`);
             // Navigation will be handled by the href attribute
         }
     }
@@ -33,14 +28,12 @@ function handleSidebarNavigation(event) {
 
 // Update active navigation state
 function updateActiveNavState(activePage) {
-    console.log(`🎯 Updating active nav state for: ${activePage}`);
     const navButtons = document.querySelectorAll('.nav-button[data-page]');
     
     navButtons.forEach(button => {
         const page = button.getAttribute('data-page');
         if (page === activePage) {
             button.classList.add('active');
-            console.log(`✅ Set active state for: ${page}`);
         } else {
             button.classList.remove('active');
         }
@@ -49,20 +42,16 @@ function updateActiveNavState(activePage) {
 
 // Test function for debugging
 window.testNavigation = function() {
-    console.log('🧪 Testing navigation buttons...');
     const navButtons = document.querySelectorAll('.nav-button');
-    console.log(`Found ${navButtons.length} buttons`);
     
     navButtons.forEach((button, index) => {
         const page = button.getAttribute('data-page');
         const hasClickHandler = button.onclick !== null;
-        console.log(`Button ${index + 1}: page="${page}", hasClickHandler=${hasClickHandler}`);
     });
 };
 
 // Function to update all navigation links with new sidebar state
 function updateNavigationLinks(sidebarState) {
-    console.log('🔄 Updating navigation links with sidebar state:', sidebarState);
     
     const navButtons = document.querySelectorAll('.nav-button[data-page]');
     navButtons.forEach(button => {
@@ -70,7 +59,6 @@ function updateNavigationLinks(sidebarState) {
         if (page) {
             const newHref = `content.php?page=${page}&sidebar=${sidebarState}`;
             button.href = newHref;
-            console.log(`✅ Updated ${page} link: ${newHref}`);
         }
     });
 }
@@ -83,11 +71,9 @@ window.updateNavigationLinks = updateNavigationLinks;
 
 // Simple modal function
 function openAddUserModal() {
-    console.log('openAddUserModal called');
     const modal = document.getElementById('addUserModal');
     if (modal) {
         modal.style.display = 'flex';
-        console.log('Modal opened');
     } else {
         console.error('Modal not found');
         alert('Modal not available');
@@ -99,12 +85,10 @@ window.openAddUserModal = openAddUserModal;
 
 // Initialize everything when DOM is ready
 document.addEventListener('DOMContentLoaded', function() {
-    console.log('🌐 GLOBAL.JS: DOM loaded, initializing...');
     
     // Get current page from URL
     const urlParams = new URLSearchParams(window.location.search);
     const currentPage = urlParams.get('page') || 'dashboard';
-    console.log(`📄 Current page: ${currentPage}`);
     
     // Update active navigation state
     updateActiveNavState(currentPage);
@@ -119,23 +103,19 @@ document.addEventListener('DOMContentLoaded', function() {
             } else {
                 sidebar.classList.remove('collapsed');
             }
-            console.log(`📱 Restored sidebar state: ${savedSidebarState}`);
         }
     }
     
     // Initialize tooltips
     function initializeTooltips() {
-        console.log('🔧 Initializing tooltips...');
         
         // Check if already initialized
         if (window.tooltipsInitialized) {
-            console.log('🔧 Tooltips already initialized, skipping');
             return;
         }
         
         const navButtons = document.querySelectorAll('.nav-button');
         if (navButtons.length === 0) {
-            console.log('🔧 No nav buttons found, retrying...');
             setTimeout(initializeTooltips, 1000);
             return;
         }
@@ -169,13 +149,11 @@ document.addEventListener('DOMContentLoaded', function() {
         navButtons.forEach(function(button, index) {
             // Get tooltip text from the visible button text (not from removed tooltip spans)
             const tooltipText = button.querySelector('span:not(.nav-icon-wrapper)')?.textContent?.trim() || 'Unknown';
-            console.log(`✅ Setting up tooltip for button ${index + 1}: "${tooltipText}"`);
             
             button.addEventListener('mouseenter', function() {
                 const sidebar = document.getElementById('sidebar');
                 const isCollapsed = sidebar.classList.contains('collapsed');
                 
-                console.log(`🖱️ HOVER ENTER: Button ${index + 1} (sidebar ${isCollapsed ? 'collapsed' : 'expanded'})`);
                 
                 // Only show tooltips when sidebar is collapsed
                 if (isCollapsed) {
@@ -186,11 +164,9 @@ document.addEventListener('DOMContentLoaded', function() {
                     // Clean up any existing tooltip
                     cleanupTooltip();
                     
-                    console.log(`🚀 Creating tooltip for button ${index + 1}: "${tooltipText}"`);
                     
                     // Get button position
                     const buttonRect = button.getBoundingClientRect();
-                    console.log(`📍 Button position: left=${buttonRect.left}, top=${buttonRect.top}, width=${buttonRect.width}, height=${buttonRect.height}`);
                     
                     // Create tooltip element
                     globalTooltip = document.createElement('div');
@@ -239,29 +215,24 @@ document.addEventListener('DOMContentLoaded', function() {
                     tooltipTimeout = setTimeout(() => {
                         if (globalTooltip && currentButtonIndex === index) {
                             globalTooltip.style.opacity = '1';
-                            console.log(`✅ Tooltip shown for button ${index + 1}`);
                         }
                     }, 100);
                 }
             });
             
             button.addEventListener('mouseleave', function() {
-                console.log(`🖱️ HOVER LEAVE: Button ${index + 1}`);
                 
                 if (currentButtonIndex === index) {
                     hideTimeout = setTimeout(() => {
                         cleanupTooltip();
-                        console.log(`✅ Tooltip removed for button ${index + 1}`);
                     }, 100);
                 }
             });
         });
         
-        console.log('✅ Tooltips initialized for collapsed sidebar only');
     }
     
     // Initialize tooltips
         setTimeout(initializeTooltips, 1000);
     
-    console.log('Navigation initialization complete');
 }); 

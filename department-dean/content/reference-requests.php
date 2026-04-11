@@ -93,7 +93,6 @@ if (!isset($_SESSION['user_id']) || !isset($_SESSION['user_role']) || $_SESSION[
 <script>
     // Load all requests data when this page is displayed
     document.addEventListener('DOMContentLoaded', function() {
-        console.log('Reference Requests View All page loaded');
         displayAllRequests();
     });
     
@@ -111,7 +110,6 @@ if (!isset($_SESSION['user_id']) || !isset($_SESSION['user_role']) || $_SESSION[
         if (requestsData) {
             try {
                 allRequests = JSON.parse(requestsData.textContent);
-                console.log('Loaded requests data:', allRequests);
             } catch (e) {
                 console.error('Error parsing requests data:', e);
             }
@@ -129,7 +127,6 @@ if (!isset($_SESSION['user_id']) || !isset($_SESSION['user_role']) || $_SESSION[
                 const card = createRequestCard(request);
                 grid.appendChild(card);
             });
-            console.log(`Displayed ${allRequests.length} requests in View All mode`);
         } else {
             grid.innerHTML = '<div style="text-align: center; padding: 40px; color: #666;">No requests found.</div>';
         }

@@ -68,7 +68,6 @@ try {
     $bookReferences = array_values($bookReferences);
     
 } catch (Exception $e) {
-    error_log("Error fetching classification books: " . $e->getMessage());
     $bookReferences = [];
 }
 

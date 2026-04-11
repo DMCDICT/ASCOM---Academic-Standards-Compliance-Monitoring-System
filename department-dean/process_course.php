@@ -193,7 +193,6 @@ try {
     
 } catch (PDOException $e) {
     // Database error
-    error_log("Database error in process_course.php: " . $e->getMessage());
     http_response_code(500);
     echo json_encode([
         'success' => false,
@@ -203,7 +202,6 @@ try {
     
 } catch (Exception $e) {
     // Validation or other error
-    error_log("Error in process_course.php: " . $e->getMessage());
     http_response_code(400);
     echo json_encode([
         'success' => false,

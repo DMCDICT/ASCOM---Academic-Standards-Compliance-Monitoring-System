@@ -30,7 +30,6 @@ if (isset($_SESSION['user_id']) && isset($pdo)) {
   $userId = $_SESSION['user_id'];
   
   // Debug: Log user ID
-  error_log('Teacher interface - User ID: ' . $userId);
   
       try {
       // Check for roles using the same logic as login system
@@ -83,11 +82,9 @@ if (isset($_SESSION['user_id']) && isset($pdo)) {
 
   } catch (Exception $e) {
     // Debug output for database errors
-    echo "<!-- DEBUG: Database error: " . $e->getMessage() . " -->";
     $hasOtherRoles = false;
   }
 } else {
-  echo "<!-- DEBUG: Missing user_id or database connection -->";
 }
 
 include './modals/switch_role_modal.php';
@@ -259,16 +256,12 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 // TOOLTIP SYSTEM - Fixed and working
-console.log('🚨 TEACHER: Tooltip system enabled');
 
 function createEmergencyTooltips() {
-    console.log('🚨 TEACHER: Creating tooltips...');
     
     const navButtons = document.querySelectorAll('.nav-button');
-    console.log(`🚨 TEACHER: Found ${navButtons.length} nav buttons`);
     
     if (navButtons.length === 0) {
-        console.log('🚨 TEACHER: No nav buttons found');
         return;
     }
     
@@ -281,13 +274,11 @@ function createEmergencyTooltips() {
             // Get innerHTML and replace <br> tags with spaces
             tooltipText = spanElement.innerHTML.replace(/<br\s*\/?>/gi, ' ').replace(/\s+/g, ' ').trim();
         }
-        console.log(`🚨 TEACHER: Setting up tooltip for button ${index + 1}: "${tooltipText}"`);
         
         button.addEventListener('mouseenter', function() {
             const sidebar = document.getElementById('sidebar');
             const isCollapsed = sidebar ? sidebar.classList.contains('collapsed') : false;
             
-            console.log(`🚨 TEACHER: Hover on button ${index + 1}, sidebar collapsed: ${isCollapsed}`);
             
             if (isCollapsed) {
                 if (emergencyTooltip) {
@@ -295,7 +286,6 @@ function createEmergencyTooltips() {
                 }
                 
                 const buttonRect = button.getBoundingClientRect();
-                console.log(`🚨 TEACHER: Button ${index + 1} position:`, buttonRect);
                 
                 emergencyTooltip = document.createElement('div');
                 emergencyTooltip.innerHTML = `
@@ -339,21 +329,17 @@ function createEmergencyTooltips() {
                 `;
                 
                 document.body.appendChild(emergencyTooltip);
-                console.log(`🚨 TEACHER: Tooltip created for button ${index + 1}`);
             }
         });
         
         button.addEventListener('mouseleave', function() {
-            console.log(`🚨 TEACHER: Leave button ${index + 1}`);
             if (emergencyTooltip) {
                 emergencyTooltip.remove();
                 emergencyTooltip = null;
-                console.log(`🚨 TEACHER: Tooltip removed for button ${index + 1}`);
             }
         });
     });
     
-    console.log('🚨 TEACHER: Emergency tooltips created successfully');
 }
 
 // Create emergency tooltips multiple times
@@ -364,52 +350,40 @@ setTimeout(createEmergencyTooltips, 5000);
 // Make it available globally
 window.createEmergencyTooltips = createEmergencyTooltips;
 
-console.log('🚨 TEACHER: Emergency tooltip system ready');
 
 // CHAT AND NOTIFICATION FUNCTIONALITY
-console.log('🚨 TEACHER: Initializing chat and notification functionality');
 
 // Initialize chats and notifications
 const chatsIcon = document.querySelector('.chats-icon');
 if (chatsIcon) {
-    console.log('🚨 TEACHER: Chats icon found, adding click handler');
     chatsIcon.onclick = function(e) {
         e.preventDefault();
         e.stopPropagation();
-        console.log('🚨 TEACHER: Chats icon clicked');
         const dropdown = document.getElementById('chatsDropdown');
         if (dropdown) {
             const currentDisplay = dropdown.style.display;
             dropdown.style.display = currentDisplay === 'block' ? 'none' : 'block';
-            console.log('🚨 TEACHER: Chats dropdown toggled:', dropdown.style.display);
         }
     };
     chatsIcon.style.cursor = 'pointer';
     chatsIcon.style.pointerEvents = 'auto';
-    console.log('🚨 TEACHER: Chats initialized');
 } else {
-    console.log('🚨 TEACHER: Chats icon not found');
 }
 
 const notificationIcon = document.querySelector('.notification-icon');
 if (notificationIcon) {
-    console.log('🚨 TEACHER: Notification icon found, adding click handler');
     notificationIcon.onclick = function(e) {
         e.preventDefault();
         e.stopPropagation();
-        console.log('🚨 TEACHER: Notification icon clicked');
         const dropdown = document.getElementById('notificationDropdown');
         if (dropdown) {
             const currentDisplay = dropdown.style.display;
             dropdown.style.display = currentDisplay === 'block' ? 'none' : 'block';
-            console.log('🚨 TEACHER: Notification dropdown toggled:', dropdown.style.display);
         }
     };
     notificationIcon.style.cursor = 'pointer';
     notificationIcon.style.pointerEvents = 'auto';
-    console.log('🚨 TEACHER: Notifications initialized');
 } else {
-    console.log('🚨 TEACHER: Notification icon not found');
 }
 
 // Close dropdowns when clicking outside
@@ -429,7 +403,6 @@ document.addEventListener('click', function(e) {
     }
 });
 
-console.log('🚨 TEACHER: Chat and notification functionality ready');
 </script>
 </body>
 </html> 

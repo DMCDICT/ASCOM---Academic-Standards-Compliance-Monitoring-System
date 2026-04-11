@@ -17,7 +17,6 @@ window.currentMonth = currentMonth;
 window.currentYear = currentYear;
 
 function renderCalendar(month, year) {
-    console.log(`Rendering calendar for month: ${month}, year: ${year}`);
     const calendarGrid = document.getElementById('calendarGrid');
     const currentMonthYearHeader = document.getElementById('currentMonthYear');
     if (!calendarGrid || !currentMonthYearHeader) { console.error("Calendar elements not found."); return; }
@@ -26,7 +25,6 @@ function renderCalendar(month, year) {
     const daysInMonth = new Date(year, month + 1, 0).getDate();
     const monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
     currentMonthYearHeader.textContent = `${monthNames[month]} ${year}`;
-    console.log(`Calendar header set to: ${monthNames[month]} ${year}`);
     const today = new Date();
     const currentDay = today.getDate();
     const currentMonthActual = today.getMonth();
@@ -138,7 +136,6 @@ function handleDayClick(day, month, year) {
     
     // Update selected date
     selectedDate = new Date(year, month, day);
-    console.log(`Selected Date: ${selectedDate.toDateString()}`);
 }
 
 // Function to load school year events
@@ -149,7 +146,6 @@ async function loadSchoolYearEvents() {
         
         if (data.status === 'success') {
             schoolYearEvents = data.data;
-            console.log('School year events loaded successfully:', schoolYearEvents.length, 'events');
         } else {
             console.error('Failed to load school year events:', data.message);
         }
@@ -372,7 +368,6 @@ window.addEventListener('DOMContentLoaded', () => {
         const successModal = document.getElementById('successModal');
         
         // Debug modal elements
-        console.log('🔍 Modal elements found:', {
             addTermModal: !!addTermModal,
             addSchoolYearModal: !!addSchoolYearModal,
             successModal: !!successModal,
@@ -384,7 +379,6 @@ window.addEventListener('DOMContentLoaded', () => {
 
         // --- ADD SCHOOL YEAR MODAL LOGIC (NEW) ---
         if (addSchoolYearModal && addSchoolYearOptionBtn) {
-            console.log('✅ Setting up Add School Year modal handlers');
             const form = document.getElementById('addSchoolYearForm');
             const saveBtn = addSchoolYearModal.querySelector('.form-btn-save');
             const requiredInputs = form.querySelectorAll('input[required], select[required]');
@@ -521,7 +515,6 @@ window.addEventListener('DOMContentLoaded', () => {
                     status: status,
                 };
 
-                console.log('Submitting school year data:', formData);
                 
                 fetch('api/add_school_year.php', {
                     method: 'POST',
@@ -542,7 +535,6 @@ window.addEventListener('DOMContentLoaded', () => {
                     });
                 })
                 .then(data => {
-                    console.log('API Response:', data);
                     if (data.status === 'success') {
                         closeModal();
                         // Show success modal
@@ -562,7 +554,6 @@ window.addEventListener('DOMContentLoaded', () => {
                         };
                     } else {
                         // Show error modal
-                        console.log('Showing error modal with message:', data.message);
                         const errorModal = document.getElementById('errorModal');
                         if (errorModal) {
                             const errorMessageText = errorModal.querySelector('#errorMessageText');
@@ -576,7 +567,6 @@ window.addEventListener('DOMContentLoaded', () => {
                             const errorOkBtn = errorModal.querySelector('#errorOkBtn');
                             if (errorOkBtn) {
                                 errorOkBtn.onclick = () => {
-                                    console.log('Error modal OK button clicked');
                                     errorModal.style.display = 'none';
                                     // Re-enable body scroll
                                     document.body.style.overflow = '';
@@ -590,7 +580,6 @@ window.addEventListener('DOMContentLoaded', () => {
                     console.error('Fetch Error:', error);
                     console.error('Error details:', error.message);
                     // Show error modal
-                    console.log('Showing network error modal');
                     const errorModal = document.getElementById('errorModal');
                     if (errorModal) {
                         const errorMessageText = errorModal.querySelector('#errorMessageText');
@@ -611,7 +600,6 @@ window.addEventListener('DOMContentLoaded', () => {
                         const errorOkBtn = errorModal.querySelector('#errorOkBtn');
                         if (errorOkBtn) {
                             errorOkBtn.onclick = () => {
-                                console.log('Network error modal OK button clicked');
                                 errorModal.style.display = 'none';
                                 // Re-enable body scroll
                                 document.body.style.overflow = '';
@@ -626,7 +614,6 @@ window.addEventListener('DOMContentLoaded', () => {
 
         // --- ADD TERM MODAL LOGIC ---
         if (addTermModal && addTermBtn) {
-            console.log('✅ Setting up Add Term modal handlers');
             const addTermForm = document.getElementById('addTermForm');
             const saveTermBtn = addTermModal.querySelector('.form-btn-save');
             const requiredInputs = addTermForm.querySelectorAll('input[required], select[required]');
@@ -950,14 +937,12 @@ window.addEventListener('DOMContentLoaded', () => {
         // --- ADD HOLIDAY MODAL LOGIC ---
         const addHolidayModal = document.getElementById('addHolidayModal');
         let addHolidayModalInitialized = false; // Flag to prevent auto-opening
-        console.log('🔍 Add Holiday Modal Check:', {
             modal: !!addHolidayModal,
             button: !!addHolidayBtn
         });
         
         // Ensure modal is hidden on page load with multiple approaches
         if (addHolidayModal) {
-            console.log('🔒 Ensuring Add Holiday Modal is hidden on page load...');
             
             // Force hide using CSS class approach
             addHolidayModal.classList.remove('show');
@@ -968,7 +953,6 @@ window.addEventListener('DOMContentLoaded', () => {
             addHolidayModal.style.opacity = '0';
             addHolidayModal.style.zIndex = '-1';
             
-            console.log('✅ Modal hidden with CSS class and style methods');
             
             // Add MutationObserver to prevent external scripts from showing the modal
             const modalObserver = new MutationObserver((mutations) => {
@@ -976,7 +960,6 @@ window.addEventListener('DOMContentLoaded', () => {
                     if (mutation.type === 'attributes' && mutation.attributeName === 'style') {
                         const target = mutation.target;
                         if (target === addHolidayModal && !addHolidayModalInitialized) {
-                            console.log('🚫 External script tried to show modal, preventing...');
                             target.style.display = 'none';
                             target.style.visibility = 'hidden';
                             target.style.opacity = '0';
@@ -992,19 +975,16 @@ window.addEventListener('DOMContentLoaded', () => {
                 attributeFilter: ['style', 'class']
             });
             
-            console.log('🔍 MutationObserver added to prevent unauthorized modal opening');
             
             // Double-check after a brief delay
             setTimeout(() => {
                 if (addHolidayModal.classList.contains('show')) {
-                    console.log('🔄 Re-hiding modal after delay...');
                     addHolidayModal.classList.remove('show');
                 }
             }, 100);
         }
         
         if (addHolidayModal && addHolidayBtn) {
-            console.log('✅ Setting up Add Holiday modal handlers');
             const addHolidayForm = document.getElementById('addHolidayForm');
             const saveHolidayBtn = addHolidayModal.querySelector('.form-btn-save');
             const requiredHolidayInputs = addHolidayForm.querySelectorAll('input[required], select[required]');
@@ -1019,19 +999,14 @@ window.addEventListener('DOMContentLoaded', () => {
             };
 
             const openAddHolidayModal = () => { 
-                console.log('🎯 Add Holiday modal opening - EXPLICIT CALL ONLY');
-                console.log('📍 Call stack:', new Error().stack);
-                console.log('🏁 Initialization flag:', addHolidayModalInitialized);
                 
                 // Only allow opening if properly initialized
                 if (!addHolidayModalInitialized) {
-                    console.log('❌ Modal not initialized, preventing auto-opening');
                     return;
                 }
                 
                 // Double-check modal state before opening
                 if (addHolidayModal.classList.contains('show')) {
-                    console.log('⚠️ Modal already open, ignoring duplicate call');
                     return;
                 }
                 
@@ -1043,18 +1018,15 @@ window.addEventListener('DOMContentLoaded', () => {
                 
                 // Disable body scroll
                 document.body.style.overflow = 'hidden';
-                console.log('✅ Add Holiday modal opened successfully');
             };
             
             const closeAddHolidayModal = () => { 
-                console.log('🚪 Add Holiday modal closing...');
                 
                 // Hide the modal using CSS class
                 addHolidayModal.classList.remove('show');
                 
                 // Re-enable body scroll
                 document.body.style.overflow = '';
-                console.log('✅ Add Holiday modal closed');
             };
 
             // All Day switch functionality
@@ -1064,7 +1036,6 @@ window.addEventListener('DOMContentLoaded', () => {
                     const startDateInput = document.getElementById('holidayStartDate');
                     const endDateInput = document.getElementById('holidayEndDate');
                     
-                    console.log('All Day holiday:', isAllDay);
                     
                     if (isAllDay) {
                         // When All Day is enabled, set end date to match start date and disable it
@@ -1098,7 +1069,6 @@ window.addEventListener('DOMContentLoaded', () => {
 
             // Simple button click handler
             addHolidayBtn.addEventListener('click', () => {
-                console.log('🔘 Add Holiday button clicked - setting initialization flag');
                 addHolidayModalInitialized = true;
                 openAddHolidayModal();
             });
@@ -1109,14 +1079,12 @@ window.addEventListener('DOMContentLoaded', () => {
             
             if (closeBtn) {
                 closeBtn.addEventListener('click', closeAddHolidayModal);
-                console.log('✅ Add Holiday modal close button configured');
             } else {
                 console.error('❌ Add Holiday modal close button not found');
             }
             
             if (cancelBtn) {
                 cancelBtn.addEventListener('click', closeAddHolidayModal);
-                console.log('✅ Add Holiday modal cancel button configured');
             } else {
                 console.error('❌ Add Holiday modal cancel button not found');
             }
@@ -1127,7 +1095,6 @@ window.addEventListener('DOMContentLoaded', () => {
                 if (saveHolidayBtn.disabled) return;
                 
                 // TODO: Implement backend submission for holidays
-                console.log('Holiday form submitted:', {
                     title: document.getElementById('holidayTitle').value,
                     startDate: document.getElementById('holidayStartDate').value,
                     endDate: document.getElementById('holidayEndDate').value,
@@ -1144,7 +1111,6 @@ window.addEventListener('DOMContentLoaded', () => {
         // --- SCHEDULE MAINTENANCE MODAL LOGIC ---
         const scheduleMaintenanceModal = document.getElementById('scheduleMaintenanceModal');
         if (scheduleMaintenanceModal && scheduleMaintenanceBtn) {
-            console.log('✅ Setting up Schedule Maintenance modal handlers');
             const scheduleMaintenanceForm = document.getElementById('scheduleMaintenanceForm');
             const saveMaintenanceBtn = scheduleMaintenanceModal.querySelector('.form-btn-save');
             const requiredMaintenanceInputs = scheduleMaintenanceForm.querySelectorAll('input[required], select[required], textarea[required]');
@@ -1178,7 +1144,6 @@ window.addEventListener('DOMContentLoaded', () => {
                 if (saveMaintenanceBtn.disabled) return;
                 
                 // TODO: Implement backend submission for maintenance
-                console.log('Maintenance form submitted:', {
                     title: document.getElementById('maintenanceTitle').value,
                     startDate: document.getElementById('maintenanceStartDate').value,
                     endDate: document.getElementById('maintenanceEndDate').value,
@@ -1213,7 +1178,6 @@ window.addEventListener('DOMContentLoaded', () => {
                         document.body.style.overflow = '';
                     }
                 } else if (event.target === errorModal) {
-                    console.log('Error modal background clicked, closing modal');
                     errorModal.style.display = 'none';
                     // Re-enable body scroll
                     document.body.style.overflow = '';
@@ -1264,7 +1228,6 @@ window.addEventListener('DOMContentLoaded', () => {
             const delayedAddTermBtn = document.getElementById('addTermBtn');
             const delayedAddSchoolYearOptionBtn = document.getElementById('addSchoolYearOptionBtn');
             
-            console.log('🔍 Delayed modal check:', {
                 addTermModal: !!delayedAddTermModal,
                 addSchoolYearModal: !!delayedAddSchoolYearModal,
                 addTermBtn: !!delayedAddTermBtn,
@@ -1273,12 +1236,10 @@ window.addEventListener('DOMContentLoaded', () => {
             
             // If modals weren't found initially but are found now, set them up
             if (!addTermModal && delayedAddTermModal && delayedAddTermBtn) {
-                console.log('✅ Setting up delayed Add Term modal handlers');
                 // Add the modal setup logic here if needed
             }
             
             if (!addSchoolYearModal && delayedAddSchoolYearModal && delayedAddSchoolYearOptionBtn) {
-                console.log('✅ Setting up delayed Add School Year modal handlers');
                 // Add the modal setup logic here if needed
             }
             

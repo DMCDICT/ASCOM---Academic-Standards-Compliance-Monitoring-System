@@ -77,7 +77,6 @@ try {
         $courseDetails['all_programs'] = $allPrograms;
     }
 } catch (Exception $e) {
-    error_log("Error fetching course details: " . $e->getMessage());
 }
 
 // Fetch book references
@@ -128,7 +127,6 @@ if ($courseDetails && isset($courseDetails['id'])) {
             }
         }
     } catch (Exception $e) {
-        error_log("Error fetching book references: " . $e->getMessage());
     }
 }
 
@@ -805,7 +803,6 @@ if ($compliancePercentage > 100) $compliancePercentage = 100;
 <script>
 // Tab switching functionality
 function switchTab(tabName) {
-    console.log('🔄 Switching to tab:', tabName);
     
     // Hide all tab contents
     const tabContents = document.querySelectorAll('.tab-content');
@@ -845,6 +842,5 @@ function switchTab(tabName) {
         selectedButton.classList.add('active');
     }
     
-    console.log('✅ Tab switched to:', tabName);
 }
 </script>

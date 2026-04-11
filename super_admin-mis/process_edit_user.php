@@ -102,9 +102,6 @@ try {
     $updateValues[] = $employee_no_original;
 
     // Debug: Log the query and values
-    error_log('Update query: ' . $updateQuery);
-    error_log('Update values: ' . json_encode($updateValues));
-    error_log('Employee no original: ' . $employee_no_original);
 
     $updateStmt = $conn->prepare($updateQuery);
     $updateStmt->bind_param(str_repeat("s", count($updateValues)), ...$updateValues);
@@ -114,9 +111,7 @@ try {
     }
 
     // Debug: Log affected rows and any errors
-    error_log('Affected rows: ' . $updateStmt->affected_rows);
     if ($updateStmt->error) {
-        error_log('MySQL error: ' . $updateStmt->error);
     }
 
     if ($updateStmt->affected_rows === 0) {
@@ -132,7 +127,6 @@ try {
         } else {
             // User exists but no changes were made - this is actually fine!
             // It means the user submitted the form with the same values that are already in the database
-            error_log('User exists but no changes detected. This is considered successful.');
             
             // Get current values to compare for logging purposes
             $currentQuery = "SELECT employee_no, first_name, middle_name, last_name, title, institutional_email, mobile_no, department_id FROM users WHERE employee_no = ?";
@@ -142,8 +136,6 @@ try {
             $currentResult = $currentStmt->get_result();
             $currentUser = $currentResult->fetch_assoc();
             
-            error_log('Current user data: ' . json_encode($currentUser));
-            error_log('Submitted data: ' . json_encode([
                 'employee_no' => $employee_no,
                 'first_name' => $first_name,
                 'middle_name' => $middle_name,
@@ -168,7 +160,6 @@ try {
         'message' => 'User account updated successfully'
     ];
     
-    error_log('Edit user success response: ' . json_encode($response));
     echo json_encode($response);
 
 } catch (Exception $e) {
@@ -177,7 +168,6 @@ try {
         'message' => $e->getMessage()
     ];
     
-    error_log('Edit user error response: ' . json_encode($error_response));
     http_response_code(400);
     echo json_encode($error_response);
 }

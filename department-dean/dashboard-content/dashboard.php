@@ -154,7 +154,6 @@ try {
         $selectedTermId = $currentAcademicTerm['id'] ?? null;
     }
 } catch (Exception $e) {
-    error_log("Error fetching academic terms: " . $e->getMessage());
 }
 
 // --- DATABASE CODE FOR REAL DATA ---
@@ -256,7 +255,6 @@ try {
         }
     }
 } catch (Exception $e) {
-    error_log("Database error in dashboard.php: " . $e->getMessage());
     // Keep default values if database query fails
 }
 
@@ -1815,7 +1813,6 @@ try {
         if (!termId) {
             sessionStorage.removeItem('selectedTermId');
             selectedTermId = null;
-            console.log('Term selection cleared');
             updateCurrentTermButtonState();
             return;
         }
@@ -1832,7 +1829,6 @@ try {
         
         // Handle "All Terms" option
         if (termId === 'all') {
-            console.log('Selected: All Terms (Current Academic Year)');
             
             // Show notification
             showTermChangeNotification('All Terms (Current Academic Year)');
@@ -1843,7 +1839,6 @@ try {
             // Find the selected term
             const selectedTerm = academicTerms.find(t => t.id == termId);
             if (selectedTerm) {
-                console.log('Selected term:', selectedTerm.display_name);
                 
                 // Show notification
                 showTermChangeNotification(selectedTerm.display_name);
@@ -1864,25 +1859,19 @@ try {
         const termSelect = document.getElementById('academicTermSelect');
         const termId = termSelect.value;
         
-        console.log('handleTermChangeFromDropdown called with termId:', termId);
-        console.log('TermId type:', typeof termId);
         
         if (termId) {
             if (termId === 'all') {
-                console.log('All Terms option selected');
             } else {
-                console.log('Specific term selected:', termId);
             }
             await handleTermChange(termId);
         } else {
-            console.log('No term selected');
             await handleTermChange(null);
         }
     }
     
     // Function to update server-side session (synchronous)
     async function updateServerSession(termId) {
-        console.log('Updating server session for term:', termId);
         
         try {
             const response = await fetch('update_selected_term.php', {
@@ -1896,7 +1885,6 @@ try {
             const data = await response.json();
             
             if (data.success) {
-                console.log('Server session updated successfully:', data);
                 return true;
             } else {
                 console.error('Error updating server session:', data.message);
@@ -1910,7 +1898,6 @@ try {
     
     // Function to refresh dashboard data based on selected term
     function refreshDashboardData(termId) {
-        console.log('Refreshing dashboard data for term:', termId);
         
         // Show loading indicator
         showLoadingIndicator();
@@ -1924,22 +1911,17 @@ try {
             body: 'term_id=' + encodeURIComponent(termId)
         })
         .then(response => {
-            console.log('AJAX response received:', response);
             return response.json();
         })
         .then(data => {
-            console.log('AJAX data received:', data);
             if (data.success) {
                 // Update dashboard statistics
-                console.log('Updating dashboard stats:', data.stats);
                 updateDashboardStats(data.stats);
                 
                 // Update Program & Courses Management section
                 if (data.programs) {
-                    console.log('Updating programs section with', data.programs.length, 'programs:', data.programs);
                     updateProgramsSection(data.programs);
                 } else {
-                    console.log('No programs data received');
                 }
                 
                 // Update course material requests
@@ -1948,7 +1930,6 @@ try {
                 // Update selected term display
                 updateSelectedTermDisplay();
                 
-                console.log('Dashboard data updated successfully');
             } else {
                 console.error('Error refreshing dashboard data:', data.message);
                 // Fallback: reload the page
@@ -2001,34 +1982,27 @@ try {
     
     // Function to update dashboard statistics
     function updateDashboardStats(stats) {
-        console.log('updateDashboardStats called with:', stats);
         
         // Update programs count
         const programsElement = document.querySelector('.stat-box:nth-child(1) .stat-amount');
-        console.log('Programs element found:', programsElement);
         if (programsElement) {
             programsElement.textContent = stats.totalPrograms || 0;
-            console.log('Updated programs count to:', stats.totalPrograms);
         } else {
             console.error('Programs element not found!');
         }
         
         // Update courses count
         const coursesElement = document.querySelector('.stat-box:nth-child(2) .stat-amount');
-        console.log('Courses element found:', coursesElement);
         if (coursesElement) {
             coursesElement.textContent = stats.totalCourses || 0;
-            console.log('Updated courses count to:', stats.totalCourses);
         } else {
             console.error('Courses element not found!');
         }
         
         // Update faculty count
         const facultyElement = document.querySelector('.stat-box:nth-child(3) .stat-amount');
-        console.log('Faculty element found:', facultyElement);
         if (facultyElement) {
             facultyElement.textContent = stats.totalFaculty || 0;
-            console.log('Updated faculty count to:', stats.totalFaculty);
         } else {
             console.error('Faculty element not found!');
         }
@@ -2036,7 +2010,6 @@ try {
     
     // Function to update Program & Courses Management section
     function updateProgramsSection(programs) {
-        console.log('updateProgramsSection called with:', programs);
         
         const programContainer = document.getElementById('programContainer');
         if (!programContainer) {
@@ -2112,7 +2085,6 @@ try {
             programContainer.appendChild(emptyCard);
         }
         
-        console.log('Programs section updated successfully');
     }
     
     // Function to update course material requests
@@ -2148,11 +2120,9 @@ try {
     function updateSelectedTermDisplay() {
         if (selectedTermId) {
             if (selectedTermId === 'all') {
-                console.log('Currently viewing data for: All Terms (Current Academic Year)');
             } else {
                 const selectedTerm = academicTerms.find(t => t.id == selectedTermId);
                 if (selectedTerm) {
-                    console.log('Currently viewing data for:', selectedTerm.display_name);
                 }
             }
         }
@@ -2313,7 +2283,6 @@ try {
     }
 
 function toggleSection() {
-    console.log('toggleSection called');
     
     const section = document.querySelector('.dashboard-section');
     const container = section.querySelector('.reference-requests-container');
@@ -2321,18 +2290,13 @@ function toggleSection() {
     const collapseBtn = section.querySelector('.collapse-btn');
     const headerActions = section.querySelector('.header-actions');
     
-    console.log('Elements found:', { container, footer, collapseBtn, headerActions });
-    console.log('Container current display:', container.style.display);
-    console.log('allRequests length:', allRequests.length);
     
     // Check if container is currently hidden
     const isCurrentlyHidden = container.style.display === 'none';
     
-    console.log('Is currently hidden:', isCurrentlyHidden);
     
     if (isCurrentlyHidden) {
         // Expand - show normal layout
-        console.log('Expanding section...');
         container.style.display = 'block';
         footer.style.display = 'flex';
         
@@ -2348,10 +2312,8 @@ function toggleSection() {
         // Display the current page of requests
         displayCurrentPage();
         
-        console.log('Restored navigation buttons and removed collapsed controls');
     } else {
         // Collapse - just replace navigation buttons with red badge + expand button
-        console.log('Collapsing section...');
         container.style.display = 'none';
         footer.style.display = 'none';
         
@@ -2374,7 +2336,6 @@ function toggleSection() {
         const sectionHeader = section.querySelector('.section-header');
         sectionHeader.appendChild(collapsedControls);
         
-        console.log('Replaced navigation with red badge + expand button in same header');
     }
 }
 
@@ -2384,7 +2345,6 @@ function toggleSection() {
     let requestsPerPage = 4;
 
     document.addEventListener('DOMContentLoaded', function() {
-        console.log('DOM Content Loaded - Initializing dashboard...');
         
         // Initialize term selector
         const termSelect = document.getElementById('academicTermSelect');
@@ -2409,7 +2369,6 @@ function toggleSection() {
         
         // Load data for the selected term on page load
         if (selectedTermId) {
-            console.log('Loading data for selected term:', selectedTermId);
             // Update server session first, then refresh data
             updateServerSession(selectedTermId).then(() => {
                 refreshDashboardData(selectedTermId);
@@ -2422,18 +2381,12 @@ function toggleSection() {
         updateCurrentTermButtonState();
         
         // Debug icon paths
-        console.log('Checking icon paths...');
         const testImg = new Image();
         testImg.onload = function() {
-            console.log('✅ Icons are loading successfully from ../src/assets/icons/');
         };
         testImg.onerror = function() {
-            console.log('❌ Icons failed to load from ../src/assets/icons/');
-            console.log('Current working directory:', window.location.pathname);
-            console.log('Trying to load from:', '../src/assets/icons/left-arrow-icon.png');
             
             // Try alternative paths
-            console.log('Trying alternative paths...');
             const altPaths = [
                 '../src/assets/icons/left-arrow-icon.png',
                 '../../src/assets/icons/left-arrow-icon.png',
@@ -2444,10 +2397,8 @@ function toggleSection() {
             altPaths.forEach((path, index) => {
                 const testAlt = new Image();
                 testAlt.onload = function() {
-                    console.log(`✅ Found working path: ${path}`);
                 };
                 testAlt.onerror = function() {
-                    console.log(`❌ Path ${path} failed`);
                 };
                 testAlt.src = path;
             });
@@ -2457,13 +2408,10 @@ function toggleSection() {
         // Load data from PHP
         const requestsData = document.getElementById('allRequestsData');
         
-        console.log('Found elements:', { requestsData });
         
         if (requestsData) {
             allRequests = JSON.parse(requestsData.textContent);
             
-            console.log('Loaded pending requests:', allRequests);
-            console.log('Pending requests count:', allRequests.length);
             
             // Display summary instead of all cards
             displayCurrentPage();
@@ -2473,7 +2421,6 @@ function toggleSection() {
                 toggleSection();
             }, 100);
             
-            console.log('Dashboard initialization complete');
         } else {
             console.error('Failed to find required data elements');
         }
@@ -2513,10 +2460,7 @@ function toggleSection() {
             
             const proposals = data.proposals || [];
             
-            console.log('📋 Course proposals API response:', data);
-            console.log('📋 Course proposals loaded:', proposals.length, 'proposals');
             if (data.debug) {
-                console.log('🔍 Debug info:', data.debug);
             }
         
         // Store data globally for access by viewCourseProposalDetails
@@ -2526,8 +2470,6 @@ function toggleSection() {
         proposalsGrid.innerHTML = '';
             
             if (proposals.length === 0) {
-                console.log('⚠️ No proposals found. Showing empty state.');
-                console.log('Full API response:', JSON.stringify(data, null, 2));
                 
                 // Show empty state
                 emptyState.style.display = 'block';
@@ -2547,18 +2489,15 @@ function toggleSection() {
                     `;
                 }
             } else {
-                console.log('✅ Creating', proposals.length, 'proposal cards...');
                 // Hide empty state
                 emptyState.style.display = 'none';
         
         // Create and append cards
                 proposals.forEach((cardData, index) => {
-                    console.log(`Creating card ${index + 1}:`, cardData.id, cardData.status, cardData.isDraft);
                     try {
             const card = createCourseProposalCard(cardData);
                         if (card) {
             proposalsGrid.appendChild(card);
-                            console.log(`✅ Card ${index + 1} created and appended`);
                         } else {
                             console.error(`❌ Card ${index + 1} creation returned null/undefined`);
                         }
@@ -2708,7 +2647,6 @@ function toggleSection() {
         // Add click handler to view details
         card.addEventListener('click', function() {
             // TODO: Navigate to details page or open modal
-            console.log('View details for:', cardData);
         });
         
         return card;
@@ -2716,7 +2654,6 @@ function toggleSection() {
     
     // View course proposal details
     function viewCourseProposalDetails(proposalId) {
-        console.log('View details for course proposal:', proposalId);
         
         // Find the proposal data
         let proposal = null;
@@ -2751,7 +2688,6 @@ function toggleSection() {
             event.stopPropagation();
         }
         
-        console.log('📝 Resuming draft:', proposalId);
         
         // Find the draft proposal
         let proposal = null;
@@ -2764,7 +2700,6 @@ function toggleSection() {
             return;
         }
         
-        console.log('✅ Draft found:', proposal);
         
         // Get the first course data from the draft
         const draftData = proposal._rawCoursesData && proposal._rawCoursesData.length > 0 
@@ -2812,8 +2747,6 @@ function toggleSection() {
         
         // Open the add course modal directly (skip course type selection)
                     if (typeof openAddCourseModal === 'function') {
-            console.log('📝 Opening add course modal with draft data...');
-            console.log('Course selection context:', window.courseSelectionContext);
             
             // Ensure isResumingDraft flag is set before opening modal
             if (window.courseSelectionContext) {
@@ -2851,13 +2784,11 @@ function toggleSection() {
                 
                 while (attempts < maxAttempts) {
                     if (waitForContainers()) {
-                        console.log(`✅ All containers ready on attempt ${attempts + 1}`);
                         await loadDraftIntoForm(draftData, proposal);
                         break;
                     }
                     attempts++;
                     if (attempts < maxAttempts) {
-                        console.log(`⏳ Waiting for containers... (attempt ${attempts}/${maxAttempts})`);
                         await new Promise(resolve => setTimeout(resolve, 200));
                     }
                 }
@@ -2879,8 +2810,6 @@ function toggleSection() {
     
     // Load draft data into the form
     async function loadDraftIntoForm(draftData, proposal) {
-        console.log('📝 Loading draft data into form...', draftData);
-        console.log('📊 Draft data structure:', {
             has_outcomes: !!(draftData.learning_outcomes && draftData.learning_outcomes.length),
             outcomes_count: draftData.learning_outcomes?.length || 0,
             has_outline: !!(draftData.course_outline && draftData.course_outline.length),
@@ -2894,7 +2823,6 @@ function toggleSection() {
         
         // Store the loaded draft data globally so we can merge with it when saving again
         window.loadedDraftData = JSON.parse(JSON.stringify(draftData)); // Deep copy
-        console.log('💾 Stored loaded draft data globally for merging on save');
         
         const form = document.getElementById('addCourseForm');
         if (!form) {
@@ -2906,7 +2834,6 @@ function toggleSection() {
         // Make sure modal is visible
         const modal = document.getElementById('addCourseModal');
         if (!modal || modal.style.display === 'none') {
-            console.log('⏳ Modal not visible yet, waiting...');
             setTimeout(() => loadDraftIntoForm(draftData, proposal), 200);
             return;
         }
@@ -2915,7 +2842,6 @@ function toggleSection() {
         await new Promise(resolve => setTimeout(resolve, 100));
         
         // Ensure all step containers are accessible (even if hidden)
-        console.log('🔍 Making all step containers accessible...');
         const allSteps = document.querySelectorAll('.form-step');
         const originalStyles = [];
         allSteps.forEach((step, idx) => {
@@ -2948,12 +2874,10 @@ function toggleSection() {
             'learningOutcomesContainer': '#learningOutcomesContainer'
         };
         
-        console.log('🔍 Checking for critical containers...');
         let allContainersReady = true;
         for (const [name, selector] of Object.entries(criticalContainers)) {
             const element = document.querySelector(selector);
             if (element) {
-                console.log(`  ✅ ${name} found`);
             } else {
                 console.warn(`  ⚠️ ${name} NOT FOUND!`);
                 allContainersReady = false;
@@ -2967,7 +2891,6 @@ function toggleSection() {
             for (const [name, selector] of Object.entries(criticalContainers)) {
                 const element = document.querySelector(selector);
                 if (element) {
-                    console.log(`  ✅ ${name} found on retry`);
                 } else {
                     console.error(`  ❌ ${name} still not found after retry!`);
                 }
@@ -3018,7 +2941,6 @@ function toggleSection() {
                     academicTermEl.value = proposal.academicTerm;
                     // Trigger change event to ensure any listeners are notified
                     academicTermEl.dispatchEvent(new Event('change', { bubbles: true }));
-                    console.log('✅ Populated Academic Term:', proposal.academicTerm);
                 }
             }
             
@@ -3029,7 +2951,6 @@ function toggleSection() {
                     academicYearEl.value = proposal.academicYear;
                     // Trigger change event to ensure any listeners are notified
                     academicYearEl.dispatchEvent(new Event('change', { bubbles: true }));
-                    console.log('✅ Populated Academic Year:', proposal.academicYear);
                 }
             }
             
@@ -3040,7 +2961,6 @@ function toggleSection() {
                     yearLevelEl.value = proposal.yearLevel;
                     // Trigger change event to ensure any listeners are notified
                     yearLevelEl.dispatchEvent(new Event('change', { bubbles: true }));
-                    console.log('✅ Populated Year Level:', proposal.yearLevel);
                 }
             }
             
@@ -3052,7 +2972,6 @@ function toggleSection() {
             
             // Step 3: Learning Outcomes
             if (draftData.learning_outcomes && Array.isArray(draftData.learning_outcomes) && draftData.learning_outcomes.length > 0) {
-                console.log('📝 Loading learning outcomes -', draftData.learning_outcomes.length, 'outcomes');
                 const outcomesContainer = document.getElementById('learningOutcomesContainer');
                 if (outcomesContainer) {
                     outcomesContainer.innerHTML = ''; // Clear existing
@@ -3076,7 +2995,6 @@ function toggleSection() {
                                 </div>
                             `;
                             outcomesContainer.appendChild(outcomeField);
-                            console.log(`  ✅ Loaded outcome ${idx + 1}:`, outcome.substring(0, 50));
                             outcomeIndex++;
                         }
                     });
@@ -3087,20 +3005,15 @@ function toggleSection() {
                     if (typeof learningOutcomesCount !== 'undefined') {
                         learningOutcomesCount = outcomeIndex;
                     }
-                    console.log('✅ Loaded', outcomeIndex, 'learning outcomes');
                 } else {
                     console.error('❌ Learning outcomes container not found!');
                 }
             } else {
-                console.log('⚠️ No learning outcomes data to load or empty array');
             }
             
             // Step 4: Course Outline
             if (draftData.course_outline && Array.isArray(draftData.course_outline) && draftData.course_outline.length > 0) {
-                console.log('📝 Loading course outline -', draftData.course_outline.length, 'entries');
-                console.log('📝 Course outline data:', draftData.course_outline.slice(0, 3)); // Log first 3 entries
                 const outlineTableBody = document.getElementById('courseOutlineTableBody');
-                console.log('🔍 Looking for courseOutlineTableBody:', outlineTableBody ? 'FOUND ✅' : 'NOT FOUND ❌');
                 if (outlineTableBody) {
                     outlineTableBody.innerHTML = ''; // Clear existing
                     let topicIndex = 0;
@@ -3125,7 +3038,6 @@ function toggleSection() {
                                 <td><button type="button" class="remove-topic-btn" onclick="if(typeof window.removeCourseTopic==='function'){window.removeCourseTopic(${topicIndex});}else{this.closest('tr').remove();}">Remove</button></td>
                             `;
                             outlineTableBody.appendChild(row);
-                            console.log(`  ✅ Loaded topic ${idx + 1}:`, topic);
                             topicIndex++;
                         }
                     });
@@ -3136,12 +3048,10 @@ function toggleSection() {
                     if (typeof courseTopicsCount !== 'undefined') {
                         courseTopicsCount = topicIndex;
                     }
-                    console.log('✅ Loaded', topicIndex, 'course outline entries');
                 } else {
                     console.error('❌ Course outline table body not found!');
                 }
             } else {
-                console.log('⚠️ No course outline data to load or empty array');
             }
             
             // Step 5: Assessment Methods
@@ -3211,12 +3121,10 @@ function toggleSection() {
                                     if (typeInput && type) typeInput.value = type;
                                     if (remarksInput && remarks) remarksInput.value = remarks;
                                     
-                                    console.log('✅ Loaded learning material:', { title, author, publisher });
                                 }
                             }
                         }
                     });
-                    console.log('✅ Loaded', draftData.learning_materials.length, 'learning materials');
                 }
             }
             
@@ -3242,7 +3150,6 @@ function toggleSection() {
             // This ensures the correct step is active when styles are restored
             if (draftData.saved_step) {
                 const targetStep = parseInt(draftData.saved_step) || 1;
-                console.log('📝 Setting saved step FIRST:', targetStep);
                 window._courseFormStep = targetStep;
                 
                 // Hide all steps first
@@ -3255,7 +3162,6 @@ function toggleSection() {
                 const targetStepEl = document.getElementById(`step${targetStep}`);
                 if (targetStepEl) {
                     targetStepEl.classList.add('active');
-                    console.log(`✅ Step ${targetStep} activated`);
                 } else {
                     console.error(`❌ Step ${targetStep} element not found!`);
                 }
@@ -3277,7 +3183,6 @@ function toggleSection() {
             
             // THEN: Restore step visibility (clear inline styles)
             // IMPORTANT: Don't clear display from active step - let CSS handle it
-            console.log('🔄 Restoring step visibility to original state...');
             allSteps.forEach((step, idx) => {
                 const isActive = step.classList.contains('active');
                 if (originalStyles[idx] && !isActive) {
@@ -3300,7 +3205,6 @@ function toggleSection() {
                     // Let CSS handle display for active step
                     step.style.display = '';
                     step.style.visibility = '';
-                    console.log('✅ Active step styles cleared, CSS will handle display');
                 }
             });
             
@@ -3321,16 +3225,13 @@ function toggleSection() {
                         prevBtn.style.display = 'inline-flex';
                         prevBtn.style.visibility = 'visible';
                         prevBtn.style.opacity = '1';
-                        console.log('✅ Previous button shown for step', window._courseFormStep);
                     }
                 }
                 
-                console.log('✅ Final step after restoration:', window._courseFormStep);
             }, 100);
             
             // Step 7: Load attachments if available
             if (draftData.attachments && Array.isArray(draftData.attachments) && draftData.attachments.length > 0) {
-                console.log('📝 Loading attachments -', draftData.attachments.length, 'files');
                 // Store attachments in global array (convert metadata to File-like objects if needed)
                 if (!window.attachmentFiles) {
                     window.attachmentFiles = [];
@@ -3350,7 +3251,6 @@ function toggleSection() {
                 // Update attachment list using the proper function
                 if (typeof window.updateAttachmentList === 'function') {
                     window.updateAttachmentList();
-                    console.log('✅ Updated attachment list with', window.attachmentFiles.length, 'files');
                 } else {
                     console.warn('⚠️ updateAttachmentList function not available');
                     const attachmentList = document.getElementById('attachmentList');
@@ -3359,13 +3259,11 @@ function toggleSection() {
                     }
                 }
             } else {
-                console.log('⚠️ No attachments to load');
             }
             
             // (Duplicate restoration code removed - already handled above)
             
             // Verify data was loaded
-            console.log('🔍 Verifying loaded data...');
             const outlineTableBody = document.getElementById('courseOutlineTableBody');
             const outcomesContainer = document.getElementById('learningOutcomesContainer');
             const assessmentTableBody = document.getElementById('assessmentTableBody');
@@ -3376,7 +3274,6 @@ function toggleSection() {
             const loadedAssessments = assessmentTableBody ? assessmentTableBody.querySelectorAll('tr').length : 0;
             const loadedMaterials = materialsTableBody ? materialsTableBody.querySelectorAll('tr').length : 0;
             
-            console.log('📊 Loaded data verification:', {
                 course_outline_rows: loadedOutlineRows,
                 learning_outcomes: loadedOutcomes,
                 assessment_methods: loadedAssessments,
@@ -3390,7 +3287,6 @@ function toggleSection() {
                 console.warn('⚠️ Learning outcomes count mismatch! Expected:', draftData.learning_outcomes?.length, 'Got:', loadedOutcomes);
             }
             
-            console.log('✅ Draft data loaded into form');
             
         } catch (error) {
             console.error('❌ Error loading draft data:', error);
@@ -3498,7 +3394,6 @@ function toggleSection() {
             return;
         }
         
-        console.log('Deleting draft:', proposalId);
         
         // Close modal
         closeDeleteConfirmationModal();
@@ -3528,7 +3423,6 @@ function toggleSection() {
         .then(response => response.json())
         .then(data => {
             if (data.success) {
-                console.log('Draft deleted successfully');
                 // Show success message (optional)
                 // You could add a toast notification here if desired
             } else {
@@ -3712,14 +3606,12 @@ function toggleSection() {
     // View attachment file
     window.viewAttachmentFile = function(path, fileName) {
         // In a real implementation, this would open the file from the server
-        console.log('Viewing attachment:', path, fileName);
         window.open(path, '_blank');
     };
     
     // Download attachment file
     window.downloadAttachmentFile = function(path, fileName) {
         // In a real implementation, this would download the file from the server
-        console.log('Downloading attachment:', path, fileName);
         const link = document.createElement('a');
         link.href = path;
         link.download = fileName;
@@ -3907,7 +3799,6 @@ function toggleSection() {
     
     // Function to navigate to all courses (with term parameter)
     async function navigateToAllCourses() {
-        console.log('Navigating to all courses with term:', selectedTermId);
         // Update session with current term selection
         await updateServerSession(selectedTermId);
         // Pass term as URL parameter
@@ -3916,7 +3807,6 @@ function toggleSection() {
     
     // Function to navigate to program courses (with term parameter)
     async function navigateToProgramCourses(programCode) {
-        console.log('Navigating to program courses:', programCode, 'with term:', selectedTermId);
         // Update session with current term selection
         await updateServerSession(selectedTermId);
         // Pass term as URL parameter

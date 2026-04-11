@@ -34,7 +34,6 @@ try {
         ]);
     }
 } catch (Exception $e) {
-    error_log("Error getting program ID: " . $e->getMessage());
     echo json_encode([
         'success' => false,
         'message' => 'Error: ' . $e->getMessage()

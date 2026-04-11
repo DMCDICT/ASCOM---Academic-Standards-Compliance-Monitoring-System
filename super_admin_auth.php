@@ -63,7 +63,6 @@ try {
     header('Location: super_admin_successful_login.php');
     exit;
 } catch (Throwable $e) {
-    error_log('Super admin login failed: ' . $e->getMessage());
     header('Location: super_admin_login.php?error=invalid_credentials');
     exit;
 }

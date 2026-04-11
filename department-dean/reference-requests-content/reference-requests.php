@@ -584,7 +584,6 @@ $rejectedRequests = 1;
 <script>
     // Load all requests data when this page is displayed
     document.addEventListener('DOMContentLoaded', function() {
-        console.log('Reference Requests View All page loaded');
         displayAllRequests();
     });
     
@@ -630,7 +629,6 @@ $rejectedRequests = 1;
             grid.appendChild(createRequestCard(request));
         });
         
-        console.log(`Filtered to ${status}: ${filteredRequests.length} requests`);
     }
 
     function createRequestCard(request) {

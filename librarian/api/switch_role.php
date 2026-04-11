@@ -110,8 +110,6 @@ try {
     // Login form trims password on client side, so we only trim the input here
     if ($password !== $user['password']) {
         // Debug logging for password mismatch
-        error_log("Librarian Switch Role Password Mismatch - User ID: $userId, Target Role: $targetRole");
-        error_log("Librarian Switch Role Password Mismatch - Input length: " . strlen($password) . ", DB length: " . strlen($user['password']));
         throw new Exception('Invalid password.');
     }
     
@@ -156,7 +154,6 @@ try {
     ]);
     
 } catch (Exception $e) {
-    error_log("Error switching role: " . $e->getMessage());
     echo json_encode([
         'success' => false,
         'error' => $e->getMessage()

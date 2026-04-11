@@ -1,7 +1,5 @@
 <?php
 // Script to consolidate duplicate course entries and create proper many-to-many relationships
-error_reporting(E_ALL);
-ini_set('display_errors', 1);
 
 try {
     require_once '../includes/db_connection.php';

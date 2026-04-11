@@ -92,7 +92,6 @@ try {
     }
     
 } catch (Exception $e) {
-    error_log("Error in assign_user_role.php: " . $e->getMessage());
     echo json_encode(['success' => false, 'message' => 'Database error occurred']);
 }
 

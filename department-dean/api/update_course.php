@@ -1,7 +1,5 @@
 <?php
 // Enable error reporting for debugging
-error_reporting(E_ALL);
-ini_set('display_errors', 1);
 
 header('Content-Type: application/json');
 header('Access-Control-Allow-Origin: *');
@@ -31,11 +29,9 @@ try {
     $json_input = json_decode(file_get_contents('php://input'), true);
     if ($json_input) {
         $input = $json_input;
-        error_log("API received JSON data: " . print_r($input, true));
     } else {
         // Fallback to form data
         $input = $_POST;
-        error_log("API received form data: " . print_r($input, true));
     }
     
     if (!$input) {
@@ -43,8 +39,6 @@ try {
     }
     
     // Debug: Log all received fields
-    error_log("All received fields: " . print_r(array_keys($input), true));
-    error_log("Input data: " . print_r($input, true));
     
     // Map form field names to expected field names
     $course_code = trim($input['course_code']);
@@ -102,8 +96,6 @@ try {
     ]);
     
     $rows_affected = $stmt->rowCount();
-    error_log("Course update result: success=" . ($result ? 'true' : 'false') . ", rows_affected=" . $rows_affected);
-    error_log("Update parameters: course_code=$course_code, course_title=$course_title, term=$term, academic_year=$academic_year");
     
     if ($rows_affected === 0) {
         throw new Exception('Course not found or no changes made');
@@ -143,7 +135,6 @@ try {
         $stmt = $pdo->prepare($delete_sql);
         $delete_result = $stmt->execute([':course_code' => $course_code]);
         $deleted_rows = $stmt->rowCount();
-        error_log("Deleted $deleted_rows existing course entries for: $course_code");
         
         // Create new entries for each selected program
         $insert_sql = "INSERT INTO courses (
@@ -172,21 +163,17 @@ try {
                 
                 if ($insert_result) {
                     $created_entries++;
-                    error_log("Created course entry: $course_code -> Program ID {$program['id']}");
                 }
             }
         }
         
-        error_log("Created $created_entries new course entries for: $course_code");
         
     } catch (Exception $e) {
         // If there's an error with program update, log it but don't fail the entire update
-        error_log("Error updating course programs: " . $e->getMessage());
     }
     
     // Commit transaction
     $commit_result = $pdo->commit();
-    error_log("Transaction commit result: " . ($commit_result ? 'SUCCESS' : 'FAILED'));
     
     echo json_encode([
         'success' => true,
@@ -209,21 +196,10 @@ try {
     }
     
     // Log the error for debugging
-    error_log("Update course error: " . $e->getMessage());
-    error_log("Stack trace: " . $e->getTraceAsString());
     
-    http_response_code(400);
     echo json_encode([
         'success' => false,
-        'message' => $e->getMessage(),
-        'debug_info' => [
-            'file' => $e->getFile(),
-            'line' => $e->getLine(),
-            'trace' => $e->getTraceAsString(),
-            'received_data' => $input ?? 'No input data',
-            'post_data' => $_POST,
-            'json_input' => $json_input ?? 'No JSON input'
-        ]
+        'message' => $e->getMessage()
     ]);
 }
 ?>

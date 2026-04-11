@@ -189,7 +189,6 @@ try {
     header('Location: user_login.php?error=invalid_credentials');
     exit();
 } catch (Throwable $e) {
-    error_log('User login failed: ' . $e->getMessage());
     header('Location: user_login.php?error=invalid_credentials');
     exit();
 }

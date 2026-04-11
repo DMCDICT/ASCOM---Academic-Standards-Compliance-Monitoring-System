@@ -4,19 +4,15 @@
  * form validation, password toggling, and AJAX submission.
  */
 
-console.log('🚀 modal-edit-user.js LOADED SUCCESSFULLY!');
-console.log('Current timestamp:', new Date().toISOString());
 
 // Test function to verify JavaScript is working
 window.testEditUserJS = function() {
-    console.log('✅ testEditUserJS function is working!');
     alert('JavaScript is working! Check console for details.');
     return true;
 };
 
 // Functions to open/close user modals (global scope for onclick attributes in HTML)
 window.openEditUserModal = function(userId) {
-    console.log('Opening Edit User Modal for user ID:', userId);
     
     // Disable body scroll
     document.body.style.overflow = 'hidden';
@@ -32,7 +28,6 @@ window.openEditUserModal = function(userId) {
 };
 
 window.closeEditUserModal = function() {
-    console.log('Closing Edit User Modal');
     
     // Re-enable body scroll
     document.body.style.overflow = '';
@@ -67,7 +62,6 @@ async function fetchUserDataForEdit(userId) {
 
 // Function to populate the edit form
 function populateEditForm(user) {
-    console.log('Populating edit form with user data:', user);
     
     // Populate form fields
     document.getElementById('edit_employee_no').value = user.employee_no || '';
@@ -80,26 +74,19 @@ function populateEditForm(user) {
     document.getElementById('edit_mobile_no').value = user.mobile_no || '';
     document.getElementById('edit_password').value = '';
     
-    console.log('Form fields populated, setting up functionality...');
     
     // Small delay to ensure DOM is fully ready
     setTimeout(() => {
-        console.log('Setting up password toggle...');
         setupPasswordToggle();
         
-        console.log('Setting up institutional email...');
         setupInstitutionalEmail();
         
-        console.log('Setting up reset password...');
         setupResetPassword();
         
-        console.log('Setting up employee number validation...');
         setupEmployeeNumberValidation();
         
-        console.log('Setting up form change detection...');
         setupFormChangeDetection();
         
-        console.log('Storing original values...');
         window.storeEditFormOriginalValues();
         
         // Check if user has a default password and update reset button accordingly
@@ -114,29 +101,21 @@ function populateEditForm(user) {
                     // User has default password, set it in the form and disable reset button
                     document.getElementById('edit_password').value = user.password;
                     window.editFormDefaultPassword = expectedDefaultPassword;
-                    console.log('User has default password, reset button will be disabled');
                 }
             }
         }
         
-        console.log('Updating button state...');
         updateUpdateButton();
         
         // Force update reset button state after a short delay to ensure DOM is ready
         setTimeout(() => {
             updateResetButtonState();
-            console.log('Reset button state updated after delay');
         }, 200);
         
-        console.log('Form setup completed');
         
         // Debug: Check if password toggle is working
         const passwordInput = document.getElementById('edit_password');
         const toggleIcon = document.querySelector('.toggle-password[data-target="edit_password"]');
-        console.log('Final check - Password input:', passwordInput);
-        console.log('Final check - Toggle icon:', toggleIcon);
-        console.log('Final check - Original values stored:', window.editFormOriginalValues);
-        console.log('Final check - Default password stored:', window.editFormDefaultPassword);
     }, 100);
 }
 
@@ -145,12 +124,8 @@ function setupPasswordToggle() {
     const passwordInput = document.getElementById('edit_password');
     const toggleIcon = document.querySelector('.toggle-password[data-target="edit_password"]');
     
-    console.log('Setting up password toggle...');
-    console.log('Password input found:', passwordInput);
-    console.log('Toggle icon found:', toggleIcon);
     
     if (toggleIcon && passwordInput) {
-        console.log('Adding click event listener to toggle icon');
         
         // Remove any existing event listeners to prevent duplicates
         toggleIcon.removeEventListener('click', handlePasswordToggle);
@@ -160,7 +135,6 @@ function setupPasswordToggle() {
         passwordInput.removeEventListener('input', handlePasswordInput);
         passwordInput.addEventListener('input', handlePasswordInput);
         
-        console.log('Password toggle setup completed successfully');
     } else {
         console.error('Password input or toggle icon not found!');
         console.error('Password input:', passwordInput);
@@ -172,7 +146,6 @@ function setupPasswordToggle() {
 function handlePasswordToggle(e) {
     e.preventDefault();
     e.stopPropagation();
-    console.log('Toggle icon clicked!');
     
     const passwordInput = document.getElementById('edit_password');
     const toggleIcon = document.querySelector('.toggle-password[data-target="edit_password"]');
@@ -181,11 +154,9 @@ function handlePasswordToggle(e) {
         if (passwordInput.type === 'password') {
             passwordInput.type = 'text';
             toggleIcon.src = '../src/assets/icons/hide_password.png';
-            console.log('Password shown, icon changed to hide');
         } else {
             passwordInput.type = 'password';
             toggleIcon.src = '../src/assets/icons/show_password.png';
-            console.log('Password hidden, icon changed to show');
         }
         
         // Trigger form change detection
@@ -195,7 +166,6 @@ function handlePasswordToggle(e) {
 
 // Separate function for password input handling
 function handlePasswordInput() {
-    console.log('Password input changed:', this.value);
     updateUpdateButton();
     // Also update reset button state when password changes
     updateResetButtonState();
@@ -267,14 +237,12 @@ function updateResetButtonState() {
     const passwordInput = document.getElementById('edit_password');
     
     if (!resetBtn || !passwordInput) {
-        console.log('Reset button or password input not found for state update');
         return;
     }
     
     const currentPassword = passwordInput.value.trim();
     const defaultPassword = window.editFormDefaultPassword;
     
-    console.log('Checking reset button state:', {
         currentPassword: currentPassword ? '***' : '(empty)',
         defaultPassword: defaultPassword,
         isDefault: currentPassword === defaultPassword,
@@ -284,7 +252,6 @@ function updateResetButtonState() {
     
     // If no default password is set yet, disable the button
     if (!defaultPassword) {
-        console.log('No default password set yet, disabling reset button');
         resetBtn.disabled = true;
         resetBtn.style.background = '#e9ecef';
         resetBtn.style.color = '#6c757d';
@@ -301,7 +268,6 @@ function updateResetButtonState() {
         resetBtn.style.color = '#6c757d';
         resetBtn.style.cursor = 'not-allowed';
         resetBtn.title = currentPassword ? 'Password is already at default value' : 'Password field is empty';
-        console.log('Reset button DISABLED - password is default or empty');
     } else {
         // Password has been changed, enable reset button
         resetBtn.disabled = false;
@@ -309,7 +275,6 @@ function updateResetButtonState() {
         resetBtn.style.color = 'black';
         resetBtn.style.cursor = 'pointer';
         resetBtn.title = 'Reset password to default value';
-        console.log('Reset button ENABLED - password has been changed');
     }
 }
 
@@ -430,7 +395,6 @@ function updateUpdateButton() {
     const hasChanges = checkFormChanges();
     const isFormValid = checkFormValidity();
     
-    console.log('Update button state check:', {
         hasChanges,
         isFormValid,
         buttonDisabled: updateBtn.disabled,
@@ -442,24 +406,20 @@ function updateUpdateButton() {
         updateBtn.style.background = '#007bff';
         updateBtn.style.color = 'white';
         updateBtn.style.cursor = 'pointer';
-        console.log('UPDATE button ENABLED');
     } else {
         updateBtn.disabled = true;
         updateBtn.style.background = '#C9C9C9';
         updateBtn.style.color = '#666';
         updateBtn.style.cursor = 'not-allowed';
-        console.log('UPDATE button DISABLED - hasChanges:', hasChanges, 'isFormValid:', isFormValid);
     }
 }
 
 // Function to check if form has changes
 function checkFormChanges() {
     if (!window.editFormOriginalValues) {
-        console.log('No original values stored yet');
         return false;
     }
     
-    console.log('Checking form changes. Original values:', window.editFormOriginalValues);
     
     // Only check monitored fields for changes
     const monitoredFields = [
@@ -477,14 +437,12 @@ function checkFormChanges() {
             const currentValue = field.value;
             const originalValue = window.editFormOriginalValues[fieldId] || '';
             
-            console.log(`Field ${fieldId}:`, {
                 current: currentValue,
                 original: originalValue,
                 changed: currentValue !== originalValue
             });
             
             if (currentValue !== originalValue) {
-                console.log(`Change detected in ${fieldId}`);
                 return true;
             }
         } else {
@@ -492,7 +450,6 @@ function checkFormChanges() {
         }
     }
     
-    console.log('No changes detected');
     return false;
 }
 
@@ -510,7 +467,6 @@ function checkFormValidity() {
     for (const fieldId of requiredFields) {
         const field = document.getElementById(fieldId);
         if (field && field.value.trim() === '') {
-            console.log(`Required field ${fieldId} is empty`);
             return false;
         }
     }
@@ -520,7 +476,6 @@ function checkFormValidity() {
     if (employeeNoField && employeeNoField.value.trim() !== '') {
         const employeeNo = employeeNoField.value.trim();
         if (employeeNo.length !== 6 || !/^\d{6}$/.test(employeeNo)) {
-            console.log(`Employee number ${employeeNo} is not exactly 6 digits`);
             return false;
         }
     }
@@ -533,12 +488,10 @@ function checkFormValidity() {
         
         if (!emailValue.endsWith(institutionalEmailDomain) || 
             emailValue.substring(0, emailValue.length - institutionalEmailDomain.length).length === 0) {
-            console.log(`Email ${emailValue} is not in correct format`);
             return false;
         }
     }
     
-    console.log('Form validation passed');
     return true;
 }
 
@@ -591,8 +544,6 @@ function storeOriginalValues() {
         }
     });
     
-    console.log('Stored original form values:', window.editFormOriginalValues);
-    console.log('Stored default password:', window.editFormDefaultPassword);
     
     // Update reset button state after storing values
     updateResetButtonState();
@@ -747,18 +698,15 @@ document.addEventListener('DOMContentLoaded', function() {
         if (e.target.classList.contains('toggle-password') && e.target.getAttribute('data-target') === 'edit_password') {
             e.preventDefault();
             e.stopPropagation();
-            console.log('Password toggle clicked via event delegation!');
             
             const passwordInput = document.getElementById('edit_password');
             if (passwordInput) {
                 if (passwordInput.type === 'password') {
                     passwordInput.type = 'text';
                     e.target.src = '../src/assets/icons/hide_password.png';
-                    console.log('Password shown via delegation');
                 } else {
                     passwordInput.type = 'password';
                     e.target.src = '../src/assets/icons/show_password.png';
-                    console.log('Password hidden via delegation');
                 }
                 
                 // Trigger form change detection
@@ -770,14 +718,12 @@ document.addEventListener('DOMContentLoaded', function() {
     // Add event delegation for password input changes
     document.addEventListener('input', function(e) {
         if (e.target.id === 'edit_password') {
-            console.log('Password input changed via delegation:', e.target.value);
             updateUpdateButton();
             // Also update reset button state when password changes
             updateResetButtonState();
         }
     });
     
-    console.log('DOMContentLoaded setup completed with event delegation');
 });
 
 // Function to handle form submission

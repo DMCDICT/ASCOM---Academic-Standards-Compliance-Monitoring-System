@@ -32,10 +32,8 @@ try {
             ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='Library classification systems (Dewey Decimal, etc.)'";
             
             $pdo->exec($createTableSQL);
-            error_log("Classifications table created automatically");
         } catch (Exception $e) {
             // If creation fails, return empty array
-            error_log("Failed to auto-create classifications table: " . $e->getMessage());
             $response['success'] = true;
             $response['data'] = [];
             $response['message'] = 'Classifications table does not exist and could not be created automatically. Please run the setup script.';
@@ -62,7 +60,6 @@ try {
             $pdo->exec($createLocationSQL);
         }
     } catch (Exception $e) {
-        error_log("Error ensuring library_locations table in get_classifications: " . $e->getMessage());
     }
 
     // Fetch all classifications with optional library location
@@ -125,7 +122,6 @@ try {
             $classification['totalItems'] = $count;
         } catch (Exception $e) {
             // If counting fails, set to 0
-            error_log("Error counting books for classification: " . $e->getMessage());
             $classification['totalItems'] = 0;
         }
         
@@ -138,7 +134,6 @@ try {
     $response['message'] = 'Classifications fetched successfully';
     
 } catch (Exception $e) {
-    error_log("Error fetching classifications: " . $e->getMessage());
     $response['message'] = 'Failed to fetch classifications: ' . $e->getMessage();
 }
 

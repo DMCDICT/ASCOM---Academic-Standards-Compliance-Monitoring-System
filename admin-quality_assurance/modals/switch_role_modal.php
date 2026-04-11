@@ -105,7 +105,6 @@ function validatePassword() {
   const password = document.getElementById('switch_role_password').value;
   const confirmBtn = document.getElementById('confirmSwitchRoleBtn');
   
-  console.log('Password length:', password.length, 'Password:', password);
   
   // Enable button only if password has 8 or more characters
   if (password.length >= 8) {
@@ -114,14 +113,12 @@ function validatePassword() {
     confirmBtn.style.opacity = '1';
     confirmBtn.style.cursor = 'pointer';
     confirmBtn.style.pointerEvents = 'auto';
-    console.log('Button enabled');
   } else {
     confirmBtn.disabled = true;
     confirmBtn.setAttribute('disabled', 'disabled');
     confirmBtn.style.opacity = '0.5';
     confirmBtn.style.cursor = 'not-allowed';
     confirmBtn.style.pointerEvents = 'none';
-    console.log('Button disabled');
   }
 }
 
@@ -173,8 +170,6 @@ document.getElementById('switchRoleForm').addEventListener('submit', async funct
   confirmBtn.textContent = 'SWITCHING...';
   
   try {
-    console.log('Making request to: api/switch_role.php');
-    console.log('Request data:', { password: password, target_role: targetRole });
     
     const response = await fetch('api/switch_role.php', {
       method: 'POST',
@@ -187,22 +182,14 @@ document.getElementById('switchRoleForm').addEventListener('submit', async funct
       })
     });
     
-    console.log('Response status:', response.status);
-    console.log('Response headers:', response.headers);
     
     const data = await response.json();
     
-    console.log('Switch role response:', data);
-    console.log('Response success:', data.success);
-    console.log('Response error:', data.error);
-    console.log('Response message:', data.message);
     
     if (data.success) {
-      console.log('Success! Redirecting to:', data.redirect_url);
       // Redirect to the appropriate interface
       window.location.href = data.redirect_url;
     } else {
-      console.log('Failed:', data.error);
       showIncorrectPasswordModal();
     }
   } catch (error) {

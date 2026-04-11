@@ -37,7 +37,6 @@ try {
                         $_SESSION['user_last_name'] = $userInfo['last_name'];
                     }
                 } catch (Exception $dbError) {
-                    echo "<!-- DEBUG: User info database error: " . $dbError->getMessage() . " -->";
                 }
             }
         }
@@ -75,14 +74,11 @@ try {
                         $_SESSION['selected_role']['department_color'] = $departmentColor;
                     }
                 } catch (Exception $dbError) {
-                    echo "<!-- DEBUG: Database error: " . $dbError->getMessage() . " -->";
                 }
             } else {
-                echo "<!-- DEBUG: PDO connection not available -->";
                 try {
                     require_once dirname(__DIR__, 2) . '/bootstrap/database.php';
                     $pdo = ascom_get_pdo();
-                    echo "<!-- DEBUG: Created new PDO connection -->";
                     
                     // Now try the department query again
                     $stmt = $pdo->prepare("
@@ -97,47 +93,12 @@ try {
                     if ($deptInfo) {
                         $departmentCode = $deptInfo['department_code'];
                         $departmentColor = $deptInfo['color_code'];
-                        echo "<!-- DEBUG: Loaded from new connection - Code: " . $departmentCode . ", Color: " . $departmentColor . " -->";
                     }
                 } catch (Exception $newDbError) {
-                    echo "<!-- DEBUG: New connection failed: " . $newDbError->getMessage() . " -->";
                 }
             }
         }
         
-        // Debug: Check what's in the session
-        echo "<!-- DEBUG: User ID: " . ($_SESSION['user_id'] ?? 'Not set') . " -->";
-        echo "<!-- DEBUG: Department Code: " . $departmentCode . " -->";
-        echo "<!-- DEBUG: Department Color: " . $departmentColor . " -->";
-        echo "<!-- DEBUG: Teacher Name: " . $teacherName . " -->";
-        echo "<!-- DEBUG: PDO available: " . (isset($pdo) ? 'Yes' : 'No') . " -->";
-        echo "<!-- DEBUG: Session user_title: " . ($_SESSION['user_title'] ?? 'Not set') . " -->";
-        echo "<!-- DEBUG: Session user_first_name: " . ($_SESSION['user_first_name'] ?? 'Not set') . " -->";
-        echo "<!-- DEBUG: Session user_last_name: " . ($_SESSION['user_last_name'] ?? 'Not set') . " -->";
-        echo "<!-- DEBUG: Session selected_role: " . print_r($_SESSION['selected_role'] ?? 'Not set', true) . " -->";
-        echo "<!-- DEBUG: All session data: " . print_r($_SESSION, true) . " -->";
-        
-        // Force department from database if session is wrong
-        if (isset($_SESSION['user_id']) && isset($pdo)) {
-            try {
-                $stmt = $pdo->prepare("
-                    SELECT d.department_code, d.color_code 
-                    FROM users u 
-                    JOIN departments d ON u.department_id = d.id 
-                    WHERE u.id = ?
-                ");
-                $stmt->execute([$_SESSION['user_id']]);
-                $deptInfo = $stmt->fetch(PDO::FETCH_ASSOC);
-                
-                if ($deptInfo) {
-                    $departmentCode = $deptInfo['department_code'];
-                    $departmentColor = $deptInfo['color_code'];
-                    echo "<!-- DEBUG: FORCED department from DB - Code: " . $departmentCode . ", Color: " . $departmentColor . " -->";
-                }
-            } catch (Exception $e) {
-                echo "<!-- DEBUG: Force DB error: " . $e->getMessage() . " -->";
-            }
-        }
     }
 } catch (Exception $e) {
     // Keep default values if there's an error
@@ -1463,18 +1424,14 @@ try {
   };
 
   document.addEventListener('DOMContentLoaded', function() {
-    console.log('DOM Content Loaded - Initializing teacher dashboard...');
     
     // Load data from PHP
     const requestsData = document.getElementById('allBookRequestsData');
     
-    console.log('Found elements:', { requestsData });
     
     if (requestsData) {
       allRequests = JSON.parse(requestsData.textContent);
       
-      console.log('Loaded pending requests:', allRequests);
-      console.log('Pending requests count:', allRequests.length);
       
       // Display current page
       displayCurrentPage();
@@ -1484,7 +1441,6 @@ try {
         toggleSection();
       }, 100);
       
-      console.log('Teacher dashboard initialization complete');
     } else {
       console.error('Failed to find required data elements');
     }
@@ -1495,13 +1451,10 @@ try {
     if (coursesData) {
       allCourses = JSON.parse(coursesData.textContent);
       
-      console.log('Loaded courses:', allCourses);
-      console.log('Courses count:', allCourses.length);
       
       // Display all courses (no pagination)
       displayAllCourses();
       
-      console.log('Courses initialization complete');
     } else {
       console.error('Failed to find courses data elements');
     }
@@ -1605,7 +1558,6 @@ try {
   }
 
   function toggleSection() {
-    console.log('toggleSection called');
     
     const section = document.querySelector('.dashboard-section');
     const container = section.querySelector('.book-requests-container');
@@ -1613,18 +1565,13 @@ try {
     const collapseBtn = section.querySelector('.collapse-btn');
     const headerActions = section.querySelector('.header-actions');
     
-    console.log('Elements found:', { container, footer, collapseBtn, headerActions });
-    console.log('Container current display:', container.style.display);
-    console.log('allRequests length:', allRequests.length);
     
     // Check if container is currently hidden
     const isCurrentlyHidden = container.style.display === 'none';
     
-    console.log('Is currently hidden:', isCurrentlyHidden);
     
     if (isCurrentlyHidden) {
       // Expand - show normal layout
-      console.log('Expanding section...');
       container.style.display = 'block';
       footer.style.display = 'flex';
       
@@ -1637,10 +1584,8 @@ try {
       // Restore the navigation buttons
       headerActions.style.display = 'flex';
       
-      console.log('Restored navigation buttons and removed collapsed controls');
     } else {
       // Collapse - just replace navigation buttons with red badge + expand button
-      console.log('Collapsing section...');
       container.style.display = 'none';
       footer.style.display = 'none';
       
@@ -1663,7 +1608,6 @@ try {
       const sectionHeader = section.querySelector('.section-header');
       sectionHeader.appendChild(collapsedControls);
       
-      console.log('Replaced navigation with red badge + expand button in same header');
     }
   }
 
@@ -1671,7 +1615,6 @@ try {
   function displayAllCourses() {
     const container = document.getElementById('coursesContainer');
     
-    console.log(`Displaying all ${allCourses.length} courses`);
     
     // Clear the container
     container.innerHTML = '';
@@ -1743,7 +1686,6 @@ try {
   // Simple tooltip setup - using CSS hover
   function setupTooltipPositioning() {
     // Tooltips now work with simple CSS hover
-    console.log('CSS hover tooltip setup complete');
   }
 
   function viewCourseDetails(courseId) {
@@ -1854,7 +1796,6 @@ try {
     if (navigator.clipboard && navigator.clipboard.writeText) {
       navigator.clipboard.writeText(citation)
         .then(() => {
-          console.log('Citation copied to clipboard.');
         })
         .catch(() => {
           alert('Failed to copy citation. Please try again.');
@@ -1867,7 +1808,6 @@ try {
       tempInput.select();
       try {
         document.execCommand('copy');
-        console.log('Citation copied to clipboard.');
       } catch (e) {
         alert('Failed to copy citation. Please try again.');
       }
@@ -1903,7 +1843,6 @@ try {
         return response.json();
       })
       .then(data => {
-        console.log('Academic terms API response:', data);
         if (data.status === 'success' && data.terms && data.terms.length > 0) {
           // Clear existing options
           termSelect.innerHTML = '';
@@ -1938,7 +1877,6 @@ try {
             filterCoursesByTerm(currentTermId);
           });
           
-          console.log('Academic terms loaded successfully');
         } else {
           console.error('Failed to load academic terms:', data.message || 'No terms found');
           termSelect.innerHTML = '<option value="">No terms available</option>';
@@ -1965,7 +1903,6 @@ try {
         return response.json();
       })
       .then(data => {
-        console.log('Overview stats API response:', data);
         if (data.status === 'success' && data.stats) {
           // Update stat elements
           const totalEl = document.getElementById('statTotalCourses');
@@ -1976,7 +1913,6 @@ try {
           if (nonCompliantEl) nonCompliantEl.textContent = data.stats.non_compliant_courses || 0;
           if (compliantEl) compliantEl.textContent = data.stats.compliant_courses || 0;
           
-          console.log('Overview stats updated:', data.stats);
         } else {
           console.error('Failed to load overview stats:', data.message);
         }
@@ -1990,7 +1926,6 @@ try {
     // This function will filter the courses displayed based on the selected term
     // For now, we'll reload courses from the database via an API call
     // You may need to create an API endpoint to fetch courses filtered by term
-    console.log('Filtering courses by term:', termId);
     
     // For now, just log - we'll need to implement course filtering
     // This might require updating the courses loading to fetch from database

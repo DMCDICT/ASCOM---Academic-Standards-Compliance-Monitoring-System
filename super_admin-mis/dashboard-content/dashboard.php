@@ -37,7 +37,6 @@ if (isset($conn) && !$conn->connect_error) {
         $totalDepartments = $row['total_depts'];
         $countResult->free();
     } elseif ($countResult === false) {
-        error_log("Error executing total departments count query in dashboard.php: " . $conn->error);
         $totalDepartments = 0; // Ensure we have a fallback value
     }
 
@@ -49,7 +48,6 @@ if (isset($conn) && !$conn->connect_error) {
         $totalUsersCount = $row['total_users'];
         $totalUsersResult->free();
     } elseif ($totalUsersResult === false) {
-        error_log("Error executing total users count query in dashboard.php: " . $conn->error);
         $totalUsersCount = 0; // Ensure we have a fallback value
     }
 
@@ -109,7 +107,6 @@ if (isset($conn) && !$conn->connect_error) {
         }
         $result->free();
     } elseif ($result === false) {
-        error_log("Error executing main data query in dashboard.php: " . $conn->error);
     }
 
     // Fetch Recent Activities from activity_logs table
@@ -123,11 +120,9 @@ if (isset($conn) && !$conn->connect_error) {
         }
         $activitiesResult->free();
     } elseif ($activitiesResult === false) {
-        error_log("Error fetching recent activities in dashboard.php: " . $conn->error);
     }
 
 } else {
-    error_log("Database connection failed or not available in dashboard.php: " . ($conn->connect_error ?? "Unknown error"));
     // Default values are already set above, so no need to set them again
 }
 ?>
@@ -352,11 +347,9 @@ if (isset($conn) && !$conn->connect_error) {
 
 <!-- BACK TO TOP FUNCTIONALITY - Direct Implementation -->
 <script>
-console.log('🎯 DASHBOARD.PHP: Starting back-to-top functionality');
 
 // Wait for DOM to be ready
 document.addEventListener('DOMContentLoaded', function() {
-    console.log('🎯 DASHBOARD.PHP: DOM ready, creating back-to-top button');
     
     try {
         // Create back to top button with icon and text
@@ -381,7 +374,6 @@ document.addEventListener('DOMContentLoaded', function() {
         
         // Append button to body
         document.body.appendChild(backToTopButton);
-        console.log('🎯 DASHBOARD.PHP: Back-to-top button created and appended to body');
 
         // Show/hide button based on scroll position
         window.addEventListener('scroll', function() {
@@ -394,7 +386,6 @@ document.addEventListener('DOMContentLoaded', function() {
 
         // Scroll to top when clicked
         backToTopButton.addEventListener('click', function() {
-            console.log('🎯 DASHBOARD.PHP: Back-to-top button clicked');
             window.scrollTo({
                 top: 0,
                 behavior: 'smooth'
@@ -404,9 +395,7 @@ document.addEventListener('DOMContentLoaded', function() {
         // Test button removed - back-to-top functionality is working
         
         // Don't force show button - let it show naturally when scrolling
-        console.log('🎯 DASHBOARD.PHP: Button ready - will show when scrolling down');
         
-        console.log('🎯 DASHBOARD.PHP: Back-to-top functionality completed successfully');
     } catch (error) {
         console.error('❌ DASHBOARD.PHP: Error in back-to-top functionality:', error);
         // Fallback: Create a simple back-to-top button
@@ -421,22 +410,17 @@ document.addEventListener('DOMContentLoaded', function() {
         fallbackButton.style.zIndex = '9999';
         fallbackButton.onclick = () => window.scrollTo({ top: 0, behavior: 'smooth' });
         document.body.appendChild(fallbackButton);
-        console.log('🎯 DASHBOARD.PHP: Fallback button created');
     }
 });
 
 // TOOLTIP SYSTEM REMOVED - No tooltips needed
-console.log('🚨 DASHBOARD.PHP: Tooltip system removed');
 
 function createEmergencyTooltips() {
-    console.log('🚨 DASHBOARD.PHP: Tooltip system removed');
     return; // No tooltips
     
     const navButtons = document.querySelectorAll('.nav-button');
-    console.log(`🚨 DASHBOARD.PHP: Found ${navButtons.length} nav buttons`);
     
     if (navButtons.length === 0) {
-        console.log('🚨 DASHBOARD.PHP: No nav buttons found');
         return;
     }
     
@@ -444,13 +428,11 @@ function createEmergencyTooltips() {
     
     navButtons.forEach(function(button, index) {
         const tooltipText = button.querySelector('span:not(.nav-icon-wrapper)')?.textContent?.trim() || 'Unknown';
-        console.log(`🚨 DASHBOARD.PHP: Setting up tooltip for button ${index + 1}: "${tooltipText}"`);
         
         button.addEventListener('mouseenter', function() {
             const sidebar = document.getElementById('sidebar');
             const isCollapsed = sidebar ? sidebar.classList.contains('collapsed') : false;
             
-            console.log(`🚨 DASHBOARD.PHP: Hover on button ${index + 1}, sidebar collapsed: ${isCollapsed}`);
             
             if (isCollapsed) {
                 if (emergencyTooltip) {
@@ -458,7 +440,6 @@ function createEmergencyTooltips() {
                 }
                 
                 const buttonRect = button.getBoundingClientRect();
-                console.log(`🚨 DASHBOARD.PHP: Button ${index + 1} position:`, buttonRect);
                 
                 emergencyTooltip = document.createElement('div');
                 emergencyTooltip.innerHTML = `
@@ -502,21 +483,17 @@ function createEmergencyTooltips() {
                 `;
                 
                 document.body.appendChild(emergencyTooltip);
-                console.log(`🚨 DASHBOARD.PHP: Tooltip created for button ${index + 1}`);
             }
         });
         
         button.addEventListener('mouseleave', function() {
-            console.log(`🚨 DASHBOARD.PHP: Leave button ${index + 1}`);
             if (emergencyTooltip) {
                 emergencyTooltip.remove();
                 emergencyTooltip = null;
-                console.log(`🚨 DASHBOARD.PHP: Tooltip removed for button ${index + 1}`);
             }
         });
     });
     
-    console.log('🚨 DASHBOARD.PHP: Emergency tooltips created successfully');
 }
 
 // Create emergency tooltips multiple times
@@ -527,5 +504,4 @@ setTimeout(createEmergencyTooltips, 5000);
 // Make it available globally
 window.createEmergencyTooltips = createEmergencyTooltips;
 
-console.log('🚨 DASHBOARD.PHP: Emergency tooltip system ready');
 </script>

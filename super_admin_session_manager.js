@@ -9,7 +9,6 @@ class SuperAdminSessionManager {
 
     init() {
         // No session extension requests - Super Admin sessions are unlimited
-        console.log('Super Admin session manager initialized - unlimited sessions enabled');
         
         // Only handle tab/window close (but don't force logout)
         this.setupCloseListeners();
@@ -23,7 +22,6 @@ class SuperAdminSessionManager {
         window.addEventListener('beforeunload', (event) => {
             // Super Admin can close tabs without being logged out
             // Only log the event, don't force logout
-            console.log('Super Admin tab/window closing - session preserved');
         });
     }
 
@@ -32,14 +30,12 @@ class SuperAdminSessionManager {
         document.addEventListener('visibilitychange', () => {
             if (document.visibilityState === 'visible') {
                 // User returned to the tab - just log it
-                console.log('Super Admin returned to tab - session preserved');
             }
         });
     }
 
     // Method to manually extend session (can be called from other scripts)
     static extend() {
-        console.log('Super Admin session extension requested - unlimited session maintained');
     }
 }
 

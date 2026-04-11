@@ -73,7 +73,6 @@ try {
                 $stmt->execute([$deanDepartmentCode]);
             } else {
                 // Still no department found
-                error_log("get_programs.php: No department code found in session. Session data: " . json_encode([
                     'selected_role' => $_SESSION['selected_role'] ?? 'NOT_SET',
                     'user_id' => $_SESSION['user_id'] ?? 'NOT_SET'
                 ]));
@@ -85,7 +84,6 @@ try {
                 exit;
             }
         } else {
-            error_log("get_programs.php: No user_id in session");
             echo json_encode([
                 'success' => false,
                 'message' => 'User not logged in',
@@ -103,7 +101,6 @@ try {
     ]);
     
 } catch (Exception $e) {
-    error_log("Error in get_programs.php: " . $e->getMessage());
     echo json_encode([
         'success' => false,
         'message' => 'Failed to fetch programs',

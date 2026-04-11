@@ -539,11 +539,9 @@ let currentFilter = 'PROCESSING';
 // Load all materials from API
 async function loadAllMaterials() {
     try {
-        console.log('Loading materials from database...');
         
         // Get navigated material IDs from sessionStorage
         const navigatedMaterials = JSON.parse(sessionStorage.getItem('navigatedMaterials') || '[]');
-        console.log('Navigated materials to exclude:', navigatedMaterials);
         
         const response = await fetch('api/get_processing_materials.php?status=processing');
         
@@ -579,7 +577,6 @@ async function loadAllMaterials() {
                 return !navigatedMaterials.includes(material.id);
             });
             
-            console.log(`Loaded ${allMaterials.length} materials from database (after filtering navigated)`);
             
             // Update filter button counts
             updateFilterCounts();
@@ -927,7 +924,6 @@ function resumeProcessing(materialId) {
     // API call to update status back to processing
     updateProcessingStatus(materialId, 'processing')
         .then(() => {
-            console.log(`Resumed processing for material ${materialId}`);
             loadAllMaterials(); // Reload all materials
         })
         .catch(error => {
@@ -969,7 +965,6 @@ async function updateProcessingStatus(bookId, status, callNumber = null, noOfCop
 
 // Initialize the page and set up form handlers
 document.addEventListener('DOMContentLoaded', function() {
-    console.log('Initializing Material Processing View All page...');
     
     // Set Processing as default active filter
     currentFilter = 'PROCESSING';

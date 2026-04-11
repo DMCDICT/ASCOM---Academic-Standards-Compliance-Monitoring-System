@@ -133,7 +133,6 @@ try {
     }
     
 } catch (Exception $e) {
-    error_log("Error in assign_librarian_role.php: " . $e->getMessage());
     echo json_encode([
         'success' => false, 
         'message' => 'Failed to assign librarian role: ' . $e->getMessage()

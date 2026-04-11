@@ -1,6 +1,5 @@
 <?php
 // Suppress warnings and errors that might output HTML before JSON
-error_reporting(E_ALL);
 ini_set('display_errors', 0);
 ini_set('log_errors', 1);
 
@@ -40,7 +39,6 @@ try {
     // Check if buffer content changed (meaning output was generated, likely from die())
     $bufferAfter = ob_get_contents();
     if ($bufferAfter !== $bufferBefore && !empty($bufferAfter)) {
-        error_log("Database connection output detected: " . substr($bufferAfter, 0, 500));
         ob_clean();
         echo json_encode(['success' => false, 'message' => 'Database connection failed']);
         exit;
@@ -56,12 +54,10 @@ try {
     }
 } catch (Exception $e) {
     ob_clean();
-    error_log("Database connection error in add_book.php: " . $e->getMessage());
     echo json_encode(['success' => false, 'message' => 'Database connection failed: ' . $e->getMessage()]);
     exit;
 } catch (Throwable $e) {
     ob_clean();
-    error_log("Database connection fatal error in add_book.php: " . $e->getMessage());
     echo json_encode(['success' => false, 'message' => 'Database connection failed']);
     exit;
 }
@@ -105,7 +101,6 @@ $createdBy = $_SESSION['user_id'] ?? $_SESSION['librarian_id'] ?? $_SESSION['id'
 // If createdBy is null, set to 0 or handle appropriately
 // Note: Some databases require a value, so we'll use 0 as default
 if ($createdBy === null) {
-    error_log("Warning: createdBy is null in add_book.php. Session vars: user_id=" . ($_SESSION['user_id'] ?? 'not set') . ", librarian_id=" . ($_SESSION['librarian_id'] ?? 'not set') . ", id=" . ($_SESSION['id'] ?? 'not set'));
     $createdBy = 0; // Default to 0 if not set
 }
 
@@ -275,7 +270,6 @@ if ($isBatchWithCourses) {
         ]);
         
     } catch (Exception $e) {
-        error_log("Database error: " . $e->getMessage());
         echo json_encode(['success' => false, 'message' => 'Database error occurred: ' . $e->getMessage()]);
     }
 } else if (isset($input['input_method']) && $input['input_method'] === 'batch') {
@@ -389,7 +383,6 @@ if ($isBatchWithCourses) {
         }
         
     } catch (Exception $e) {
-        error_log("Database error: " . $e->getMessage());
         echo json_encode(['success' => false, 'message' => 'Database error occurred: ' . $e->getMessage()]);
     }
 } else {
@@ -475,7 +468,6 @@ if ($isBatchWithCourses) {
         $stmt->close();
         
     } catch (Exception $e) {
-        error_log("Database error: " . $e->getMessage());
         echo json_encode(['success' => false, 'message' => 'Database error occurred: ' . $e->getMessage()]);
     }
 }

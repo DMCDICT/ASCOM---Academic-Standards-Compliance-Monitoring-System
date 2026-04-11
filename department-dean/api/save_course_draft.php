@@ -13,11 +13,6 @@ if (session_status() == PHP_SESSION_NONE) {
 }
 
 // Debug: Log session info
-error_log('Save course draft: Session status: ' . session_status());
-error_log('Save course draft: Session ID: ' . session_id());
-error_log('Save course draft: Session name: ' . session_name());
-error_log('Save course draft: Cookies received: ' . print_r($_COOKIE, true));
-error_log('Save course draft: Session data keys: ' . implode(', ', array_keys($_SESSION ?? [])));
 
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     echo json_encode(['success' => false, 'message' => 'Invalid request method']);
@@ -25,9 +20,6 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
 }
 
 if (!isset($_SESSION['user_id'])) {
-    error_log('Save course draft: Session user_id not set. Session ID: ' . session_id());
-    error_log('Save course draft: Full session data: ' . print_r($_SESSION, true));
-    error_log('Save course draft: Request headers: ' . print_r(getallheaders(), true));
     http_response_code(401);
     echo json_encode([
         'success' => false, 
@@ -93,7 +85,6 @@ try {
         $pdo->rollBack();
     }
     
-    error_log('Error saving course draft: ' . $e->getMessage());
     echo json_encode([
         'success' => false,
         'message' => 'Error saving draft: ' . $e->getMessage()

@@ -132,7 +132,6 @@ try {
     
 } catch (Exception $e) {
     ob_clean();
-    error_log("Error in get_course_data.php: " . $e->getMessage());
     echo json_encode([
         'success' => false,
         'message' => $e->getMessage()

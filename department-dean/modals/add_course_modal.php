@@ -28,7 +28,6 @@ try {
         $schoolYears = $schoolYearsStmt->fetchAll(PDO::FETCH_ASSOC);
     }
 } catch (Exception $e) {
-    error_log("Error fetching school years in modal: " . $e->getMessage());
 }
 ?>
 
@@ -45,7 +44,6 @@ window.showCloseConfirmationModal = window.showCloseConfirmationModal || functio
         event.preventDefault();
         event.stopPropagation();
     }
-    console.log('🔔 showCloseConfirmationModal called (fallback)');
     const modal = document.getElementById('closeConfirmationModal');
     if (modal) {
         modal.style.display = 'flex';
@@ -86,7 +84,6 @@ window.closeValidationErrorModal = function() {
 
 // Define closeCourseDraftSavedModal early so it's available for onclick handlers
 window.closeCourseDraftSavedModal = window.closeCourseDraftSavedModal || function() {
-    console.log('🔴 closeCourseDraftSavedModal called (early definition)');
     const modal = document.getElementById('courseDraftSavedModal');
     if (modal) {
         modal.style.display = 'none';
@@ -103,7 +100,6 @@ window.closeCourseDraftSavedModal = window.closeCourseDraftSavedModal || functio
 // Define showCourseDraftSavedModal early as a placeholder - will be overridden with full implementation later
 // This ensures it exists when saveCourseAsDraft tries to call it
 window.showCourseDraftSavedModal = function(courseData) {
-    console.log('💾 showCourseDraftSavedModal called (placeholder - will be overridden)');
     // Try to show the modal even with placeholder - in case real function didn't load
     const modal = document.getElementById('courseDraftSavedModal');
     if (modal) {
@@ -114,7 +110,6 @@ window.showCourseDraftSavedModal = function(courseData) {
         modal.style.display = 'flex';
         modal.style.zIndex = '10020';
         modal.style.visibility = 'visible';
-        console.log('✅ Placeholder modal shown');
     } else {
         console.error('❌ Draft saved modal not found in DOM (placeholder)');
     }
@@ -258,15 +253,12 @@ window.showCloseConfirmationModal = function(event) {
         event.stopPropagation();
     }
     
-    console.log('🔔 showCloseConfirmationModal called');
     
     // Check if step 1 has any data - if not, close directly without confirmation
     if (typeof window.hasStep1Data === 'function') {
         const hasStep1 = window.hasStep1Data();
-        console.log('📋 Step 1 has data?', hasStep1);
         
         if (!hasStep1) {
-            console.log('✅ Step 1 is empty, closing modal directly without confirmation');
             // Step 1 is empty, close directly without showing confirmation
             if (typeof window.closeAddCourseModal === 'function') {
                 window.closeAddCourseModal();
@@ -286,7 +278,6 @@ window.showCloseConfirmationModal = function(event) {
         return false;
     }
     
-    console.log('✅ Modal element found - showing confirmation modal');
     
     // Step 1 has data, so show the confirmation modal
     // This gives them the option to Save as Draft, Discard, or Cancel
@@ -321,12 +312,8 @@ window.showCloseConfirmationModal = function(event) {
     const mainModal = document.getElementById('addCourseModal');
     if (mainModal) {
         // Keep main modal open but ensure confirmation modal is on top
-        console.log('Main modal is open, showing confirmation on top');
     }
     
-    console.log('✅ Close confirmation modal should now be visible');
-    console.log('Modal display:', modal.style.display);
-    console.log('Modal z-index:', modal.style.zIndex);
     
     return false;
 };
@@ -357,7 +344,6 @@ window.closeAddCourseModal = function() {
     if (window._draftSuccessModalOpen === true) {
         const draftModal = document.getElementById('courseDraftSavedModal');
         if (draftModal && window.getComputedStyle(draftModal).display !== 'none') {
-            console.log('⚠️ Preventing main modal close - draft success modal is still open');
             return;
         }
     }
@@ -375,12 +361,10 @@ window.closeAddCourseModal = function() {
         delete window.courseSelectionContext.isResumingDraft;
         delete window.courseSelectionContext.proposalId;
     }
-    console.log('📝 Cleared draft resume data on modal close');
 };
 
 // Save as draft
 window.saveCourseAsDraft = async function(event) {
-    console.log('💾 Saving course as draft...');
     
     const triggerBtn = event?.currentTarget || document.querySelector('[data-save-draft-btn]');
     const originalText = triggerBtn ? triggerBtn.textContent : null;
@@ -417,14 +401,12 @@ window.saveCourseAsDraft = async function(event) {
         });
         
         const data = await response.json();
-        console.log('Draft save response:', data);
         
         if (!response.ok) {
             throw new Error(data.message || 'Failed to save course draft.');
         }
         
         if (data.success) {
-            console.log('✅ Draft saved successfully, showing success modal first...');
             
             // Close confirmation modal first
             if (typeof window.closeCloseConfirmationModal === 'function') {
@@ -432,12 +414,10 @@ window.saveCourseAsDraft = async function(event) {
             }
             
             // Show the success modal FIRST before clearing the form
-            console.log('showCourseDraftSavedModal function exists?', typeof window.showCourseDraftSavedModal);
             
             // Function to show the modal (with retry if function not loaded yet)
             const showDraftSavedModal = (retryCount = 0) => {
                 if (typeof window.showCourseDraftSavedModal === 'function') {
-                    console.log('Calling showCourseDraftSavedModal...');
                     try {
                         // Call the modal function - it has its own error handling
                         window.showCourseDraftSavedModal({
@@ -445,7 +425,6 @@ window.saveCourseAsDraft = async function(event) {
                             course_name: courseSummary?.course_name || '',
                             program: courseSummary?.program_display || ''
                         });
-                        console.log('✅ showCourseDraftSavedModal called successfully');
                         
                         // Clear the form AFTER showing the modal, with a small delay to ensure modal is visible
                         setTimeout(() => {
@@ -464,7 +443,6 @@ window.saveCourseAsDraft = async function(event) {
                     }
                 } else if (retryCount < 5) {
                     // Retry after a short delay - function might still be loading
-                    console.log(`⏳ showCourseDraftSavedModal not found, retrying... (${retryCount + 1}/5)`);
                     setTimeout(() => showDraftSavedModal(retryCount + 1), 100);
                 } else {
                     console.error('❌ showCourseDraftSavedModal function not found after 5 retries');
@@ -478,7 +456,6 @@ window.saveCourseAsDraft = async function(event) {
                         if (courseNameEl) courseNameEl.textContent = courseSummary?.course_name || '—';
                         modal.style.display = 'flex';
                         modal.style.zIndex = '10020';
-                        console.log('✅ Manually showed draft saved modal as fallback');
                     } else {
                         console.error('❌ Draft saved modal element not found in DOM');
                     }
@@ -532,8 +509,6 @@ function buildCourseDraftPayload() {
     // First check for loaded draft data (from when draft was loaded into form)
     if (window.loadedDraftData) {
         previousDraftData = window.loadedDraftData;
-        console.log('📝 Found loaded draft data to merge with current form data');
-        console.log('  Previous draft has:', {
             outcomes: previousDraftData.learning_outcomes?.length || 0,
             outline: previousDraftData.course_outline?.length || 0,
             assessments: previousDraftData.assessment_methods?.length || 0,
@@ -541,7 +516,6 @@ function buildCourseDraftPayload() {
         });
     } else if (window.draftToResume && window.draftToResume.courseData) {
         previousDraftData = window.draftToResume.courseData;
-        console.log('📝 Found draftToResume data to merge with current form data');
     }
     
     const selectedProgramsInput = document.getElementById('selectedPrograms');
@@ -590,8 +564,6 @@ function buildCourseDraftPayload() {
     
     const yearLevelLabel = getYearLevelLabel(yearLevel);
     
-    console.log('🔍 Building draft payload - Current step:', window._courseFormStep);
-    console.log('🔍 Collecting data from all steps...');
     
     // Collect data from DOM first
     let learningOutcomes = collectLearningOutcomes();
@@ -602,10 +574,8 @@ function buildCourseDraftPayload() {
     
     // Fallback: If collections are empty, try to extract from FormData
     if (learningOutcomes.length === 0) {
-        console.log('⚠️ No learning outcomes found in DOM, checking FormData...');
         const formOutcomes = formData.getAll('learning_outcomes[]');
         learningOutcomes = formOutcomes.filter(o => o && o.trim());
-        console.log('  Found', learningOutcomes.length, 'outcomes in FormData');
     }
     
     // Merge with previous draft data: use current if exists, otherwise use previous
@@ -615,12 +585,10 @@ function buildCourseDraftPayload() {
             : [];
         if (prevOutcomes.length > 0) {
             learningOutcomes = prevOutcomes;
-            console.log('  ✅ Using', learningOutcomes.length, 'outcomes from previous draft (merge)');
         }
     }
     
     if (courseOutline.length === 0) {
-        console.log('⚠️ No course outline found in DOM, checking FormData...');
         // Try to extract from FormData - course_outline is an array
         const outlineKeys = Array.from(formData.keys()).filter(k => k.startsWith('course_outline['));
         if (outlineKeys.length > 0) {
@@ -635,7 +603,6 @@ function buildCourseDraftPayload() {
                 }
             });
             courseOutline = Object.values(outlineMap).filter(o => o.topic || o.description || o.hours);
-            console.log('  Found', courseOutline.length, 'outline entries in FormData');
         }
     }
     
@@ -646,7 +613,6 @@ function buildCourseDraftPayload() {
             : [];
         if (prevOutline.length > 0) {
             courseOutline = prevOutline;
-            console.log('  ✅ Using', courseOutline.length, 'outline entries from previous draft (merge)');
         }
     }
     
@@ -657,7 +623,6 @@ function buildCourseDraftPayload() {
             : [];
         if (prevAssessments.length > 0) {
             assessmentMethods = prevAssessments;
-            console.log('  ✅ Using', assessmentMethods.length, 'assessment methods from previous draft (merge)');
         }
     }
     
@@ -668,16 +633,9 @@ function buildCourseDraftPayload() {
             : [];
         if (prevMaterials.length > 0) {
             learningMaterials = prevMaterials;
-            console.log('  ✅ Using', learningMaterials.length, 'learning materials from previous draft (merge)');
         }
     }
     
-    console.log('📊 Draft data summary:');
-    console.log('  - Learning Outcomes:', learningOutcomes.length);
-    console.log('  - Course Outline entries:', courseOutline.length);
-    console.log('  - Assessment Methods:', assessmentMethods.length);
-    console.log('  - Learning Materials:', learningMaterials.length);
-    console.log('  - Attachments:', attachments.length);
     
     const rawFormSnapshot = snapshotFormData(formData);
     
@@ -772,15 +730,12 @@ function collectLearningOutcomes() {
     const outcomes = [];
     // Use querySelectorAll to find ALL outcome inputs, even if hidden
     const fields = document.querySelectorAll('#learningOutcomesContainer .outcome-input, .outcome-input');
-    console.log('📝 Collecting learning outcomes, found', fields.length, 'fields');
     fields.forEach((field, index) => {
         const value = field.value?.trim();
         if (value) {
             outcomes.push(value);
-            console.log(`  Outcome ${index + 1}:`, value.substring(0, 50));
         }
     });
-    console.log('✅ Collected', outcomes.length, 'learning outcomes');
     return outcomes;
 }
 
@@ -788,7 +743,6 @@ function collectCourseOutline() {
     // Use querySelectorAll to find ALL rows, even if hidden
     const rows = document.querySelectorAll('#courseOutlineTableBody tr, .course-outline-row');
     const outline = [];
-    console.log('📝 Collecting course outline, found', rows.length, 'rows');
     rows.forEach((row, index) => {
         const topic = row.querySelector('.topic-input')?.value?.trim() || '';
         const description = row.querySelector('.topic-description')?.value?.trim() || '';
@@ -800,10 +754,8 @@ function collectCourseOutline() {
                 description: description,
                 hours: hours ? parseFloat(hours) : 0.5
             });
-            console.log(`  Topic ${index + 1}:`, topic || '(no topic)', '-', description ? description.substring(0, 30) : '(no description)');
         }
     });
-    console.log('✅ Collected', outline.length, 'course outline entries');
     return outline;
 }
 
@@ -811,7 +763,6 @@ function collectAssessmentMethods() {
     // Use querySelectorAll to find ALL assessment rows, even if hidden
     const rows = document.querySelectorAll('#assessmentTableBody tr, .assessment-method-row');
     const assessments = [];
-    console.log('📝 Collecting assessment methods, found', rows.length, 'rows');
     rows.forEach((row, index) => {
         const type = row.querySelector('.assessment-type-input')?.value?.trim() || '';
         const percentage = row.querySelector('.assessment-percentage-input')?.value?.trim() || '';
@@ -824,10 +775,8 @@ function collectAssessmentMethods() {
                 weight: weight,
                 percentage: percentage // Keep for backward compatibility
             });
-            console.log(`  Assessment ${index + 1}:`, type || '(no type)', '-', percentage || '0', '%');
         }
     });
-    console.log('✅ Collected', assessments.length, 'assessment methods');
     return assessments;
 }
 
@@ -835,7 +784,6 @@ function collectLearningMaterials() {
     // Use querySelectorAll to find ALL material rows, even if hidden
     const rows = document.querySelectorAll('#learningMaterialsTableBody tr, .material-row');
     const materials = [];
-    console.log('📝 Collecting learning materials, found', rows.length, 'rows');
     rows.forEach((row, index) => {
         const callNumber = row.querySelector('.material-call-number-input')?.value?.trim() || '';
         const title = row.querySelector('.material-title-input')?.value?.trim() || '';
@@ -855,10 +803,8 @@ function collectLearningMaterials() {
                 type: type,
                 remarks: remarks
             });
-            console.log(`  Material ${index + 1}:`, title || '(no title)', '-', author || '(no author)');
         }
     });
-    console.log('✅ Collected', materials.length, 'learning materials');
     return materials;
 }
 
@@ -907,7 +853,6 @@ function snapshotFormData(formData) {
 
 // Discard/Delete proposal - Completely reset modal to fresh state
 window.discardCourseProposal = function() {
-    console.log('🗑️ Discarding course proposal - resetting everything to fresh state...');
     
     // STEP 0: Close the close confirmation modal first
     if (typeof window.closeCloseConfirmationModal === 'function') {
@@ -935,7 +880,6 @@ window.discardCourseProposal = function() {
             courseType: 'proposal'
         };
     }
-    console.log('✅ Cleared draft resume data on discard - context reset to fresh state');
     
     // STEP 2: Reset form completely
     const form = document.getElementById('addCourseForm');
@@ -951,7 +895,6 @@ window.discardCourseProposal = function() {
                 field.value = '';
             }
         });
-        console.log('✅ Reset all form fields');
     }
     
     // STEP 3: Clear Learning Outcomes
@@ -964,7 +907,6 @@ window.discardCourseProposal = function() {
         if (typeof learningOutcomesCount !== 'undefined') {
             learningOutcomesCount = 0;
         }
-        console.log('✅ Cleared learning outcomes');
     }
     
     // STEP 4: Clear Course Outline
@@ -977,7 +919,6 @@ window.discardCourseProposal = function() {
         if (typeof courseTopicsCount !== 'undefined') {
             courseTopicsCount = 0;
         }
-        console.log('✅ Cleared course outline');
     }
     
     // STEP 5: Clear Assessment Methods
@@ -991,7 +932,6 @@ window.discardCourseProposal = function() {
     if (assessmentContainer) {
         assessmentContainer.innerHTML = '';
     }
-    console.log('✅ Cleared assessment methods');
     
     // STEP 6: Clear Learning Materials
     const learningMaterialsTableBody = document.getElementById('learningMaterialsTableBody');
@@ -1003,7 +943,6 @@ window.discardCourseProposal = function() {
         if (typeof materialCount !== 'undefined') {
             materialCount = 0;
         }
-        console.log('✅ Cleared learning materials');
     }
     
     // STEP 7: Clear Attachments
@@ -1018,7 +957,6 @@ window.discardCourseProposal = function() {
     if (fileInput) {
         fileInput.value = '';
     }
-    console.log('✅ Cleared attachments');
     
     // STEP 8: Reset all step indicators and progress
     window._courseFormStep = 1;
@@ -1050,7 +988,6 @@ window.discardCourseProposal = function() {
     if (typeof updateNavigationButtons === 'function') {
         updateNavigationButtons();
     }
-    console.log('✅ Reset all steps and progress indicators');
     
     // STEP 9: Clear localStorage related to drafts (optional - can be commented out if needed)
     try {
@@ -1080,15 +1017,12 @@ window.discardCourseProposal = function() {
         if (typeof window.closeAddCourseModal === 'function') {
             window.closeAddCourseModal();
         }
-        console.log('✅ Modal closed after discard - ready for fresh start');
     }, 100);
     
-    console.log('✅ Discard complete - modal is now completely empty and ready for new course proposal');
 };
 
 // Clear form after successful draft save (keeps modal open but form empty)
 window.clearCourseFormAfterDraftSave = function() {
-    console.log('🧹 Clearing form after draft save...');
     
     // STEP 0: Clear ALL draft resume data and reset context completely
     window.draftToResume = null;
@@ -1104,7 +1038,6 @@ window.clearCourseFormAfterDraftSave = function() {
         delete window.courseSelectionContext.proposalId;
         delete window.courseSelectionContext.skipCourseTypeSelection;
     }
-    console.log('✅ Cleared draft resume data and reset context');
     
     // STEP 1: Reset form completely
     const form = document.getElementById('addCourseForm');
@@ -1124,7 +1057,6 @@ window.clearCourseFormAfterDraftSave = function() {
                 field.value = '';
             }
         });
-        console.log('✅ Reset all form fields');
     }
     
     // STEP 2: Clear Learning Outcomes
@@ -1137,7 +1069,6 @@ window.clearCourseFormAfterDraftSave = function() {
         if (typeof learningOutcomesCount !== 'undefined') {
             learningOutcomesCount = 0;
         }
-        console.log('✅ Cleared learning outcomes');
     }
     
     // STEP 3: Clear Course Outline
@@ -1150,7 +1081,6 @@ window.clearCourseFormAfterDraftSave = function() {
         if (typeof courseTopicsCount !== 'undefined') {
             courseTopicsCount = 0;
         }
-        console.log('✅ Cleared course outline');
     }
     
     // STEP 4: Clear Assessment Methods
@@ -1164,7 +1094,6 @@ window.clearCourseFormAfterDraftSave = function() {
     if (assessmentContainer) {
         assessmentContainer.innerHTML = '';
     }
-    console.log('✅ Cleared assessment methods');
     
     // STEP 5: Clear Learning Materials
     const learningMaterialsTableBody = document.getElementById('learningMaterialsTableBody');
@@ -1176,7 +1105,6 @@ window.clearCourseFormAfterDraftSave = function() {
         if (typeof materialCount !== 'undefined') {
             materialCount = 0;
         }
-        console.log('✅ Cleared learning materials');
     }
     
     // STEP 6: Clear Attachments
@@ -1191,7 +1119,6 @@ window.clearCourseFormAfterDraftSave = function() {
     if (fileInput) {
         fileInput.value = '';
     }
-    console.log('✅ Cleared attachments');
     
     // STEP 7: Reset all step indicators and progress
     window._courseFormStep = 1;
@@ -1231,8 +1158,6 @@ window.clearCourseFormAfterDraftSave = function() {
         }, 50);
     }
     
-    console.log('✅ Reset all steps and progress indicators');
-    console.log('✅ Form cleared after draft save');
 };
 
 
@@ -1241,8 +1166,6 @@ window.validateCurrentStep = function() {
     try {
         // Get current step from window variable
         const currentStep = window._courseFormStep || 1;
-        console.log('=== VALIDATION START ===');
-        console.log('validateCurrentStep called for step:', currentStep);
         
         const currentStepElement = document.getElementById(`step${currentStep}`);
         if (!currentStepElement) {
@@ -1255,7 +1178,6 @@ window.validateCurrentStep = function() {
             return false;
         }
         
-        console.log('Step element found:', currentStepElement);
         
         // Clear previous error states
         currentStepElement.querySelectorAll('.form-control, select, textarea, input').forEach(field => {
@@ -1350,7 +1272,6 @@ window.validateCurrentStep = function() {
         
         // General validation for all required fields
         const requiredFields = currentStepElement.querySelectorAll('[required]');
-        console.log('Found required fields:', requiredFields.length);
         
         if (requiredFields.length === 0) {
             console.warn('⚠️ No required fields found in step', currentStep);
@@ -1363,7 +1284,6 @@ window.validateCurrentStep = function() {
                            field.hasAttribute('hidden');
             
             if (isHidden) {
-                console.log(`Skipping hidden required field ${index + 1}:`, field.id || field.name);
                 return;
             }
             
@@ -1392,7 +1312,6 @@ window.validateCurrentStep = function() {
             
             fieldLabel = fieldLabel.replace(/\s+/g, ' ').trim();
             
-            console.log(`Checking field ${index + 1}:`, {
                 name: fieldName,
                 label: fieldLabel,
                 value: fieldValue,
@@ -1428,8 +1347,6 @@ window.validateCurrentStep = function() {
             }
         });
     
-        console.log('Validation result:', isValid);
-        console.log('Missing fields:', missingFields);
     
         if (!isValid) {
             if (firstInvalidField) {
@@ -1444,12 +1361,9 @@ window.validateCurrentStep = function() {
                 const missingList = missingFields.length > 0 ? '\n\nPlease fill in:\n• ' + missingFields.join('\n• ') : '';
                 alert('Please fill in all required fields before proceeding.' + missingList);
             }
-            console.log('Validation failed. Missing fields:', missingFields);
         } else {
-            console.log('✅ Validation passed for step', currentStep);
         }
         
-        console.log('=== VALIDATION END ===');
         return isValid;
     } catch (error) {
         console.error('Error in validateCurrentStep:', error);
@@ -1463,7 +1377,6 @@ window.validateCurrentStep = function() {
 };
 
 window.nextStep = function(event) {
-    console.log('🔵 NEXT BUTTON CLICKED');
     if (event) {
         event.preventDefault();
         event.stopPropagation();
@@ -1474,15 +1387,11 @@ window.nextStep = function(event) {
         
         // ALWAYS validate before proceeding - REQUIRED
         if (typeof window.validateCurrentStep === 'function' || typeof validateCurrentStep === 'function') {
-            console.log('🔍 Running validation for step', currentStep);
             const validateFunc = window.validateCurrentStep || validateCurrentStep;
             const isValid = validateFunc();
-            console.log('🔍 Validation result:', isValid);
             if (!isValid) {
-                console.log('❌ Validation failed - blocking navigation');
                 return false;
             }
-            console.log('✅ Validation passed - proceeding to next step');
         } else {
             console.error('❌ validateCurrentStep function not found!');
             if (typeof showValidationErrorModal === 'function') {
@@ -1530,7 +1439,6 @@ window.nextStep = function(event) {
                             prevBtn.style.display = 'inline-flex';
                             prevBtn.style.visibility = 'visible';
                             prevBtn.style.opacity = '1';
-                            console.log('✅ Explicitly showing Previous button on step', window._courseFormStep, 'display:', prevBtn.style.display);
                             return true;
                         } else {
                             console.warn('⚠️ Previous button not found yet, will retry...');
@@ -1568,7 +1476,6 @@ window.nextStep = function(event) {
                             }
                         }, 100);
                     } else {
-                        console.log('📝 Skipping learning outcomes initialization - resuming draft');
                     }
                 }
                 
@@ -1577,7 +1484,6 @@ window.nextStep = function(event) {
                 if (window._courseFormStep === 4) {
                     const isResumingDraft = window.courseSelectionContext && window.courseSelectionContext.isResumingDraft === true;
                     if (!isResumingDraft) {
-                        console.log('📍 Navigated to step 4, initializing course outline...');
                         // Call immediately
                         if (typeof window.initializeCourseOutline === 'function') {
                             window.initializeCourseOutline();
@@ -1596,7 +1502,6 @@ window.nextStep = function(event) {
                             }
                         }, 300);
                     } else {
-                        console.log('📝 Skipping course outline initialization - resuming draft');
                     }
                 }
                 
@@ -1605,7 +1510,6 @@ window.nextStep = function(event) {
                 if (window._courseFormStep === 5) {
                     const isResumingDraft = window.courseSelectionContext && window.courseSelectionContext.isResumingDraft === true;
                     if (!isResumingDraft) {
-                        console.log('📍 Navigated to step 5, initializing assessment...');
                         // Call immediately
                         if (typeof window.initializeAssessment === 'function') {
                             window.initializeAssessment();
@@ -1624,14 +1528,12 @@ window.nextStep = function(event) {
                             }
                         }, 300);
                     } else {
-                        console.log('📝 Skipping assessment initialization - resuming draft');
                     }
                 }
                 
                 // If we moved to step 7 (Attachments), update attachment list and ensure file input is ready
                 if (window._courseFormStep === 7) {
                     if (typeof window.updateAttachmentList === 'function') {
-                        console.log('📎 Step 7 active, updating attachment list');
                         // Small delay to ensure DOM is ready
                         setTimeout(() => {
                             window.updateAttachmentList();
@@ -1652,11 +1554,9 @@ window.nextStep = function(event) {
                                                (typeof initializeFileDropZone === 'function' ? initializeFileDropZone : null);
                                 
                                 if (initFunc) {
-                                    console.log('🔄 Re-initializing file drop zone on step 7 activation');
                                     initFunc();
                                 } else if (retryCount < maxRetries) {
                                     retryCount++;
-                                    console.log(`⏳ initializeFileDropZone not found yet, retrying (${retryCount}/${maxRetries})...`);
                                     setTimeout(tryInit, 100);
                                 } else {
                                     console.error('❌ initializeFileDropZone not found after', maxRetries, 'retries');
@@ -1739,7 +1639,6 @@ window.previousStep = function() {
                         }
                     }, 100);
                 } else {
-                    console.log('📝 Skipping learning outcomes initialization - resuming draft');
                 }
             }
             
@@ -1748,7 +1647,6 @@ window.previousStep = function() {
             if (window._courseFormStep === 4) {
                 const isResumingDraft = window.courseSelectionContext && window.courseSelectionContext.isResumingDraft === true;
                 if (!isResumingDraft) {
-                    console.log('📍 Navigated back to step 4, initializing course outline...');
                     // Call immediately
                     if (typeof window.initializeCourseOutline === 'function') {
                         window.initializeCourseOutline();
@@ -1767,14 +1665,12 @@ window.previousStep = function() {
                         }
                     }, 300);
                 } else {
-                    console.log('📝 Skipping course outline initialization - resuming draft');
                 }
             }
         }
     }
 };
 
-console.log('✅ Navigation functions defined - window.nextStep type:', typeof window.nextStep);
 
 // Learning Materials Management - Define BEFORE modal HTML
 window.materialCount = window.materialCount || 0;
@@ -1835,7 +1731,6 @@ window.addMaterialRow = function() {
         }
     }, 100);
     
-    console.log('✅ Material row added, count:', window.materialCount);
 };
 
 window.removeMaterialRow = function(index) {
@@ -1858,7 +1753,6 @@ function removeMaterialRow(index) {
     }
 }
 
-console.log('✅ Material functions defined - window.addMaterialRow type:', typeof window.addMaterialRow);
 
 // Learning Outcomes Functions
 let learningOutcomesCount = 0;
@@ -1897,9 +1791,7 @@ window.initializeLearningOutcomes = function() {
         for (let i = 0; i < 3; i++) {
             window.addLearningOutcome();
         }
-        console.log('Initialized 3 learning outcome fields');
     } else {
-        console.log('Learning outcomes already exist, skipping initialization');
     }
 };
 
@@ -1980,7 +1872,6 @@ function removeCourseTopic(index) {
 
 // Initialize Course Outline - Define early so it's available when navigation code runs
 window.initializeCourseOutline = function() {
-    console.log('🔄 initializeCourseOutline called');
     const tbody = document.getElementById('courseOutlineTableBody');
     if (!tbody) {
         console.warn('⚠️ Course outline table body not found, retrying...');
@@ -1997,14 +1888,9 @@ window.initializeCourseOutline = function() {
     const hasLoadedDraftData = window.loadedDraftData && window.loadedDraftData.course_outline && window.loadedDraftData.course_outline.length > 0;
     
     if (isResumingDraft || hasExistingData || hasLoadedDraftData) {
-        console.log('📝 Skipping course outline initialization - draft data exists or already populated');
-        console.log('  - isResumingDraft:', isResumingDraft);
-        console.log('  - hasExistingData:', hasExistingData, '(rows:', tbody.querySelectorAll('tr').length, ')');
-        console.log('  - hasLoadedDraftData:', hasLoadedDraftData);
         return; // Don't clear existing data when resuming draft
     }
     
-    console.log('✅ Table body found, clearing and initializing...');
     
     // ALWAYS clear any existing rows first to ensure fresh initialization
     tbody.innerHTML = '';
@@ -2022,12 +1908,10 @@ window.initializeCourseOutline = function() {
             <td><button type="button" class="remove-topic-btn" onclick="removeCourseTopic(${topicIndex})">Remove</button></td>
         `;
         tbody.appendChild(row);
-        console.log(`✅ Added topic row ${i + 1}/3`);
     }
     
     // Verify rows were added
     const rows = tbody.querySelectorAll('tr');
-    console.log(`✅ Initialized course outline: ${rows.length} rows added`);
     if (rows.length !== 3) {
         console.warn(`⚠️ Expected 3 rows but found ${rows.length}, retrying...`);
         setTimeout(() => {
@@ -2077,7 +1961,6 @@ function removeAssessmentMethod(index) {
 
 // Initialize Assessment - Define early so it's available when navigation code runs
 window.initializeAssessment = function() {
-    console.log('🔄 initializeAssessment called');
     const tbody = document.getElementById('assessmentTableBody');
     if (!tbody) {
         console.warn('⚠️ Assessment table body not found, retrying...');
@@ -2094,14 +1977,9 @@ window.initializeAssessment = function() {
     const hasLoadedDraftData = window.loadedDraftData && window.loadedDraftData.assessment_methods && window.loadedDraftData.assessment_methods.length > 0;
     
     if (isResumingDraft || hasExistingData || hasLoadedDraftData) {
-        console.log('📝 Skipping assessment initialization - draft data exists or already populated');
-        console.log('  - isResumingDraft:', isResumingDraft);
-        console.log('  - hasExistingData:', hasExistingData, '(rows:', tbody.querySelectorAll('tr').length, ')');
-        console.log('  - hasLoadedDraftData:', hasLoadedDraftData);
         return; // Don't clear existing data when resuming draft
     }
     
-    console.log('✅ Table body found, clearing and initializing...');
     
     // ALWAYS clear any existing rows first to ensure fresh initialization
     tbody.innerHTML = '';
@@ -2118,12 +1996,10 @@ window.initializeAssessment = function() {
             <td><button type="button" class="remove-assessment-btn" onclick="removeAssessmentMethod(${assessmentIndex})">Remove</button></td>
         `;
         tbody.appendChild(row);
-        console.log(`✅ Added assessment row ${i + 1}/3`);
     }
     
     // Verify rows were added
     const rows = tbody.querySelectorAll('tr');
-    console.log(`✅ Initialized assessment: ${rows.length} rows added`);
     if (rows.length !== 3) {
         console.warn(`⚠️ Expected 3 rows but found ${rows.length}, retrying...`);
         setTimeout(() => {
@@ -2140,32 +2016,25 @@ window.loadAcademicYears = (function() {
     return async function() {
         // Prevent multiple calls
         if (loading) {
-            console.log('⏸️ Already loading academic years...');
             return;
         }
         
         // Check if already loaded
         const checkSelect = document.getElementById('academicYear');
         if (loaded && checkSelect && checkSelect.options.length > 1) {
-            console.log('✅ Academic years already loaded');
             return;
         }
         
         loading = true;
-        console.log('🔄 Loading academic years...');
-        console.log('🔄 Current URL:', window.location.href);
         
         try {
             // Find select element first
             let select = document.getElementById('academicYear');
-            console.log('🔄 Select element found:', !!select);
             
             if (!select) {
                 // Wait and try again
-                console.log('⏳ Waiting for select element...');
                 await new Promise(resolve => setTimeout(resolve, 200));
                 select = document.getElementById('academicYear');
-                console.log('🔄 Select element found after wait:', !!select);
             }
             
             if (!select) {
@@ -2174,23 +2043,17 @@ window.loadAcademicYears = (function() {
                 return;
             }
             
-            console.log('✅ Select element found, fetching data...');
             
             // Fetch data
             const response = await fetch('api/get_school_years.php');
-            console.log('🔄 Response status:', response.status, response.statusText);
-            console.log('🔄 Response URL:', response.url);
             
             if (!response.ok) {
                 throw new Error(`HTTP ${response.status}: ${response.statusText}`);
             }
             
             const data = await response.json();
-            console.log('🔄 API response data:', JSON.stringify(data, null, 2));
             
             if (data.success && data.school_years && Array.isArray(data.school_years) && data.school_years.length > 0) {
-                console.log('✅ Data is valid, populating dropdown...');
-                console.log('🔄 Number of years:', data.school_years.length);
                 
                 // Clear and populate
                 select.innerHTML = '<option value="">Select Academic Year</option>';
@@ -2200,10 +2063,8 @@ window.loadAcademicYears = (function() {
                     option.value = year.id;
                     option.textContent = year.school_year || year.school_year_label || 'Academic Year';
                     select.appendChild(option);
-                    console.log(`  ✅ Added option ${index + 1}: ${option.textContent} (id: ${year.id})`);
                 });
                 
-                console.log('✅ Academic years loaded successfully! Total options:', select.options.length);
                 loaded = true;
             } else {
                 console.error('❌ Invalid data structure:');
@@ -2228,7 +2089,6 @@ window.loadAcademicYears = (function() {
 })();
 
 function populateAcademicYearSelect(select, data) {
-    console.log('📋 Populating academic year select with data:', data);
     
     if (!select) {
         console.error('❌ Select element is null or undefined');
@@ -2242,15 +2102,9 @@ function populateAcademicYearSelect(select, data) {
     }
     
     // Check if data has the expected structure
-    console.log('📋 Checking data structure...');
-    console.log('  - data.success:', data.success);
-    console.log('  - data.school_years exists:', !!data.school_years);
-    console.log('  - data.school_years is array:', Array.isArray(data.school_years));
-    console.log('  - data.school_years length:', data.school_years?.length || 0);
     
     // Only log full data if debugging is needed (can be large)
     if (!data.success || !data.school_years || data.school_years.length === 0) {
-        console.log('  - Full data:', JSON.stringify(data, null, 2));
     }
     
     // Validate and populate
@@ -2267,14 +2121,11 @@ function populateAcademicYearSelect(select, data) {
                 const yearLabel = year.school_year || year.school_year_label || `A.Y. ${year.year_start}-${year.year_end}` || 'Academic Year';
                 option.textContent = yearLabel;
                 select.appendChild(option);
-                console.log(`  ✅ Added: ${yearLabel} (id: ${year.id})`);
             } catch (err) {
                 console.error(`  ❌ Error adding year ${index + 1}:`, err, year);
             }
         });
         
-        console.log('✅ Academic years loaded successfully:', data.school_years.length, 'years');
-        console.log('📋 Final select options count:', select.options.length);
     } else {
         const errorMsg = data.message || data.error || 'No data returned';
         console.error('❌ Failed to load academic years:', errorMsg);
@@ -2441,7 +2292,6 @@ window.saveMaterial = function() {
     // Close modal
     window.closeAddMaterialModal();
     
-    console.log(editingIndex !== undefined ? '✅ Material updated via modal' : '✅ Material added via modal', 'count:', materialIndex);
 };
 
 window.editMaterial = function(index) {
@@ -2484,7 +2334,6 @@ window.editMaterial = function(index) {
     window.openAddMaterialModal();
 };
 
-console.log('✅ Material modal functions defined');
 
 // File Management Functions - Define BEFORE modal HTML
 window.attachmentFiles = window.attachmentFiles || [];
@@ -2537,7 +2386,6 @@ window.updateAttachmentList = function() {
     attachmentList.style.flexDirection = 'column';
     attachmentList.style.gap = '10px';
     
-    console.log('📋 Updating attachment list. Files count:', window.attachmentFiles ? window.attachmentFiles.length : 0);
     
     attachmentList.innerHTML = '';
     
@@ -2576,7 +2424,6 @@ window.updateAttachmentList = function() {
         attachmentList.appendChild(item);
     });
     
-    console.log('✅ Attachment list updated with', window.attachmentFiles.length, 'files');
 };
 
 window.viewAttachment = function(index) {
@@ -2627,12 +2474,10 @@ window.updateFileInput = function() {
 };
 
 window.handleFiles = function(files) {
-    console.log('📁 handleFiles called with', files.length, 'files');
     
     // Initialize attachmentFiles array if it doesn't exist
     if (!window.attachmentFiles) {
         window.attachmentFiles = [];
-        console.log('✅ Initialized attachmentFiles array');
     }
     
     const maxSize = 50 * 1024 * 1024; // 50MB
@@ -2641,7 +2486,6 @@ window.handleFiles = function(files) {
     let skippedCount = 0;
     
     Array.from(files).forEach(file => {
-        console.log('Processing file:', file.name, 'Size:', file.size);
         
         // Check file size
         if (file.size > maxSize) {
@@ -2665,15 +2509,11 @@ window.handleFiles = function(files) {
         if (!isDuplicate) {
             window.attachmentFiles.push(file);
             addedCount++;
-            console.log('✅ Added file:', file.name);
         } else {
-            console.log('⚠️ Skipped duplicate file:', file.name);
             skippedCount++;
         }
     });
     
-    console.log('📊 Files processed - Added:', addedCount, 'Skipped:', skippedCount);
-    console.log('📊 Total files in array:', window.attachmentFiles.length);
     
     // Update debug info
     const debugText = document.getElementById('attachmentDebugText');
@@ -2715,7 +2555,6 @@ window.handleFiles = function(files) {
     }
     
     if (addedCount > 0) {
-        console.log('✅ Successfully added', addedCount, 'file(s)');
         
         // Show a visual feedback with animation
         const attachmentList = document.getElementById('attachmentList');
@@ -2732,9 +2571,7 @@ window.handleFiles = function(files) {
         
         // Show a success message
         if (addedCount === 1) {
-            console.log(`✅ File "${window.attachmentFiles[window.attachmentFiles.length - 1].name}" added successfully`);
         } else {
-            console.log(`✅ ${addedCount} files added successfully`);
         }
     }
     
@@ -2745,16 +2582,13 @@ window.handleFiles = function(files) {
     }
 };
 
-console.log('✅ File management functions defined');
 
 // Initialize file drop zone - Define it early so it's always available
 window.initializeFileDropZone = window.initializeFileDropZone || function initializeFileDropZone() {
-    console.log('🔍 initializeFileDropZone called');
     const dropZone = document.getElementById('fileDropZone');
     const fileInput = document.getElementById('courseAttachments');
     const attachmentList = document.getElementById('attachmentList');
     
-    console.log('🔍 Initializing file drop zone...', {
         dropZone: !!dropZone,
         fileInput: !!fileInput,
         attachmentList: !!attachmentList,
@@ -2765,17 +2599,14 @@ window.initializeFileDropZone = window.initializeFileDropZone || function initia
     
     if (!dropZone || !fileInput) {
         // Retry if elements not ready yet
-        console.log('⏳ Elements not ready, retrying in 100ms...');
         setTimeout(window.initializeFileDropZone, 100);
         return;
     }
     
-    console.log('✅ All required elements found, proceeding with initialization...');
     
     // Initialize attachment files array
     if (!window.attachmentFiles) {
         window.attachmentFiles = [];
-        console.log('✅ Initialized attachmentFiles array');
     }
     
     // Update attachment list if element exists
@@ -2800,7 +2631,6 @@ window.initializeFileDropZone = window.initializeFileDropZone || function initia
         // Click to browse
         dropZone.addEventListener('click', function(e) {
             if (e.target !== fileInput && !e.target.closest('.file-actions')) {
-                console.log('🖱️ Drop zone clicked, triggering file input');
                 fileInput.click();
             }
         });
@@ -2823,10 +2653,8 @@ window.initializeFileDropZone = window.initializeFileDropZone || function initia
             e.stopPropagation();
             dropZone.classList.remove('drag-over');
             
-            console.log('📥 Files dropped, count:', e.dataTransfer.files.length);
             if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
                 const filesArray = Array.from(e.dataTransfer.files);
-                console.log('📥 Processing dropped files:', filesArray.length, 'files');
                 if (typeof window.handleFiles === 'function') {
                     window.handleFiles(filesArray);
                 }
@@ -2845,18 +2673,12 @@ window.initializeFileDropZone = window.initializeFileDropZone || function initia
     }
     
     fileInput._changeHandler = function(e) {
-        console.log('📁 File input changed, files selected:', e.target.files ? e.target.files.length : 0);
-        console.log('📁 File input files:', e.target.files);
-        console.log('📁 Current attachmentFiles count:', window.attachmentFiles ? window.attachmentFiles.length : 0);
         
         if (e.target.files && e.target.files.length > 0) {
-            console.log('📁 Calling handleFiles with', e.target.files.length, 'files');
-            console.log('📁 File names:', Array.from(e.target.files).map(f => f.name));
             
             if (typeof window.handleFiles === 'function') {
                 // Create a copy of the FileList to ensure we can process it
                 const filesArray = Array.from(e.target.files);
-                console.log('📁 Processing files array:', filesArray.length, 'files');
                 window.handleFiles(filesArray);
             } else {
                 console.error('❌ window.handleFiles is not a function!', typeof window.handleFiles);
@@ -2871,7 +2693,6 @@ window.initializeFileDropZone = window.initializeFileDropZone || function initia
     // Test that the file input is accessible
     const fileInputStyle = window.getComputedStyle(fileInput);
     const parentStyle = fileInput.parentElement ? window.getComputedStyle(fileInput.parentElement) : null;
-    console.log('📎 File input element:', {
         id: fileInput.id,
         type: fileInput.type,
         multiple: fileInput.multiple,
@@ -2887,8 +2708,6 @@ window.initializeFileDropZone = window.initializeFileDropZone || function initia
     
     // Also attach a direct click handler to the file input for debugging
     fileInput.addEventListener('click', function(e) {
-        console.log('🖱️ File input clicked directly');
-        console.log('🖱️ Click event details:', {
             target: e.target,
             currentTarget: e.currentTarget,
             bubbles: e.bubbles
@@ -2903,15 +2722,11 @@ window.initializeFileDropZone = window.initializeFileDropZone || function initia
         debugText.textContent = `File input ready. Current files: ${window.attachmentFiles ? window.attachmentFiles.length : 0}`;
     }
     
-    console.log('✅ File drop zone initialized successfully');
-    console.log('✅ File input change handler attached:', !!fileInput._changeHandler);
 };
 
-console.log('✅ initializeFileDropZone function defined');
 
 // Populate Review Data - Define it early so it's always available
 window.populateReviewData = window.populateReviewData || function populateReviewData() {
-    console.log('📋 Populating review data...');
     
     try {
         // Get all form values from Step 1
@@ -2931,7 +2746,6 @@ window.populateReviewData = window.populateReviewData || function populateReview
         const prerequisites = prerequisitesEl ? prerequisitesEl.value.trim() : '-';
         const courseDescription = courseDescriptionEl ? courseDescriptionEl.value.trim() : '-';
         
-        console.log('Step 1 data:', { courseCode, courseName, units, lectureHours, laboratoryHours, prerequisites, courseDescription });
         
         // Get Learning Outcomes (Step 3)
         const outcomeInputs = document.querySelectorAll('.outcome-input');
@@ -2940,7 +2754,6 @@ window.populateReviewData = window.populateReviewData || function populateReview
             .filter(outcome => outcome.length > 0)
             .map((outcome, index) => `${index + 1}. ${outcome}`)
             .join('\n') || 'None specified';
-        console.log('Learning Outcomes:', learningOutcomes);
         
         // Get Course Outline (Step 4)
         const courseOutlineTableBody = document.querySelector('#courseOutlineTableBody');
@@ -2975,7 +2788,6 @@ window.populateReviewData = window.populateReviewData || function populateReview
                 courseOutline = outlineItems.join('\n\n');
             }
         }
-        console.log('Course Outline:', courseOutline);
         
         // Get Assessment Methods (Step 5)
         const assessmentTableBody = document.querySelector('#assessmentTableBody');
@@ -3009,11 +2821,9 @@ window.populateReviewData = window.populateReviewData || function populateReview
                 }
             }
         }
-        console.log('Assessment Methods:', assessmentMethods);
         
         // Get learning materials from table (Step 6)
         const materialRows = document.querySelectorAll('.material-row');
-        console.log('Found material rows:', materialRows.length);
         
         const materialList = Array.from(materialRows)
             .map(row => {
@@ -3066,12 +2876,10 @@ window.populateReviewData = window.populateReviewData || function populateReview
             .filter(item => item !== null)
             .join('\n') || 'None specified';
         
-        console.log('Materials list:', materialList);
         
         // Get justification (Step 8)
         const justificationEl = document.getElementById('justification');
         const justification = justificationEl ? justificationEl.value.trim() : '-';
-        console.log('Justification:', justification);
         
         // Populate review fields
         const reviewCourseCode = document.getElementById('reviewCourseCode');
@@ -3123,7 +2931,6 @@ window.populateReviewData = window.populateReviewData || function populateReview
                     `;
                 });
                 reviewAttachments.innerHTML = attachmentsHTML;
-                console.log('Attachments from window.attachmentFiles:', window.attachmentFiles.length, 'files');
             } else {
                 // Fallback: try to get from file input
                 const attachmentInput = document.getElementById('courseAttachments');
@@ -3147,7 +2954,6 @@ window.populateReviewData = window.populateReviewData || function populateReview
                         `;
                     });
                     reviewAttachments.innerHTML = attachmentsHTML;
-                    console.log('Attachments from file input:', files.length, 'files');
                 } else {
                     reviewAttachments.textContent = 'None';
                 }
@@ -3155,7 +2961,6 @@ window.populateReviewData = window.populateReviewData || function populateReview
         }
         
         // Force update navigation buttons when review data is populated (step 9)
-        console.log('🔄 Forcing button update on step 9...');
         const nextBtn = document.getElementById('nextStepBtn');
         const submitBtn = document.getElementById('submitToQABtn');
         
@@ -3167,7 +2972,6 @@ window.populateReviewData = window.populateReviewData || function populateReview
         if (submitBtn) {
             submitBtn.style.display = 'block';
             submitBtn.textContent = 'Submit to QA';
-            console.log('✅ Submit button forced to show with "Submit to QA" text');
         }
         
         // Also call updateNavigationButtons to ensure consistency
@@ -3177,14 +2981,12 @@ window.populateReviewData = window.populateReviewData || function populateReview
             }, 10);
         }
         
-        console.log('✅ Review data populated successfully');
     } catch (error) {
         console.error('❌ Error populating review data:', error);
         alert('Error loading review data: ' + error.message);
     }
 };
 
-console.log('✅ populateReviewData function defined');
 </script>
 
 <div id="addCourseModal" class="modal course-proposal-modal" style="display: none; z-index: 10005;">
@@ -5439,11 +5241,6 @@ window._courseTotalSteps = window._courseTotalSteps || 9;
 
 // FORCE DEFINE - Don't check if it exists, just define it
 window.nextStep = function(event) {
-        console.log('🔵🔵🔵 NEXT BUTTON CLICKED - FUNCTION EXECUTING');
-        console.log('Function is running!');
-        console.log('Event object:', event);
-        console.log('Current step:', window._courseFormStep);
-        console.log('Total steps:', window._courseTotalSteps);
         
         if (event) {
             event.preventDefault();
@@ -5454,19 +5251,14 @@ window.nextStep = function(event) {
             const currentStep = window._courseFormStep || 1;
             const totalSteps = window._courseTotalSteps || 9;
             
-            console.log('Current step:', currentStep, 'Total steps:', totalSteps);
             
         // ALWAYS validate before proceeding - REQUIRED
         if (typeof window.validateCurrentStep === 'function' || typeof validateCurrentStep === 'function') {
-            console.log('🔍 Running validation for step', currentStep);
             const validateFunc = window.validateCurrentStep || validateCurrentStep;
             const isValid = validateFunc();
-            console.log('🔍 Validation result:', isValid);
             if (!isValid) {
-                console.log('❌ Validation failed - blocking navigation');
                 return false;
             }
-            console.log('✅ Validation passed - proceeding to next step');
         } else {
             console.error('❌ validateCurrentStep function not found!');
             showValidationErrorModal('Validation function not loaded. Please refresh the page.', []);
@@ -5478,8 +5270,6 @@ window.nextStep = function(event) {
                 const currentStepEl = document.getElementById('step' + currentStep);
                 const nextStepEl = document.getElementById('step' + (currentStep + 1));
                 
-                console.log('Current step element:', currentStepEl);
-                console.log('Next step element:', nextStepEl);
                 
                 if (currentStepEl) {
                     currentStepEl.classList.remove('active');
@@ -5523,13 +5313,11 @@ window.nextStep = function(event) {
                         }, 50);
                     }
                     
-                    console.log('✅ Moved to step', window._courseFormStep);
                 } else {
                     console.error('Next step element not found!');
                     alert('Error: Next step not found');
                 }
             } else {
-                console.log('Already on last step');
             }
             
             return false;
@@ -5539,20 +5327,13 @@ window.nextStep = function(event) {
             return false;
         }
     };
-    console.log('✅ window.nextStep function DEFINED and assigned');
 } else {
-    console.log('⚠️ window.nextStep already exists, not redefining');
 }
 
 // Verify function is defined - IMMEDIATELY after definition
-console.log('✅ window.nextStep function DEFINED');
-console.log('Function type:', typeof window.nextStep);
-console.log('Function exists?', !!window.nextStep);
-console.log('Function test:', window.nextStep ? window.nextStep.toString().substring(0, 50) : 'NULL');
 
 // CRITICAL: Test that the function can be called immediately
 if (typeof window.nextStep === 'function') {
-    console.log('✅✅✅ window.nextStep is DEFINED and is a FUNCTION - READY TO USE');
     // Make it available globally immediately
     window['nextStep'] = window.nextStep; // Ensure it's accessible
 } else {
@@ -5563,11 +5344,8 @@ if (typeof window.nextStep === 'function') {
 
 // Test if it's accessible
 if (typeof window.nextStep === 'function') {
-    console.log('✅ nextStep is accessible as a function');
     // Test call to make sure it works
-    console.log('Testing function call...');
     try {
-        console.log('Function can be called:', typeof window.nextStep === 'function');
     } catch(e) {
         console.error('Error testing function:', e);
     }
@@ -5576,8 +5354,6 @@ if (typeof window.nextStep === 'function') {
     console.error('Value:', window.nextStep);
 }
 
-console.log('🚨 MODAL SCRIPT FINISHED LOADING');
-console.log('Final check - window.nextStep:', typeof window.nextStep, window.nextStep);
 
 // EMERGENCY FALLBACK: If function still isn't defined, define a simple one
 if (typeof window.nextStep !== 'function') {
@@ -5590,11 +5366,9 @@ if (typeof window.nextStep !== 'function') {
             step1.classList.remove('active');
             step2.classList.add('active');
             window._courseFormStep = 2;
-            console.log('Emergency: Moved to step 2');
         }
         return false;
     };
-    console.log('✅ Emergency fallback function created');
 }
 
 // Also define variables for backward compatibility  
@@ -5605,10 +5379,6 @@ const totalSteps = window._courseTotalSteps || 5;
 window.currentStep = window.currentStep || currentStep;
 window.totalSteps = window.totalSteps || totalSteps;
 
-console.log('✅ Variables defined - currentStep:', currentStep, 'totalSteps:', totalSteps);
-console.log('window.nextStep type:', typeof window.nextStep);
-console.log('window.currentStep:', window.currentStep);
-console.log('window.totalSteps:', window.totalSteps);
 
 // Use global variables
 let currentStep = window.currentStep || 1;
@@ -5943,9 +5713,6 @@ function selectSuggestion(item, titleInput, authorInput, yearInput, callNumberIn
 
 // Function to attach navigation event listeners
 function attachNavigationEventListeners() {
-    console.log('=== ATTACHING NAVIGATION EVENT LISTENERS ===');
-    console.log('window.nextStep type:', typeof window.nextStep);
-    console.log('window.nextStep value:', window.nextStep);
     
     const nextBtn = document.getElementById('nextStepBtn');
     const prevBtn = document.getElementById('prevStepBtn');
@@ -5956,7 +5723,6 @@ function attachNavigationEventListeners() {
         return;
     }
     
-    console.log('✅ Next button found:', nextBtn);
     
     // Remove any existing click handlers by cloning
     if (nextBtn) {
@@ -5967,23 +5733,16 @@ function attachNavigationEventListeners() {
         
         // Use a direct, simple event listener - don't prevent default to allow onclick to work too
         newNextBtn.addEventListener('click', function(event) {
-            console.log('🔵🔵🔵 NEXT BUTTON CLICKED - EVENT LISTENER FIRED!');
-            console.log('Event:', event);
-            console.log('window.nextStep type:', typeof window.nextStep);
-            console.log('window.nextStep:', window.nextStep);
             
             // Don't prevent default - let onclick handler work as fallback
             // Only prevent if we successfully handle it
             if (typeof window.nextStep === 'function') {
-                console.log('✅✅✅ Calling window.nextStep...');
                 try {
                     event.preventDefault();
                     event.stopPropagation();
                     const result = window.nextStep(event);
-                    console.log('nextStep returned:', result);
                     // If validation failed (returns false), don't proceed
                     if (result === false) {
-                        console.log('❌ Navigation blocked due to validation failure');
                         return false;
                     }
                 } catch (e) {
@@ -6003,8 +5762,6 @@ function attachNavigationEventListeners() {
             }
         }, false);
         
-        console.log('✅ Next button event listener attached');
-        console.log('Button onclick attribute:', newNextBtn.getAttribute('onclick'));
     }
     
     if (prevBtn) {
@@ -6022,14 +5779,11 @@ function attachNavigationEventListeners() {
             newPrevBtn.style.display = 'inline-flex';
             newPrevBtn.style.visibility = 'visible';
             newPrevBtn.style.opacity = '1';
-            console.log('✅ Previous button shown after cloning (step > 1)');
         } else {
             newPrevBtn.style.display = 'none';
-            console.log('Previous button hidden after cloning (step 1)');
         }
         
         newPrevBtn.addEventListener('click', function(event) {
-            console.log('🔵 PREVIOUS BUTTON CLICKED - EVENT LISTENER FIRED!');
             if (typeof window.previousStep === 'function') {
                 event.preventDefault();
                 event.stopPropagation();
@@ -6040,7 +5794,6 @@ function attachNavigationEventListeners() {
                 return true;
             }
         });
-        console.log('✅ Previous button event listener attached, final display:', newPrevBtn.style.display);
     } else {
         console.error('❌ Previous button not found in attachNavigationEventListeners!');
     }
@@ -6057,10 +5810,8 @@ function attachNavigationEventListeners() {
                 console.error('handleSubmitToQA function not found!');
             }
         });
-        console.log('✅ Submit button event listener attached');
     }
     
-    console.log('=== NAVIGATION EVENT LISTENERS COMPLETE ===');
 }
 
 // Initialize form
@@ -6098,7 +5849,6 @@ document.addEventListener('DOMContentLoaded', function() {
                 if (mutation.type === 'attributes' && mutation.attributeName === 'class') {
                     const isActive = step3.classList.contains('active');
                     if (isActive) {
-                        console.log('🔍 Step 3 became active, initializing learning outcomes...');
                         setTimeout(() => {
                             if (typeof window.initializeLearningOutcomes === 'function') {
                                 window.initializeLearningOutcomes();
@@ -6121,14 +5871,12 @@ document.addEventListener('DOMContentLoaded', function() {
             const hasExistingData = tbody && tbody.querySelectorAll('tr').length > 0;
             
             if (!isResumingDraft && !hasExistingData) {
-                console.log('🔍 Step 4 is already active on page load, initializing course outline...');
                 setTimeout(() => {
                     if (typeof window.initializeCourseOutline === 'function') {
                         window.initializeCourseOutline();
                     }
                 }, 200);
             } else {
-                console.log('📝 Skipping course outline initialization on page load - draft data exists or already populated');
             }
         }
         
@@ -6137,7 +5885,6 @@ document.addEventListener('DOMContentLoaded', function() {
                 if (mutation.type === 'attributes' && mutation.attributeName === 'class') {
                     const isActive = step4.classList.contains('active');
                     if (isActive) {
-                        console.log('🔍 Step 4 became active (via observer), initializing course outline...');
                         // Call immediately
                         if (typeof window.initializeCourseOutline === 'function') {
                             window.initializeCourseOutline();
@@ -6172,7 +5919,6 @@ document.addEventListener('DOMContentLoaded', function() {
                 if (mutation.type === 'attributes' && mutation.attributeName === 'class') {
                     const isActive = step5.classList.contains('active');
                     if (isActive) {
-                        console.log('🔍 Step 5 became active, forcing button update...');
                         // Force button update immediately
                         const nextBtn = document.getElementById('nextStepBtn');
                         const submitBtn = document.getElementById('submitToQABtn');
@@ -6201,7 +5947,6 @@ document.addEventListener('DOMContentLoaded', function() {
             attributeFilter: ['class']
         });
         
-        console.log('✅ MutationObserver set up to watch step5 activation');
     }
 });
 
@@ -6243,18 +5988,15 @@ function updateNavigationButtons() {
     
     const total = window._courseTotalSteps || 9;
     
-    console.log('updateNavigationButtons - step:', step, 'total:', total, 'window._courseFormStep:', window._courseFormStep);
     
     // Show/hide Previous button
     if (prevBtn) {
         if (step === 1) {
             prevBtn.style.display = 'none';
-            console.log('Previous button hidden (step 1)');
         } else {
             prevBtn.style.display = 'inline-flex'; // Use inline-flex to match CSS class
             prevBtn.style.visibility = 'visible';
             prevBtn.style.opacity = '1';
-            console.log('✅ Previous button shown (step > 1), display:', prevBtn.style.display);
         }
     } else {
         console.error('❌ Previous button (prevStepBtn) not found!');
@@ -6270,7 +6012,6 @@ function updateNavigationButtons() {
         if (submitBtn) {
             submitBtn.style.display = 'inline-flex'; // Use inline-flex to match CSS class
             submitBtn.textContent = 'Submit to QA';
-            console.log('✅ Submit button shown with text: Submit to QA');
         }
     } else {
         // On steps 1-4, show Next and hide Submit
@@ -6286,7 +6027,6 @@ function updateNavigationButtons() {
         }
     }
     
-    console.log('Navigation buttons updated. Step:', step, 'Previous button display:', prevBtn?.style.display, 'Next button display:', nextBtn.style.display, 'Submit button display:', submitBtn?.style.display);
 }
 
 // validateCurrentStep function moved to top of file (line ~88) - removed duplicate here
@@ -6411,25 +6151,20 @@ function handleSubmitToQA(event) {
             submitBtn.textContent = 'Submitting...';
             
             // Submit to backend
-            console.log('Submitting course to QA...');
-            console.log('Form data:', formData);
             
             fetch('process_course.php', {
                 method: 'POST',
                 body: formData
             })
             .then(response => {
-                console.log('Response received:', response.status, response.statusText);
                 // Check if response is ok
                 if (!response.ok) {
                     throw new Error(`HTTP error! status: ${response.status}`);
                 }
                 // Get response text first to check if it's valid JSON
                 return response.text().then(text => {
-                    console.log('Response text:', text);
                     try {
                         const data = JSON.parse(text);
-                        console.log('Parsed JSON data:', data);
                         return data;
                     } catch (parseError) {
                         console.error('Failed to parse JSON response:', text);
@@ -6439,25 +6174,20 @@ function handleSubmitToQA(event) {
                 });
             })
             .then(data => {
-                console.log('Processing response data:', data);
                 if (data.success) {
-                    console.log('Success! Showing success modal...');
                     const courseCode = formData.get('course_code');
                     const courseName = formData.get('course_name');
-                    console.log('Course code:', courseCode, 'Course name:', courseName);
                     
                     if (typeof showCourseSuccessModal === 'function') {
                         showCourseSuccessModal({
                             course_code: courseCode,
                             course_name: courseName
                         });
-                        console.log('Success modal should be shown');
                     } else {
                         console.error('showCourseSuccessModal function not found!');
                         alert('Successfully submitted course proposal to QA!');
                     }
                 } else {
-                    console.log('Submission failed. Showing error modal...');
                     if (typeof showCourseErrorModal === 'function') {
                         showCourseErrorModal(data.message || 'Failed to submit course proposal.');
                     } else {
@@ -6477,14 +6207,12 @@ function handleSubmitToQA(event) {
                 }
             })
             .finally(() => {
-                console.log('Resetting submit button...');
                 if (submitBtn) {
                     submitBtn.disabled = false;
                     submitBtn.textContent = 'Submit to QA';
                 }
             });
         } else {
-            console.log('User cancelled submission');
         }
     }
     
@@ -6493,12 +6221,6 @@ function handleSubmitToQA(event) {
 
 // Modal functions
 window.openAddCourseModal = function() {
-        console.log('=== openAddCourseModal CALLED ===');
-        console.log('window.courseSelectionContext:', window.courseSelectionContext);
-        console.log('typeof window.courseSelectionContext:', typeof window.courseSelectionContext);
-        console.log('window.courseSelectionContext === undefined:', window.courseSelectionContext === undefined);
-        console.log('window.courseSelectionContext === null:', window.courseSelectionContext === null);
-        console.log('!!window.courseSelectionContext:', !!window.courseSelectionContext);
         
         const modal = document.getElementById('addCourseModal');
         if (!modal) {
@@ -6515,7 +6237,6 @@ window.openAddCourseModal = function() {
                 delete window.courseSelectionContext.skipCourseTypeSelection;
             }
             window._modalWasDiscarded = false; // Clear the flag
-            console.log('📝 Modal was discarded - ensuring completely fresh start');
         }
         
         // Check if we're resuming a draft - if not, clear any draft-related flags
@@ -6529,25 +6250,18 @@ window.openAddCourseModal = function() {
             if (window.courseSelectionContext) {
                 delete window.courseSelectionContext.isResumingDraft;
             }
-            console.log('📝 Cleared draft resume data - opening fresh modal');
         } else {
             // Only keep draft data if we're explicitly resuming
-            console.log('📝 Resuming draft - keeping draft data');
         }
         
         // Check if we have course selection context FIRST, before showing modal
         // Apply class BEFORE modal is displayed so CSS can take effect immediately
         const hasContext = window.courseSelectionContext !== undefined && window.courseSelectionContext !== null && Object.keys(window.courseSelectionContext).length > 0;
-        console.log('hasContext:', hasContext);
-        console.log('Context object:', JSON.stringify(window.courseSelectionContext, null, 2));
         
         if (hasContext) {
             modal.classList.add('from-course-selection');
-            console.log('✓ Course selection context detected, class added to modal');
-            console.log('Context details:', JSON.stringify(window.courseSelectionContext, null, 2));
         } else {
             modal.classList.remove('from-course-selection');
-            console.log('✗ No course selection context');
         }
             
             // Inject CSS directly if context exists
@@ -6581,7 +6295,6 @@ window.openAddCourseModal = function() {
                     }
                 `;
                 document.head.appendChild(style);
-                console.log('✓ Injected CSS style tag to hide fields');
             } else {
                 // Remove injected style if no context
                 const existingStyle = document.getElementById('hide-course-selection-fields-style');
@@ -6614,7 +6327,6 @@ window.openAddCourseModal = function() {
                 requestAnimationFrame(() => {
                     const pf = document.getElementById('programField');
                     const afr = document.getElementById('academicFieldsRow');
-                    console.log('FRAME 1 - programField:', !!pf, 'academicFieldsRow:', !!afr);
                     if (pf) {
                         pf.style.setProperty('display', 'none', 'important');
                         pf.style.setProperty('visibility', 'hidden', 'important');
@@ -6629,7 +6341,6 @@ window.openAddCourseModal = function() {
                 setTimeout(() => {
                     const pf = document.getElementById('programField');
                     const afr = document.getElementById('academicFieldsRow');
-                    console.log('TIMEOUT 1 - programField:', !!pf, 'academicFieldsRow:', !!afr);
                     if (pf) {
                         pf.style.setProperty('display', 'none', 'important');
                         pf.style.setProperty('visibility', 'hidden', 'important');
@@ -6664,7 +6375,6 @@ window.openAddCourseModal = function() {
             updateProgress();
             updateNavigationButtons();
         } else {
-            console.log('📝 Resuming draft - skipping form reset');
             // Don't reset step - it will be set by loadDraftIntoForm
         }
         
@@ -6762,7 +6472,6 @@ window.openAddCourseModal = function() {
                     }
                 });
                 
-                console.log('✅ Manually reset all form fields except program selection');
                 
                 // Now ensure program selection is preserved
                 if (programValueBeforeReset) {
@@ -6777,11 +6486,9 @@ window.openAddCourseModal = function() {
                     if (programSelectBtn) {
                         programSelectBtn.setAttribute('data-selected-programs', programValueBeforeReset);
                     }
-                    console.log('✅ Preserved program selection:', programValueBeforeReset);
                 }
             }
         } else {
-            console.log('📝 Resuming draft - skipping form field reset (draft data will be loaded)');
         }
         
         // Program selection is already preserved above (we didn't reset it)
@@ -6797,11 +6504,9 @@ window.openAddCourseModal = function() {
                     input.value = savedProgramIds;
                     input.defaultValue = savedProgramIds;
                     input.setAttribute('value', savedProgramIds);
-                    console.log('🔄 Re-restored program selection (delayed check):', savedProgramIds);
                 }
                 if (text && savedProgramText && text.textContent !== savedProgramText && text.textContent === 'Select Program(s)') {
                     text.textContent = savedProgramText;
-                    console.log('🔄 Re-restored program text (delayed check):', savedProgramText);
                 }
             }, 100);
         }
@@ -6818,31 +6523,23 @@ window.openAddCourseModal = function() {
         
         // Re-initialize file drop zone when modal opens to ensure event listeners are attached
         setTimeout(() => {
-            console.log('🔄 Attempting to re-initialize file drop zone after modal open');
-            console.log('🔄 initializeFileDropZone type:', typeof initializeFileDropZone);
-            console.log('🔄 window.initializeFileDropZone type:', typeof window.initializeFileDropZone);
             
             // Try both scopes
             const initFunc = typeof initializeFileDropZone === 'function' ? initializeFileDropZone : 
                            (typeof window.initializeFileDropZone === 'function' ? window.initializeFileDropZone : null);
             
             if (initFunc) {
-                console.log('🔄 Re-initializing file drop zone after modal open');
                 initFunc();
             } else {
                 console.error('❌ initializeFileDropZone function not found!');
                 // Try to find and initialize manually
                 const dropZone = document.getElementById('fileDropZone');
                 const fileInput = document.getElementById('courseAttachments');
-                console.log('🔍 Manual check - dropZone:', !!dropZone, 'fileInput:', !!fileInput);
             }
         }, 200);
         
         // IMPORTANT: Remove fields AFTER form reset when context exists
         const hasContextAfterReset = window.courseSelectionContext !== undefined && window.courseSelectionContext !== null;
-        console.log('=== CHECKING CONTEXT AFTER FORM RESET ===');
-        console.log('hasContextAfterReset:', hasContextAfterReset);
-        console.log('window.courseSelectionContext:', window.courseSelectionContext);
         
         // Fields have been removed from the form - no need to remove/hide them
         
@@ -6982,7 +6679,6 @@ window.openAddCourseModal = function() {
             if (programIds.length > 0) {
                 if (selectedProgramsInput) {
                     selectedProgramsInput.value = programIds.join(',');
-                    console.log('✅ Restored program IDs:', selectedProgramsInput.value);
                 }
                 
                 if (programNames.length > 0) {
@@ -6993,7 +6689,6 @@ window.openAddCourseModal = function() {
                 
                 if (programSelectText) {
                     programSelectText.textContent = displayText;
-                    console.log('✅ Restored program text:', displayText);
                 }
                 
                 // Update window.selectedProgramsData for consistency
@@ -7007,7 +6702,6 @@ window.openAddCourseModal = function() {
         // Pre-fill form fields if we have course selection context
         // Use setTimeout to ensure DOM is ready after form reset
         setTimeout(() => {
-            console.log('Checking courseSelectionContext:', window.courseSelectionContext);
             if (window.courseSelectionContext) {
                 const context = window.courseSelectionContext;
                 
@@ -7015,7 +6709,6 @@ window.openAddCourseModal = function() {
                 const modal = document.getElementById('addCourseModal');
                 if (modal) {
                     modal.classList.add('from-course-selection');
-                    console.log('Added from-course-selection class to modal');
                 }
                 
                 // Fields have been removed from the form
@@ -7150,8 +6843,6 @@ function confirmProgramSelection() {
         selectedProgramsInput.defaultValue = idsStr; // CRITICAL: Set defaultValue so form.reset() resets TO this value, not empty
         selectedProgramsInput.setAttribute('value', idsStr);
         selectedProgramsInput.setAttribute('data-persistent-value', idsStr);
-        console.log('✅ Updated hidden input selectedPrograms with value:', idsStr);
-        console.log('✅ Set defaultValue to:', idsStr, '(form.reset() will now reset TO this value)');
     } else {
         console.error('❌ selectedPrograms input field not found!');
     }
@@ -7164,7 +6855,6 @@ function confirmProgramSelection() {
         programSelectText.textContent = displayText;
         // Set persistent attribute
         programSelectText.setAttribute('data-persistent-text', displayText);
-        console.log('✅ Updated button text to:', displayText);
     } else {
         console.error('❌ programSelectText element not found!');
     }
@@ -7174,7 +6864,6 @@ function confirmProgramSelection() {
         programSelectBtn.setAttribute('data-selected-programs', selectedPrograms.join(','));
         programSelectBtn.setAttribute('data-selected-names', JSON.stringify(selectedNames));
         programSelectBtn.setAttribute('data-display-text', displayText);
-        console.log('✅ Stored program selection in button data attributes');
     }
     
     // Make sure it persists even after modal operations
@@ -7189,9 +6878,6 @@ function confirmProgramSelection() {
         console.warn('Could not save to localStorage:', e);
     }
     
-    console.log('✅ Program selection confirmed:', selectedNames);
-    console.log('✅ Selected program IDs:', selectedPrograms);
-    console.log('✅ Stored in window.selectedProgramsData:', window.selectedProgramsData);
     
     // Start monitoring to ensure it persists
     if (typeof startProgramSelectionMonitor === 'function') {
@@ -7231,7 +6917,6 @@ function protectButtonText() {
             set: function(value) {
                 // If trying to set to "Select Program(s)" and we have saved data, restore it instead
                 if ((value === 'Select Program(s)' || value === '' || !value) && savedData.ids.length > 0) {
-                    console.log('🛡️ Blocked attempt to clear program selection, restoring:', expectedText);
                     descriptor.set.call(this, expectedText);
                     return;
                 }
@@ -7241,7 +6926,6 @@ function protectButtonText() {
             configurable: true
         });
         
-        console.log('🛡️ Protected button text from being cleared');
     }
 }
 
@@ -7307,7 +6991,6 @@ function setupProgramSelectionObserver() {
     // Store both observers
     window.programSelectionInputObserver = inputObserver;
     
-    console.log('✅ Set up MutationObserver to protect program selection');
 }
 
 function updateConfirmButton() {
@@ -7428,7 +7111,6 @@ window.restoreProgramSelection = function() {
                 names: savedNames
             };
             
-            console.log('✅ Restored program selection:', savedIds);
             return true;
         }
     }
@@ -7466,7 +7148,6 @@ function startProgramSelectionMonitor() {
                     programSelectText.textContent = displayText;
                 }
                 
-                console.log('🔧 Restored program selection from monitor');
             }
         }
     }, 500);
@@ -7517,7 +7198,6 @@ function startProgramSelectionMonitor() {
                     programSelectText.textContent = displayText;
                 }
                 
-                console.log('🔧 Restored program selection from monitor');
             }
         }
     }, 500);
@@ -7539,7 +7219,6 @@ function startProgramSelectionMonitor() {
 
 // Success/Error modal functions
 function showCourseSuccessModal(courseData) {
-    console.log('showCourseSuccessModal called with:', courseData);
     const modal = document.getElementById('courseSuccessModal');
     if (modal) {
         const codeEl = document.getElementById('successCourseCode');
@@ -7548,7 +7227,6 @@ function showCourseSuccessModal(courseData) {
         if (nameEl) nameEl.textContent = courseData.course_name || '';
         modal.style.display = 'flex';
         modal.style.zIndex = '10002';
-        console.log('Success modal displayed');
     } else {
         console.error('courseSuccessModal element not found!');
     }
@@ -7568,10 +7246,8 @@ function closeCourseSuccessModal() {
 // Close draft saved modal function (accessible globally)
 // Override the early definition with full implementation
 window.closeCourseDraftSavedModal = function() {
-    console.log('🔴 closeCourseDraftSavedModal called (full implementation)');
     const modal = document.getElementById('courseDraftSavedModal');
     if (modal) {
-        console.log('✅ Modal found, closing...');
         modal.setAttribute('style', 
             'display: none !important; ' +
             'z-index: 10020 !important; ' +
@@ -7597,7 +7273,6 @@ window.closeCourseDraftSavedModal = function() {
         delete window.courseSelectionContext.isResumingDraft;
         delete window.courseSelectionContext.proposalId;
     }
-    console.log('📝 Cleared all draft-related state after saving draft');
     
     // Close the main course modal after closing the success modal
     if (typeof closeAddCourseModal === 'function') {
@@ -7606,7 +7281,6 @@ window.closeCourseDraftSavedModal = function() {
     
     // Refresh the course proposals section if on dashboard
     if (typeof initializeCourseProposals === 'function') {
-        console.log('Refreshing course proposals after draft save...');
         initializeCourseProposals();
     }
     
@@ -7622,7 +7296,6 @@ function closeCourseDraftSavedModal() {
 
 // Override placeholder with full implementation - this MUST override the placeholder
 window.showCourseDraftSavedModal = function(courseData) {
-    console.log('💾 Showing draft saved modal (FULL IMPLEMENTATION - placeholder overridden)...', courseData);
     
     // Function to actually show the modal
     function showModal() {
@@ -7682,7 +7355,6 @@ window.showCourseDraftSavedModal = function(courseData) {
                 const parent = modal.parentElement;
                 const parentStyle = window.getComputedStyle(parent);
                 if (parentStyle.display === 'none' || parentStyle.visibility === 'hidden') {
-                    console.log('Moving modal to body');
                     document.body.appendChild(modal);
                 }
             }
@@ -7719,9 +7391,6 @@ window.showCourseDraftSavedModal = function(courseData) {
             // Force a reflow to ensure styles are applied
             void modal.offsetHeight;
             
-            console.log('✅ Modal display set to:', modal.style.display);
-            console.log('✅ Modal z-index:', modal.style.zIndex);
-            console.log('✅ Modal visibility:', modal.style.visibility);
             
             // Verify visibility immediately and retry if needed
             const computed = window.getComputedStyle(modal);
@@ -7732,7 +7401,6 @@ window.showCourseDraftSavedModal = function(courseData) {
                 modal.style.zIndex = '10020';
                 modal.style.opacity = '1';
             } else {
-                console.log('✅ Draft saved modal is visible');
             }
             
             // Double-check after a brief delay
@@ -7745,7 +7413,6 @@ window.showCourseDraftSavedModal = function(courseData) {
                     modal.style.zIndex = '10020';
                     modal.style.opacity = '1';
                 } else {
-                    console.log('✅ Draft saved modal confirmed visible');
                 }
             }, 50);
             
@@ -7770,14 +7437,12 @@ window.showCourseDraftSavedModal = function(courseData) {
                 newCloseBtn.addEventListener('click', function(e) {
                     e.preventDefault();
                     e.stopPropagation();
-                    console.log('✅ Close button clicked via event listener');
                     if (typeof closeCourseDraftSavedModal === 'function') {
                         closeCourseDraftSavedModal();
                     } else if (typeof window.closeCourseDraftSavedModal === 'function') {
                         window.closeCourseDraftSavedModal();
                     }
                 });
-                console.log('✅ Close button event listener attached');
             }
             
             if (okBtn) {
@@ -7789,14 +7454,12 @@ window.showCourseDraftSavedModal = function(courseData) {
                 newOkBtn.addEventListener('click', function(e) {
                     e.preventDefault();
                     e.stopPropagation();
-                    console.log('✅ OK button clicked via event listener');
                     if (typeof closeCourseDraftSavedModal === 'function') {
                         closeCourseDraftSavedModal();
                     } else if (typeof window.closeCourseDraftSavedModal === 'function') {
                         window.closeCourseDraftSavedModal();
                     }
                 });
-                console.log('✅ OK button event listener attached');
             }
             
         } catch (error) {
@@ -7813,18 +7476,14 @@ window.showCourseDraftSavedModal = function(courseData) {
 };
 
 // Confirm function is loaded
-console.log('✅ showCourseDraftSavedModal function defined:', typeof window.showCourseDraftSavedModal);
-console.log('✅ closeCourseDraftSavedModal function defined:', typeof window.closeCourseDraftSavedModal);
 
 function showCourseErrorModal(errorMessage) {
-    console.log('showCourseErrorModal called with:', errorMessage);
     const modal = document.getElementById('courseErrorModal');
     if (modal) {
         const errorEl = document.getElementById('errorMessage');
         if (errorEl) errorEl.textContent = errorMessage;
         modal.style.display = 'flex';
         modal.style.zIndex = '10002';
-        console.log('Error modal displayed');
     } else {
         console.error('courseErrorModal element not found!');
     }
@@ -7883,7 +7542,6 @@ document.getElementById('programSearch')?.addEventListener('input', function(e) 
     filterPrograms(e.target.value);
 });
 
-console.log('✅ Multi-step Course Proposal Form Loaded');
 
 // The onclick handlers in the HTML should work - no need for additional event listeners
 </script> 

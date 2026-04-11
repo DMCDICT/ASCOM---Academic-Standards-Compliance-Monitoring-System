@@ -7,16 +7,10 @@ set_error_handler(function($severity, $message, $file, $line) {
 
 try {
     // Log the incoming POST data for debugging
-    error_log("=== COURSE CREATION DEBUG START ===");
-    error_log("File reached: process_add_course.php");
-    error_log("POST data: " . print_r($_POST, true));
-    error_log("Session status: " . session_status());
     
     // Include session configuration
     $sessionConfigPath = dirname(__FILE__) . '/../session_config.php';
-    error_log("Looking for session config at: $sessionConfigPath");
     if (!file_exists($sessionConfigPath)) {
-        error_log("Session config file not found at: $sessionConfigPath");
         throw new Exception('Session configuration file not found');
     }
     require_once $sessionConfigPath;
@@ -27,19 +21,14 @@ try {
     }
     
     // Debug: Log session data
-    error_log("Session data after start: " . print_r($_SESSION, true));
     
     // Check if user is logged in as dean
     if (!isset($_SESSION['dean_logged_in']) || !$_SESSION['dean_logged_in']) {
-        error_log("ERROR: User not logged in as dean");
-        error_log("dean_logged_in: " . ($_SESSION['dean_logged_in'] ?? 'not set'));
         throw new Exception('Unauthorized access - Dean role required');
     }
     
     // Check if selected role is dean
     if (!isset($_SESSION['selected_role']) || $_SESSION['selected_role']['type'] !== 'dean') {
-        error_log("ERROR: Selected role is not dean");
-        error_log("selected_role: " . print_r($_SESSION['selected_role'] ?? 'not set', true));
         throw new Exception('Unauthorized access - Dean role required');
     }
     
@@ -48,10 +37,8 @@ try {
     
     // Debug: Check database connection
     if (!isset($pdo) || $pdo === null) {
-        error_log("ERROR: Database connection failed - \$pdo is null");
         throw new Exception('Database connection failed');
     }
-    error_log("Database connection: OK");
     
     // Get form data
     $courseCode = trim($_POST['course_code'] ?? '');
@@ -63,14 +50,6 @@ try {
     $selectedPrograms = trim($_POST['programs'] ?? '');
     
     // Debug: Log form data
-    error_log("Form data received:");
-    error_log("- Course Code: '$courseCode'");
-    error_log("- Course Name: '$courseName'");
-    error_log("- Units: $units");
-    error_log("- Year Level: '$yearLevel'");
-    error_log("- School Term: '$schoolTerm'");
-    error_log("- School Year: '$schoolYear'");
-    error_log("- Selected Programs: '$selectedPrograms'");
     
     // Validate required fields
     if (empty($courseCode)) {
@@ -102,16 +81,13 @@ try {
     // If department_id is not available, get it from department_code
     if (!$deanDepartmentId && isset($_SESSION['selected_role']['department_code'])) {
         $deptCode = $_SESSION['selected_role']['department_code'];
-        error_log("Getting department ID for code: $deptCode");
         $deptQuery = "SELECT id FROM departments WHERE department_code = ?";
         $deptStmt = $pdo->prepare($deptQuery);
         $deptStmt->execute([$deptCode]);
         $deptResult = $deptStmt->fetch(PDO::FETCH_ASSOC);
         if ($deptResult) {
             $deanDepartmentId = $deptResult['id'];
-            error_log("Found department ID: $deanDepartmentId");
         } else {
-            error_log("No department found for code: $deptCode");
         }
     }
     
@@ -192,7 +168,6 @@ try {
                 ]);
                 
                 $courseId = $libraryCourseId;
-                error_log("Updated library course ID $libraryCourseId with program_id $programId");
             } else {
                 // For subsequent programs or if no library course exists, create new entry
                 $insertQuery = "INSERT INTO courses (
@@ -222,7 +197,6 @@ try {
                 ]);
                 
                 $courseId = $pdo->lastInsertId();
-                error_log("Created new course ID $courseId for program_id $programId");
             }
             
             $createdCourses[] = [
@@ -254,8 +228,6 @@ try {
     
 } catch (Exception $e) {
     ob_end_clean();
-    error_log("EXCEPTION CAUGHT: " . $e->getMessage());
-    error_log("Stack trace: " . $e->getTraceAsString());
     http_response_code(500);
     
     // Return detailed error for debugging

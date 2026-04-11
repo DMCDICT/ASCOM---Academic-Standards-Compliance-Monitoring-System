@@ -86,7 +86,6 @@
 
   // Function to initialize settings page (can be called from global.js)
   window.initializeSettingsPage = function() {
-    console.log('Initializing settings page...');
     
     const accountCard = document.getElementById('accountCard');
     const mainContent = document.getElementById('settingsMainContent');
@@ -104,9 +103,7 @@
         accountCard.style.boxShadow = '0 2px 8px rgba(0,0,0,0.03)';
       });
       
-      console.log('Settings page initialized successfully');
     } else {
-      console.log('Settings page elements not found');
     }
   };
 

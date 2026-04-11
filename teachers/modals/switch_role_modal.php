@@ -123,7 +123,6 @@ function validatePassword() {
   const password = document.getElementById('switch_role_password').value;
   const confirmBtn = document.getElementById('confirmSwitchRoleBtn');
   
-  console.log('Password length:', password.length, 'Password:', password);
   
   // Enable button only if password has 8 or more characters
   if (password.length >= 8) {
@@ -132,14 +131,12 @@ function validatePassword() {
     confirmBtn.style.opacity = '1';
     confirmBtn.style.cursor = 'pointer';
     confirmBtn.style.pointerEvents = 'auto';
-    console.log('Button enabled');
   } else {
     confirmBtn.disabled = true;
     confirmBtn.setAttribute('disabled', 'disabled');
     confirmBtn.style.opacity = '0.5';
     confirmBtn.style.cursor = 'not-allowed';
     confirmBtn.style.pointerEvents = 'none';
-    console.log('Button disabled');
   }
 }
 

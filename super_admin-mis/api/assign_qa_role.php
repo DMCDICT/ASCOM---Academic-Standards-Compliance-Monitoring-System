@@ -133,7 +133,6 @@ try {
     }
     
 } catch (Exception $e) {
-    error_log("Error in assign_qa_role.php: " . $e->getMessage());
     echo json_encode([
         'success' => false, 
         'message' => 'Failed to assign Quality Assurance role: ' . $e->getMessage()
