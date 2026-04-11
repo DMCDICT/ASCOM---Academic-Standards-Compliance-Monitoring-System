@@ -1,30 +1,15 @@
 <?php
-// Ensure we use the unified session configuration across the app
-require_once 'session_config.php';
-
-// Start the configured session (ASCOM_SESSION)
-if (session_status() == PHP_SESSION_NONE) {
-    session_start();
-}
-
-// If there was a previous user session, mark offline and reset
-$employee_no = $_SESSION['employee_no'] ?? null;
-if ($employee_no && $employee_no !== 'SUPER_ADMIN') {
-    updateUserForcedLogout($employee_no);
-    // Clear and restart session with same configuration
+// Clear any existing sessions to prevent conflicts
+if (session_status() == PHP_SESSION_ACTIVE) {
     session_destroy();
-    configureExtendedSession();
-    session_start();
 }
-
-// Rest of the login page code...
 ?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>User Login - ASCOM Monitoring System</title>
+  <title>Super Admin Login - ASCOM Monitoring System</title>
   <style>
     @font-face {
   font-family: 'TT Interphases';
@@ -43,15 +28,7 @@ if ($employee_no && $employee_no !== 'SUPER_ADMIN') {
       justify-content: center;
       align-items: center;
       margin: 0;
-    }
-
-    .corner-image {
-      position: fixed;
-      bottom: 0;
-      right: 0;
-      width: 800px;
-      height: auto;
-      z-index: 1;
+      flex-direction: column;
     }
 
     .overlay {
@@ -61,27 +38,48 @@ if ($employee_no && $employee_no !== 'SUPER_ADMIN') {
       width: 100%;
       height: 100%;
       background: rgba(0, 37, 24, 0.6);
-      z-index: 2;
+      z-index: 1;
+    }
+
+    .logo-container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 40px;
+      z-index: 3;
+      position: relative;
     }
 
     .logo-image {
-      position: absolute;
-      top: 50px;
-      left: 50%;
-      transform: translateX(-50%);
       width: 280px;
+      height: auto;
+      margin-bottom: 20px;
+      z-index: 3;
+      position: relative;
+    }
+
+    .portal-label {
+      color: white;
+      font-size: 22px;
+      font-weight: bold;
+      letter-spacing: 2px;
+      margin-top: 5px;
+      text-shadow: 0px 2px 4px rgba(0, 0, 0, 0.3);
+      position: relative;
       z-index: 3;
     }
 
     .login-container {
       position: relative;
       z-index: 3;
-      margin-top: 150px;
       background: rgba(217, 217, 217, 0.1);
       backdrop-filter: blur(35px);
       padding: 25px;
       border-radius: 20px;
       box-shadow: 0px 4px 20px rgba(0, 0, 0, 0.2);
+      width: 100%;
+      max-width: 400px;
     }
 
     input {
@@ -207,21 +205,35 @@ if ($employee_no && $employee_no !== 'SUPER_ADMIN') {
     .hidden-behind-popup {
       visibility: hidden;
     }
+
+    .error-message {
+      color: #ff6b6b;
+      margin: 10px 0;
+      font-size: 16px;
+    }
   </style>
 </head>
 <body>
 
-  <img src="src/assets/images/scc_buena_building.png" alt="SCC Building" class="corner-image" id="buildingImage">
   <div class="overlay" id="mainOverlay"></div>
-  <img src="src/assets/images/ASCOM_Monitoring_System.png" alt="Logo" class="logo-image" id="logoImage">
 
-      <div class="login-container" id="loginContainer">
-    <form id="loginForm" action="user_auth.php" method="POST">
+  <div class="logo-container">
+    <img src="src/assets/images/ASCOM_Monitoring_System.png" alt="Logo" class="logo-image" id="logoImage">
+    <div class="portal-label">Super Admin Portal</div>
+  </div>
+
+  <div class="login-container" id="loginContainer">
+    <form id="loginForm" action="super_admin_auth.php" method="POST">
       <input type="text" id="username" name="username" placeholder="Enter Email" required>
       <div class="password-container">
         <input type="password" id="password" name="password" placeholder="Enter Password" required>
         <img src="src/assets/icons/hide_password.png" alt="Toggle Password" id="togglePassword" class="toggle-password">
       </div>
+      
+      <?php if (isset($_GET['error'])): ?>
+        <!-- Removed redundant error message label below password field -->
+      <?php endif; ?>
+      
       <button type="submit" id="loginButton" disabled>Login</button>
     </form>
     
@@ -248,7 +260,6 @@ if ($employee_no && $employee_no !== 'SUPER_ADMIN') {
     const closePopupBtn = document.getElementById("closePopupBtn");
     const errorPopupText = document.getElementById("errorPopupText");
 
-    const buildingImage = document.getElementById("buildingImage");
     const logoImage = document.getElementById("logoImage");
     const loginContainer = document.getElementById("loginContainer");
     const mainOverlay = document.getElementById("mainOverlay");
@@ -287,44 +298,17 @@ if ($employee_no && $employee_no !== 'SUPER_ADMIN') {
       }, 1000);
     }
 
-    // Add form submission debugging
-    document.getElementById("loginForm").addEventListener("submit", function(e) {
-      console.log("Form submitted!");
-      console.log("Username:", usernameInput.value);
-      console.log("Password length:", passwordInput.value.length);
-      
-      // Don't prevent default - let it submit normally
-      // This will help us see if the form is actually submitting
-    });
-
     window.addEventListener('DOMContentLoaded', () => {
       const urlParams = new URLSearchParams(window.location.search);
       const error = urlParams.get('error');
-      const captchaVerified = urlParams.get('captcha_verified');
-      const username = urlParams.get('username');
 
       if (error === 'invalid_credentials') {
         errorPopupText.textContent = "Incorrect username or password. Please try again.";
         showErrorPopupWithTimer();
-      } else if (error === 'account_disabled') {
-        errorPopupText.textContent = "Account is disabled. Please contact administrator.";
-        showErrorPopupWithTimer();
-      }
-
-      // Handle CAPTCHA verification success
-      if (captchaVerified === 'true' && username) {
-        // Pre-fill username field
-        usernameInput.value = decodeURIComponent(username);
-        // Enable login button if password is also filled
-        validateInputs();
-        // Show success message
-        errorPopupText.textContent = "CAPTCHA verification successful! You can now proceed with login.";
-        errorPopupText.style.color = "#28a745";
-        showErrorPopupWithTimer();
       }
 
       // Remove query parameters from the URL
-      if (error || captchaVerified) {
+      if (error) {
         history.replaceState(null, "", window.location.pathname);
       }
     });

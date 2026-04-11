@@ -5,7 +5,7 @@ require_once 'super_admin-mis/includes/db_connection.php';
 require_once 'bootstrap/auth.php';
 
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-    header('Location: index.php');
+    header('Location: super_admin_login.php');
     exit;
 }
 
@@ -13,7 +13,7 @@ $username = isset($_POST['username']) ? trim($_POST['username']) : '';
 $password = $_POST['password'] ?? '';
 
 if ($username === '' || $password === '') {
-    header('Location: index.php?error=invalid_credentials');
+    header('Location: super_admin_login.php?error=invalid_credentials');
     exit;
 }
 
@@ -26,7 +26,7 @@ try {
     $stmt->close();
 
     if (!$admin) {
-        header('Location: index.php?error=invalid_credentials');
+        header('Location: super_admin_login.php?error=invalid_credentials');
         exit;
     }
 
@@ -42,7 +42,7 @@ try {
     );
 
     if (!$verified) {
-        header('Location: index.php?error=invalid_credentials');
+        header('Location: super_admin_login.php?error=invalid_credentials');
         exit;
     }
 
@@ -64,6 +64,6 @@ try {
     exit;
 } catch (Throwable $e) {
     error_log('Super admin login failed: ' . $e->getMessage());
-    header('Location: index.php?error=invalid_credentials');
+    header('Location: super_admin_login.php?error=invalid_credentials');
     exit;
 }

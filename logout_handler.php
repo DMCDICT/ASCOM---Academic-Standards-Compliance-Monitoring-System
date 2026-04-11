@@ -31,7 +31,7 @@ updateUserLogoutStatus($employeeNo);
 $_SESSION = [];
 session_destroy();
 
-$redirectUrl = $userRole === 'super_admin' ? 'index.php' : 'user_login.php';
+$redirectUrl = $userRole === 'super_admin' ? 'super_admin_login.php' : 'user_login.php';
 
 if (
     isset($_SERVER['HTTP_X_REQUESTED_WITH']) &&

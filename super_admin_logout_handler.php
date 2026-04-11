@@ -41,12 +41,12 @@ if (isset($_SERVER['HTTP_X_REQUESTED_WITH']) && $_SERVER['HTTP_X_REQUESTED_WITH'
     echo json_encode([
         'success' => true,
         'message' => 'Super Admin logged out successfully',
-        'redirect' => 'index.php'
+        'redirect' => 'super_admin_login.php'
     ]);
     exit;
 }
 
 // Redirect to Super Admin login page
-header("Location: index.php");
+header("Location: super_admin_login.php");
 exit();
 ?> 

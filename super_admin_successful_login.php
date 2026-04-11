@@ -7,7 +7,7 @@ if (session_status() === PHP_SESSION_NONE) {
 }
 
 if (!isSuperAdminAuthenticated()) {
-    header('Location: index.php');
+    header('Location: super_admin_login.php');
     exit();
 }
 

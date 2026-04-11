@@ -70,7 +70,9 @@ function handleSuperAdminAuthFailure(): void
 {
     $_SESSION = [];
     session_destroy();
-    header('Location: ../index.php');
+    $currentUrl = $_SERVER['REQUEST_URI'] ?? '';
+    $redirect = strpos($currentUrl, 'super_admin-mis') !== false ? '../super_admin_login.php' : 'super_admin_login.php';
+    header("Location: {$redirect}");
     exit();
 }
 

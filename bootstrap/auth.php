@@ -55,7 +55,7 @@ function ascom_authenticated_for_regular_user(): bool
     return !empty($_SESSION['is_authenticated']) && !empty($_SESSION['user_id']);
 }
 
-function ascom_require_super_admin(string $redirectPath = '../index.php'): void
+function ascom_require_super_admin(string $redirectPath = 'super_admin_login.php'): void
 {
     if (session_status() === PHP_SESSION_NONE) {
         session_start();

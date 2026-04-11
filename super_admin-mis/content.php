@@ -3,7 +3,7 @@ require_once dirname(__FILE__) . '/../super_admin_session_config.php';
 require_once dirname(__FILE__) . '/../bootstrap/auth.php';
 require_once dirname(__FILE__) . '/includes/db_connection.php';
 
-ascom_require_super_admin('../index.php');
+ascom_require_super_admin('../super_admin_login.php');
 secureSuperAdminSession();
 
 // Check if this is an AJAX request

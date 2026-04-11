@@ -108,7 +108,7 @@ function handleSessionTimeout(): void
         session_destroy();
 
         $currentUrl = $_SERVER['REQUEST_URI'] ?? '';
-        $redirect = strpos($currentUrl, 'super_admin-mis') !== false ? '../index.php' : '../user_login.php';
+        $redirect = strpos($currentUrl, 'super_admin-mis') !== false ? '../super_admin_login.php' : 'user_login.php';
         header("Location: {$redirect}");
         exit();
     }
