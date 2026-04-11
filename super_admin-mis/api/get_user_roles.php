@@ -114,7 +114,6 @@ try {
     ]);
     
 } catch (Exception $e) {
-    error_log("Error in get_user_roles.php: " . $e->getMessage());
     echo json_encode([
         'success' => false,
         'message' => 'Database error occurred'

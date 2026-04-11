@@ -26,9 +26,6 @@ try {
     $userId = $_SESSION['user_id'];
     $limit = isset($_GET['limit']) ? (int)$_GET['limit'] : 10; // Default to 10 for dashboard
     
-    error_log('=== get_course_proposals.php called ===');
-    error_log('User ID from session: ' . $userId);
-    error_log('Limit: ' . $limit);
     
     $proposals = [];
     $drafts = [];
@@ -41,35 +38,26 @@ try {
         // Check if course_drafts table exists
         $checkDraftsTable = $pdo->query("SHOW TABLES LIKE 'course_drafts'");
         if ($checkDraftsTable->rowCount() > 0) {
-            error_log('=== STARTING DRAFT FETCH ===');
-            error_log('User ID: ' . $userId . ' (type: ' . gettype($userId) . ')');
-            error_log('course_drafts table exists');
             
             // First, let's check ALL drafts to see what user_ids exist
             $allDraftsCheck = $pdo->query("SELECT id, user_id, program_id, term, academic_year FROM course_drafts LIMIT 10");
             $allDrafts = $allDraftsCheck->fetchAll(PDO::FETCH_ASSOC);
-            error_log('All drafts in table (first 10): ' . json_encode($allDrafts));
             
             // Also check if there are any drafts at all
             $totalDraftsCheck = $pdo->query("SELECT COUNT(*) as total FROM course_drafts");
             $totalDrafts = $totalDraftsCheck->fetch(PDO::FETCH_ASSOC);
-            error_log('Total drafts in table: ' . $totalDrafts['total']);
             
             // Check drafts for current user specifically
             $userDraftsCheck = $pdo->prepare("SELECT COUNT(*) as total FROM course_drafts WHERE user_id = ?");
             $userDraftsCheck->execute([$userId]);
             $userDrafts = $userDraftsCheck->fetch(PDO::FETCH_ASSOC);
-            error_log('Drafts for current user (' . $userId . '): ' . $userDrafts['total']);
             
             // First, let's check the actual user_id type in the database
             $checkUserIdStmt = $pdo->prepare("SELECT id, user_id, CAST(user_id AS CHAR) as user_id_str FROM course_drafts WHERE user_id = ? LIMIT 1");
             $checkUserIdStmt->execute([$userId]);
             $checkUserIdResult = $checkUserIdStmt->fetch(PDO::FETCH_ASSOC);
-            error_log('Direct user_id check: ' . json_encode($checkUserIdResult));
-            error_log('Session user_id type: ' . gettype($userId) . ', value: ' . $userId);
             
             // Try query without JOIN first (more reliable)
-            error_log('Trying simple query without JOIN...');
             $draftsQuerySimple = "
                 SELECT 
                     id,
@@ -91,26 +79,20 @@ try {
             $draftsStmtSimple->execute([$userId, $limit]);
             $drafts = $draftsStmtSimple->fetchAll(PDO::FETCH_ASSOC);
             
-            error_log('Simple query returned ' . count($drafts) . ' drafts');
             
             // If still no results, try with string comparison
             if (count($drafts) === 0) {
-                error_log('⚠️ No results with int comparison, trying string comparison...');
                 $draftsStmtSimple->execute([(string)$userId, $limit]);
                 $drafts = $draftsStmtSimple->fetchAll(PDO::FETCH_ASSOC);
-                error_log('String query returned ' . count($drafts) . ' drafts');
             }
             
             // If still no results, try without WHERE clause to see all drafts
             if (count($drafts) === 0) {
-                error_log('⚠️ Still no results, checking all drafts...');
                 $allDraftsStmt = $pdo->query("SELECT id, user_id, CAST(user_id AS CHAR) as user_id_str FROM course_drafts LIMIT 5");
                 $allDrafts = $allDraftsStmt->fetchAll(PDO::FETCH_ASSOC);
-                error_log('All drafts in table: ' . json_encode($allDrafts));
                 
                 // If there's exactly 1 draft, use it regardless of user_id (temporary fix)
                 if (count($allDrafts) === 1) {
-                    error_log('⚠️ TEMPORARY FIX: Using the only draft in database');
                     $anyDraftStmt = $pdo->query("
                         SELECT 
                             id,
@@ -127,12 +109,9 @@ try {
                         LIMIT 1
                     ");
                     $drafts = $anyDraftStmt->fetchAll(PDO::FETCH_ASSOC);
-                    error_log('Got draft with user_id: ' . ($drafts[0]['user_id'] ?? 'N/A'));
-                    error_log('Draft count after temp fix: ' . count($drafts));
                 } else {
                     // Even if there are multiple, if total_drafts_for_user is 1, there's a query issue
                     // So let's try to get it anyway
-                    error_log('⚠️ Multiple drafts exist, but user should have 1. Trying to get it...');
                     $forceStmt = $pdo->query("
                         SELECT 
                             id,
@@ -151,7 +130,6 @@ try {
                     ");
                     $forceStmt->execute([$userId]);
                     $drafts = $forceStmt->fetchAll(PDO::FETCH_ASSOC);
-                    error_log('Force query returned: ' . count($drafts) . ' drafts');
                 }
             }
             
@@ -171,26 +149,20 @@ try {
                                 $draft['program_name'] = $program['program_name'];
                             }
                         } catch (Exception $e) {
-                            error_log('Error fetching program: ' . $e->getMessage());
                         }
                     }
                 }
                 unset($draft); // Break reference
                 
-                error_log('✅ Final drafts count after adding program info: ' . count($drafts));
                 if (count($drafts) > 0) {
-                    error_log('First draft: ID=' . $drafts[0]['id'] . ', user_id=' . $drafts[0]['user_id']);
                 }
             }
             
-            error_log('Found ' . count($drafts) . ' drafts for user ' . $userId);
             
             // If no drafts found for this user, try to find ANY draft (for debugging and temporary fix)
             if (count($drafts) === 0) {
-                error_log('⚠️ No drafts found for user ' . $userId . ', checking all drafts...');
                 $allDraftsCheck = $pdo->query("SELECT id, user_id FROM course_drafts LIMIT 5");
                 $allDrafts = $allDraftsCheck->fetchAll(PDO::FETCH_ASSOC);
-                error_log('All drafts in database: ' . json_encode($allDrafts));
                 
                 // TEMPORARY FIX: If there's only 1 draft total, use it regardless of user_id
                 // This helps debug the user_id mismatch issue
@@ -198,7 +170,6 @@ try {
                 $totalDrafts = $totalDraftsCheck->fetch(PDO::FETCH_ASSOC);
                 
                 if ($totalDrafts['total'] == 1) {
-                    error_log('⚠️ TEMPORARY FIX: Only 1 draft exists, using it regardless of user_id');
                     $anyDraftQuery = $pdo->query("
                         SELECT 
                             cd.id,
@@ -219,54 +190,36 @@ try {
                     ");
                     $anyDraft = $anyDraftQuery->fetch(PDO::FETCH_ASSOC);
                     if ($anyDraft) {
-                        error_log('⚠️ Using draft with user_id: ' . $anyDraft['user_id'] . ' (your session user_id: ' . $userId . ')');
                         $drafts = [$anyDraft]; // Use this draft even though user_id doesn't match
                     }
                 }
             }
             
             if (count($drafts) > 0) {
-                error_log('First draft ID: ' . $drafts[0]['id']);
-                error_log('First draft user_id: ' . $drafts[0]['user_id']);
-                error_log('First draft courses_data length: ' . strlen($drafts[0]['courses_data'] ?? ''));
             }
         } else {
-            error_log('course_drafts table does not exist');
             $drafts = [];
         }
     } catch (Exception $e) {
-        error_log('Error checking/fetching course_drafts: ' . $e->getMessage());
-        error_log('Stack trace: ' . $e->getTraceAsString());
         $drafts = [];
     }
     
-    error_log('Starting to process ' . count($drafts) . ' drafts...');
     
     foreach ($drafts as $draft) {
-        error_log('=== Processing draft ID: ' . $draft['id'] . ' ===');
         
         // Decode JSON data
         $rawData = $draft['courses_data'];
-        error_log('Raw data type: ' . gettype($rawData));
-        error_log('Raw data length: ' . strlen($rawData));
-        error_log('Raw data preview (first 300 chars): ' . substr($rawData, 0, 300));
         
         $coursesData = json_decode($rawData, true);
         
         // Log for debugging
         if (json_last_error() !== JSON_ERROR_NONE) {
-            error_log('❌ JSON decode error for draft ' . $draft['id'] . ': ' . json_last_error_msg());
-            error_log('JSON error code: ' . json_last_error());
-            error_log('Raw courses_data (first 500 chars): ' . substr($rawData, 0, 500));
-            error_log('Raw courses_data length: ' . strlen($rawData));
             
             // Try to fix common JSON issues
             $cleanedData = trim($rawData);
             if (substr($cleanedData, 0, 1) !== '[' && substr($cleanedData, 0, 1) !== '{') {
-                error_log('⚠️ Data does not start with [ or {, might be double-encoded');
                 $coursesData = json_decode($cleanedData, true);
                 if (json_last_error() !== JSON_ERROR_NONE) {
-                    error_log('Still failed after trim');
                     continue;
                 }
             } else {
@@ -274,40 +227,28 @@ try {
             }
         }
         
-        error_log('✅ JSON decoded successfully');
-        error_log('Decoded type: ' . gettype($coursesData));
         
         if (!is_array($coursesData)) {
-            error_log('⚠️ Draft ' . $draft['id'] . ' courses_data is not an array. Type: ' . gettype($coursesData));
             if (is_object($coursesData)) {
-                error_log('Converting object to array...');
                 $coursesData = (array)$coursesData;
             } else if (is_string($coursesData)) {
-                error_log('⚠️ Data is still a string, trying to decode again...');
                 $coursesData = json_decode($coursesData, true);
                 if (json_last_error() !== JSON_ERROR_NONE || !is_array($coursesData)) {
-                    error_log('❌ Still not an array after second decode');
                     continue;
                 }
             } else {
-                error_log('❌ Cannot convert to array, skipping');
                 continue;
             }
         }
         
         if (empty($coursesData)) {
-            error_log('⚠️ Draft ' . $draft['id'] . ' has empty courses_data array');
             // Don't skip - create a minimal proposal anyway
             $coursesData = [['course_code' => 'N/A', 'course_name' => 'Draft (empty)']];
         }
         
-        error_log('✅ Processing draft ' . $draft['id'] . ' with ' . count($coursesData) . ' course(s)');
         
         // Get first course for display
         $firstCourse = $coursesData[0] ?? [];
-        error_log('First course keys: ' . implode(', ', array_keys($firstCourse)));
-        error_log('First course code: ' . ($firstCourse['course_code'] ?? 'NOT SET'));
-        error_log('First course name: ' . ($firstCourse['course_name'] ?? 'NOT SET'));
         
         // Calculate totals
         $totalAttachments = 0;
@@ -352,16 +293,10 @@ try {
             '_rawCoursesData' => $coursesData
         ];
         
-        error_log('✅ Created proposal data for draft ' . $draft['id']);
-        error_log('Proposal ID: ' . $proposalData['id']);
-        error_log('Course count: ' . $proposalData['coursesCount']);
         
         $proposals[] = $proposalData;
-        error_log('✅ Added to proposals array. Total now: ' . count($proposals));
     }
     
-    error_log('=== Finished processing drafts ===');
-    error_log('Total proposals after processing drafts: ' . count($proposals));
     
     // 2. Fetch submitted proposals from course_proposals table (if it exists)
     try {
@@ -398,7 +333,6 @@ try {
             $submittedProposals = [];
         }
     } catch (Exception $e) {
-        error_log('Error checking/fetching course_proposals: ' . $e->getMessage());
         $submittedProposals = [];
     }
     
@@ -469,11 +403,6 @@ try {
     // Limit to requested number
     $proposals = array_slice($proposals, 0, $limit);
     
-    error_log('=== Final Results ===');
-    error_log('Total proposals to return: ' . count($proposals));
-    error_log('Drafts found in query: ' . count($drafts));
-    error_log('Drafts successfully processed: ' . count($proposals));
-    error_log('Proposals processed: ' . count($submittedProposals));
     
     // EMERGENCY FIX: If we know there's a draft but got 0 results, force load it
     $totalDraftsForUser = 0;
@@ -489,7 +418,6 @@ try {
     }
     
     if ($totalDraftsForUser > 0 && count($proposals) === 0) {
-        error_log('🚨 EMERGENCY FIX: Draft exists for user but query returned 0. Force loading...');
         
         // Force load the draft
         try {
@@ -512,7 +440,6 @@ try {
             $forceDrafts = $forceStmt->fetchAll(PDO::FETCH_ASSOC);
             
             if (count($forceDrafts) > 0) {
-                error_log('✅ Force query found ' . count($forceDrafts) . ' draft(s)');
                 $drafts = $forceDrafts;
                 
                 // Process them
@@ -581,20 +508,15 @@ try {
                             '_draftId' => $draft['id'],
                             '_rawCoursesData' => $coursesData
                         ];
-                        error_log('✅ Emergency fix: Added draft to proposals');
                     }
                 }
             }
         } catch (Exception $e) {
-            error_log('Error in emergency fix: ' . $e->getMessage());
         }
     }
     
     // If we found drafts but didn't process any, there's a problem
     if (count($drafts) > 0 && count($proposals) === 0) {
-        error_log('❌ CRITICAL: Found ' . count($drafts) . ' drafts but processed 0!');
-        error_log('This means all drafts were skipped during processing.');
-        error_log('Check the logs above for JSON decode errors or empty array issues.');
     }
     
     // Return response with debug info
@@ -668,7 +590,6 @@ try {
     echo json_encode($response);
     
 } catch (Exception $e) {
-    error_log('Error fetching course proposals: ' . $e->getMessage());
     http_response_code(500);
     echo json_encode([
         'success' => false,

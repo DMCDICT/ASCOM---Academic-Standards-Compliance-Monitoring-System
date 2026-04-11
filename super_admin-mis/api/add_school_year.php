@@ -8,7 +8,6 @@ header('Content-Type: application/json');
 
 // Enable error logging instead of display
 ini_set('log_errors', 1);
-ini_set('error_log', '../logs/php_errors.log');
 
 require_once '../includes/db_connection.php';
 
@@ -24,32 +23,24 @@ try {
         send_response('error', 'Database connection error.');
     }
     
-    error_log("Table check result: " . $table_check->num_rows);
     if ($table_check->num_rows === 0) {
-        error_log("school_years table does not exist");
         send_response('error', 'school_years table does not exist in the database.');
     } else {
-        error_log("school_years table exists");
         
         // Check table structure
         $structure = $conn->query("DESCRIBE school_years");
         if ($structure) {
-            error_log("Table structure:");
             while ($row = $structure->fetch_assoc()) {
-                error_log("Field: " . $row['Field'] . " Type: " . $row['Type']);
             }
         }
     }
 } catch (Exception $e) {
-    error_log("Database error: " . $e->getMessage());
     send_response('error', 'Database connection error.');
 }
 
 try {
     $jsonData = file_get_contents('php://input');
-    error_log("Received JSON data: " . $jsonData);
     $data = json_decode($jsonData);
-    error_log("Decoded data: " . print_r($data, true));
 
     if (!$data || !isset($data->school_year_label) || !isset($data->start_date) || !isset($data->end_date) || !isset($data->status)) {
         send_response('error', 'Invalid input data. Please fill out all fields.');
@@ -96,14 +87,12 @@ if ($overlap_stmt) {
 // Check if start_date and end_date fields exist in the table
 $field_check = $conn->query("SHOW COLUMNS FROM school_years LIKE 'start_date'");
 if (!$field_check) {
-    error_log("Field check error: " . $conn->error);
     send_response('error', 'Database error: Could not check table structure.');
 }
 $has_start_date = $field_check->num_rows > 0;
 
 $field_check = $conn->query("SHOW COLUMNS FROM school_years LIKE 'end_date'");
 if (!$field_check) {
-    error_log("Field check error: " . $conn->error);
     send_response('error', 'Database error: Could not check table structure.');
 }
 $has_end_date = $field_check->num_rows > 0;
@@ -126,14 +115,12 @@ if ($status === 'Active') {
     }
     
     if (!$update_result) {
-        error_log("Update error: " . $conn->error);
         send_response('error', 'Database error: Could not update existing school years.');
     }
 }
 
 if ($has_school_year_label && $has_status) {
     // Use new structure with school_year_label and status
-    error_log("Using new structure - school_year_label: $label, status: $status, start_date: $start_date, end_date: $end_date");
     
     // Convert status to proper format
     $status_value = ($status === 'Active') ? 'Active' : 'Inactive';
@@ -147,7 +134,6 @@ if ($has_school_year_label && $has_status) {
         $sql = "INSERT INTO school_years (school_year_label, year_start, year_end, start_date, end_date, status) VALUES (?, ?, ?, ?, ?, ?)";
         $stmt = $conn->prepare($sql);
         if ($stmt === false) { 
-            error_log("Prepare error: " . $conn->error);
             send_response('error', 'Server error: Could not prepare the statement. ' . $conn->error); 
         }
         $bind_result = $stmt->bind_param('siisss', $label, $year_start, $year_end, $start_date, $end_date, $status_value);
@@ -156,52 +142,42 @@ if ($has_school_year_label && $has_status) {
         $sql = "INSERT INTO school_years (school_year_label, start_date, end_date, status) VALUES (?, ?, ?, ?)";
         $stmt = $conn->prepare($sql);
         if ($stmt === false) { 
-            error_log("Prepare error: " . $conn->error);
             send_response('error', 'Server error: Could not prepare the statement. ' . $conn->error); 
         }
         $bind_result = $stmt->bind_param('ssss', $label, $start_date, $end_date, $status_value);
     }
     
     if (!$bind_result) {
-        error_log("Bind error: " . $stmt->error);
         send_response('error', 'Server error: Could not bind parameters.');
     }
 } elseif ($has_start_date && $has_end_date) {
     // Use old structure with year_start, year_end, start_date, end_date, is_active
-    error_log("Using old structure with date fields - year_start: $year_start, year_end: $year_end, start_date: $start_date, end_date: $end_date");
     $sql = "INSERT INTO school_years (year_start, year_end, start_date, end_date, is_active) VALUES (?, ?, ?, ?, ?)";
     $stmt = $conn->prepare($sql);
     if ($stmt === false) { 
-        error_log("Prepare error: " . $conn->error);
         send_response('error', 'Server error: Could not prepare the statement. ' . $conn->error); 
     }
     $bind_result = $stmt->bind_param('iissi', $year_start, $year_end, $start_date, $end_date, $is_active);
     if (!$bind_result) {
-        error_log("Bind error: " . $stmt->error);
         send_response('error', 'Server error: Could not bind parameters.');
     }
 } else {
     // Use only year fields if date fields don't exist
-    error_log("Using year fields only - year_start: $year_start, year_end: $year_end");
     $sql = "INSERT INTO school_years (year_start, year_end, is_active) VALUES (?, ?, ?)";
     $stmt = $conn->prepare($sql);
     if ($stmt === false) { 
-        error_log("Prepare error: " . $conn->error);
         send_response('error', 'Server error: Could not prepare the statement. ' . $conn->error); 
     }
     $bind_result = $stmt->bind_param('iii', $year_start, $year_end, $is_active);
     if (!$bind_result) {
-        error_log("Bind error: " . $stmt->error);
         send_response('error', 'Server error: Could not bind parameters.');
     }
 }
 
 $execute_result = $stmt->execute();
 if ($execute_result) {
-    error_log("School year inserted successfully");
     send_response('success', 'New school year has been added successfully!');
 } else {
-    error_log("Execute error: " . $stmt->error . ", MySQL errno: " . $conn->errno);
     // Check for duplicate entry error (MySQL error 1062)
     if ($conn->errno == 1062 || strpos($stmt->error, 'Duplicate entry') !== false) {
         send_response('error', 'This school year already exists.');
@@ -212,7 +188,6 @@ if ($execute_result) {
     $stmt->close();
     $conn->close();
 } catch (Exception $e) {
-    error_log("Unexpected error: " . $e->getMessage());
     // Check if this is a duplicate entry error
     if (strpos($e->getMessage(), 'Duplicate entry') !== false) {
         send_response('error', 'This school year already exists.');

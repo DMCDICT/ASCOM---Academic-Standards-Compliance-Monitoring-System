@@ -62,7 +62,6 @@ window.NOTIFICATIONS_API_BASE = '<?php echo rtrim(dirname(dirname($_SERVER["SCRI
 <script>
 // Simple, clean modal functions
 window.initializeFormEventListeners = function() {
-    console.log('✅ initializeFormEventListeners called');
     // Simple implementation - no complex logic
 };
 
@@ -71,7 +70,6 @@ window.initializeFormEventListeners = window.initializeFormEventListeners;
 
 // Success modal function
 function showSuccessModal(message) {
-    console.log("🎉 showSuccessModal called with message:", message);
     
     // Remove existing success modal if it exists
     const existingModal = document.getElementById('successModal');
@@ -183,33 +181,28 @@ function closeErrorModal() {
 
 // Define modal functions immediately so they're available for onclick handlers
 window.closeAddDepartmentModal = function() {
-    console.log('🎯 closeAddDepartmentModal called');
     const modal = document.getElementById('addDepartmentModal');
     if (modal) {
         modal.style.display = 'none';
         // Re-enable body scroll
         document.body.style.overflow = 'auto';
-        console.log('✅ Modal closed');
     } else {
         console.error('❌ Modal not found for closing');
     }
 };
 
 window.closeSuccessModal = function() {
-    console.log('🎯 closeSuccessModal called');
     const modal = document.getElementById('successModal');
     if (modal) {
         modal.style.display = 'none';
         // Re-enable body scroll
         document.body.style.overflow = 'auto';
-        console.log('✅ Success modal closed');
     } else {
         console.error('❌ Success modal not found');
     }
 };
 
 window.openSuccessModal = function(message) {
-    console.log('🎯 openSuccessModal called with message:', message);
     const modal = document.getElementById('successModal');
     const messageElement = document.getElementById('successMessage');
     if (modal && messageElement) {
@@ -217,7 +210,6 @@ window.openSuccessModal = function(message) {
         modal.style.display = 'flex';
         // Disable body scroll
         document.body.style.overflow = 'hidden';
-        console.log('✅ Success modal opened');
     } else {
         console.error('❌ Success modal or message element not found');
     }
@@ -227,7 +219,6 @@ window.openSuccessModal = function(message) {
 
 window.handleDepartmentFormSubmit = function(event) {
     event.preventDefault();
-    console.log('🎯 Form submission started');
     
     // Check if button is disabled
     const createBtn = event.target.querySelector(".create-btn");
@@ -241,7 +232,6 @@ window.handleDepartmentFormSubmit = function(event) {
     const departmentName = formData.get('department_name');
     const colorCode = formData.get('color_code');
     
-    console.log('Form data:', { departmentCode, departmentName, colorCode });
     
     // Submit to backend
     fetch('./process_add_department.php', {
@@ -249,7 +239,6 @@ window.handleDepartmentFormSubmit = function(event) {
         body: formData
     })
     .then(response => {
-        console.log('📥 Response status:', response.status);
         if (!response.ok) {
             return response.text().then(text => {
                 console.error('❌ HTTP error response:', text);
@@ -259,10 +248,8 @@ window.handleDepartmentFormSubmit = function(event) {
         return response.json();
     })
     .then(data => {
-        console.log('📥 Response data:', data);
         
         if (data.success) {
-            console.log('✅ Department created successfully');
             closeAddDepartmentModal();
             openSuccessModal(data.message);
             
@@ -272,7 +259,6 @@ window.handleDepartmentFormSubmit = function(event) {
             // Update UI if department container exists
             const departmentContainer = document.getElementById('departmentContainer');
             if (departmentContainer && data.department) {
-                console.log('🔧 Adding department to UI:', data.department);
                 const newDept = data.department;
                 const newCard = document.createElement('div');
                 newCard.className = 'department-card';
@@ -318,7 +304,6 @@ window.handleDepartmentFormSubmit = function(event) {
 };
 
 window.initializeColorPicker = function() {
-    console.log('🎯 Initializing color picker');
     const colorPicker = document.getElementById('colorPicker');
     const colorHex = document.getElementById('colorHex');
     const colorSwatch = document.getElementById('colorSwatchDisplay');
@@ -352,7 +337,6 @@ window.initializeColorPicker = function() {
             });
         }
         
-        console.log('✅ Color picker initialized');
     } else {
         console.error('❌ Color picker elements not found');
     }
@@ -360,7 +344,6 @@ window.initializeColorPicker = function() {
 
 // Function to open the Add Department modal
 window.openAddDepartmentModal = function() {
-    console.log('🎯 Opening Add Department modal');
     const modal = document.getElementById('addDepartmentModal');
     if (modal) {
         modal.style.display = 'flex';
@@ -371,7 +354,6 @@ window.openAddDepartmentModal = function() {
         const form = document.getElementById('addDepartmentForm');
         if (form) {
             form.reset();
-            console.log('✅ Form reset successfully');
         }
         
         // Initialize color picker and form
@@ -385,7 +367,6 @@ window.openAddDepartmentModal = function() {
                 colorPicker.value = defaultColor;
                 colorHex.value = defaultColor;
                 colorSwatchDisplay.style.backgroundColor = defaultColor;
-                console.log('✅ Color elements set successfully');
             }
             
             if (typeof initializeColorPicker === 'function') {
@@ -394,7 +375,6 @@ window.openAddDepartmentModal = function() {
             
             if (typeof window.checkFormValidity === 'function') {
                 window.checkFormValidity();
-                console.log('✅ checkFormValidity called successfully');
             }
             
             // Re-initialize event listeners for form validation
@@ -444,11 +424,9 @@ window.openAddDepartmentModal = function() {
     }
 };
 
-console.log('✅ Modal functions defined at page load');
 
 // Account Access Management Functions
 window.openLibrarianAccessModal = function() {
-    console.log('🎯 Opening Librarian Access modal');
     // Disable body scroll
     document.body.style.overflow = 'hidden';
     
@@ -540,7 +518,6 @@ window.closeLibrarianAccessModal = function() {
 };
 
 window.openQualityAssuranceAccessModal = function() {
-    console.log('🎯 Opening Quality Assurance Access modal');
     // Disable body scroll
     document.body.style.overflow = 'hidden';
     
@@ -633,7 +610,6 @@ window.closeQualityAssuranceAccessModal = function() {
 
 // Helper functions for loading users
 function loadUsersForLibrarianAccess() {
-    console.log('🎯 Loading users for librarian access...');
     const usersList = document.getElementById('librarianUsersList');
     if (!usersList) return;
     
@@ -645,7 +621,6 @@ function loadUsersForLibrarianAccess() {
         .then(response => response.json())
         .then(data => {
             if (data.success) {
-                console.log('✅ Loaded', data.count, 'users for librarian access');
                 displayLibrarianUsers(data.users);
             } else {
                 console.error('❌ Failed to load users:', data.message);
@@ -659,7 +634,6 @@ function loadUsersForLibrarianAccess() {
 }
 
 function loadUsersForQAAccess() {
-    console.log('🎯 Loading users for QA access...');
     const usersList = document.getElementById('qaUsersList');
     if (!usersList) return;
     
@@ -671,7 +645,6 @@ function loadUsersForQAAccess() {
         .then(response => response.json())
         .then(data => {
             if (data.success) {
-                console.log('✅ Loaded', data.count, 'users for QA access');
                 displayQAUsers(data.users);
             } else {
                 console.error('❌ Failed to load users:', data.message);
@@ -752,7 +725,6 @@ function filterQAUsers(searchTerm) {
 
 // Assignment functions for individual users
 window.assignLibrarianAccessToUser = function(userId, userName) {
-    console.log('🎯 Assigning librarian access to user:', userName, 'ID:', userId);
     
     // Show loading state on the button
     const button = event.target;
@@ -795,7 +767,6 @@ window.assignLibrarianAccessToUser = function(userId, userName) {
 };
 
 window.assignQAAccessToUser = function(userId, userName) {
-    console.log('🎯 Assigning QA access to user:', userName, 'ID:', userId);
     
     // Show loading state on the button
     const button = event.target;
@@ -839,7 +810,6 @@ window.assignQAAccessToUser = function(userId, userName) {
 </script>
 
 <!-- Load dashboard.js immediately to avoid syntax errors -->
-<script src="./scripts/dashboard.js?v=<?php echo time(); ?>" onload="console.log('✅ dashboard.js loaded successfully')" onerror="console.error('❌ dashboard.js failed to load')"></script>
 
 <!-- Department Details Modal Functions -->
 <script>
@@ -848,7 +818,6 @@ let currentDepartmentData = null;
 
 // Function to open department details modal
 window.openDepartmentDetailsModal = function(deptIndex) {
-    console.log('🎯 Opening department details modal for index:', deptIndex);
     
     // Get department data from the PHP array (we'll need to make this available globally)
     const deptCards = document.querySelectorAll('.department-card');
@@ -926,7 +895,6 @@ window.setupTeacherSearchInput = function() {
         
         // Add event listener for teacher search input
         teacherSearchInput.addEventListener('input', function() {
-            console.log('🔍 Search input changed:', this.value);
             window.filterTeachers();
         });
         
@@ -941,9 +909,7 @@ window.setupTeacherSearchInput = function() {
             this.style.boxShadow = 'none';
         });
         
-        console.log('✅ Teacher search input event listener added');
     } else {
-        console.log('⚠️ Teacher search input not found');
     }
 };
 
@@ -957,18 +923,15 @@ window.closeDepartmentDetailsModal = function() {
 
 // Function to load current dean with title
 function loadCurrentDean(deptCode) {
-    console.log('🎯 Loading current dean for department:', deptCode);
     
     fetch(`./api/get_current_dean.php?dept_code=${encodeURIComponent(deptCode)}`)
         .then(response => {
-            console.log('Dean response status:', response.status);
             if (!response.ok) {
                 throw new Error(`HTTP error! status: ${response.status}`);
             }
             return response.json();
         })
         .then(data => {
-            console.log('Dean data:', data);
             
             if (data.success) {
                 document.getElementById('currentDean').textContent = data.dean_name;
@@ -984,7 +947,6 @@ function loadCurrentDean(deptCode) {
 
 // Function to load department teachers
 function loadDepartmentTeachers(deptCode) {
-    console.log('🎯 Loading teachers for department:', deptCode);
     
     // Store the department code for later use
     window.currentDepartmentCode = deptCode;
@@ -992,20 +954,16 @@ function loadDepartmentTeachers(deptCode) {
     // Fetch teachers from this department
     fetch(`./api/get_department_teachers.php?dept_code=${encodeURIComponent(deptCode)}`)
         .then(response => {
-            console.log('Response status:', response.status);
             if (!response.ok) {
                 throw new Error(`HTTP error! status: ${response.status}`);
             }
             return response.json();
         })
         .then(data => {
-            console.log('Teachers data:', data);
             
             // Store teachers data globally for search functionality
             window.allTeachers = data.success ? data.teachers : [];
             
-            console.log('🔍 Stored teachers:', window.allTeachers);
-            console.log('🔍 Teachers count:', window.allTeachers.length);
             
             // Display teachers
             displayFilteredTeachers(window.allTeachers);
@@ -1110,15 +1068,11 @@ function displayFilteredTeachers(teachers) {
 
 // Function to filter teachers based on search input
 window.filterTeachers = function() {
-    console.log('🔍 filterTeachers called');
     const searchInput = document.getElementById('teacherSearchInput');
     const searchTerm = searchInput ? searchInput.value.toLowerCase().trim() : '';
     
-    console.log('🔍 Search term:', searchTerm);
-    console.log('🔍 All teachers:', window.allTeachers);
     
     if (!window.allTeachers) {
-        console.log('⚠️ No teachers data available');
         return;
     }
     
@@ -1131,12 +1085,10 @@ window.filterTeachers = function() {
                        employeeNo.includes(searchTerm) || 
                        email.includes(searchTerm);
         
-        console.log(`🔍 Teacher: ${fullName}, Employee: ${employeeNo}, Email: ${email}, Matches: ${matches}`);
         
         return matches;
     });
     
-    console.log('🔍 Filtered teachers:', filteredTeachers);
     displayFilteredTeachers(filteredTeachers);
 };
 
@@ -1152,11 +1104,9 @@ window.toggleDeanAssignmentMode = function() {
     if (isDeanAssignmentMode) {
         assignBtn.textContent = 'Cancel Assignment Mode';
         assignBtn.style.backgroundColor = '#FF6B6B';
-        console.log('🎯 Entered dean assignment mode');
     } else {
         assignBtn.textContent = 'Assign a New Dean';
         assignBtn.style.backgroundColor = '#739AFF';
-        console.log('🎯 Exited dean assignment mode');
     }
     
     // Refresh the teachers list to show/hide assign buttons
@@ -1199,15 +1149,12 @@ window.confirmAssignDean = function() {
         return;
     }
     
-    console.log('🎯 Confirming dean assignment:', selectedTeacherForDean);
     
     const requestData = {
         department_code: currentDepartmentData.code,
         teacher_id: selectedTeacherForDean.id
     };
     
-    console.log('📤 Sending request to api/assign_department_dean.php');
-    console.log('📤 Request data:', requestData);
     
     // Send assignment request
     fetch('api/assign_department_dean.php', {
@@ -1218,12 +1165,9 @@ window.confirmAssignDean = function() {
         body: JSON.stringify(requestData)
     })
     .then(response => {
-        console.log('📥 Response status:', response.status);
-        console.log('📥 Response headers:', response.headers);
         return response.json();
     })
     .then(data => {
-        console.log('📥 Response data:', data);
         if (data.success) {
             // Reload current dean display with updated title
             loadCurrentDean(currentDepartmentData.code);
@@ -1281,7 +1225,6 @@ window.removeDepartmentDean = function() {
         return;
     }
     
-    console.log('🎯 Removing dean from department:', currentDepartmentData.code);
     
     // Send removal request
     fetch('api/remove_department_dean.php', {
@@ -1370,7 +1313,6 @@ function toggleSidebar() {
 }
 
 function openAddUserModal() {
-    console.log('=== openAddUserModal called ===');
     // Disable body scroll
     document.body.style.overflow = 'hidden';
     
@@ -1599,7 +1541,6 @@ function createCompleteModal() {
     `;
     
     document.body.appendChild(modal);
-    console.log('Modal added to DOM');
     
     // Apply dark mode styles if dark theme is active
     const currentTheme = document.documentElement.getAttribute('data-theme') || 'light';
@@ -1700,7 +1641,6 @@ function closeCompleteModal() {
         modal.remove();
         // Re-enable body scroll
         document.body.style.overflow = 'auto';
-        console.log('Complete modal removed');
     }
 }
 
@@ -1709,7 +1649,6 @@ function loadDepartmentsAndInitialize() {
     fetch('./api/get_departments.php')
         .then(response => response.json())
         .then(data => {
-            console.log('Departments loaded from database:', data);
             
             if (data.success && data.departments.length > 0) {
                 // Populate department dropdown with real data
@@ -1824,7 +1763,6 @@ function loadDepartmentsAndInitialize() {
     fetch('./api/get_departments.php')
         .then(response => response.json())
         .then(data => {
-            console.log('Departments loaded from database:', data);
             
             if (data.success && data.departments.length > 0) {
                 // Populate department dropdown with real data
@@ -2124,7 +2062,6 @@ function initializeModalFunctions() {
         addUserForm.addEventListener('submit', function(e) {
             e.preventDefault(); // Prevent default form submission
             
-            console.log('Form submission started');
             
             // Disable the submit button to prevent double submission
             const createBtn = document.getElementById('create_btn');
@@ -2144,7 +2081,6 @@ function initializeModalFunctions() {
                 body: formData
             })
             .then(response => {
-                console.log('Response received:', response);
                 // Check if response is JSON
                 const contentType = response.headers.get('content-type');
                 if (contentType && contentType.includes('application/json')) {
@@ -2158,7 +2094,6 @@ function initializeModalFunctions() {
                 }
             })
             .then(data => {
-                console.log('Response data:', data);
                 
                 if (data.success) {
                     // Show success modal
@@ -2264,7 +2199,6 @@ function closeCompleteModal() {
         modal.remove();
         // Re-enable body scroll
         document.body.style.overflow = 'auto';
-        console.log('Complete modal removed');
     }
 }
 
@@ -2741,14 +2675,11 @@ window.toggleTheme = function() {
     // Dark theme temporarily disabled - coming soon
     return;
     
-    console.log('Current theme:', currentTheme);
-    console.log('Switching to:', newTheme);
     
     // Set theme
     html.setAttribute('data-theme', newTheme);
     
     // Verify it was set
-    console.log('Theme attribute is now:', html.getAttribute('data-theme'));
     
     // Directly apply styles as fallback
     if (newTheme === 'dark') {
@@ -2993,7 +2924,6 @@ window.toggleTheme = function() {
     // Update icon
     updateThemeIcon(newTheme);
     
-    console.log('Theme switched to:', newTheme);
 }
 
 window.updateThemeIcon = function(theme) {
@@ -3126,7 +3056,6 @@ document.addEventListener('DOMContentLoaded', function() {
         updateThemeIcon('light');
     }
     
-    console.log('Theme loaded: light (dark theme disabled)');
 });
 </script>
 
@@ -3325,7 +3254,6 @@ $notifRead = array_filter($notifList, function($n) { return ($n['is_read'] ?? fa
     $sidebarState = isset($_GET['sidebar']) ? $_GET['sidebar'] : 'expanded';
     
     // DEBUG: Show what we're getting
-    echo "<!-- DEBUG: sidebarState = " . $sidebarState . " -->";
     ?>
     
     <script>
@@ -3373,19 +3301,14 @@ $notifRead = array_filter($notifList, function($n) { return ($n['is_read'] ?? fa
     
     // Simple tooltip system for collapsed sidebar
     function initializeTooltips() {
-        console.log('🎯 Initializing tooltips...');
         const navButtons = document.querySelectorAll('.nav-button');
-        console.log('🎯 Found', navButtons.length, 'nav buttons');
         let tooltip = null;
         
         navButtons.forEach(function(button, index) {
-            console.log('🎯 Setting up tooltip for button', index + 1);
             
             button.addEventListener('mouseenter', function() {
-                console.log('🎯 Mouse enter on button', index + 1);
                 const sidebar = document.getElementById('sidebar');
                 const isCollapsed = sidebar && sidebar.classList.contains('collapsed');
-                console.log('🎯 Sidebar collapsed:', isCollapsed);
                 
                 if (isCollapsed) {
                     const spanElement = button.querySelector('span:not(.nav-icon-wrapper)');
@@ -3394,7 +3317,6 @@ $notifRead = array_filter($notifList, function($n) { return ($n['is_read'] ?? fa
                         // Get innerHTML and replace <br> tags with spaces
                         tooltipText = spanElement.innerHTML.replace(/<br\s*\/?>/gi, ' ').replace(/\s+/g, ' ').trim();
                     }
-                    console.log('🎯 Tooltip text:', tooltipText);
                     
                     if (tooltip) tooltip.remove();
                     
@@ -3441,21 +3363,17 @@ $notifRead = array_filter($notifList, function($n) { return ($n['is_read'] ?? fa
                     tooltip.style.top = (rect.top + rect.height / 2 - 15) + 'px';
                     
                     document.body.appendChild(tooltip);
-                    console.log('🎯 Tooltip created and added to DOM');
                 }
             });
             
             button.addEventListener('mouseleave', function() {
-                console.log('🎯 Mouse leave on button', index + 1);
                 if (tooltip) {
                     tooltip.remove();
                     tooltip = null;
-                    console.log('🎯 Tooltip removed');
                 }
             });
         });
         
-        console.log('🎯 Tooltip initialization complete');
     }
     </script>
     
@@ -3563,21 +3481,15 @@ foreach ($modalFiles as $modalFile) {
 
 
 
-<script src="../super_admin_session_manager.js?v=1.1" onload="console.log('✅ super_admin_session_manager.js loaded')" onerror="console.error('❌ super_admin_session_manager.js failed to load')"></script>
-<script src="../scripts/global.js?v=<?php echo time(); ?>&ultra=1" onload="console.log('✅ global.js loaded')" onerror="console.error('❌ global.js failed to load')"></script>
 <script>
-console.log('=== Script Loading Test ===');
-console.log('About to load modal-add-department.js');
 
 // Define functions directly in global scope
-console.log('🔧 Defining modal functions in global scope...');
 
 // Wrap everything in a function to avoid global scope issues
 (function() {
 
 // Add Department Modal Functions
 window.openAddDepartmentModal = function() {
-    console.log('🎯 Opening Add Department modal');
     const modal = document.getElementById('addDepartmentModal');
     if (modal) {
         modal.style.display = 'flex';
@@ -3586,7 +3498,6 @@ window.openAddDepartmentModal = function() {
         const form = document.getElementById('addDepartmentForm');
         if (form) {
             form.reset();
-            console.log('✅ Form reset successfully');
         }
         
         // Initialize color picker and form
@@ -3600,7 +3511,6 @@ window.openAddDepartmentModal = function() {
                 colorPicker.value = defaultColor;
                 colorHex.value = defaultColor;
                 colorSwatchDisplay.style.backgroundColor = defaultColor;
-                console.log('✅ Color elements set successfully');
             }
             
             if (typeof initializeColorPicker === 'function') {
@@ -3609,7 +3519,6 @@ window.openAddDepartmentModal = function() {
             
             if (typeof window.checkFormValidity === 'function') {
                 window.checkFormValidity();
-                console.log('✅ checkFormValidity called successfully');
             }
             
             // Re-initialize event listeners for form validation
@@ -3665,7 +3574,6 @@ window.closeAddDepartmentModal = function() {
         modal.style.display = 'none';
         // Re-enable body scroll
         document.body.style.overflow = '';
-        console.log('✅ Add Department modal closed');
     }
 };
 
@@ -3678,7 +3586,6 @@ window.openSuccessModal = function(message) {
         successModal.style.zIndex = '10000';
         // Disable body scroll
         document.body.style.overflow = 'hidden';
-        console.log('✅ Success modal opened');
     }
 };
 
@@ -3688,7 +3595,6 @@ window.closeSuccessModal = function() {
         successModal.style.display = 'none';
         // Re-enable body scroll
         document.body.style.overflow = '';
-        console.log('✅ Success modal closed');
     }
 };
 
@@ -3700,7 +3606,6 @@ window.closeSuccessModal = function() {
 
     // Teacher Account Creation Functions
     window.openAddUserModal = function() {
-        console.log('=== DIRECT openAddUserModal called ===');
         if (typeof createCompleteModal === 'function') {
             createCompleteModal();
         } else {
@@ -3746,7 +3651,6 @@ window.closeSuccessModal = function() {
     };
 
     window.openAddUserSuccessModal = function(message) {
-        console.log('=== GLOBAL openAddUserSuccessModal called ===');
         const successMessage = document.getElementById('addUserSuccessMessage');
         const successModal = document.getElementById('addUserSuccessModal');
         
@@ -3754,7 +3658,6 @@ window.closeSuccessModal = function() {
             successMessage.innerText = message;
             successModal.style.display = 'flex';
             successModal.style.zIndex = '10000';
-            console.log('✅ Teacher account success modal opened');
         } else {
             console.error('❌ Teacher account success modal elements not found');
             alert('Success: ' + message);
@@ -3765,16 +3668,13 @@ window.closeSuccessModal = function() {
         const successModal = document.getElementById('addUserSuccessModal');
         if (successModal) {
             successModal.style.display = 'none';
-            console.log('✅ Teacher account success modal closed');
         }
     };
 
-    console.log('✅ All modal functions defined globally');
 }
 
 // Define functions immediately to prevent ReferenceError
 window.openAddDepartmentModal = function() {
-    console.log('=== IMMEDIATE openAddDepartmentModal called ===');
     const modal = document.getElementById('addDepartmentModal');
     if (modal) {
         modal.style.display = 'flex';
@@ -3790,13 +3690,11 @@ window.openAddDepartmentModal = function() {
         modal.style.justifyContent = 'center';
         modal.style.alignItems = 'center';
         
-        console.log('✅ Modal opened via immediate function with consistent styling');
         
         // Initialize form
         const form = document.getElementById('addDepartmentForm');
         if (form) {
             form.reset();
-            console.log('✅ Form reset successfully');
         }
         
         // Initialize color picker
@@ -3809,7 +3707,6 @@ window.openAddDepartmentModal = function() {
             colorPicker.value = defaultColor;
             colorHex.value = defaultColor;
             colorSwatchDisplay.style.backgroundColor = defaultColor;
-            console.log('✅ Color elements set successfully');
         }
         
         // Call checkFormValidity after a short delay to ensure DOM is ready
@@ -3821,19 +3718,16 @@ window.openAddDepartmentModal = function() {
                 createBtn.style.backgroundColor = '#4CAF50';
                 createBtn.style.color = 'white';
                 createBtn.style.cursor = 'pointer';
-                console.log('✅ Create button enabled for demonstration');
             }
             
             if (typeof window.checkFormValidity === 'function') {
                 window.checkFormValidity();
-                console.log('✅ checkFormValidity called successfully');
             } else {
                 console.error('❌ checkFormValidity function not available');
             }
         }, 50);
     } else {
         console.error('❌ Modal element not found in immediate function');
-        console.log('Available modals:', document.querySelectorAll('[id*="modal"]').length);
     }
 };
 
@@ -3843,7 +3737,6 @@ window.closeAddDepartmentModal = function() {
         modal.style.display = 'none';
         // Re-enable body scroll
         document.body.style.overflow = '';
-        console.log('✅ Modal closed via immediate function');
     }
 };
 
@@ -3853,7 +3746,6 @@ window.openSuccessModal = function(message) {
     if (successMessage && successModal) {
         successMessage.innerText = message;
         successModal.style.display = 'flex';
-        console.log('✅ Success modal opened via immediate function');
     }
 };
 
@@ -3861,7 +3753,6 @@ window.closeSuccessModal = function() {
     const successModal = document.getElementById('successModal');
     if (successModal) {
         successModal.style.display = 'none';
-        console.log('✅ Success modal closed via immediate function');
     }
 };
 
@@ -3869,7 +3760,6 @@ window.closeSuccessModal = function() {
 
 
 
-console.log('✅ All department modal functions defined immediately');
 
 // Function to check form validity for department creation
 // TEMPORARILY DISABLED FOR DEMONSTRATION - Button always enabled
@@ -3921,7 +3811,6 @@ window.checkFormValidity = function() {
         createBtn.style.cursor = 'not-allowed';
     }
     
-    console.log('Form validation check:', {
         otherFieldsFilled,
         isColorHexValid,
         isColorHexFormatValid,
@@ -3935,7 +3824,6 @@ window.checkFormValidity = function() {
 
 // Duplicate functions removed - using the ones defined earlier
 
-console.log('✅ All teacher account modal functions defined immediately');
 
 // REMOVED COMPLEX TOGGLE FUNCTION - USING SIMPLE APPROACH ABOVE
 
@@ -3945,7 +3833,6 @@ console.log('✅ All teacher account modal functions defined immediately');
 <script>
 // Initialize form validation listeners when DOM is ready
 document.addEventListener("DOMContentLoaded", function() {
-    console.log('🔧 Initializing department form validation...');
     
     const addDepartmentForm = document.getElementById("addDepartmentForm");
     if (addDepartmentForm) {
@@ -3993,7 +3880,6 @@ document.addEventListener("DOMContentLoaded", function() {
             window.checkFormValidity();
         }
         
-        console.log('✅ Department form validation initialized');
     } else {
         console.warn('⚠️ Department form not found during DOMContentLoaded');
     }
@@ -4001,19 +3887,15 @@ document.addEventListener("DOMContentLoaded", function() {
 
 // Force define the function if it's not available
 if (typeof window.openAddDepartmentModal === 'undefined') {
-    console.log('⚠️ openAddDepartmentModal not found, defining fallback...');
     window.openAddDepartmentModal = function() {
-        console.log('=== FALLBACK openAddDepartmentModal called ===');
         const modal = document.getElementById('addDepartmentModal');
         if (modal) {
             modal.style.display = 'flex';
-            console.log('✅ Modal opened via fallback function');
             
             // Initialize form
             const form = document.getElementById('addDepartmentForm');
             if (form) {
                 form.reset();
-                console.log('✅ Form reset successfully');
             }
             
             // Initialize color picker
@@ -4026,20 +3908,16 @@ if (typeof window.openAddDepartmentModal === 'undefined') {
                 colorPicker.value = defaultColor;
                 colorHex.value = defaultColor;
                 colorSwatchDisplay.style.backgroundColor = defaultColor;
-                console.log('✅ Color elements set successfully');
             }
             
             // Call checkFormValidity if available
             if (typeof window.checkFormValidity === 'function') {
                 window.checkFormValidity();
-                console.log('✅ checkFormValidity called successfully');
             }
         } else {
             console.error('❌ Modal element not found in fallback');
-            console.log('Available modals:', document.querySelectorAll('[id*="modal"]').length);
         }
     };
-    console.log('✅ Fallback openAddDepartmentModal defined');
 }
 
 // Also ensure other functions are available
@@ -4048,7 +3926,6 @@ if (typeof window.closeAddDepartmentModal === 'undefined') {
         const modal = document.getElementById('addDepartmentModal');
         if (modal) {
             modal.style.display = 'none';
-            console.log('✅ Modal closed via fallback function');
         }
     };
 }
@@ -4060,7 +3937,6 @@ if (typeof window.openSuccessModal === 'undefined') {
         if (successMessage && successModal) {
             successMessage.innerText = message;
             successModal.style.display = 'flex';
-            console.log('✅ Success modal opened via fallback function');
         }
     };
 }
@@ -4070,7 +3946,6 @@ if (typeof window.closeSuccessModal === 'undefined') {
         const successModal = document.getElementById('successModal');
         if (successModal) {
             successModal.style.display = 'none';
-            console.log('✅ Success modal closed via fallback function');
         }
     };
 }
@@ -4078,11 +3953,9 @@ if (typeof window.closeSuccessModal === 'undefined') {
 // Removed orphaned code block that was causing syntax errors
 
 // Fallback functions removed to fix syntax error
-console.log('✅ Fallback functions script block completed');
 </script>
 <script>
 // Modal functions are already defined in the earlier script block
-console.log('✅ Modal functions are available from earlier script block');
 </script>
 <script src="./scripts/modal-add-user.js?v=<?php echo time(); ?>&ultra=1"></script>
 <script src="./scripts/user-account-management.js?v=2.8"></script>
@@ -4093,19 +3966,14 @@ console.log('✅ Modal functions are available from earlier script block');
 
 <!-- Simple initialization -->
 <script>
-console.log('Super Admin page loaded successfully');
-console.log('Current page:', '<?php echo isset($_GET['page']) ? $_GET['page'] : 'dashboard'; ?>');
-console.log('Basic JavaScript test - this should appear in console');
 
 // Test if we can create a simple function
 window.testFunction = function() {
-    console.log('Test function works!');
     alert('JavaScript is working!');
 };
 
 // Simple test function for modal
 // window.testModalShow = function() {
-//     console.log('🎯 Opening Add Department modal');
 //     const modal = document.getElementById('addDepartmentModal');
 //     if (modal) {
 //         modal.style.display = 'flex';
@@ -4122,35 +3990,25 @@ window.testFunction = function() {
 
 // Simple test to see if DOM is ready
 document.addEventListener('DOMContentLoaded', function() {
-    console.log('DOMContentLoaded fired');
     
     if (typeof initializeTooltips === 'function') {
         initializeTooltips();
-        console.log('Tooltips initialized');
     }
 });
 
 // IMMEDIATE TEST - This should run as soon as the script loads
-console.log('🚀 BACK TO TOP SCRIPT LOADING - IMMEDIATE TEST');
 
 // Back to Top functionality
-console.log('🎯 BACK TO TOP: About to add DOMContentLoaded listener');
 document.addEventListener('DOMContentLoaded', function() {
-    console.log('🎯 Back to Top: DOMContentLoaded fired');
-    console.log('Back to Top: Current URL =', window.location.href);
-    console.log('Back to Top: Document ready state =', document.readyState);
     
     // Get current page from URL
     const urlParams = new URLSearchParams(window.location.search);
     const currentPage = urlParams.get('page') || 'dashboard';
-    console.log('Back to Top: Current page =', currentPage);
-    console.log('Back to Top: URL params =', urlParams.toString());
     
     // Exclude back-to-top button from course material requests pages and book requests page (dashboard.js handles all pages now)
     const excludedPages = ['reference-requests', 'course-material-requests', 'my-requests', 'book-requests'];
     
     if (!excludedPages.includes(currentPage)) {
-        console.log('Back to Top: Creating button for page:', currentPage);
         
         // Create back to top button with icon and text
         const backToTopButton = document.createElement('button');
@@ -4174,22 +4032,18 @@ document.addEventListener('DOMContentLoaded', function() {
         
         // Append button to body
         document.body.appendChild(backToTopButton);
-        console.log('Back to Top: Button created and appended to body');
 
         // Show/hide button based on scroll position
         window.addEventListener('scroll', function() {
             if (window.pageYOffset > 300) {
                 backToTopButton.classList.add('show');
-                console.log('Back to Top: Button shown');
             } else {
                 backToTopButton.classList.remove('show');
-                console.log('Back to Top: Button hidden');
             }
         });
 
         // Scroll to top when clicked
         backToTopButton.addEventListener('click', function() {
-            console.log('Back to Top: Button clicked');
             window.scrollTo({
                 top: 0,
                 behavior: 'smooth'
@@ -4200,27 +4054,21 @@ document.addEventListener('DOMContentLoaded', function() {
         
         // Back-to-top button ready - will show when scrolling down
     } else {
-        console.log('Back to Top: Page excluded:', currentPage);
     }
 });
 
 // Fallback: Try to create button immediately if DOM is already ready
-console.log('🔄 BACK TO TOP: Starting fallback check');
 if (document.readyState === 'loading') {
-    console.log('🔄 Back to Top: DOM still loading, waiting for DOMContentLoaded');
 } else {
-    console.log('🔄 Back to Top: DOM already ready, creating button immediately');
     
     // Get current page from URL
     const urlParams = new URLSearchParams(window.location.search);
     const currentPage = urlParams.get('page') || 'dashboard';
-    console.log('Back to Top Fallback: Current page =', currentPage);
     
     // Exclude back-to-top button from course material requests pages and book requests page (dashboard.js handles all pages now)
     const excludedPages = ['reference-requests', 'course-material-requests', 'my-requests', 'book-requests'];
     
     if (!excludedPages.includes(currentPage)) {
-        console.log('Back to Top Fallback: Creating button for page:', currentPage);
         
         // Create back to top button with icon and text
         const backToTopButton = document.createElement('button');
@@ -4244,22 +4092,18 @@ if (document.readyState === 'loading') {
         
         // Append button to body
         document.body.appendChild(backToTopButton);
-        console.log('Back to Top Fallback: Button created and appended to body');
 
         // Show/hide button based on scroll position
         window.addEventListener('scroll', function() {
             if (window.pageYOffset > 300) {
                 backToTopButton.classList.add('show');
-                console.log('Back to Top Fallback: Button shown');
             } else {
                 backToTopButton.classList.remove('show');
-                console.log('Back to Top Fallback: Button hidden');
             }
         });
 
         // Scroll to top when clicked
         backToTopButton.addEventListener('click', function() {
-            console.log('Back to Top Fallback: Button clicked');
             window.scrollTo({
                 top: 0,
                 behavior: 'smooth'

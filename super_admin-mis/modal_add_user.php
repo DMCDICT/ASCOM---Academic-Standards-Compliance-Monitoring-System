@@ -7,7 +7,6 @@ if (!isset($conn) || !$conn instanceof mysqli || $conn->connect_error) {
         require_once __DIR__ . '/includes/db_connection.php';
     }
     if (!isset($conn) || $conn->connect_error) {
-        error_log("Database connection failed or not available in modal_add_user.php for fetching departments/roles. Check content.php inclusion and status.");
         $departments = [];
         $roles = [];
     }
@@ -25,7 +24,6 @@ if (isset($conn) && $conn instanceof mysqli && !$conn->connect_error) {
         }
         $departmentsResult->free();
     } else {
-        error_log("Failed to fetch departments in modal_add_user.php: " . $conn->error);
     }
     // Fetch roles
     $rolesQuery = "SELECT id, role FROM roles ORDER BY id ASC";
@@ -36,7 +34,6 @@ if (isset($conn) && $conn instanceof mysqli && !$conn->connect_error) {
         }
         $rolesResult->free();
     } else {
-        error_log("Failed to fetch roles in modal_add_user.php: " . $conn->error);
     }
 }
 ?>

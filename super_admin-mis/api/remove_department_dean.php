@@ -90,7 +90,6 @@ try {
         }
     } catch (Exception $e) {
         // If title column doesn't exist, continue without updating title
-        error_log("Title update failed (column may not exist): " . $e->getMessage());
     }
     
     // Log the activity (if activity_logs table exists)
@@ -106,7 +105,6 @@ try {
         $activityStmt->execute();
     } catch (Exception $e) {
         // Activity logging failed, but don't fail the entire operation
-        error_log("Activity logging failed: " . $e->getMessage());
     }
     
     // Commit transaction
@@ -123,7 +121,6 @@ try {
     // Rollback transaction on error
     $conn->rollback();
     
-    error_log("Error in remove_department_dean.php: " . $e->getMessage());
     echo json_encode([
         'success' => false,
         'message' => $e->getMessage()

@@ -32,7 +32,6 @@ if (isset($_SESSION['user_id']) && isset($pdo)) {
   $userId = $_SESSION['user_id'];
   
   // Debug: Log user ID
-  error_log('Librarian interface - User ID: ' . $userId);
   
       try {
       // Check for roles using the same logic as login system
@@ -89,7 +88,6 @@ if (isset($_SESSION['user_id']) && isset($pdo)) {
     $_SESSION['available_roles'] = $availableRoles;
     
     } catch (Exception $e) {
-      error_log('Librarian role check error: ' . $e->getMessage());
     }
 }
 
@@ -277,16 +275,12 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 // TOOLTIP SYSTEM - Fixed and working
-console.log('🚨 LIBRARIAN: Tooltip system enabled');
 
 function createEmergencyTooltips() {
-    console.log('🚨 LIBRARIAN: Creating tooltips...');
     
     const navButtons = document.querySelectorAll('.nav-button');
-    console.log(`🚨 LIBRARIAN: Found ${navButtons.length} nav buttons`);
     
     if (navButtons.length === 0) {
-        console.log('🚨 LIBRARIAN: No nav buttons found');
         return;
     }
     
@@ -299,13 +293,11 @@ function createEmergencyTooltips() {
             // Get innerHTML and replace <br> tags with spaces
             tooltipText = spanElement.innerHTML.replace(/<br\s*\/?>/gi, ' ').replace(/\s+/g, ' ').trim();
         }
-        console.log(`🚨 LIBRARIAN: Setting up tooltip for button ${index + 1}: "${tooltipText}"`);
         
         button.addEventListener('mouseenter', function() {
             const sidebar = document.getElementById('sidebar');
             const isCollapsed = sidebar ? sidebar.classList.contains('collapsed') : false;
             
-            console.log(`🚨 LIBRARIAN: Hover on button ${index + 1}, sidebar collapsed: ${isCollapsed}`);
             
             if (isCollapsed) {
                 if (emergencyTooltip) {
@@ -313,7 +305,6 @@ function createEmergencyTooltips() {
                 }
                 
                 const buttonRect = button.getBoundingClientRect();
-                console.log(`🚨 LIBRARIAN: Button ${index + 1} position:`, buttonRect);
                 
                 emergencyTooltip = document.createElement('div');
                 emergencyTooltip.innerHTML = `
@@ -357,21 +348,17 @@ function createEmergencyTooltips() {
                 `;
                 
                 document.body.appendChild(emergencyTooltip);
-                console.log(`🚨 LIBRARIAN: Tooltip created for button ${index + 1}`);
             }
         });
         
         button.addEventListener('mouseleave', function() {
-            console.log(`🚨 LIBRARIAN: Leave button ${index + 1}`);
             if (emergencyTooltip) {
                 emergencyTooltip.remove();
                 emergencyTooltip = null;
-                console.log(`🚨 LIBRARIAN: Tooltip removed for button ${index + 1}`);
             }
         });
     });
     
-    console.log('🚨 LIBRARIAN: Emergency tooltips created successfully');
 }
 
 // Create emergency tooltips once
@@ -380,52 +367,40 @@ setTimeout(createEmergencyTooltips, 1000);
 // Make it available globally
 window.createEmergencyTooltips = createEmergencyTooltips;
 
-console.log('🚨 LIBRARIAN: Emergency tooltip system ready');
 
 // CHAT AND NOTIFICATION FUNCTIONALITY
-console.log('🚨 LIBRARIAN: Initializing chat and notification functionality');
 
 // Initialize chats and notifications
 const chatsIcon = document.querySelector('.chats-icon');
 if (chatsIcon) {
-    console.log('🚨 LIBRARIAN: Chats icon found, adding click handler');
     chatsIcon.onclick = function(e) {
         e.preventDefault();
         e.stopPropagation();
-        console.log('🚨 LIBRARIAN: Chats icon clicked');
         const dropdown = document.getElementById('chatsDropdown');
         if (dropdown) {
             const currentDisplay = dropdown.style.display;
             dropdown.style.display = currentDisplay === 'block' ? 'none' : 'block';
-            console.log('🚨 LIBRARIAN: Chats dropdown toggled:', dropdown.style.display);
         }
     };
     chatsIcon.style.cursor = 'pointer';
     chatsIcon.style.pointerEvents = 'auto';
-    console.log('🚨 LIBRARIAN: Chats initialized');
 } else {
-    console.log('🚨 LIBRARIAN: Chats icon not found');
 }
 
 const notificationIcon = document.querySelector('.notification-icon');
 if (notificationIcon) {
-    console.log('🚨 LIBRARIAN: Notification icon found, adding click handler');
     notificationIcon.onclick = function(e) {
         e.preventDefault();
         e.stopPropagation();
-        console.log('🚨 LIBRARIAN: Notification icon clicked');
         const dropdown = document.getElementById('notificationDropdown');
         if (dropdown) {
             const currentDisplay = dropdown.style.display;
             dropdown.style.display = currentDisplay === 'block' ? 'none' : 'block';
-            console.log('🚨 LIBRARIAN: Notification dropdown toggled:', dropdown.style.display);
         }
     };
     notificationIcon.style.cursor = 'pointer';
     notificationIcon.style.pointerEvents = 'auto';
-    console.log('🚨 LIBRARIAN: Notifications initialized');
 } else {
-    console.log('🚨 LIBRARIAN: Notification icon not found');
 }
 
 // Close dropdowns when clicking outside
@@ -445,7 +420,6 @@ document.addEventListener('click', function(e) {
     }
 });
 
-console.log('🚨 LIBRARIAN: Chat and notification functionality ready');
 </script>
 </body>
 </html> 

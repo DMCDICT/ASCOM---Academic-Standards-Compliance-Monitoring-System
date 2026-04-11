@@ -99,7 +99,6 @@ try {
     }
     
 } catch (Exception $e) {
-    error_log("Error fetching course details: " . $e->getMessage());
 }
 
 // If showing program courses, fetch all courses for the program
@@ -212,7 +211,6 @@ if ($showProgramCourses) {
             $allProgramsStmt->execute();
             $allPrograms = $allProgramsStmt->fetchAll(PDO::FETCH_ASSOC);
     } catch (Exception $e) {
-        error_log("Error fetching program courses: " . $e->getMessage());
     }
 }
 
@@ -241,14 +239,11 @@ if (!$showProgramCourses && $courseDetails) {
         $searchCourseCode = $courseCode ?: ($courseDetails['course_code'] ?? '');
         
         // Debug logging
-        error_log("DEBUG Book Refs: courseCode='$courseCode', courseId=" . ($courseId ?? 'NULL') . ", searchCourseCode='$searchCourseCode'");
-        error_log("DEBUG Book Refs: courseDetails exists=" . ($courseDetails ? 'YES (ID: ' . ($courseDetails['id'] ?? 'N/A') . ')' : 'NO'));
         
         if (!empty($searchCourseCode)) {
             // Get the course_id to use for querying
             $courseIdForQuery = $courseId ?? ($courseDetails['id'] ?? null);
             
-            error_log("DEBUG Book Refs: courseIdForQuery = " . ($courseIdForQuery ?? 'NULL'));
             
             // Method 1: If we have a specific course_id, use it directly (matches how program-courses counts)
             if ($courseIdForQuery) {
@@ -313,18 +308,15 @@ if (!$showProgramCourses && $courseDetails) {
                     }
                 }
                 
-                error_log("DEBUG Book Refs Method 1 (course_id=$courseIdForQuery): Found " . count($bookReferences) . " references");
             }
             
             // Method 2: If no results, try finding all courses with same course_code and get their references
             if (empty($bookReferences)) {
-                error_log("DEBUG Book Refs: Trying Method 2 (course_code join for '$searchCourseCode')");
                 $courseIdsQuery = "SELECT id FROM courses WHERE course_code = ?";
                 $courseIdsStmt = $pdo->prepare($courseIdsQuery);
                 $courseIdsStmt->execute([$searchCourseCode]);
                 $matchingCourseIds = $courseIdsStmt->fetchAll(PDO::FETCH_COLUMN);
                 
-                error_log("DEBUG Book Refs: Found " . count($matchingCourseIds) . " courses with course_code '$searchCourseCode': " . implode(', ', $matchingCourseIds));
                 
                 if (!empty($matchingCourseIds)) {
                     $placeholders = implode(',', array_fill(0, count($matchingCourseIds), '?'));
@@ -389,20 +381,15 @@ if (!$showProgramCourses && $courseDetails) {
                         }
                     }
                     
-                    error_log("DEBUG Book Refs Method 2: Found " . count($bookReferences) . " references");
                 }
             }
             
             // Final debug
-            error_log("DEBUG Book Refs FINAL: Total references = " . count($bookReferences));
             if (!empty($bookReferences)) {
-                error_log("DEBUG Book Refs: First reference: " . json_encode($bookReferences[0]));
             }
         } else {
-            error_log("DEBUG Book Refs: searchCourseCode is empty!");
         }
     } catch (Exception $e) {
-        error_log("ERROR fetching book references: " . $e->getMessage());
     }
     
             // Format names
@@ -2216,10 +2203,7 @@ if (!$showProgramCourses && $courseDetails) {
         <div class="book-references-section">
             <?php 
             // TEMP DEBUG - Remove after fixing
-            error_log("DEBUG: Total bookReferences count = " . count($bookReferences));
-            error_log("DEBUG: courseCode = '$courseCode', courseId = " . ($courseId ?? 'NULL') . ", courseDetails['id'] = " . ($courseDetails['id'] ?? 'NULL'));
             if (!empty($bookReferences)) {
-                error_log("DEBUG: First book reference: " . json_encode($bookReferences[0]));
             }
             
             // Count only compliant books (less than 5 years old)
@@ -2480,9 +2464,7 @@ if (!$showProgramCourses && $courseDetails) {
         // Debug: Check if modal exists when page loads
         document.addEventListener('DOMContentLoaded', function() {
             const editModal = document.getElementById('editCourseModal');
-            console.log('🔧 DOMContentLoaded - Modal element found:', editModal);
             if (editModal) {
-                console.log('🔧 Modal exists and is ready');
             } else {
                 console.error('❌ Modal not found on page load');
             }
@@ -2490,7 +2472,6 @@ if (!$showProgramCourses && $courseDetails) {
         
         // EDIT COURSE FUNCTION - CALLS openEditCourseModal FROM MODAL FILE
         function editCourse(courseCode) {
-            console.log('🔧 Opening edit modal for:', courseCode);
             
             // Get programs data from PHP (context-aware)
             const programsData = [
@@ -2525,7 +2506,6 @@ if (!$showProgramCourses && $courseDetails) {
                 ?>
             ];
             
-            console.log('🔧 Programs from PHP:', programsData);
             
             // Prepare course data for the edit modal
             const courseData = {
@@ -2538,7 +2518,6 @@ if (!$showProgramCourses && $courseDetails) {
                 programs: programsData
             };
             
-            console.log('🔧 Course data:', courseData);
             
             // Open the edit course modal using the function from edit_course_modal.php
             if (typeof openEditCourseModal === 'function') {
@@ -2552,7 +2531,6 @@ if (!$showProgramCourses && $courseDetails) {
         // OLD COMPLEX FUNCTION - REMOVED - NOW USING PROPER FORM SUBMISSION
         /*
         async function editCourseOLD(courseCode) {
-            console.log('🔧 Opening edit modal for:', courseCode);
             
             // Open the modal
             const editModal = document.getElementById('editCourseModal');
@@ -2577,7 +2555,6 @@ if (!$showProgramCourses && $courseDetails) {
             const programCodeValue = '<?php echo htmlspecialchars($courseDetails['program_code'] ?? ''); ?>';
             const programColorValue = '<?php echo htmlspecialchars($courseDetails['color_code'] ?? ''); ?>';
             
-            console.log('🔧 Data from PHP:', {
                 courseCode: courseCodeValue,
                 courseTitle: courseTitleValue,
                 units: unitsValue,
@@ -2600,8 +2577,6 @@ if (!$showProgramCourses && $courseDetails) {
             // Set year level - fix mapping
             const yearLevelSelect = document.getElementById('edit_year_level');
             if (yearLevelSelect && yearLevelValue) {
-                console.log('🔧 Year level from database:', yearLevelValue);
-                console.log('🔧 Available options:', Array.from(yearLevelSelect.options).map(opt => opt.value));
                 
                 // Try different mapping strategies
                 let mappedValue = yearLevelValue;
@@ -2631,7 +2606,6 @@ if (!$showProgramCourses && $courseDetails) {
                 }
                 
                 yearLevelSelect.value = mappedValue;
-                console.log('✅ Year level set to:', mappedValue, '(from:', yearLevelValue, ')');
             }
             
             // Set term - map database values to select values
@@ -2644,7 +2618,6 @@ if (!$showProgramCourses && $courseDetails) {
                 else if (termValue === 'summer') selectValue = 'summer';
                 
                 termSelect.value = selectValue;
-                console.log('✅ Term set to:', selectValue, '(from:', termValue, ')');
             }
             
             // Load school years and set the correct one
@@ -2665,11 +2638,9 @@ if (!$showProgramCourses && $courseDetails) {
                             program_name: program.program_name,
                             program_color: program.color_code || '#1976d2'
                         }));
-                        console.log('✅ Fetched programs from course_programs table:', programsData);
                     }
                 }
             } catch (e) {
-                console.log('🔧 Could not fetch from course_programs, using fallback');
             }
             
             // Fallback to single program from course details
@@ -2680,17 +2651,14 @@ if (!$showProgramCourses && $courseDetails) {
                     program_name: programNameValue,
                     program_color: programColorValue || '#1976d2'
                 }];
-                console.log('✅ Using fallback program from course details:', programsData);
             }
             
             if (programsData.length > 0) {
                 document.getElementById('editSelectedProgramsInput').value = JSON.stringify(programsData);
                 document.getElementById('editProgramButtonText').textContent = `Select Program(s) - ${programsData.length} Program(s) Selected`;
-                console.log('✅ Programs set to:', programsData);
             } else {
                 document.getElementById('editSelectedProgramsInput').value = '';
                 document.getElementById('editProgramButtonText').textContent = 'Select Program(s) - No Program Selected';
-                console.log('✅ No programs found for this course');
             }
             
             // Store original values for comparison - IN FORM FIELD FORMAT
@@ -2719,10 +2687,8 @@ if (!$showProgramCourses && $courseDetails) {
                     year_level: document.getElementById('edit_year_level').value,
                     programs: document.getElementById('editSelectedProgramsInput').value
                 };
-                console.log('🔧 Original values updated to match form fields:', window.originalEditValues);
             }, 100);
             
-            console.log('🔧 STORED ORIGINAL VALUES:', window.originalEditValues);
             
             // Update button with proper disable logic
             const updateBtn = document.getElementById('updateCourseBtn');
@@ -2733,7 +2699,6 @@ if (!$showProgramCourses && $courseDetails) {
                 updateBtn.style.cursor = 'not-allowed';
                 updateBtn.style.opacity = '0.6';
                 updateBtn.title = 'No changes made';
-                console.log('✅ Update button starts disabled');
                 
                 // Add form change listeners to enable button
                 const formFields = [
@@ -2751,7 +2716,6 @@ if (!$showProgramCourses && $courseDetails) {
                     if (field) {
                         field.addEventListener('input', checkEditFormChanges);
                         field.addEventListener('change', checkEditFormChanges);
-                        console.log('✅ Added listener to:', fieldId);
                     } else {
                         console.error('❌ Field not found:', fieldId);
                     }
@@ -2766,10 +2730,8 @@ if (!$showProgramCourses && $courseDetails) {
                 // UPDATE BUTTON FUNCTIONALITY
                 updateBtn.onclick = function(e) {
                     e.preventDefault();
-                    console.log('🔧 Update button clicked - processing update...');
                     
                     if (updateBtn.disabled) {
-                        console.log('❌ Update button is disabled - no changes to update');
                         return;
                     }
                     
@@ -2784,7 +2746,6 @@ if (!$showProgramCourses && $courseDetails) {
                         programs: document.getElementById('editSelectedProgramsInput').value
                     };
                     
-                    console.log('🔧 Form data to update:', formData);
                     
                     // Show loading state
                     updateBtn.disabled = true;
@@ -2800,14 +2761,12 @@ if (!$showProgramCourses && $courseDetails) {
                         body: JSON.stringify(formData)
                     })
                     .then(response => {
-                        console.log('🔧 API Response Status:', response.status);
                         if (!response.ok) {
                             throw new Error(`HTTP error! status: ${response.status}`);
                         }
                         return response.json();
                     })
                     .then(data => {
-                        console.log('🔧 API Response Data:', data);
                         
                         if (data.success) {
                             showUpdateSuccessModal(data.data);
@@ -2861,11 +2820,9 @@ if (!$showProgramCourses && $courseDetails) {
                 
                 // Test button removed - Update Button is now working!
                 
-                console.log('✅ Edit form change listeners added');
                 
                 // START WITH BUTTON DISABLED
                 setTimeout(() => {
-                    console.log('🔧 INITIAL STATE - Starting with button disabled...');
                     const updateBtn = document.getElementById('updateCourseBtn');
                     if (updateBtn) {
                         updateBtn.disabled = true;
@@ -2874,18 +2831,15 @@ if (!$showProgramCourses && $courseDetails) {
                         updateBtn.style.cursor = 'not-allowed';
                         updateBtn.style.opacity = '0.6';
                         updateBtn.title = 'No changes made';
-                        console.log('✅ Update button STARTED DISABLED');
                     }
                 }, 100);
                 
                 // PROPER INTERVAL CHECK - Check every 1 second
                 const forceCheck = setInterval(() => {
                     if (document.getElementById('editCourseModal').style.display === 'flex') {
-                        console.log('🔧 INTERVAL CHECK - Modal is open, checking changes...');
                         checkEditFormChanges();
                     } else {
                         clearInterval(forceCheck);
-                        console.log('🔧 INTERVAL CHECK - Modal closed, stopping interval');
                     }
                 }, 1000);
             } else {
@@ -2897,11 +2851,9 @@ if (!$showProgramCourses && $courseDetails) {
         
         // PROPER BUTTON LOGIC - Start disabled, enable only on changes
         function checkEditFormChanges() {
-            console.log('🔧 CHECKING CHANGES - Comparing current vs original');
             
             const updateBtn = document.getElementById('updateCourseBtn');
             if (!updateBtn || !window.originalEditValues) {
-                console.log('❌ Update button or original values not found');
                 return;
             }
             
@@ -2917,8 +2869,6 @@ if (!$showProgramCourses && $courseDetails) {
             };
             
             // DEBUG: Show all values
-            console.log('🔧 CURRENT VALUES:', currentValues);
-            console.log('🔧 ORIGINAL VALUES:', window.originalEditValues);
             
             // NORMALIZE VALUES FOR COMPARISON
             const normalizeYearLevel = (value) => {
@@ -2943,7 +2893,6 @@ if (!$showProgramCourses && $courseDetails) {
                         return JSON.stringify(normalized);
                     }
                 } catch (e) {
-                    console.log('🔧 Error parsing programs JSON:', e.message, 'Value:', value);
                     return value;
                 }
                 return value;
@@ -2956,27 +2905,22 @@ if (!$showProgramCourses && $courseDetails) {
             if (currentValues.course_code !== window.originalEditValues.course_code) {
                 hasChanges = true;
                 changes.push('course_code');
-                console.log('🔧 Course code changed:', window.originalEditValues.course_code, '->', currentValues.course_code);
             }
             if (currentValues.course_title !== window.originalEditValues.course_title) {
                 hasChanges = true;
                 changes.push('course_title');
-                console.log('🔧 Course title changed:', window.originalEditValues.course_title, '->', currentValues.course_title);
             }
             if (currentValues.units !== window.originalEditValues.units) {
                 hasChanges = true;
                 changes.push('units');
-                console.log('🔧 Units changed:', window.originalEditValues.units, '->', currentValues.units);
             }
             if (currentValues.term !== window.originalEditValues.term) {
                 hasChanges = true;
                 changes.push('term');
-                console.log('🔧 Term changed:', window.originalEditValues.term, '->', currentValues.term);
             }
             if (currentValues.academic_year !== window.originalEditValues.academic_year) {
                 hasChanges = true;
                 changes.push('academic_year');
-                console.log('🔧 Academic year changed:', window.originalEditValues.academic_year, '->', currentValues.academic_year);
             }
             
             // NORMALIZED YEAR LEVEL COMPARISON
@@ -2985,29 +2929,19 @@ if (!$showProgramCourses && $courseDetails) {
             if (normalizedCurrentYearLevel !== normalizedOriginalYearLevel) {
                 hasChanges = true;
                 changes.push('year_level');
-                console.log('🔧 Year level changed:', normalizedOriginalYearLevel, '->', normalizedCurrentYearLevel);
             }
             
             // NORMALIZED PROGRAMS COMPARISON
             const normalizedCurrentPrograms = normalizePrograms(currentValues.programs);
             const normalizedOriginalPrograms = normalizePrograms(window.originalEditValues.programs);
             
-            console.log('🔧 PROGRAM COMPARISON DEBUG:');
-            console.log('🔧 Raw current programs:', currentValues.programs);
-            console.log('🔧 Raw original programs:', window.originalEditValues.programs);
-            console.log('🔧 Normalized current:', normalizedCurrentPrograms);
-            console.log('🔧 Normalized original:', normalizedOriginalPrograms);
             
             if (normalizedCurrentPrograms !== normalizedOriginalPrograms) {
                 hasChanges = true;
                 changes.push('programs');
-                console.log('🔧 Programs changed:', normalizedOriginalPrograms, '->', normalizedCurrentPrograms);
             } else {
-                console.log('🔧 Programs unchanged:', normalizedOriginalPrograms, '==', normalizedCurrentPrograms);
             }
             
-            console.log('🔧 Has changes:', hasChanges);
-            console.log('🔧 Changed fields:', changes);
             
             if (hasChanges) {
                 // ENABLE BUTTON - There are changes
@@ -3017,7 +2951,6 @@ if (!$showProgramCourses && $courseDetails) {
                 updateBtn.style.cursor = 'pointer';
                 updateBtn.style.opacity = '1';
                 updateBtn.title = 'Update course';
-                console.log('✅ Update button ENABLED - changes detected:', changes);
             } else {
                 // DISABLE BUTTON - No changes
                 updateBtn.disabled = true;
@@ -3026,13 +2959,11 @@ if (!$showProgramCourses && $courseDetails) {
                 updateBtn.style.cursor = 'not-allowed';
                 updateBtn.style.opacity = '0.6';
                 updateBtn.title = 'No changes made';
-                console.log('✅ Update button DISABLED - no changes');
             }
         }
         
         // Function to load school years and set the correct value
         async function loadSchoolYearsAndSetValue(targetYear) {
-            console.log('🔧 Loading school years for:', targetYear);
             
             const schoolYearSelect = document.getElementById('edit_school_year');
             if (!schoolYearSelect) {
@@ -3059,7 +2990,6 @@ if (!$showProgramCourses && $courseDetails) {
                     // Set the target year
                     if (targetYear) {
                         schoolYearSelect.value = targetYear;
-                        console.log('✅ School year set to:', targetYear);
                     }
                 }
             } catch (error) {
@@ -3073,7 +3003,6 @@ if (!$showProgramCourses && $courseDetails) {
             if (editModal) {
                 editModal.style.display = 'none';
                 document.body.style.overflow = '';
-                console.log('✅ Edit modal closed');
             }
         }
         
@@ -3092,19 +3021,14 @@ if (!$showProgramCourses && $courseDetails) {
         
         // Debug function to manually test button
         window.testUpdateButton = function() {
-            console.log('🔧 Manual test of Update button...');
-            console.log('🔧 Original values:', window.originalEditValues);
             checkEditFormChanges();
         };
         
         // Simple test function to check if listeners are working
         window.testFieldChange = function() {
-            console.log('🔧 Testing field change detection...');
             const yearLevelField = document.getElementById('edit_year_level');
             if (yearLevelField) {
-                console.log('🔧 Current year level value:', yearLevelField.value);
                 yearLevelField.value = '2';
-                console.log('🔧 Changed year level to:', yearLevelField.value);
                 checkEditFormChanges();
             } else {
                 console.error('❌ Year level field not found');
@@ -3113,15 +3037,12 @@ if (!$showProgramCourses && $courseDetails) {
         
         // Test function for program changes
         window.testProgramChange = function() {
-            console.log('🔧 Testing program change detection...');
             const programsInput = document.getElementById('editSelectedProgramsInput');
             if (programsInput) {
-                console.log('🔧 Current programs value:', programsInput.value);
                 // Simulate adding a program
                 const currentPrograms = JSON.parse(programsInput.value || '[]');
                 currentPrograms.push({id: '2', program_code: 'TEST', program_name: 'Test Program'});
                 programsInput.value = JSON.stringify(currentPrograms);
-                console.log('🔧 Changed programs to:', programsInput.value);
                 checkEditFormChanges();
             } else {
                 console.error('❌ Programs input not found');
@@ -3132,7 +3053,6 @@ if (!$showProgramCourses && $courseDetails) {
         
         // Assign faculty function
         function assignFaculty(courseCode) {
-            console.log('Assign faculty to course:', courseCode);
             alert('Assign faculty to course: ' + courseCode + '\n\nThis will open the faculty assignment functionality.');
         }
         
@@ -3169,7 +3089,6 @@ if (!$showProgramCourses && $courseDetails) {
         
         // Tab switching functionality
         function switchBookTab(tabName) {
-            console.log('🔄 Switching to tab:', tabName);
             
             // Hide all tab contents
             const tabContents = document.querySelectorAll('.tab-content');
@@ -3209,18 +3128,15 @@ if (!$showProgramCourses && $courseDetails) {
                 selectedButton.classList.add('active');
             }
             
-            console.log('✅ Tab switched to:', tabName);
         }
         
         // View book details function
         function viewBookDetails(bookId) {
-            console.log('View book details:', bookId);
             alert('View book details: ' + bookId + '\n\nThis will open the book details functionality.');
         }
         
         // Edit book reference function
         function editBookReference(bookId) {
-            console.log('Edit book reference:', bookId);
             alert('Edit book reference: ' + bookId + '\n\nThis will open the book reference edit functionality.');
         }
         
@@ -3238,41 +3154,33 @@ if (!$showProgramCourses && $courseDetails) {
         
         // Test function for backup modal
         function testBackupModal() {
-            console.log('Testing backup modal...');
             const backupModal = document.getElementById('editCourseModalBackup');
             if (backupModal) {
                 backupModal.style.display = 'flex';
-                console.log('Backup modal opened');
             } else {
-                console.log('Backup modal not found');
             }
         }
         
         // Function to navigate to individual course details
         function navigateToCourse(courseCode, courseTitle, courseId) {
-            console.log('Navigating to course:', courseCode, courseTitle, 'ID:', courseId);
             window.location.href = 'content.php?page=course-details&course_code=' + encodeURIComponent(courseCode) + '&course_title=' + encodeURIComponent(courseTitle) + '&course_id=' + encodeURIComponent(courseId);
         }
         
         // Function to navigate to individual course details from program courses
         function navigateToCourseFromProgram(courseCode, courseTitle, programCode, courseId) {
-            console.log('Navigating to course from program:', courseCode, courseTitle, programCode, 'ID:', courseId);
             window.location.href = 'content.php?page=course-details&course_code=' + encodeURIComponent(courseCode) + '&course_title=' + encodeURIComponent(courseTitle) + '&from_program=' + encodeURIComponent(programCode) + '&course_id=' + encodeURIComponent(courseId);
         }
         
         // Function to edit program
         function editProgram(programCode) {
-            console.log('🔧 Edit program function called with:', programCode);
             
             // Get program data from the current page
             const programName = '<?php echo $showProgramCourses && $programInfo ? addslashes($programInfo['program_name']) : ""; ?>';
             const programMajor = '<?php echo $showProgramCourses && $programInfo ? addslashes($programInfo['major'] ?? '') : ""; ?>';
             
-            console.log('🔧 Program data:', { programCode, programName, programMajor });
             
             // Check if modal exists
             const modal = document.getElementById('editProgramModal');
-            console.log('🔧 Modal element found:', modal);
             
             if (!modal) {
                 console.error('❌ Edit program modal not found!');
@@ -3303,7 +3211,6 @@ if (!$showProgramCourses && $courseDetails) {
             modal.style.display = 'flex';
             document.body.style.overflow = 'hidden';
             
-            console.log('✅ Edit program modal displayed');
         }
         
         // Function to close edit program modal
@@ -3398,7 +3305,6 @@ if (!$showProgramCourses && $courseDetails) {
             const hasChanges = originalEditProgramData.program_name !== programName ||
                               originalEditProgramData.major !== major;
 
-            console.log('🔧 Edit Program Form Check:', {
                 isValid: isValid,
                 hasChanges: hasChanges,
                 programName: programName,
@@ -3416,7 +3322,6 @@ if (!$showProgramCourses && $courseDetails) {
                 program_name: document.getElementById('editProgramName').value.trim(),
                 major: document.getElementById('editProgramMajor').value.trim()
             };
-            console.log('🔧 Stored original edit program data:', originalEditProgramData);
         }
         
         // HEADER ALIGNMENT - FORCE HEADERS TO MATCH DATA
@@ -3457,7 +3362,6 @@ if (!$showProgramCourses && $courseDetails) {
                         header.style.setProperty('text-align', 'left', 'important');
                         break;
                 }
-                console.log(`Fixed header ${index}: ${header.textContent} - ${header.style.textAlign}`);
             });
         }
 
@@ -3506,10 +3410,8 @@ if (!$showProgramCourses && $courseDetails) {
                             cell.setAttribute('style', cell.getAttribute('style') + '; text-align: left !important;');
                             break;
                     }
-                    console.log(`Cell ${index}: ${cell.textContent.trim()} - ${cell.style.textAlign}`);
                 });
             });
-            console.log('Fixed data cell alignment for all rows');
         }
 
         // COURSE CODE ALIGNMENT - FOCUSED FIX
@@ -3521,7 +3423,6 @@ if (!$showProgramCourses && $courseDetails) {
                 cell.style.verticalAlign = 'middle';
                 cell.style.fontWeight = '600';
                 cell.style.color = '#333';
-                console.log('Fixed Course Code alignment:', cell.textContent);
             });
         }
         
@@ -3578,7 +3479,6 @@ if (!$showProgramCourses && $courseDetails) {
         
         // Simple page load - no complex JavaScript needed
         document.addEventListener('DOMContentLoaded', function() {
-            console.log('✅ Page loaded - using CSS-only alignment approach');
         });
 
         

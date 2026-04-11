@@ -8,7 +8,6 @@ header('Content-Type: application/json');
 
 // Enable error logging instead of display
 ini_set('log_errors', 1);
-ini_set('error_log', '../logs/php_errors.log');
 
 require_once '../includes/db_connection.php';
 
@@ -40,9 +39,7 @@ try {
     }
 
     $events = [];
-    error_log("Processing school year events...");
     while ($row = $result->fetch_assoc()) {
-        error_log("Processing school year: " . print_r($row, true));
         
         // Determine if this school year is currently active based on actual dates
         $current_date = date('Y-m-d');
@@ -77,9 +74,7 @@ try {
     $terms_result = $conn->query($terms_sql);
     
     if ($terms_result) {
-        error_log("Processing term events...");
         while ($term = $terms_result->fetch_assoc()) {
-            error_log("Processing term: " . print_r($term, true));
             
             // Determine if this term is currently active
             $current_date = date('Y-m-d');
@@ -111,13 +106,10 @@ try {
         }
     }
     
-    error_log("Total events created: " . count($events));
-    error_log("Events data: " . print_r($events, true));
 
     send_response('success', $events);
 
 } catch (Exception $e) {
-    error_log("Unexpected error in get_school_year_events: " . $e->getMessage());
     send_response('error', null, 'An unexpected error occurred.');
 }
 ?>

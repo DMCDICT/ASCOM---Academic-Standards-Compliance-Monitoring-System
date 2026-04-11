@@ -70,7 +70,6 @@ try {
     }
     
 } catch (Exception $e) {
-    error_log("Error in get_current_dean.php: " . $e->getMessage());
     echo json_encode([
         'success' => false,
         'message' => 'Database error occurred'

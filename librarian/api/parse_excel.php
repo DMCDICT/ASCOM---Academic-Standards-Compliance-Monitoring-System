@@ -16,7 +16,6 @@ try {
     $programStmt->execute();
     $programCodes = $programStmt->fetchAll(PDO::FETCH_COLUMN);
 } catch (Exception $e) {
-    error_log("Error fetching programs: " . $e->getMessage());
 }
 
 // Function to match program code (handles cases like "BSIT-CHED" -> "BSIT")
@@ -151,7 +150,6 @@ try {
     ]);
     
 } catch (Exception $e) {
-    error_log("Excel processing error: " . $e->getMessage());
     echo json_encode([
         'success' => false,
         'message' => 'Error processing Excel data: ' . $e->getMessage()

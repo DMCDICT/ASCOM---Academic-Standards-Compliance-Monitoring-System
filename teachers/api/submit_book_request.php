@@ -176,13 +176,11 @@ try {
     ]);
     
 } catch (PDOException $e) {
-    error_log('Database error in submit_book_request.php: ' . $e->getMessage());
     echo json_encode([
         'success' => false,
         'error' => 'Database error occurred. Please try again later.'
     ]);
 } catch (Exception $e) {
-    error_log('Error in submit_book_request.php: ' . $e->getMessage());
     echo json_encode([
         'success' => false,
         'error' => 'An error occurred. Please try again later.'

@@ -60,7 +60,6 @@ try {
     $response['count'] = count($books);
     
 } catch (Exception $e) {
-    error_log("Library search error: " . $e->getMessage());
     $response['message'] = 'Search failed: ' . $e->getMessage();
 }
 

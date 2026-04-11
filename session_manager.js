@@ -78,10 +78,8 @@ class SessionManager {
                 const data = await response.json();
                 if (data.success && data.employee_no) {
                     employeeNo = data.employee_no;
-                    console.log('Employee number loaded:', employeeNo);
                 }
             } catch (error) {
-                console.log('Could not get employee number:', error);
             }
         };
         
@@ -90,7 +88,6 @@ class SessionManager {
         
         // Function to send logout request
         const sendLogoutRequest = () => {
-            console.log('Sending logout request due to tab close/inactivity');
             
             // Try multiple methods to ensure logout request is sent
             try {
@@ -113,7 +110,6 @@ class SessionManager {
                         logout_reason: 'tab_close',
                         employee_no: employeeNo
                     })
-                }).catch(e => console.log('Fetch logout failed:', e));
                 
                 // Method 3: synchronous XMLHttpRequest (fallback)
                 const xhr = new XMLHttpRequest();
@@ -124,9 +120,7 @@ class SessionManager {
                     employee_no: employeeNo
                 }));
                 
-                console.log('All logout methods attempted');
             } catch (error) {
-                console.log('All logout methods failed:', error);
             }
         };
         
@@ -149,7 +143,6 @@ class SessionManager {
                             lastActivity = Date.now();
                         }
                     } catch (error) {
-                        console.log('Heartbeat failed, page may be closed');
                         sendLogoutRequest();
                     }
                 }
@@ -169,10 +162,8 @@ class SessionManager {
             isPageVisible = document.visibilityState === 'visible';
             
             if (isPageVisible) {
-                console.log('Page became visible, starting heartbeat');
                 startHeartbeat();
             } else {
-                console.log('Page became hidden, stopping heartbeat and sending logout');
                 stopHeartbeat();
                 sendLogoutRequest();
             }
@@ -180,13 +171,11 @@ class SessionManager {
         
         // Handle pagehide (more reliable than unload)
         window.addEventListener('pagehide', (event) => {
-            console.log('Page hiding, sending logout request');
             sendLogoutRequest();
         });
         
         // Most aggressive approach: force redirect to logout on page unload
         window.addEventListener('beforeunload', (event) => {
-            console.log('Tab/window closing, forcing logout redirect');
             
             // Try to send logout request first
             sendLogoutRequest();
@@ -196,13 +185,11 @@ class SessionManager {
                 // This will force a redirect to logout page
                 window.location.href = '../logout_handler.php?reason=tab_close';
             } catch (e) {
-                console.log('Redirect failed:', e);
             }
         });
         
         // Handle unload (page unload)
         window.addEventListener('unload', (event) => {
-            console.log('Page unloading, sending logout request');
             sendLogoutRequest();
         });
         
@@ -211,7 +198,6 @@ class SessionManager {
             if (!isPageVisible) {
                 const timeSinceLastActivity = Date.now() - lastActivity;
                 if (timeSinceLastActivity > 10000) { // 10 seconds
-                    console.log('Page inactive for too long, sending logout');
                     sendLogoutRequest();
                 }
             }

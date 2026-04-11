@@ -41,7 +41,6 @@ try {
         // Try to create table, but ignore foreign key constraint if users table has issues
         try {
             $pdo->exec($createTableSQL);
-            error_log("Classifications table created automatically");
         } catch (Exception $e) {
             // If foreign key fails, try without it
             $createTableSQLNoFK = "CREATE TABLE IF NOT EXISTS `classifications` (
@@ -61,11 +60,9 @@ try {
               KEY `idx_created_by` (`created_by`)
             ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci";
             $pdo->exec($createTableSQLNoFK);
-            error_log("Classifications table created automatically (without foreign key)");
         }
     }
 } catch (Exception $e) {
-    error_log("Error checking/creating classifications table: " . $e->getMessage());
 }
 
 // Check if library_locations table exists, if not create it automatically
@@ -84,10 +81,8 @@ try {
         ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='Physical library locations (Main, Buenavista, etc.)'";
 
         $pdo->exec($createLocationSQL);
-        error_log("library_locations table created automatically");
     }
 } catch (Exception $e) {
-    error_log("Error checking/creating library_locations table: " . $e->getMessage());
 }
 
 try {
@@ -201,7 +196,6 @@ try {
     $response['id'] = $pdo->lastInsertId();
     
 } catch (Exception $e) {
-    error_log("Error adding classification: " . $e->getMessage());
     $response['message'] = $e->getMessage();
 }
 

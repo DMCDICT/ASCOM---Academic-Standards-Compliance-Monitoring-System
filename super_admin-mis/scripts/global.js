@@ -1,9 +1,7 @@
-console.log('🚀 GLOBAL.JS LOADING - CLEAN VERSION');
 
 // IMMEDIATE sidebar state restoration - runs before DOM is ready
 (function() {
     const savedState = localStorage.getItem('sidebarCollapsed');
-    console.log('⚡ IMMEDIATE: Restoring sidebar state:', savedState);
     
     // Apply the state immediately to prevent any flash
     if (savedState === 'true') {
@@ -17,7 +15,6 @@ console.log('🚀 GLOBAL.JS LOADING - CLEAN VERSION');
 
 // Simple sidebar toggle
 function toggleSidebar() {
-    console.log('toggleSidebar function called');
     const sidebar = document.getElementById('sidebar');
     if (sidebar) {
         const wasCollapsed = sidebar.classList.contains('collapsed');
@@ -33,7 +30,6 @@ function toggleSidebar() {
         // Reinitialize tooltips when sidebar state changes
         initializeTooltips();
         
-        console.log('Sidebar toggled:', wasCollapsed, '->', isNowCollapsed);
     }
 }
 
@@ -51,36 +47,30 @@ function updateContentWrapperMargin(isCollapsed) {
 
 // Navigation function - SIMPLE AND RELIABLE
 function handleSidebarNavigation(page) {
-    console.log('🎯 Navigation to:', page);
     
     // Save current sidebar state before navigation
     const sidebar = document.getElementById('sidebar');
     const isCollapsed = sidebar ? sidebar.classList.contains('collapsed') : false;
-    console.log('💾 Saving sidebar state before navigation:', isCollapsed ? 'collapsed' : 'expanded');
     localStorage.setItem('sidebarCollapsed', isCollapsed);
     
     // Verify the state was saved
     const savedState = localStorage.getItem('sidebarCollapsed');
-    console.log('✅ Verified saved state:', savedState);
     
     // Update active state before navigation
     updateActiveNavState(page);
     
     // Simple page navigation
-    console.log('🚀 Navigating to:', `content.php?page=${page}`);
     window.location.href = `content.php?page=${page}`;
 }
 
 // Function to update active navigation state
 function updateActiveNavState(activePage) {
-    console.log('🎯 Updating active nav state for:', activePage);
     
     const navButtons = document.querySelectorAll('.nav-button');
     navButtons.forEach(button => {
         const page = button.getAttribute('data-page');
         if (page === activePage) {
             button.classList.add('active');
-            console.log(`✅ Set active state for: ${page}`);
         } else {
             button.classList.remove('active');
         }
@@ -94,25 +84,20 @@ window.updateActiveNavState = updateActiveNavState;
 
 // Test function for debugging
 window.testNavigation = function() {
-    console.log('🧪 Testing navigation buttons...');
     const navButtons = document.querySelectorAll('.nav-button');
-    console.log(`Found ${navButtons.length} buttons`);
     
     navButtons.forEach((button, index) => {
         const page = button.getAttribute('data-page');
         const hasClickHandler = button.onclick !== null;
-        console.log(`Button ${index + 1}: page="${page}", hasClickHandler=${hasClickHandler}`);
     });
 };
 
 // IMMEDIATE initialization - runs right after script loads
 (function() {
-    console.log('⚡ IMMEDIATE: Initializing navigation buttons');
     
     // Wait a bit for DOM to be ready
     setTimeout(() => {
         const navButtons = document.querySelectorAll('.nav-button');
-        console.log(`⚡ IMMEDIATE: Found ${navButtons.length} navigation buttons`);
         
         navButtons.forEach((button, index) => {
             const page = button.getAttribute('data-page');
@@ -124,7 +109,6 @@ window.testNavigation = function() {
                 button.onclick = function(e) {
                     e.preventDefault();
                     e.stopPropagation();
-                    console.log('⚡ IMMEDIATE: Navigation button clicked:', page);
                     handleSidebarNavigation(page);
                 };
                 
@@ -132,7 +116,6 @@ window.testNavigation = function() {
                 button.style.cursor = 'pointer';
                 button.style.pointerEvents = 'auto';
                 
-                console.log(`⚡ IMMEDIATE: Button ${index + 1} initialized for page: ${page}`);
             }
         });
     }, 100);
@@ -140,7 +123,6 @@ window.testNavigation = function() {
 
 // Initialize sidebar state when DOM is ready
 document.addEventListener('DOMContentLoaded', function() {
-    console.log('🔄 DOM ready - initializing sidebar state');
     
     const sidebar = document.getElementById('sidebar');
     const savedState = localStorage.getItem('sidebarCollapsed');
@@ -149,21 +131,17 @@ document.addEventListener('DOMContentLoaded', function() {
         // Remove any existing collapsed class first
         sidebar.classList.remove('collapsed');
         
-        console.log('🔍 Saved sidebar state from localStorage:', savedState);
         
         if (savedState === 'true') {
             sidebar.classList.add('collapsed');
             updateContentWrapperMargin(true);
-            console.log('✅ Sidebar restored to COLLAPSED state');
         } else {
             sidebar.classList.remove('collapsed');
             updateContentWrapperMargin(false);
-            console.log('✅ Sidebar restored to EXPANDED state');
         }
         
         // Verify the state was applied correctly
         const isActuallyCollapsed = sidebar.classList.contains('collapsed');
-        console.log('🔍 Sidebar state verification:', isActuallyCollapsed ? 'COLLAPSED' : 'EXPANDED');
         
         // Initialize tooltips for collapsed sidebar
         initializeTooltips();
@@ -179,23 +157,19 @@ document.addEventListener('DOMContentLoaded', function() {
         hamburger.onclick = function(e) {
             e.preventDefault();
             e.stopPropagation();
-            console.log('🍔 Hamburger clicked - toggling sidebar');
             toggleSidebar();
         };
         
         // Make sure it's clickable
         hamburger.style.cursor = 'pointer';
         hamburger.style.pointerEvents = 'auto';
-        console.log('✅ Hamburger button initialized');
     }
     
     // Initialize navigation buttons
     const navButtons = document.querySelectorAll('.nav-button');
-    console.log(`🔍 Found ${navButtons.length} navigation buttons`);
     
     navButtons.forEach((button, index) => {
         const page = button.getAttribute('data-page');
-        console.log(`🔍 Button ${index + 1}: data-page="${page}"`);
         
         if (page) {
             // Remove any existing click handlers
@@ -205,7 +179,6 @@ document.addEventListener('DOMContentLoaded', function() {
             button.addEventListener('click', function(e) {
                 e.preventDefault();
                 e.stopPropagation();
-                console.log('🎯 Navigation button clicked:', page);
                 handleSidebarNavigation(page);
             });
             
@@ -213,35 +186,27 @@ document.addEventListener('DOMContentLoaded', function() {
             button.style.cursor = 'pointer';
             button.style.pointerEvents = 'auto';
             
-            console.log(`✅ Button ${index + 1} initialized for page: ${page}`);
         } else {
-            console.log(`⚠️ Button ${index + 1} has no data-page attribute`);
         }
     });
     
-    console.log('✅ Navigation buttons initialized');
     
     // Set initial active state based on current page
     const currentPage = new URLSearchParams(window.location.search).get('page') || 'dashboard';
-    console.log('🎯 Setting initial active state for page:', currentPage);
     updateActiveNavState(currentPage);
 });
 
 // Initialize tooltips for sidebar buttons - Only for collapsed sidebar
 function initializeTooltips() {
-    console.log('🔧 Initializing tooltips for collapsed sidebar only');
     
     // Check if tooltips are already initialized to prevent duplicates
     if (window.tooltipsInitialized) {
-        console.log('⚠️ Tooltips already initialized, skipping...');
         return;
     }
     
     const navButtons = document.querySelectorAll('.nav-button');
-    console.log(`Found ${navButtons.length} nav buttons`);
     
     if (navButtons.length === 0) {
-        console.log('❌ No nav buttons found! Trying again in 1 second...');
         setTimeout(initializeTooltips, 1000);
         return;
     }
@@ -275,13 +240,11 @@ function initializeTooltips() {
     navButtons.forEach(function(button, index) {
         // Get tooltip text from the visible button text (not from removed tooltip spans)
         const tooltipText = button.querySelector('span:not(.nav-icon-wrapper)')?.textContent?.trim() || 'Unknown';
-        console.log(`✅ Setting up tooltip for button ${index + 1}: "${tooltipText}"`);
         
         button.addEventListener('mouseenter', function() {
             const sidebar = document.getElementById('sidebar');
             const isCollapsed = sidebar.classList.contains('collapsed');
             
-            console.log(`🖱️ HOVER ENTER: Button ${index + 1} (sidebar ${isCollapsed ? 'collapsed' : 'expanded'})`);
             
             // Only show tooltips when sidebar is collapsed
             if (isCollapsed) {
@@ -292,7 +255,6 @@ function initializeTooltips() {
                 // Clean up any existing tooltip
                 cleanupTooltip();
                 
-                console.log(`🚀 Creating tooltip for button ${index + 1}: "${tooltipText}"`);
                 
                 // Get button position
                 const buttonRect = button.getBoundingClientRect();
@@ -332,23 +294,19 @@ function initializeTooltips() {
                 document.body.appendChild(globalTooltip);
                 currentButtonIndex = index;
                 
-                console.log(`✅ Tooltip created for button ${index + 1}`);
             }
         });
         
         button.addEventListener('mouseleave', function() {
-            console.log(`🖱️ HOVER LEAVE: Button ${index + 1}`);
             
             if (currentButtonIndex === index) {
                 hideTimeout = setTimeout(() => {
                     cleanupTooltip();
-                    console.log(`✅ Tooltip removed for button ${index + 1}`);
                 }, 100);
             }
         });
     });
     
-    console.log('✅ Tooltips initialized for collapsed sidebar only');
 }
 
 // Active/Inactive status function (for user management)
@@ -378,4 +336,3 @@ function getActiveInactiveStatus(userData) {
 // Make function globally available
 window.getActiveInactiveStatus = getActiveInactiveStatus;
 
-console.log('✅ GLOBAL.JS LOADED SUCCESSFULLY');

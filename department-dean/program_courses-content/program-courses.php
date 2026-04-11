@@ -33,7 +33,6 @@ $programs = [];
         $programsStmt->execute([$deanDepartmentCode]);
         $programs = $programsStmt->fetchAll(PDO::FETCH_ASSOC);
 } catch (Exception $e) {
-    error_log("Error fetching programs in program-courses.php: " . $e->getMessage());
     $programs = [];
     }
 }
@@ -103,7 +102,6 @@ if ($deanDepartmentCode && $programCode) {
             $programMajor = $row['major'] ?? '';
         }
     } catch (Exception $e) {
-        error_log("Error fetching courses in program-courses.php: " . $e->getMessage());
     }
 }
 
@@ -795,19 +793,16 @@ const currentProgramMajor = '<?php echo addslashes($programMajor); ?>';
 
 // Function to view course details
 function viewCourseDetails(courseCode, courseId) {
-    console.log('Viewing course details for:', courseCode, 'ID:', courseId);
     window.location.href = 'content.php?page=course-details&course_code=' + encodeURIComponent(courseCode) + '&course_id=' + encodeURIComponent(courseId);
 }
 
 // Edit Program Modal Functions
      function editProgram(programCode) {
-         console.log('editProgram function called with:', programCode);
          
          // Get current program data
          const currentProgramName = programName;
          const currentProgramMajorValue = currentProgramMajor;
          
-    console.log('Current data:', { currentProgramName, currentProgramMajorValue });
          
          // Check if modal exists
          const modal = document.getElementById('editProgramModal');
@@ -993,7 +988,6 @@ function addFormChangeListeners() {
 // Approve and Reject Course Functions
 function approveCourse(courseId) {
     if (confirm('Are you sure you want to approve this course?')) {
-        console.log('Approving course:', courseId);
         
         fetch('api/approve_reject_course.php', {
             method: 'POST',
@@ -1005,7 +999,6 @@ function approveCourse(courseId) {
         .then(response => response.json())
         .then(data => {
             if (data.success) {
-                console.log('Course approved successfully');
                 alert('Course approved successfully!');
                 window.location.reload();
             } else {
@@ -1022,7 +1015,6 @@ function approveCourse(courseId) {
 
 function rejectCourse(courseId) {
     if (confirm('Are you sure you want to reject this course?')) {
-        console.log('Rejecting course:', courseId);
         
         fetch('api/approve_reject_course.php', {
             method: 'POST',
@@ -1034,7 +1026,6 @@ function rejectCourse(courseId) {
         .then(response => response.json())
         .then(data => {
             if (data.success) {
-                console.log('Course rejected successfully');
                 alert('Course rejected successfully!');
                 window.location.reload();
             } else {
@@ -1082,7 +1073,6 @@ document.addEventListener('click', function(event) {
 
 // Edit course from program courses page
 async function editCourseFromProgram(courseCode, courseId) {
-    console.log('Edit course from program:', courseCode, courseId);
     
     try {
         // Fetch course data
@@ -1128,7 +1118,6 @@ async function editCourseFromProgram(courseCode, courseId) {
 
 // Assign faculty from program courses page
 function assignFacultyFromProgram(courseCode) {
-    console.log('Assign faculty to course:', courseCode);
     // Close the action menu
     const menu = document.getElementById('actionMenu-' + courseCode);
     if (menu) {
@@ -1140,7 +1129,6 @@ function assignFacultyFromProgram(courseCode) {
 
 // Open add course modal from program courses page
 function openAddCourseModalFromProgram(programCode) {
-    console.log('Opening add course modal from program:', programCode);
     // Store the program code for use in the modal
     window.currentProgramCode = programCode;
     // Open the add course modal

@@ -85,7 +85,6 @@ try {
     ]);
     
 } catch (Exception $e) {
-    error_log("Error in get_department_teachers.php: " . $e->getMessage());
     echo json_encode([
         'success' => false,
         'message' => 'Database error occurred'

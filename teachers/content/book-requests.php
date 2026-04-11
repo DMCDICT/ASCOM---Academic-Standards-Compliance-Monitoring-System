@@ -746,19 +746,16 @@ let allRequests = [];
 let currentStatusFilter = 'PENDING';
 
 document.addEventListener('DOMContentLoaded', function() {
-    console.log('DOM Content Loaded - Initializing book requests page...');
     
     // Load data from PHP
     const requestsData = document.getElementById('allBookRequestsData');
     
     if (requestsData) {
         allRequests = JSON.parse(requestsData.textContent);
-        console.log('Loaded all requests:', allRequests);
         
         // Display pending requests by default
         displayAllRequests();
         
-        console.log('Book requests page initialization complete');
     } else {
         console.error('Failed to find required data elements');
     }

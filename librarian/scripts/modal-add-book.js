@@ -5,8 +5,6 @@
 
 // UNIVERSAL MODAL FUNCTIONS - Works for ALL modals
 function preventBackgroundScroll() {
-    console.log('Preventing background scroll...');
-    console.log('Current scroll position:', window.scrollY);
     
     const scrollY = window.scrollY;
     
@@ -22,12 +20,9 @@ function preventBackgroundScroll() {
     document.documentElement.style.setProperty('overflow', 'hidden', 'important');
     
     window.scrollPosition = scrollY;
-    console.log('Background scroll prevented - body position:', document.body.style.position);
-    console.log('Body overflow:', document.body.style.overflow);
 }
 
 function restoreBackgroundScroll() {
-    console.log('Restoring background scroll...');
     
     // Remove all the fixed positioning styles
     document.body.style.removeProperty('position');
@@ -42,32 +37,24 @@ function restoreBackgroundScroll() {
     
     if (window.scrollPosition !== undefined) {
         window.scrollTo(0, window.scrollPosition);
-        console.log('Restored to scroll position:', window.scrollPosition);
     }
-    console.log('Background scroll restored');
 }
 
 // Modal functions
 // Make sure the function is globally available
 window.openAddBookModal = function() {
-    console.log('🚀 OPENING ADD BOOK MODAL - FUNCTION CALLED');
     
     // Show modal
     const modal = document.getElementById('addBookModal');
-    console.log('Modal element found:', modal);
     
     if (modal) {
         modal.style.display = 'flex';
         modal.style.setProperty('overflow', 'hidden', 'important');
-        console.log('Modal display set to flex with overflow hidden');
         
         // USE THE EXACT SAME FUNCTION AS THE TEST BUTTONS
-        console.log('🔒 CALLING lockPageScroll() FUNCTION...');
         if (typeof lockPageScroll === 'function') {
             lockPageScroll();
-            console.log('✅ lockPageScroll() called successfully');
         } else {
-            console.log('❌ lockPageScroll function not found!');
             // Fallback
             document.body.style.setProperty('overflow', 'hidden', 'important');
             document.body.style.setProperty('position', 'fixed', 'important');
@@ -78,25 +65,17 @@ window.openAddBookModal = function() {
             document.documentElement.style.setProperty('overflow', 'hidden', 'important');
         }
         
-        console.log('✅ Modal opened and scroll lock attempted');
-        console.log('Body overflow after lock:', document.body.style.overflow);
-        console.log('Body position after lock:', document.body.style.position);
         
         // CHECK IF SOMETHING IS OVERRIDING - Wait 1 second and check again
         setTimeout(function() {
-            console.log('🔍 CHECKING AFTER 1 SECOND...');
-            console.log('Body overflow after 1s:', document.body.style.overflow);
-            console.log('Body position after 1s:', document.body.style.position);
             
             if (document.body.style.overflow !== 'hidden') {
-                console.log('⚠️ WARNING: Something overrode the overflow! Re-applying...');
                 if (typeof lockPageScroll === 'function') {
                     lockPageScroll();
                 }
             }
         }, 1000);
     } else {
-        console.log('❌ Modal element not found!');
     }
     
     // Reset form
@@ -109,8 +88,6 @@ window.openAddBookModal = function() {
     
     // FORCE DISABLE SUBMIT BUTTON INITIALLY
     const submitBtn = document.querySelector('.create-btn');
-    console.log('Looking for button with class .create-btn');
-    console.log('Found button:', submitBtn);
     
     if (submitBtn) {
         submitBtn.disabled = true;
@@ -118,12 +95,8 @@ window.openAddBookModal = function() {
         submitBtn.style.cursor = 'not-allowed';
         submitBtn.style.pointerEvents = 'none';
         submitBtn.style.backgroundColor = '#6c757d';
-        console.log('ADD BOOK button FORCED disabled initially');
-        console.log('Button disabled state:', submitBtn.disabled);
     } else {
-        console.log('ADD BOOK button not found - trying alternative selectors');
         const altBtn = document.querySelector('button[type="submit"]');
-        console.log('Alternative button found:', altBtn);
     }
     
     // Initialize autocomplete
@@ -131,7 +104,6 @@ window.openAddBookModal = function() {
     
     // Initialize form validation - EXACT SAME AS SWITCH ROLE MODAL
     setTimeout(function() {
-        console.log('🔍 Initializing validation (SWITCH ROLE APPROACH)...');
         
         // DISABLE BUTTON IMMEDIATELY (SAME AS SWITCH ROLE MODAL)
         const button = document.getElementById('addBookBtn');
@@ -142,7 +114,6 @@ window.openAddBookModal = function() {
             button.style.cursor = 'not-allowed';
             button.style.pointerEvents = 'none';
             button.style.backgroundColor = '#6c757d';
-            console.log('✅ BUTTON FORCED DISABLED (SWITCH ROLE APPROACH)');
         }
         
         // Add event listeners to all form fields - FORCE IMMEDIATE VALIDATION
@@ -152,18 +123,14 @@ window.openAddBookModal = function() {
             if (field) {
                 // Add multiple event types to ensure it triggers
                 field.addEventListener('input', function() {
-                    console.log(`📝 Field ${fieldId} changed, running validation...`);
                     validateAddBookButton();
                 });
                 field.addEventListener('change', function() {
-                    console.log(`🔄 Field ${fieldId} changed, running validation...`);
                     validateAddBookButton();
                 });
                 field.addEventListener('keyup', function() {
-                    console.log(`⌨️ Field ${fieldId} keyup, running validation...`);
                     validateAddBookButton();
                 });
-                console.log(`✅ Added validation listeners to ${fieldId}`);
             }
         });
         
@@ -191,7 +158,6 @@ window.closeAddBookModal = function() {
         // Also restore html element
         document.documentElement.style.setProperty('overflow', '', 'important');
         
-        console.log('Modal closed and scroll restored with !important');
     }
 }
 
@@ -341,23 +307,18 @@ document.addEventListener('keydown', function(event) {
 
 // Course Autocomplete Function
 function initCourseAutocomplete() {
-    console.log('Initializing autocomplete...');
     const searchInput = document.getElementById('course_search');
     const courseIdInput = document.getElementById('course_id');
     const suggestionsPanel = document.getElementById('suggestionsPanel');
     let currentSuggestions = [];
     let selectedIndex = -1;
 
-    console.log('Elements found:', { searchInput: !!searchInput, courseIdInput: !!courseIdInput, suggestionsPanel: !!suggestionsPanel });
-    console.log('Courses data:', coursesData);
 
     if (!searchInput || !courseIdInput || !suggestionsPanel) {
-        console.log('Autocomplete elements not found');
         return;
     }
 
     if (!coursesData || coursesData.length === 0) {
-        console.log('No courses data available');
         return;
     }
 
@@ -367,7 +328,6 @@ function initCourseAutocomplete() {
     // Handle input typing
     searchInput.addEventListener('input', function() {
         const query = this.value.toLowerCase().trim();
-        console.log('User typed:', query);
         
         if (query.length === 0) {
             showSuggestions(coursesData);
@@ -377,7 +337,6 @@ function initCourseAutocomplete() {
                 course.title.toLowerCase().includes(query) ||
                 course.display.toLowerCase().includes(query)
             );
-            console.log('Filtered results:', filtered.length);
             showSuggestions(filtered);
         }
         selectedIndex = -1;
@@ -412,7 +371,6 @@ function initCourseAutocomplete() {
 
     // Handle focus
     searchInput.addEventListener('focus', function() {
-        console.log('Input focused, showing all courses');
         showSuggestions(coursesData);
     });
 
@@ -424,17 +382,14 @@ function initCourseAutocomplete() {
     });
 
     function showSuggestions(suggestions) {
-        console.log('Showing suggestions:', suggestions.length);
         currentSuggestions = suggestions.slice(0, 10); // Limit to 10 items
         suggestionsPanel.innerHTML = '';
         
         if (currentSuggestions.length === 0) {
-            console.log('No suggestions to show');
             hideSuggestions();
             return;
         }
 
-        console.log('Creating', currentSuggestions.length, 'suggestion items');
         currentSuggestions.forEach((course, index) => {
             const item = document.createElement('button');
             item.className = 'suggestion-item';
@@ -444,7 +399,6 @@ function initCourseAutocomplete() {
         });
 
         suggestionsPanel.classList.add('show');
-        console.log('Suggestions panel should now be visible');
         
         // Force visibility for debugging
         suggestionsPanel.style.display = 'block';
@@ -465,7 +419,6 @@ function initCourseAutocomplete() {
         hideSuggestions();
         
         // Trigger validation immediately
-        console.log('🔍 Course selected, running validation...');
         validateAddBookButton();
     }
 
@@ -477,7 +430,6 @@ function initCourseAutocomplete() {
 
 // EXACT SAME APPROACH AS WORKING SWITCH ROLE MODAL
 function validateAddBookButton() {
-    console.log('🔍 VALIDATION RUNNING (SWITCH ROLE APPROACH)...');
     
     // Get all required field values with detailed logging
     const courseSearch = document.getElementById('course_search');
@@ -488,7 +440,6 @@ function validateAddBookButton() {
     const authors = document.getElementById('authors');
     const publisher = document.getElementById('publisher');
     
-    console.log('🔍 Field elements found:', {
         courseSearch: courseSearch,
         courseId: courseId,
         callNo: callNo,
@@ -506,7 +457,6 @@ function validateAddBookButton() {
     const authorsValue = authors?.value?.trim() || '';
     const publisherValue = publisher?.value?.trim() || '';
     
-    console.log('🔍 Field values:', {
         courseSearch: courseSearchValue,
         courseId: courseIdValue,
         callNo: callNoValue,
@@ -518,13 +468,10 @@ function validateAddBookButton() {
     
     // Find the button using ID (SAME AS SWITCH ROLE MODAL)
     const button = document.getElementById('addBookBtn');
-    console.log('Button found by ID:', button);
     
     // Check if all required fields are filled
     const allFilled = courseSearchValue && courseIdValue && callNoValue && bookTitleValue && copyrightValue && authorsValue && publisherValue;
     
-    console.log('All fields filled:', allFilled);
-    console.log('Individual checks:', {
         courseSearch: !!courseSearchValue,
         courseId: !!courseIdValue,
         callNo: !!callNoValue,
@@ -543,7 +490,6 @@ function validateAddBookButton() {
             button.style.cursor = 'pointer';
             button.style.pointerEvents = 'auto';
             button.style.backgroundColor = '#0f7a53';
-            console.log('✅ BUTTON ENABLED');
         } else {
             // DISABLE BUTTON (SAME AS SWITCH ROLE MODAL)
             button.disabled = true;
@@ -552,10 +498,8 @@ function validateAddBookButton() {
             button.style.cursor = 'not-allowed';
             button.style.pointerEvents = 'none';
             button.style.backgroundColor = '#6c757d';
-            console.log('❌ BUTTON DISABLED');
         }
     } else {
-        console.log('❌ BUTTON NOT FOUND BY ID');
     }
 }
 
@@ -563,9 +507,6 @@ function validateAddBookButton() {
 window.validateAddBookButton = validateAddBookButton;
 
 // Test if function is available
-console.log('🔧 MODAL-ADD-BOOK.JS LOADED');
-console.log('🔧 openAddBookModal function available:', typeof window.openAddBookModal);
-console.log('🔧 lockPageScroll function available:', typeof lockPageScroll);
 
 
 

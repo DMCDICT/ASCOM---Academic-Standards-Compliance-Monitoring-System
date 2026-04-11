@@ -5,7 +5,6 @@
  * Path to assets: From department-dean/scripts/ to src/assets/
  */
 
-console.log('🚀 program-management.js loaded successfully!');
 
 // Define animated icon path relative to this JS file's location (department-dean/scripts/)
 const ANIMATED_CHECK_ICON_PROGRAM = '/DataDrift/ASCOM%20Monitoring%20System/src/assets/animated_icons/check-animated-icon.gif';
@@ -47,13 +46,11 @@ function openAddProgramModal() {
     // Check form validity after clearing all fields
     setTimeout(() => {
         if (typeof checkFormValidity === 'function') {
-            console.log('🔍 Calling checkFormValidity after clearing fields...');
             checkFormValidity();
             
             // Double-check the button state
             const createBtn = document.querySelector('#addProgramModal .create-btn');
             if (createBtn) {
-                console.log('🔍 Button state after validation:', {
                     disabled: createBtn.disabled,
                     text: createBtn.textContent,
                     classes: createBtn.className
@@ -100,7 +97,6 @@ function openSuccessModal(message) {
     
     const modalIcon = document.getElementById('modalIcon');
     if (modalIcon) {
-        console.log('Setting success icon to:', ANIMATED_CHECK_ICON_PROGRAM);
         modalIcon.src = ANIMATED_CHECK_ICON_PROGRAM;
     } else {
         console.error('Modal icon element not found!');
@@ -130,7 +126,6 @@ function openErrorModal(message) {
     
     const modalIcon = document.getElementById('modalIcon');
     if (modalIcon) {
-        console.log('Setting error icon to:', ANIMATED_ERROR_ICON_PROGRAM);
         modalIcon.src = ANIMATED_ERROR_ICON_PROGRAM;
     } else {
         console.error('Modal icon element not found!');
@@ -166,7 +161,6 @@ function closeSuccessModal() {
 
 // Function to check form validity (GLOBAL scope - called by openAddProgramModal)
 function checkFormValidity() {
-    console.log('🔍 checkFormValidity called');
     
     const addProgramForm = document.getElementById("addProgramForm");
     if (!addProgramForm) {
@@ -177,21 +171,17 @@ function checkFormValidity() {
     const createBtn = addProgramForm.querySelector(".create-btn");
     const requiredFields = Array.from(addProgramForm.querySelectorAll("input[required]"));
     
-    console.log('🔍 Required fields found:', requiredFields.length);
     requiredFields.forEach(field => {
-        console.log('  -', field.id, ':', field.value, '(required:', field.hasAttribute('required'), ')');
     });
 
     const otherFieldsFilled = requiredFields.every(field => field.value.trim() !== "");
 
-    console.log('🔍 Validation results:', {
         otherFieldsFilled
     });
 
     if (createBtn) {
         const shouldBeDisabled = !otherFieldsFilled;
         createBtn.disabled = shouldBeDisabled;
-        console.log('✅ CREATE button disabled:', shouldBeDisabled);
     } else {
         console.error('❌ Create button not found');
     }

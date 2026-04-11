@@ -39,7 +39,6 @@ try {
     ]);
     
 } catch (Exception $e) {
-    error_log("Error fetching school years: " . $e->getMessage());
     echo json_encode([
         'success' => false,
         'error' => 'Failed to fetch school years',

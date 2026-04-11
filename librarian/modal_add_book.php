@@ -141,7 +141,6 @@ if (coursesData.length === 0) {
   );
 }
 
-console.log('Courses data loaded:', coursesData);
 
 // WORKING AUTOCOMPLETE - RESPONDS TO TYPING
 function initWorkingAutocomplete() {
@@ -150,14 +149,12 @@ function initWorkingAutocomplete() {
     const suggestionsPanel = document.getElementById('suggestionsPanel');
     
     if (!searchInput || !courseIdInput || !suggestionsPanel) {
-        console.log('Elements not found');
         return;
     }
     
     // Show suggestions when typing
     searchInput.addEventListener('input', function() {
         const query = this.value.toLowerCase().trim();
-        console.log('Typing:', query);
         
         // Clear previous suggestions
         suggestionsPanel.innerHTML = '';
@@ -174,7 +171,6 @@ function initWorkingAutocomplete() {
             course.display.toLowerCase().includes(query)
         );
         
-        console.log('Found', filtered.length, 'matches');
         
         if (filtered.length === 0) {
             suggestionsPanel.style.display = 'none';
@@ -222,10 +218,8 @@ function initWorkingAutocomplete() {
                 searchInput.value = course.display;
                 courseIdInput.value = course.id;
                 suggestionsPanel.style.display = 'none';
-                console.log('Selected:', course.display);
                 
                 // Trigger validation after course selection
-                console.log('🔄 Course selected - triggering validation');
                 setTimeout(function() {
                     if (typeof validateAddBookButton === 'function') {
                         validateAddBookButton();
@@ -375,7 +369,6 @@ document.addEventListener('DOMContentLoaded', function() {
         addBookForm.addEventListener('submit', function(e) {
             // Prevent multiple submissions
             if (isSubmitting) {
-                console.log('🚫 Form already submitting - preventing duplicate submission');
                 e.preventDefault();
                 e.stopPropagation();
                 return false;
@@ -383,14 +376,12 @@ document.addEventListener('DOMContentLoaded', function() {
             
             e.preventDefault();
             e.stopPropagation();
-            console.log('📚 Form submitted - adding book...');
             
             // Check if we're in batch mode FIRST before validation
             const byBatchCheckbox = document.getElementById('byBatchCheckbox');
             
             if (byBatchCheckbox && byBatchCheckbox.checked) {
                 // Batch mode: skip HTML5 validation, use batch mode validation instead
-                console.log('📚 Batch mode detected - skipping HTML5 validation');
                 isSubmitting = true;
                 handleBatchSubmit();
                 return;
@@ -398,17 +389,13 @@ document.addEventListener('DOMContentLoaded', function() {
             
             // Single book mode: check form validation
             isSubmitting = true;
-            console.log('📚 Single book mode - checking form validation');
             
             // Check if form is valid before proceeding
             if (!addBookForm.checkValidity()) {
-                console.log('❌ Form validation failed - HTML5 validation');
-                console.log('❌ Form validity details:', addBookForm.checkValidity());
                 isSubmitting = false;
                 return false;
             }
             
-            console.log('✅ Form validation passed - proceeding with submission');
             handleSingleSubmit();
         });
         
@@ -428,7 +415,6 @@ document.addEventListener('DOMContentLoaded', function() {
                 location: formData.get('location')
             };
             
-            console.log('📚 Book data to submit:', bookData);
             
             // Make actual API call to save book
             fetch('api/add_book.php', {
@@ -440,7 +426,6 @@ document.addEventListener('DOMContentLoaded', function() {
             })
             .then(response => response.json())
             .then(data => {
-                console.log('📚 API Response:', data);
                 if (data.success) {
                     showAddBookSuccessModal(bookData.book_title);
                 } else {
@@ -448,14 +433,12 @@ document.addEventListener('DOMContentLoaded', function() {
                 }
                 // Reset submission flag
                 isSubmitting = false;
-                console.log('📚 Form submission completed - resetting flag');
             })
             .catch(error => {
                 console.error('📚 API Error:', error);
                 showAddBookErrorModal('Network error. Please check your connection and try again.');
                 // Reset submission flag
                 isSubmitting = false;
-                console.log('📚 Form submission failed - resetting flag');
             });
         }
         
@@ -480,7 +463,6 @@ document.addEventListener('DOMContentLoaded', function() {
                 books: batchBooks
             };
             
-            console.log('📚 Batch data to submit:', batchData);
             
             fetch('api/add_book.php', {
                 method: 'POST',
@@ -491,7 +473,6 @@ document.addEventListener('DOMContentLoaded', function() {
             })
             .then(response => response.json())
             .then(data => {
-                console.log('📚 Batch API Response:', data);
                 if (data.success) {
                     showAddBookSuccessModal(`${batchBooks.length} books`);
                     // Clear batch list
@@ -504,20 +485,17 @@ document.addEventListener('DOMContentLoaded', function() {
                     showAddBookErrorModal(data.message || 'Failed to add books. Please try again.');
                 }
                 isSubmitting = false;
-                console.log('📚 Batch submission completed - resetting flag');
             })
             .catch(error => {
                 console.error('📚 Batch API Error:', error);
                 showAddBookErrorModal('Network error. Please check your connection and try again.');
                 isSubmitting = false;
-                console.log('📚 Batch submission failed - resetting flag');
             });
         }
     }
     
         // Add validation event listeners to form fields
     setTimeout(function() {
-        console.log('🔍 Setting up field validation listeners...');
 
         const formFields = ['course_search', 'course_id', 'call_no', 'book_title', 'copyright', 'edition', 'authors', 'publisher', 'isbn', 'no_of_copies', 'location'];
         formFields.forEach(fieldId => {
@@ -525,18 +503,14 @@ document.addEventListener('DOMContentLoaded', function() {
             if (field) {
                 // Add multiple event types to ensure it triggers
                 field.addEventListener('input', function() {
-                    console.log(`📝 Field ${fieldId} input event triggered`);
                     validateAddBookButton();
                 });
                 field.addEventListener('change', function() {
-                    console.log(`🔄 Field ${fieldId} change event triggered`);
                     validateAddBookButton();
                 });
                 field.addEventListener('keyup', function() {
-                    console.log(`⌨️ Field ${fieldId} keyup event triggered`);
                     validateAddBookButton();
                 });
-                console.log(`✅ Added validation listeners to ${fieldId}`);
             }
         });
         
@@ -545,15 +519,11 @@ document.addEventListener('DOMContentLoaded', function() {
             validateAddBookButton();
         }, 100);
         
-        console.log('✅ Field validation setup complete');
     }, 100);
 });
 
 // SIMPLE SCROLL PREVENTION - DIRECT APPROACH WITH !important
 function lockPageScroll() {
-    console.log('LOCKING PAGE SCROLL - DIRECT APPROACH WITH !important');
-    console.log('Before lock - body overflow:', document.body.style.overflow);
-    console.log('Before lock - body position:', document.body.style.position);
     
     document.body.style.setProperty('overflow', 'hidden', 'important');
     document.body.style.setProperty('position', 'fixed', 'important');
@@ -563,13 +533,9 @@ function lockPageScroll() {
     document.body.style.setProperty('left', '0', 'important');
     document.documentElement.style.setProperty('overflow', 'hidden', 'important');
     
-    console.log('After lock - body overflow:', document.body.style.overflow);
-    console.log('After lock - body position:', document.body.style.position);
-    console.log('Page scroll locked with !important');
 }
 
 function unlockPageScroll() {
-    console.log('UNLOCKING PAGE SCROLL - DIRECT APPROACH WITH !important');
     document.body.style.setProperty('overflow', '', 'important');
     document.body.style.setProperty('position', '', 'important');
     document.body.style.setProperty('width', '', 'important');
@@ -577,12 +543,10 @@ function unlockPageScroll() {
     document.body.style.setProperty('top', '', 'important');
     document.body.style.setProperty('left', '', 'important');
     document.documentElement.style.setProperty('overflow', '', 'important');
-    console.log('Page scroll unlocked with !important');
 }
 
 // SIMPLE TEST FUNCTION
 function testValidation() {
-    console.log('🧪 TESTING VALIDATION...');
     
     // Get all field values
     const courseSearch = document.getElementById('course_search')?.value?.trim() || '';
@@ -593,14 +557,10 @@ function testValidation() {
     const authors = document.getElementById('authors')?.value?.trim() || '';
     const publisher = document.getElementById('publisher')?.value?.trim() || '';
     
-    console.log('Field values:', { courseSearch, courseId, callNo, bookTitle, copyright, authors, publisher });
     
     const allFilled = courseSearch && courseId && callNo && bookTitle && copyright && authors && publisher;
-    console.log('All filled:', allFilled);
     
     const button = document.getElementById('addBookBtn');
-    console.log('Button found:', button);
-    console.log('Button disabled:', button?.disabled);
     
     if (allFilled) {
         button.disabled = false;
@@ -608,14 +568,12 @@ function testValidation() {
         button.style.cursor = 'pointer';
         button.style.pointerEvents = 'auto';
         button.style.backgroundColor = '#0f7a53';
-        console.log('✅ BUTTON ENABLED BY TEST');
     } else {
         button.disabled = true;
         button.style.opacity = '0.5';
         button.style.cursor = 'not-allowed';
         button.style.pointerEvents = 'none';
         button.style.backgroundColor = '#6c757d';
-        console.log('❌ BUTTON DISABLED BY TEST');
     }
 }
 </script>
@@ -649,7 +607,6 @@ function testValidation() {
 <script>
 // SIMPLE BULLETPROOF VALIDATION - DIRECT APPROACH
 function validateAddBookButton() {
-    console.log('🔍 SIMPLE VALIDATION RUNNING...');
     
     // Get all required field values with detailed logging
     const courseSearch = document.getElementById('course_search');
@@ -661,7 +618,6 @@ function validateAddBookButton() {
     const publisher = document.getElementById('publisher');
     const location = document.getElementById('location');
     
-    console.log('🔍 Field elements found:', {
         courseSearch: courseSearch,
         courseId: courseId,
         callNo: callNo,
@@ -681,7 +637,6 @@ function validateAddBookButton() {
     const publisherValue = publisher?.value?.trim() || '';
     const locationValue = location?.value?.trim() || '';
     
-    console.log('🔍 Field values:', {
         courseSearch: courseSearchValue,
         courseId: courseIdValue,
         callNo: callNoValue,
@@ -694,7 +649,6 @@ function validateAddBookButton() {
     
     // Find the button using ID
     const button = document.getElementById('addBookBtn');
-    console.log('Button found by ID:', button);
     
     // Check if batch mode is enabled
     const byBatchCheckbox = document.getElementById('byBatchCheckbox');
@@ -707,8 +661,6 @@ function validateAddBookButton() {
     const noOfCopiesValue = document.getElementById('no_of_copies')?.value?.trim() || '';
     const allFilled = courseSearchValue && courseIdValue && callNoValue && bookTitleValue && copyrightValue && noOfCopiesValue && locationValue;
     
-    console.log('All fields filled:', allFilled);
-    console.log('Individual checks:', {
         courseSearch: !!courseSearchValue,
         courseId: !!courseIdValue,
         callNo: !!callNoValue,
@@ -729,7 +681,6 @@ function validateAddBookButton() {
             button.style.cursor = 'pointer';
             button.style.pointerEvents = 'auto';
             button.style.backgroundColor = '#0f7a53';
-            console.log('✅ BUTTON ENABLED');
         } else {
             // DISABLE BUTTON
             button.disabled = true;
@@ -738,16 +689,13 @@ function validateAddBookButton() {
             button.style.cursor = 'not-allowed';
             button.style.pointerEvents = 'none';
             button.style.backgroundColor = '#6c757d';
-            console.log('❌ BUTTON DISABLED');
         }
     } else {
-        console.log('❌ BUTTON NOT FOUND BY ID');
     }
 }
 
 // Make it globally accessible
 window.validateAddBookButton = validateAddBookButton;
-console.log('✅ Inline validation function loaded');
 
 // Batch mode functions
 let batchBooks = [];
@@ -941,7 +889,6 @@ window.updateBatchListDisplay = updateBatchListDisplay;
 
 // Function to show success modal
 function showAddBookSuccessModal(bookTitle) {
-    console.log('✅ Showing success modal for book:', bookTitle);
     
     // Set success message
     const messageElement = document.getElementById('addBookSuccessMessage');
@@ -971,13 +918,11 @@ function showAddBookSuccessModal(bookTitle) {
         // Override any error modal functions
         if (typeof showAddBookErrorModal === 'function') {
             window.showAddBookErrorModal = function() {
-                console.log('🚫 Error modal blocked after successful submission');
             };
         }
         
         if (typeof showAddBookError === 'function') {
             window.showAddBookError = function() {
-                console.log('🚫 Error function blocked after successful submission');
             };
         }
     }, 100);
@@ -985,7 +930,6 @@ function showAddBookSuccessModal(bookTitle) {
 
 // Function to show error modal
 function showAddBookErrorModal(errorMessage) {
-    console.log('🚫 Showing error modal:', errorMessage);
     
     // Set error message
     const messageElement = document.getElementById('addBookErrorMessage');
@@ -1038,19 +982,16 @@ window.addEventListener('DOMContentLoaded', function() {
     // Override any error modal functions that might exist
     if (typeof showAddBookError === 'function') {
         window.showAddBookError = function() {
-            console.log('🚫 showAddBookError blocked');
         };
     }
     
     if (typeof showError === 'function') {
         window.showError = function() {
-            console.log('🚫 showError blocked');
         };
     }
     
     if (typeof showModalError === 'function') {
         window.showModalError = function() {
-            console.log('🚫 showModalError blocked');
         };
     }
     

@@ -95,7 +95,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $response['data'] = $addedBooks;
         
     } catch (Exception $e) {
-        error_log("Error adding book reference: " . $e->getMessage());
         $response['message'] = 'Failed to add book reference: ' . $e->getMessage();
     }
 } else {

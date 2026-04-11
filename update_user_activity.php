@@ -36,6 +36,5 @@ try {
 
     echo json_encode(['success' => true, 'message' => 'Activity updated']);
 } catch (Throwable $e) {
-    error_log('Error updating user activity: ' . $e->getMessage());
     echo json_encode(['success' => false, 'message' => 'Database error']);
 }

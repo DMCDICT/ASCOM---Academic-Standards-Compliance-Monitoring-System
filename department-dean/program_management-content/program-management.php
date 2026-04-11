@@ -50,12 +50,9 @@ try {
         $stmt->execute([$deanDepartmentCode]);
         $programs = $stmt->fetchAll(PDO::FETCH_ASSOC);
         
-        error_log("Program Management - Fetched " . count($programs) . " programs from database");
     } else {
-        error_log("Program Management - No department code found in session");
     }
 } catch (Exception $e) {
-    error_log("Program Management - Database error: " . $e->getMessage());
     $programs = [];
 }
 
@@ -166,7 +163,6 @@ if (isset($conn) && !$conn->connect_error) {
         }
     }
 } else {
-    error_log("Database connection failed or not available in program-management.php: " . ($conn->connect_error ?? "Unknown error"));
 }
 */
 
@@ -335,7 +331,6 @@ if (isset($conn) && !$conn->connect_error) {
                  echo "<p><strong>Courses:</strong> " . htmlspecialchars($program['course_count']) . "</p>";
                  echo "<p><strong>Faculty:</strong> " . htmlspecialchars($program['faculty_count']) . "</p>";
                  echo "<button class='view-details-btn' onclick=\"window.location.href='content.php?page=program-courses&program=" . urlencode($program['program_code']) . "'\">View Details</button>";
-                 echo "<button class='view-details-btn' onclick=\"console.log('Button clicked!'); window.location.href='content.php?page=program-courses&program=" . urlencode($program['program_code']) . "'\" style='background: red; margin-left: 10px;'>TEST NAVIGATION</button>";
                  echo "</div>";
              }
         } else {

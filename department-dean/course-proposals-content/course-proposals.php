@@ -428,8 +428,6 @@
             
             allProposals = data.proposals || [];
             
-            console.log('Total proposals loaded:', allProposals.length);
-            console.log('Draft proposals:', allProposals.filter(p => p.isDraft === true || p.status === 'Draft'));
             
             // Display all proposals
             displayProposals(allProposals);
@@ -492,8 +490,6 @@
         const grid = document.getElementById('allProposalsGrid');
         grid.innerHTML = '';
         
-        console.log('Displaying proposals:', proposals.length);
-        console.log('Proposals data:', proposals);
         
         if (proposals.length === 0) {
             grid.innerHTML = '<div style="grid-column: 1 / -1; text-align: center; padding: 40px; color: #666;"><p>No course proposals found.</p></div>';
@@ -501,7 +497,6 @@
         }
         
         proposals.forEach(proposal => {
-            console.log('Creating card for:', proposal.id || proposal.programCode, 'isDraft:', proposal.isDraft, 'status:', proposal.status);
             const card = createProposalCard(proposal);
             grid.appendChild(card);
         });
@@ -612,7 +607,6 @@
 
     // View course proposal details
     function viewCourseProposalDetails(proposalId) {
-        console.log('View details for course proposal:', proposalId);
         
         // Find the proposal data
         const proposal = allProposals.find(p => (p.id === proposalId || p.courseCode === proposalId));
@@ -782,7 +776,6 @@
     window.viewAttachmentFile = function(path, fileName) {
         // In a real implementation, this would open the file from the server
         // For now, we'll simulate it
-        console.log('Viewing attachment:', path, fileName);
         window.open(path, '_blank');
     };
     
@@ -790,7 +783,6 @@
     window.downloadAttachmentFile = function(path, fileName) {
         // In a real implementation, this would download the file from the server
         // For now, we'll simulate it
-        console.log('Downloading attachment:', path, fileName);
         const link = document.createElement('a');
         link.href = path;
         link.download = fileName;
@@ -805,7 +797,6 @@
             event.stopPropagation();
         }
         
-        console.log('Resuming draft:', proposalId);
         
         // Find the draft proposal
         const proposal = allProposals.find(p => (p.id === proposalId || p.courseCode === proposalId) && (p.isDraft === true || p.status === 'Draft'));
@@ -863,7 +854,6 @@
             return;
         }
         
-        console.log('Deleting draft:', proposalId);
         
         // Remove from local array
         const index = allProposals.findIndex(p => (p.id === proposalId || p.courseCode === proposalId) && (p.isDraft === true || p.status === 'Draft'));
@@ -886,7 +876,6 @@
         .then(response => response.json())
         .then(data => {
             if (data.success) {
-                console.log('Draft deleted successfully');
             } else {
                 console.error('Error deleting draft:', data.message);
                 alert('Error deleting draft: ' + (data.message || 'Unknown error'));

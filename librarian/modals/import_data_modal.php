@@ -605,7 +605,6 @@ function handleFile(file) {
                                 detectedCourses[courseKey].books.push(book);
                                 // Debug: Log first few books being stored
                                 if (detectedCourses[courseKey].books.length <= 3) {
-                                    console.log(`📚 Storing book #${detectedCourses[courseKey].books.length} for course "${currentCourseCode}":`, book.book_title);
                                 }
                             }
                         }
@@ -637,12 +636,10 @@ function handleFile(file) {
             
             // STORE ORIGINAL DETECTED COURSES LOCALLY (with books arrays!)
             originalDetectedCourses = detectedCourses;
-            console.log('✅✅✅ STORED original detectedCourses with', Object.keys(originalDetectedCourses).length, 'courses');
             
             // Verify books are stored - check first few courses
             const sampleCourses = Object.values(originalDetectedCourses).slice(0, 3);
             sampleCourses.forEach((course, idx) => {
-                console.log(`✅ Sample course #${idx + 1}:`, {
                     course_code: course.course_code,
                     program_code: course.program_code,
                     books_count: course.books ? course.books.length : 0,
@@ -673,13 +670,10 @@ function handleFile(file) {
                     
                     // Note: originalDetectedCourses is already stored above with all books arrays intact
                     // The server's detected_courses doesn't have books, but we use originalDetectedCourses for lookups
-                    console.log('✅ Using originalDetectedCourses for book lookups (has', Object.keys(originalDetectedCourses).length, 'courses with books)');
                     
                     // IMPORTANT: Keep the original courseBooksMap that was built during parsing
                     // It has the correct course_code associations before server transformation
                     // The server response might have transformed the structure, so we use the original
-                    console.log('✅ Keeping original courseBooksMap with', Object.keys(courseBooksMap).length, 'courses');
-                    console.log('✅ Original courseBooksMap courses:', Object.keys(courseBooksMap));
                     
                     // Also update course_code on importedBooksData if missing (preserve from original)
                     if (importedBooksData && originalParsedBooksData) {
@@ -1563,13 +1557,6 @@ window.currentCourseBooks = [];
 
 // Show course books modal
 function showCourseBooksModal(courseIndex) {
-    console.log('🔴 ========== showCourseBooksModal CALLED ==========');
-    console.log('🔴 Course Index:', courseIndex);
-    console.log('🔴 detectedCoursesData length:', detectedCoursesData ? detectedCoursesData.length : 0);
-    console.log('🔴 importedBooksData programs:', importedBooksData ? Object.keys(importedBooksData).length : 0);
-    console.log('🔴 originalParsedBooksData programs:', originalParsedBooksData ? Object.keys(originalParsedBooksData).length : 0);
-    console.log('🔴 originalDetectedCourses courses:', originalDetectedCourses ? Object.keys(originalDetectedCourses).length : 'MISSING!');
-    console.log('🔴 courseBooksMap courses:', courseBooksMap ? Object.keys(courseBooksMap).length : 0);
     
     if (!detectedCoursesData || !detectedCoursesData[courseIndex]) {
         console.error('❌ Course not found at index:', courseIndex);
@@ -1581,9 +1568,6 @@ function showCourseBooksModal(courseIndex) {
     const courseCode = course.course_code;
     const programCode = course.program_code;
 
-    console.log('🔴 Course found:', course);
-    console.log('🔴 Course Code:', courseCode);
-    console.log('🔴 Program Code:', programCode);
     
     // CRITICAL: Verify data exists before proceeding
     if (!importedBooksData && !originalParsedBooksData) {
@@ -1609,30 +1593,17 @@ function showCourseBooksModal(courseIndex) {
     const normalizedCourseCode = String(courseCode || '').trim();
     const normalizedProgramCode = String(programCode || '').trim().toUpperCase();
     
-    console.log('�� === LOADING COURSE BOOK REFERENCES ===');
-    console.log('🔍 Course Code:', normalizedCourseCode);
-    console.log('🔍 Program Code:', normalizedProgramCode);
-    console.log('🔍 courseBooksMap:', courseBooksMap);
     
     // METHOD 0: Try to get books directly from ORIGINAL detectedCourses (MOST RELIABLE!)
     // This is the original structure BEFORE server processing - it has the books arrays!
-    console.log('🔴 ========== METHOD 0: originalDetectedCourses LOOKUP ==========');
-    console.log('🔍 Looking for Course Code:', normalizedCourseCode);
-    console.log('🔍 Looking for Program Code:', normalizedProgramCode);
-    console.log('🔍 originalDetectedCourses exists:', !!originalDetectedCourses);
-    console.log('🔍 originalDetectedCourses type:', typeof originalDetectedCourses);
     
     if (originalDetectedCourses && typeof originalDetectedCourses === 'object') {
         const allKeys = Object.keys(originalDetectedCourses);
-        console.log('🔍 originalDetectedCourses has', allKeys.length, 'courses');
-        console.log('🔍 ALL keys (first 20):', allKeys.slice(0, 20));
         
         // Show sample course structure
         if (allKeys.length > 0) {
             const sampleKey = allKeys[0];
             const sampleCourse = originalDetectedCourses[sampleKey];
-            console.log('🔍 Sample course key:', sampleKey);
-            console.log('🔍 Sample course structure:', {
                 course_code: sampleCourse?.course_code,
                 program_code: sampleCourse?.program_code,
                 has_books: !!sampleCourse?.books,
@@ -1649,12 +1620,10 @@ function showCourseBooksModal(courseIndex) {
             `${courseCode}|${programCode}`
         ];
         
-        console.log('🔍 Trying possible keys:', possibleKeys);
         
         for (const key of possibleKeys) {
             if (originalDetectedCourses[key]) {
                 const courseObj = originalDetectedCourses[key];
-                console.log(`✅ Found course with key "${key}":`, {
                     course_code: courseObj.course_code,
                     program_code: courseObj.program_code,
                     books_count: courseObj.books?.length || 0
@@ -1662,7 +1631,6 @@ function showCourseBooksModal(courseIndex) {
                 
                 if (courseObj.books && Array.isArray(courseObj.books) && courseObj.books.length > 0) {
                     courseBooks = [...courseObj.books];
-                    console.log(`✅✅✅ FOUND ${courseBooks.length} books with key "${key}"!`);
                     break;
                 }
             }
@@ -1670,19 +1638,16 @@ function showCourseBooksModal(courseIndex) {
         
         // If still no books, try matching by course code only (case-insensitive)
         if (courseBooks.length === 0) {
-            console.log('🔍 No exact match found, trying case-insensitive course code match...');
             const matchingKeys = allKeys.filter(key => {
                 const parts = key.split('|');
                 const keyCourseCode = parts[0] ? String(parts[0]).trim() : '';
                 return keyCourseCode.toLowerCase() === normalizedCourseCode.toLowerCase();
             });
             
-            console.log(`🔍 Found ${matchingKeys.length} keys matching course code:`, matchingKeys);
             
             matchingKeys.forEach(key => {
                 const course = originalDetectedCourses[key];
                 if (course && course.books && Array.isArray(course.books) && course.books.length > 0) {
-                    console.log(`✅ Adding ${course.books.length} books from key "${key}"`);
                     course.books.forEach(book => {
                         if (!courseBooks.find(b => b.book_title === book.book_title && b.authors === book.authors)) {
                             courseBooks.push(book);
@@ -1692,20 +1657,16 @@ function showCourseBooksModal(courseIndex) {
             });
             
             if (courseBooks.length > 0) {
-                console.log(`✅✅✅ Found ${courseBooks.length} books total by aggregating!`);
             }
         }
     } else {
         console.error('❌ originalDetectedCourses is empty, null, or wrong type!');
     }
     
-    console.log('🔍 Final courseBooks count after METHOD 0:', courseBooks.length);
     
     // METHOD 0.3: DIRECT SEARCH IN originalParsedBooksData (SAME DATA THAT SHOWS COPYRIGHT YEARS!)
     // Since copyright years ARE showing, the books MUST be in originalParsedBooksData!
     if (courseBooks.length === 0 && originalParsedBooksData && Object.keys(originalParsedBooksData).length > 0) {
-        console.log('🔴 ========== METHOD 0.3: DIRECT SEARCH IN originalParsedBooksData ==========');
-        console.log('🔍 Searching for course code:', normalizedCourseCode);
         
         Object.keys(originalParsedBooksData).forEach(programKey => {
             const books = originalParsedBooksData[programKey];
@@ -1728,7 +1689,6 @@ function showCourseBooksModal(courseIndex) {
         });
         
         if (courseBooks.length > 0) {
-            console.log(`✅✅✅ FOUND ${courseBooks.length} books in originalParsedBooksData!`);
         } else {
             console.error('❌ No books found in originalParsedBooksData for course:', normalizedCourseCode);
         }
@@ -1737,16 +1697,13 @@ function showCourseBooksModal(courseIndex) {
     // METHOD 0.5: LAST RESORT - Search ALL courses by course code only (ignore program completely)
     // This should ALWAYS work if books exist
     if (courseBooks.length === 0 && originalDetectedCourses && typeof originalDetectedCourses === 'object') {
-        console.log('🔴 ========== METHOD 0.5: EXHAUSTIVE SEARCH BY COURSE CODE ONLY ==========');
         const allCourses = Object.values(originalDetectedCourses);
-        console.log(`🔍 Searching through ${allCourses.length} total courses...`);
         
         let foundCount = 0;
         allCourses.forEach((course, idx) => {
             const courseCodeMatch = String(course.course_code || '').trim().toLowerCase() === normalizedCourseCode.toLowerCase();
             if (courseCodeMatch && course.books && Array.isArray(course.books)) {
                 foundCount++;
-                console.log(`✅ Course #${idx} matches! Course code: "${course.course_code}", Books: ${course.books.length}`);
                 course.books.forEach(book => {
                     if (!courseBooks.find(b => b.book_title === book.book_title && b.authors === book.authors)) {
                         courseBooks.push(book);
@@ -1756,13 +1713,9 @@ function showCourseBooksModal(courseIndex) {
         });
         
         if (courseBooks.length > 0) {
-            console.log(`✅✅✅ EXHAUSTIVE SEARCH FOUND ${courseBooks.length} books from ${foundCount} matching courses!`);
         } else {
             console.error('❌ EXHAUSTIVE SEARCH FOUND NOTHING!');
-            console.log('🔍 Searched for course code:', normalizedCourseCode);
-            console.log('🔍 Available course codes in originalDetectedCourses:');
             allCourses.slice(0, 10).forEach(c => {
-                console.log(`  - "${c.course_code}" (${c.books?.length || 0} books)`);
             });
         }
     }
@@ -1771,7 +1724,6 @@ function showCourseBooksModal(courseIndex) {
     // Use ORIGINAL data first (before server transformation) as it has correct course_code
     if ((!courseBooksMap || Object.keys(courseBooksMap).length === 0)) {
         if (originalParsedBooksData && Object.keys(originalParsedBooksData).length > 0) {
-            console.log('⚠️ courseBooksMap is empty, rebuilding from originalParsedBooksData (BEST SOURCE)...');
             courseBooksMap = {};
             Object.keys(originalParsedBooksData).forEach(programCode => {
                 const books = originalParsedBooksData[programCode];
@@ -1793,9 +1745,7 @@ function showCourseBooksModal(courseIndex) {
                     });
                 }
             });
-            console.log('✅ Rebuilt courseBooksMap from original data:', Object.keys(courseBooksMap).length, 'courses with books');
         } else if (importedBooksData && Object.keys(importedBooksData).length > 0) {
-            console.log('⚠️ courseBooksMap is empty, rebuilding from importedBooksData (FALLBACK)...');
         courseBooksMap = {};
         Object.keys(importedBooksData).forEach(programCode => {
             const books = importedBooksData[programCode];
@@ -1817,7 +1767,6 @@ function showCourseBooksModal(courseIndex) {
                 });
             }
         });
-            console.log('✅ Rebuilt courseBooksMap from imported data:', Object.keys(courseBooksMap).length, 'courses with books');
         }
     }
     
@@ -1827,7 +1776,6 @@ function showCourseBooksModal(courseIndex) {
     if (courseBooksMap) {
         if (courseBooksMap[normalizedCourseCode]) {
         courseBooks = [...courseBooksMap[normalizedCourseCode]];
-            console.log(`✅ Found ${courseBooks.length} books in courseBooksMap (exact match) for "${normalizedCourseCode}"`);
     } else {
             // Try case-insensitive match
             const matchingKey = Object.keys(courseBooksMap).find(key => 
@@ -1835,42 +1783,31 @@ function showCourseBooksModal(courseIndex) {
             );
             if (matchingKey) {
                 courseBooks = [...courseBooksMap[matchingKey]];
-                console.log(`✅ Found ${courseBooks.length} books in courseBooksMap (case-insensitive match) for "${normalizedCourseCode}" (matched key: "${matchingKey}")`);
             }
         }
     }
     
     if (courseBooks.length === 0) {
-        console.log('�� No books in courseBooksMap, searching importedBooksData...');
         // Normalize the course code for matching (trim)
         const normalizedCourseCode = String(courseCode || '').trim();
         const normalizedProgramCode = String(programCode || '').trim().toUpperCase();
         
-        console.log('🔍 === AGGRESSIVE BOOK SEARCH ===');
-        console.log('🔍 Searching for Course Code:', normalizedCourseCode);
-        console.log('🔍 Program Code:', normalizedProgramCode);
-        console.log('🔍 importedBooksData:', importedBooksData);
-        console.log('🔍 originalParsedBooksData:', originalParsedBooksData);
         
         // AGGRESSIVE SEARCH: Search by course code ONLY (ignore program code completely)
         const searchByCourseCodeOnly = (dataToSearch, dataName) => {
             if (!dataToSearch || Object.keys(dataToSearch).length === 0) {
-                console.log(`🔍 ${dataName}: No data available`);
                 return 0;
             }
             
-            console.log(`🔍 Searching ${dataName} by course code ONLY (ignoring program)...`);
             let foundCount = 0;
             
             Object.keys(dataToSearch).forEach(programKey => {
                 const books = dataToSearch[programKey];
                 
                 if (!Array.isArray(books)) {
-                    console.log(`🔍 ${dataName} - Program ${programKey}: not an array`);
                     return;
                 }
                 
-                console.log(`🔍 ${dataName} - Program ${programKey}: checking ${books.length} books`);
                 
                 books.forEach((book, idx) => {
                     const bookCourseCode = String(book.course_code || '').trim();
@@ -1879,7 +1816,6 @@ function showCourseBooksModal(courseIndex) {
                     if (bookCourseCode === normalizedCourseCode || 
                         bookCourseCode.toLowerCase() === normalizedCourseCode.toLowerCase()) {
                         foundCount++;
-                        console.log(`✅ MATCH FOUND in ${dataName}!`, {
                             index: idx,
                             courseCode: bookCourseCode,
                             title: book.book_title || 'No title',
@@ -1890,71 +1826,54 @@ function showCourseBooksModal(courseIndex) {
                         if (!courseBooks.find(b => b.book_title === book.book_title && b.authors === book.authors)) {
                             courseBooks.push(book);
                             window.currentCourseBooks.push(book); // Store globally too
-                            console.log(`✅ Added book to list. Total now: ${courseBooks.length}`);
                         }
                     }
                 });
             });
             
-            console.log(`�� ${dataName}: Found ${foundCount} books by course code only`);
             return foundCount;
         };
         
         // Search in originalParsedBooksData FIRST (has correct course_code from parsing)
         // THIS IS THE SAME DATA THAT DETECTED COPYRIGHT YEARS, SO IT MUST HAVE THE BOOKS!
         if (originalParsedBooksData && Object.keys(originalParsedBooksData).length > 0) {
-            console.log('🔍 Searching originalParsedBooksData FIRST (BEST SOURCE - SAME AS COPYRIGHT YEARS)...');
-            console.log('🔍 Available programs in originalParsedBooksData:', Object.keys(originalParsedBooksData));
             searchByCourseCodeOnly(originalParsedBooksData, 'originalParsedBooksData');
         } else {
             console.error('❌ originalParsedBooksData is empty or missing - THIS IS A PROBLEM!');
-            console.log('🔍 importedBooksData exists:', !!importedBooksData);
-            console.log('🔍 importedBooksData keys:', importedBooksData ? Object.keys(importedBooksData) : 'null');
         }
         
         // If still no books, search in importedBooksData (server-matched data)
         if (courseBooks.length === 0 && importedBooksData && Object.keys(importedBooksData).length > 0) {
-            console.log('🔍 No books in originalParsedBooksData, searching importedBooksData (FALLBACK)...');
             searchByCourseCodeOnly(importedBooksData, 'importedBooksData');
         } else if (!importedBooksData || Object.keys(importedBooksData).length === 0) {
-            console.log('🔍 importedBooksData is empty or missing');
         }
         
-        console.log(`🔍 FINAL RESULT: Found ${courseBooks.length} books for course "${normalizedCourseCode}"`);
         window.currentCourseBooks = courseBooks; // Store globally
-        console.log('�� Stored courseBooks globally:', window.currentCourseBooks.length);
     }
     
     if (courseBooks.length > 0) {
-        console.log('🔴 First book sample:', {
             courseCode: courseBooks[0].course_code,
             title: courseBooks[0].book_title,
             authors: courseBooks[0].authors
         });
     } else {
         console.error('❌ NO BOOKS FOUND! This is a problem.');
-        console.log('🔍 Available course codes in originalParsedBooksData:');
         if (originalParsedBooksData) {
             Object.keys(originalParsedBooksData).forEach(programKey => {
                 const books = originalParsedBooksData[programKey];
                 if (Array.isArray(books) && books.length > 0) {
                     const uniqueCourseCodes = [...new Set(books.map(b => String(b.course_code || '').trim()))];
-                    console.log(`  Program ${programKey}: ${uniqueCourseCodes.slice(0, 10).join(', ')}${uniqueCourseCodes.length > 10 ? '...' : ''}`);
                 }
             });
         }
-        console.log('🔍 Available course codes in importedBooksData:');
         if (importedBooksData) {
             Object.keys(importedBooksData).forEach(programKey => {
                 const books = importedBooksData[programKey];
                 if (Array.isArray(books) && books.length > 0) {
                     const uniqueCourseCodes = [...new Set(books.map(b => String(b.course_code || '').trim()))];
-                    console.log(`  Program ${programKey}: ${uniqueCourseCodes.slice(0, 10).join(', ')}${uniqueCourseCodes.length > 10 ? '...' : ''}`);
                 }
             });
         }
-        console.log('🔍 Looking for course code:', normalizedCourseCode);
-        console.log('🔍 courseBooksMap has these keys:', courseBooksMap ? Object.keys(courseBooksMap).slice(0, 10) : 'null');
     }
     
     // Get modal and books list FIRST
@@ -1982,12 +1901,7 @@ function showCourseBooksModal(courseIndex) {
     
     // Use found books or fallback to global - USE LET SO WE CAN ASSIGN DUMMY DATA LATER
     let booksToDisplay = courseBooks.length > 0 ? courseBooks : (window.currentCourseBooks.length > 0 ? window.currentCourseBooks : []);
-    console.log('🔴 ========== RENDERING CONTENT ==========');
-    console.log('🔴 Books found locally:', courseBooks.length);
-    console.log('🔴 Books in global:', window.currentCourseBooks.length);
-    console.log('🔴 Books to display (BEFORE dummy check):', booksToDisplay.length);
     if (booksToDisplay.length > 0) {
-        console.log('🔴 First book sample:', {
             title: booksToDisplay[0].book_title,
             authors: booksToDisplay[0].authors,
             course_code: booksToDisplay[0].course_code
@@ -2023,7 +1937,6 @@ function showCourseBooksModal(courseIndex) {
         // Remove any duplicate containers (safety check)
         const allContainers = modal.querySelectorAll('#courseBooksListContainer');
         if (allContainers.length > 1) {
-            console.log('⚠️ Found', allContainers.length, 'containers - removing duplicates');
             // Keep the first one, remove the rest
             for (let i = 1; i < allContainers.length; i++) {
                 allContainers[i].remove();
@@ -2033,17 +1946,12 @@ function showCourseBooksModal(courseIndex) {
         // Remove any duplicate lists (safety check)
         const allLists = modal.querySelectorAll('#courseBooksList');
         if (allLists.length > 1) {
-            console.log('⚠️ Found', allLists.length, 'lists - removing duplicates');
             // Keep the first one, remove the rest
             for (let i = 1; i < allLists.length; i++) {
                 allLists[i].remove();
             }
         }
         
-        console.log('✅ Modal display styles applied');
-        console.log('  - display:', window.getComputedStyle(modal).display);
-        console.log('  - visibility:', window.getComputedStyle(modal).visibility);
-        console.log('  - z-index:', window.getComputedStyle(modal).zIndex);
     } catch (error) {
         console.error('❌ Error setting modal styles:', error);
         // Fallback: use direct style assignment
@@ -2056,9 +1964,7 @@ function showCourseBooksModal(courseIndex) {
     
     // RENDER CONTENT AFTER MODAL IS VISIBLE
     // If no books found, show dummy data for preview
-    console.log('🔍 Checking if dummy data needed. booksToDisplay.length:', booksToDisplay.length);
     if (booksToDisplay.length === 0) {
-        console.log('⚠️⚠️⚠️ No books found, ASSIGNING dummy data NOW...');
         const currentYear = new Date().getFullYear();
         booksToDisplay = [
             {
@@ -2117,17 +2023,10 @@ function showCourseBooksModal(courseIndex) {
                 call_number: 'QA76.758 .M37 2020'
             }
         ];
-        console.log('✅✅✅ DUMMY DATA ASSIGNED! Now booksToDisplay.length =', booksToDisplay.length);
-        console.log('✅✅✅ First dummy book:', booksToDisplay[0]);
     } else {
-        console.log('✅ Real books found, no dummy data needed. booksToDisplay.length:', booksToDisplay.length);
     }
     
-    console.log('🔴 FINAL CHECK: booksToDisplay.length =', booksToDisplay.length, '(about to render)');
     if (booksToDisplay.length > 0) {
-        console.log('🔴 RENDERING', booksToDisplay.length, 'BOOKS NOW');
-        console.log('🔴 booksList element:', booksList);
-        console.log('🔴 container element:', container);
         
         const currentYear = new Date().getFullYear();
         let html = `<div style="margin-bottom: 16px !important; padding-bottom: 12px !important; border-bottom: 2px solid #e0e0e0 !important; display: block !important; visibility: visible !important; opacity: 1 !important; background: white !important; padding: 12px !important;">
@@ -2160,14 +2059,11 @@ function showCourseBooksModal(courseIndex) {
         });
         
         // SET CONTENT - MULTIPLE METHODS TO ENSURE IT STICKS
-        console.log('🔴 HTML to set (first 500 chars):', html.substring(0, 500));
-        console.log('🔴 Full HTML length:', html.length);
         
         try {
         // Method 1: Clear and set innerHTML
         booksList.innerHTML = '';
         booksList.innerHTML = html;
-            console.log('✅ Method 1: innerHTML set directly');
         
             // Method 2: Also use DOM manipulation as backup
         const tempDiv = document.createElement('div');
@@ -2183,9 +2079,6 @@ function showCourseBooksModal(courseIndex) {
             booksList.appendChild(tempDiv.firstChild);
         }
         
-            console.log('✅ Method 2: DOM manipulation complete');
-        console.log('✅ booksList.innerHTML.length after setting:', booksList.innerHTML.length);
-            console.log('✅ booksList.children.length:', booksList.children.length);
             
             // Force a reflow
             booksList.offsetHeight;
@@ -2207,16 +2100,13 @@ function showCourseBooksModal(courseIndex) {
         
         // Force ALL children to be visible FIRST
         const allChildren = booksList.querySelectorAll('*');
-        console.log('🔍 Found', allChildren.length, 'child elements to make visible');
         allChildren.forEach((child, idx) => {
             child.style.setProperty('display', 'block', 'important');
             child.style.setProperty('visibility', 'visible', 'important');
             child.style.setProperty('opacity', '1', 'important');
             if (idx < 3) {
-                console.log(`  Child ${idx}:`, child.tagName, child.textContent?.substring(0, 50));
             }
         });
-        console.log('✅ Forced visibility on', allChildren.length, 'child elements');
         
         // FIX EXISTING container with absolute positioning - DON'T replace, just fix it!
         setTimeout(() => {
@@ -2230,13 +2120,9 @@ function showCourseBooksModal(courseIndex) {
             
             // Verify content exists
             if (existingList.innerHTML.length < 100) {
-                console.log('⚠️ Content not set yet, waiting...');
                 return;
             }
             
-            console.log('✅ FIXING EXISTING CONTAINER (not replacing - no duplicates!)');
-            console.log('List innerHTML length:', existingList.innerHTML.length);
-            console.log('List children count:', existingList.children.length);
             
             // Get modal box - ensure it's rendered
             const modalBox = modal.querySelector('.modal-box');
@@ -2258,7 +2144,6 @@ function showCourseBooksModal(courseIndex) {
             
             // Force a reflow and verify modal-box is rendering
             const modalBoxHeight = modalBox.offsetHeight;
-            console.log('Modal-box offsetHeight:', modalBoxHeight);
             if (modalBoxHeight === 0) {
                 console.error('❌ Modal-box has 0 height! Setting explicit height...');
                 modalBox.style.height = '400px';
@@ -2276,9 +2161,6 @@ function showCourseBooksModal(courseIndex) {
             const topPosition = headerHeight + 24;
             const containerWidth = (modalBoxRect.width > 0 ? modalBoxRect.width : 600) - 48;
             
-            console.log('Modal box height:', modalHeight);
-            console.log('Available height:', availableHeight);
-            console.log('Top position:', topPosition);
             
             // CRITICAL: Clear inline style attribute first (it has position:relative !important)
             existingContainer.removeAttribute('style');
@@ -2315,14 +2197,6 @@ function showCourseBooksModal(courseIndex) {
                 const computed = window.getComputedStyle(existingContainer);
                 const finalHeight = existingContainer.offsetHeight;
                 
-                console.log('✅ CONTAINER FIXED');
-                console.log('Container offsetHeight:', finalHeight);
-                console.log('Container scrollHeight:', existingContainer.scrollHeight);
-                console.log('Container computed position:', computed.position);
-                console.log('Container computed height:', computed.height);
-                console.log('List offsetHeight:', existingList.offsetHeight);
-                console.log('List scrollHeight:', existingList.scrollHeight);
-                console.log('List innerHTML length:', existingList.innerHTML.length);
                 
                 // If still 0 despite correct computed styles, try forcing a layout recalculation
                 if (finalHeight === 0 && computed.position === 'absolute' && computed.height !== 'auto') {
@@ -2366,13 +2240,10 @@ function showCourseBooksModal(courseIndex) {
                     
                     // Final check
                     const finalCheck = existingContainer.offsetHeight;
-                    console.log('✅ After layout force, offsetHeight:', finalCheck);
-                    console.log('Modal-box offsetHeight after fix:', modalBox.offsetHeight);
                     
                     // If STILL 0, try using getBoundingClientRect to see actual rendered size
                     if (finalCheck === 0) {
                         const rect = existingContainer.getBoundingClientRect();
-                        console.log('getBoundingClientRect():', {
                             width: rect.width,
                             height: rect.height,
                             top: rect.top,
@@ -2384,11 +2255,9 @@ function showCourseBooksModal(courseIndex) {
                         // If getBoundingClientRect shows dimensions but offsetHeight is 0, it's a browser quirk
                         // Try moving it to a different position or using transform
                         if (rect.height > 0) {
-                            console.log('✅ getBoundingClientRect shows height:', rect.height, '- element IS rendered!');
                             // Element is actually rendered, just offsetHeight is wrong
                             // Force visibility by ensuring it's in viewport
                             if (rect.top < 0 || rect.left < 0) {
-                                console.log('⚠️ Element is outside viewport, adjusting position...');
                                 existingContainer.style.top = '100px';
                                 existingContainer.style.left = '50px';
                             }
@@ -2418,15 +2287,11 @@ function showCourseBooksModal(courseIndex) {
                             
                             setTimeout(() => {
                                 const testRect = testContainer.getBoundingClientRect();
-                                console.log('Test container getBoundingClientRect:', testRect);
                                 if (testRect.height > 0) {
-                                    console.log('✅ Test container RENDERS! Parent was the issue.');
-                                    console.log('Moving container to modal-box directly (outside flex structure)...');
                                     
                                     // Remove container from current parent
                                     const currentParent = existingContainer.parentNode;
                                     if (currentParent && currentParent !== modalBox) {
-                                        console.log('Removing from current parent:', currentParent.tagName);
                                         currentParent.removeChild(existingContainer);
                                     }
                                     
@@ -2440,8 +2305,6 @@ function showCourseBooksModal(courseIndex) {
                                         modalBox.appendChild(existingContainer);
                                     }
                                     
-                                    console.log('✅ Container moved to modal-box directly');
-                                    console.log('Container parent now:', existingContainer.parentNode?.tagName);
                                     
                                     // Re-apply styles now that it's in the right parent
                                     existingContainer.style.setProperty('position', 'absolute', 'important');
@@ -2456,12 +2319,8 @@ function showCourseBooksModal(courseIndex) {
                                     setTimeout(() => {
                                         const finalRect = existingContainer.getBoundingClientRect();
                                         const finalOffset = existingContainer.offsetHeight;
-                                        console.log('✅ After moving to modal-box:');
-                                        console.log('  getBoundingClientRect height:', finalRect.height);
-                                        console.log('  offsetHeight:', finalOffset);
                                         
                                         if (finalRect.height > 0 || finalOffset > 0) {
-                                            console.log('✅✅✅ SUCCESS! Container is now rendering!');
                                         }
                                     }, 100);
                                 }
@@ -2477,16 +2336,6 @@ function showCourseBooksModal(courseIndex) {
         setTimeout(() => {
             const checkList = document.getElementById('courseBooksList');
             const checkContainer = document.getElementById('courseBooksListContainer');
-            console.log('🔍 ========== VERIFICATION AFTER 200ms ==========');
-            console.log('  - booksList exists:', !!checkList);
-            console.log('  - booksList.innerHTML.length:', checkList ? checkList.innerHTML.length : 'null');
-            console.log('  - booksToDisplay.length:', booksToDisplay.length);
-            console.log('  - container display:', checkContainer ? window.getComputedStyle(checkContainer).display : 'null');
-            console.log('  - container visibility:', checkContainer ? window.getComputedStyle(checkContainer).visibility : 'null');
-            console.log('  - booksList display:', checkList ? window.getComputedStyle(checkList).display : 'null');
-            console.log('  - booksList visibility:', checkList ? window.getComputedStyle(checkList).visibility : 'null');
-            console.log('  - booksList opacity:', checkList ? window.getComputedStyle(checkList).opacity : 'null');
-            console.log('  - booksList children count:', checkList ? checkList.children.length : 'null');
             
             // FORCE ALL CHILDREN TO BE VISIBLE
             if (checkList) {
@@ -2502,7 +2351,6 @@ function showCourseBooksModal(courseIndex) {
                         n.style.setProperty('opacity', '1', 'important');
                     });
                 });
-                console.log('✅ Forced visibility on', checkList.children.length, 'direct children');
             }
             
             if (checkList && checkList.innerHTML.length < 100 && booksToDisplay.length > 0) {
@@ -2512,7 +2360,6 @@ function showCourseBooksModal(courseIndex) {
                 checkList.style.setProperty('visibility', 'visible', 'important');
                 checkList.style.setProperty('opacity', '1', 'important');
             } else if (checkList && checkList.innerHTML.length >= 100) {
-                console.log('✅ Content verified - length:', checkList.innerHTML.length);
             } else {
                 console.error('❌ Content verification failed - checkList:', !!checkList, 'booksToDisplay:', booksToDisplay.length);
             }
@@ -2528,8 +2375,6 @@ function showCourseBooksModal(courseIndex) {
         }, 500);
     } else {
         console.error('❌ NO BOOKS TO DISPLAY - This should not happen if dummy data worked!');
-        console.log('🔴 Debug: importedBooksData keys:', importedBooksData ? Object.keys(importedBooksData) : 'null');
-        console.log('🔴 Debug: originalParsedBooksData keys:', originalParsedBooksData ? Object.keys(originalParsedBooksData) : 'null');
         
         // Show error message
         const errorHtml = `<div style="padding: 20px; text-align: center; color: #666; background: #fff; border-radius: 8px; margin: 20px;">
@@ -2541,7 +2386,6 @@ function showCourseBooksModal(courseIndex) {
         
         try {
             booksList.innerHTML = errorHtml;
-            console.log('✅ Error message set');
         } catch (error) {
             console.error('❌ Error setting error message:', error);
         }
@@ -2569,7 +2413,6 @@ function showCourseBooksModal(courseIndex) {
                 });
                 forceHtml += '</div>';
                 checkList.innerHTML = forceHtml;
-                console.log('✅ Force-rendered content');
             }
         }
         
@@ -2605,7 +2448,6 @@ function closeCourseBooksModal() {
         modal.removeAttribute('data-modal-open');
         modal.classList.remove('show');
         document.body.style.overflow = '';
-        console.log('✅ Course books modal closed');
     }
 }
 
@@ -2622,7 +2464,6 @@ window.closeCourseBooksModal = closeCourseBooksModal;
 // Also define as direct global functions to ensure they're always accessible
 if (typeof closeCourseBooksModal === 'undefined') {
     window.closeCourseBooksModal = function() {
-        console.log('🔴 CLOSING MODAL (global fallback)...');
         const modal = document.getElementById('courseBooksModal');
         if (modal) {
             modal.style.display = 'none';

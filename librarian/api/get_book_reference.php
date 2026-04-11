@@ -57,7 +57,6 @@ try {
     $response['message'] = 'Book reference fetched successfully';
     
 } catch (Exception $e) {
-    error_log("Error fetching book reference: " . $e->getMessage());
     $response['message'] = 'Failed to fetch book reference: ' . $e->getMessage();
 }
 

@@ -165,17 +165,14 @@ if (!$isAuthenticated) {
 // All functions are now defined in fix_js_errors.js to avoid conflicts
 
 // Simple diagnostic check
-console.log('🔍 DIAGNOSTIC: Checking critical functions...');
 const criticalFunctions = ['openAddCourseModal', 'toggleSidebar', 'checkProgramsAndOpenCourseModal'];
 criticalFunctions.forEach(funcName => {
     if (typeof window[funcName] === 'function') {
-        console.log('✅ Function available:', funcName);
     } else {
         console.error('❌ Function missing:', funcName);
     }
 });
 
-console.log('🔍 DIAGNOSTIC: All checks complete');
 </script>
 </body>
 </html>

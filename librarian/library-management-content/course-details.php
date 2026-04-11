@@ -13,7 +13,6 @@ if (empty($courseCode)) {
 }
 
 // Debug: Log the course code
-error_log("Course Details - Looking for course: " . $courseCode);
 
 // Fetch course details and all programs - get all course entries for this course code
 $courseDetails = null;
@@ -77,12 +76,9 @@ try {
         $courseDetails['all_programs'] = $allPrograms;
         
         // Debug: Log if course was found
-        error_log("Course Details - Found course: " . $courseDetails['course_code'] . " with " . count($allPrograms) . " programs");
     } else {
-        error_log("Course Details - No course found with code: " . $courseCode);
     }
 } catch (Exception $e) {
-    error_log("Error fetching course details: " . $e->getMessage());
 }
 
 // Fetch book references
@@ -133,7 +129,6 @@ if ($courseDetails && isset($courseDetails['id'])) {
             }
         }
     } catch (Exception $e) {
-        error_log("Error fetching book references: " . $e->getMessage());
     }
 }
 
@@ -1010,7 +1005,6 @@ const currentCourseTitle = <?php echo json_encode($courseDetails['course_title']
 const currentCourseId = <?php echo $courseDetails['id'] ?? 0; ?>;
 
 function openAddBookModal() {
-    console.log('🚀 COURSE-DETAILS: Opening Add Book Modal...');
     
     // Show modal
     const modal = document.getElementById('addBookModal');
@@ -1019,12 +1013,9 @@ function openAddBookModal() {
         modal.style.setProperty('overflow', 'hidden', 'important');
         
         // Prevent body scroll - SAME AS WORKING TEST BUTTONS
-        console.log('🔒 COURSE-DETAILS: Applying scroll lock...');
         if (typeof lockPageScroll === 'function') {
             lockPageScroll();
-            console.log('✅ COURSE-DETAILS: lockPageScroll() called successfully');
         } else {
-            console.log('❌ COURSE-DETAILS: lockPageScroll function not found!');
             // Fallback
             document.body.style.setProperty('overflow', 'hidden', 'important');
             document.body.style.setProperty('position', 'fixed', 'important');
@@ -1035,9 +1026,7 @@ function openAddBookModal() {
             document.documentElement.style.setProperty('overflow', 'hidden', 'important');
         }
         
-        console.log('✅ COURSE-DETAILS: Modal opened and scroll locked');
     } else {
-        console.log('❌ COURSE-DETAILS: Modal element not found!');
     }
     
     // Set course information in the form if available
@@ -1048,7 +1037,6 @@ function openAddBookModal() {
         courseSearchInput.value = currentCourseCode + ' - ' + currentCourseTitle;
         // Set the hidden course_id field
         courseIdInput.value = currentCourseId;
-        console.log('✅ COURSE-DETAILS: Pre-filled course:', currentCourseCode);
     }
     
     // Don't reset the form - keep the course filled in
@@ -1066,7 +1054,6 @@ function openAddBookModal() {
 
 // Tab switching functionality
 function switchTab(tabName) {
-    console.log('🔄 Switching to tab:', tabName);
     
     // Hide all tab contents
     const tabContents = document.querySelectorAll('.tab-content');
@@ -1106,12 +1093,10 @@ function switchTab(tabName) {
         selectedButton.classList.add('active');
     }
     
-    console.log('✅ Tab switched to:', tabName);
 }
 
 // Archive book functionality
 function archiveBook(bookId) {
-    console.log('📦 Archiving book with ID:', bookId);
     
     if (confirm('Are you sure you want to archive this book reference? This action can be undone later.')) {
         // Here you would make an API call to archive the book
@@ -1123,9 +1108,7 @@ function archiveBook(bookId) {
         // 2. Refresh the page or update the UI
         // 3. Show success/error messages
         
-        console.log('✅ Book archived:', bookId);
     } else {
-        console.log('❌ Archive cancelled by user');
     }
 }
 
@@ -1214,7 +1197,6 @@ function closeCatalogingErrorModal() {
 
 // Processing status functions
 async function startCataloging(bookId) {
-    console.log('📚 Starting cataloging for book ID:', bookId);
     
     // Fetch book reference data from database
     try {
@@ -1304,17 +1286,14 @@ function validateCompleteCatalogingButton() {
 }
 
 function draftBook(bookId) {
-    console.log('📝 Drafting book ID:', bookId);
     // Navigate to Material Processing page
     window.location.href = 'content.php?page=material-processing';
 }
 
 function resumeProcessing(bookId) {
-    console.log('▶️ Resuming processing for book ID:', bookId);
     // API call to update status back to processing
     updateProcessingStatus(bookId, 'processing')
         .then(() => {
-            console.log(`Resumed processing for book ${bookId}`);
             // Reload the page to reflect the change
             window.location.reload();
         })

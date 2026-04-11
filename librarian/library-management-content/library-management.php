@@ -1738,7 +1738,6 @@ const sampleCourses = [
 
 // Initialize Library Management
 document.addEventListener('DOMContentLoaded', function() {
-    console.log('Initializing Library Management page...');
     
     // Load data from database
     loadLibraryData();
@@ -1747,7 +1746,6 @@ document.addEventListener('DOMContentLoaded', function() {
     document.addEventListener('click', function(e) {
         // Handle pagination button clicks specifically
         if (e.target.classList.contains('page-number') || e.target.classList.contains('pagination-btn')) {
-            console.log('Pagination button clicked:', e.target);
             // Don't stop propagation, let the onclick handler work
             // e.stopPropagation();
         }
@@ -1757,7 +1755,6 @@ document.addEventListener('DOMContentLoaded', function() {
 // Function to fetch library data from database
 async function loadLibraryData() {
     try {
-        console.log('Loading library data from database...');
         
         // Build query parameters
         const params = new URLSearchParams({
@@ -1792,13 +1789,6 @@ async function loadLibraryData() {
             
             // Debug: Log the first course to see what data we're getting
             if (allCourses.length > 0) {
-                console.log('First course data:', allCourses[0]);
-                console.log('Program color from API:', allCourses[0].program_color);
-                console.log('Total database courses:', allCourses.length);
-                console.log('Total merged courses:', mergedCourses.length);
-                console.log('Items per page:', libraryItemsPerPage);
-                console.log('Total pages:', totalPages);
-                console.log('Current page:', currentLibraryPage);
             }
             
             displayCourses();
@@ -1815,7 +1805,6 @@ async function loadLibraryData() {
 
 // Add Course Modal Function - LIBRARIAN
 function openAddCourseModal() {
-    console.log('Opening librarian add course modal...');
     
     try {
         // Show modal
@@ -1849,7 +1838,6 @@ function openAddCourseModal() {
                 checkLibrarianCourseFormValidity();
             }, 100);
             
-            console.log('Librarian add course modal opened successfully');
         } else {
             console.error('Librarian add course modal element not found');
         }
@@ -1870,7 +1858,6 @@ function closeLibrarianAddCourseModal() {
             document.body.style.width = '';
             document.body.style.height = '';
             
-            console.log('Librarian add course modal closed successfully');
         }
     } catch (error) {
         console.error('Error closing librarian add course modal:', error);
@@ -1939,7 +1926,6 @@ function openLibrarianProgramSelectModal() {
                 if (searchInput) searchInput.focus();
             }, 100);
             
-            console.log('Librarian program selection modal opened');
         } else {
             console.error('Librarian program selection modal not found');
         }
@@ -2093,7 +2079,6 @@ function resetLibrarianCourseForm() {
             createBtn.disabled = true;
             createBtn.style.backgroundColor = '#6c757d';
         }
-        console.log('Librarian course form reset successfully');
     } catch (error) {
         console.error('Error resetting librarian form:', error);
     }
@@ -2133,7 +2118,6 @@ function retryLibrarianCourseCreation() {
 
 // Create course via API
 function createLibrarianCourseWithDatabase(courseData) {
-    console.log('Creating librarian course in database...');
     
     const createBtn = document.getElementById('librarianCreateCourseBtn');
     if (createBtn) {
@@ -2151,17 +2135,14 @@ function createLibrarianCourseWithDatabase(courseData) {
     })
     .then(response => response.json())
     .then(data => {
-        console.log('Librarian course creation response:', data);
         
         if (data.success) {
-            console.log('Librarian course creation successful');
             showLibrarianCourseSuccessModal({
                 course_code: courseData.course_code,
                 course_name: courseData.course_name,
                 program_name: data.program_name || 'Selected Program'
             });
         } else {
-            console.log('Librarian course creation failed:', data.message);
             showLibrarianCourseErrorModal(
                 data.message || 'Failed to create course. Please try again.',
                 data.error_details || null
@@ -2247,13 +2228,6 @@ function displayCourses() {
     const paginatedCourses = mergedCourses.slice(startIndex, endIndex);
     
     // Debug: Log pagination info
-    console.log('Display Courses Debug:');
-    console.log('- Total merged courses:', mergedCourses.length);
-    console.log('- Current page:', currentLibraryPage);
-    console.log('- Items per page:', libraryItemsPerPage);
-    console.log('- Start index:', startIndex);
-    console.log('- End index:', endIndex);
-    console.log('- Courses to display:', paginatedCourses.length);
     
     // Display paginated merged courses
     paginatedCourses.forEach(courseGroup => {
@@ -2374,8 +2348,6 @@ function groupCoursesByInfo(courses) {
         };
         
         // Debug: Log the program color and full course data
-        console.log('Course data:', course);
-        console.log('Program:', programInfo.name, 'Color:', programInfo.color);
         
         // Check if program is already in the group
         const existingProgram = groups[key].programs.find(p => p.name === programInfo.name);
@@ -2478,7 +2450,6 @@ function updateLibraryPagination() {
                 e.preventDefault();
                 e.stopPropagation();
                 const page = parseInt(this.getAttribute('data-page'));
-                console.log('Fallback click handler triggered for page:', page);
                 goToPage(page);
             });
             
@@ -2487,7 +2458,6 @@ function updateLibraryPagination() {
                 e.preventDefault();
                 e.stopPropagation();
                 const page = parseInt(this.getAttribute('data-page'));
-                console.log('Direct onclick handler triggered for page:', page);
                 goToPage(page);
                 return false;
             };
@@ -2508,13 +2478,10 @@ function changePage(direction) {
 }
 
 function goToPage(page) {
-    console.log(`goToPage called with page: ${page}, currentLibraryPage: ${currentLibraryPage}, totalPages: ${totalPages}`);
     if (page >= 0 && page < totalPages) {
         currentLibraryPage = page;
-        console.log(`Setting currentLibraryPage to: ${currentLibraryPage}`);
         loadLibraryData();
     } else {
-        console.log(`Page ${page} is out of range (0-${totalPages-1})`);
     }
 }
 
@@ -2540,7 +2507,6 @@ function filterLibraryItems() {
 }
 
 function importLibraryData() {
-    console.log('Opening import data modal...');
     if (typeof openImportDataModal === 'function') {
         openImportDataModal();
     } else {
@@ -2549,12 +2515,10 @@ function importLibraryData() {
 }
 
 function exportLibraryData() {
-    console.log('Exporting library data...');
     alert('Library data export would start here. This would generate a CSV or Excel file with all library items.');
 }
 
 function openFilterModal() {
-    console.log('Opening filter modal...');
     document.getElementById('libraryFilterModal').style.display = 'flex';
     
     // Use universal scroll prevention
@@ -2577,7 +2541,6 @@ function openFilterModal() {
 }
 
 function closeFilterModal() {
-    console.log('Closing filter modal...');
     document.getElementById('libraryFilterModal').style.display = 'none';
     
     // Use universal scroll restoration
@@ -2772,7 +2735,6 @@ function clearProgramSelection() {
 }
 
 function applyFilters() {
-    console.log('Applying filters...');
     
     // Get filter values
     currentFilters.yearLevel = document.getElementById('filterYearLevel').value;
@@ -2785,7 +2747,6 @@ function applyFilters() {
     const selectedPrograms = checkboxes.length > 0 ? Array.from(checkboxes).map(checkbox => checkbox.value) : ['all'];
     currentFilters.program = selectedPrograms;
     
-    console.log('Current filters:', currentFilters);
     
     // Reset to first page and reload data from database
     currentLibraryPage = 0;
@@ -2796,7 +2757,6 @@ function applyFilters() {
 }
 
 function clearFilters() {
-    console.log('Clearing all filters...');
     
     // Reset all filter selects
     document.getElementById('filterYearLevel').value = 'all';
@@ -2827,7 +2787,6 @@ function clearFilters() {
 }
 
 function applyCourseFilters() {
-    console.log('Applying course filters...');
     
     // Start with all courses
     filteredCourses = [...allCourses];
@@ -2889,7 +2848,6 @@ function applyCourseFilters() {
     displayCourses();
     updateLibraryPagination();
     
-    console.log(`Filtered to ${filteredCourses.length} courses`);
 }
 
 // Librarian form submission handler
@@ -2905,7 +2863,6 @@ document.addEventListener('DOMContentLoaded', function() {
                 courseData[key] = value;
             }
             
-            console.log('Librarian Course Data:', courseData);
             
             // Create course in database
             createLibrarianCourseWithDatabase(courseData);

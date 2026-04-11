@@ -22,7 +22,6 @@ $logoutInfo = [
 file_put_contents('super_admin_logout_log.txt', json_encode($logoutInfo) . PHP_EOL, FILE_APPEND);
 
 // Log to error log
-error_log("Super Admin logout at: " . date('Y-m-d H:i:s'));
 
 // Clear session data
 $_SESSION = array();

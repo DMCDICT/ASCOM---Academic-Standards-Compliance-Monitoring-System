@@ -12,7 +12,6 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
 
 // Check authentication
 if (!isset($_SESSION['user_id'])) {
-    error_log('Delete draft: User not authenticated. Session user_id: ' . (isset($_SESSION['user_id']) ? $_SESSION['user_id'] : 'not set'));
     echo json_encode(['success' => false, 'message' => 'User not authenticated']);
     exit;
 }
@@ -24,7 +23,6 @@ try {
     $proposalId = $data['proposal_id'] ?? null;
     $programId = $data['program_id'] ?? null;
     
-    error_log('Delete draft request - user_id: ' . $userId . ', proposal_id: ' . $proposalId . ', program_id: ' . $programId);
     
     if (!$proposalId) {
         echo json_encode([
@@ -66,13 +64,11 @@ try {
     $deleteStmt->execute([$actualDraftId, $userId]);
     
     if ($deleteStmt->rowCount() > 0) {
-        error_log('Draft deleted successfully - ID: ' . $actualDraftId);
         echo json_encode([
             'success' => true,
             'message' => 'Draft deleted successfully'
         ]);
     } else {
-        error_log('No rows deleted - draft ID: ' . $actualDraftId . ', user_id: ' . $userId);
         echo json_encode([
             'success' => false,
             'message' => 'Draft not found or already deleted'
@@ -80,8 +76,6 @@ try {
     }
     
 } catch (Exception $e) {
-    error_log('Error deleting course draft: ' . $e->getMessage());
-    error_log('Stack trace: ' . $e->getTraceAsString());
     echo json_encode([
         'success' => false,
         'message' => 'Error deleting draft: ' . $e->getMessage()

@@ -127,7 +127,6 @@ try {
     $response['message'] = 'Processing materials fetched successfully';
     
 } catch (Exception $e) {
-    error_log("Error fetching processing materials: " . $e->getMessage());
     $response['message'] = 'Failed to fetch processing materials: ' . $e->getMessage();
 }
 

@@ -287,15 +287,6 @@ if ($employee_no && $employee_no !== 'SUPER_ADMIN') {
       }, 1000);
     }
 
-    // Add form submission debugging
-    document.getElementById("loginForm").addEventListener("submit", function(e) {
-      console.log("Form submitted!");
-      console.log("Username:", usernameInput.value);
-      console.log("Password length:", passwordInput.value.length);
-      
-      // Don't prevent default - let it submit normally
-      // This will help us see if the form is actually submitting
-    });
 
     window.addEventListener('DOMContentLoaded', () => {
       const urlParams = new URLSearchParams(window.location.search);

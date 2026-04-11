@@ -11,9 +11,6 @@ require_once dirname(__FILE__) . '/../../super_admin-mis/includes/db_connection.
 $userId = $_SESSION['user_id'] ?? $_SESSION['id'] ?? null;
 
 // Debug: Log what we found
-error_log('QA Switch Role - Session user_id: ' . ($_SESSION['user_id'] ?? 'not set'));
-error_log('QA Switch Role - Session id: ' . ($_SESSION['id'] ?? 'not set'));
-error_log('QA Switch Role - Final userId: ' . ($userId ?? 'null'));
 
 if (!$userId) {
     echo json_encode(['success' => false, 'error' => 'User ID not found in session']);
@@ -35,9 +32,7 @@ $result = $stmt->get_result();
 $user = $result->fetch_assoc();
 
 // Debug: Log user data
-error_log('QA Switch Role - User found: ' . ($user ? 'yes' : 'no'));
 if ($user) {
-    error_log('QA Switch Role - User data: ' . print_r($user, true));
 }
 
 if ($user) {
@@ -56,8 +51,6 @@ if ($user) {
     ];
     
     // Debug: Log what we're setting
-    error_log('QA Switch Role - Setting department: ' . $user['department_code']);
-    error_log('QA Switch Role - Setting color: ' . $user['color_code']);
     
     // Ensure session is written
     session_write_close();

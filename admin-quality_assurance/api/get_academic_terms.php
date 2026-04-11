@@ -65,7 +65,6 @@ try {
         }
     } else {
         // No active academic year found
-        error_log("No active academic year found in get_academic_terms.php");
     }
     
     // Get initial date range for "All Terms" option
@@ -93,7 +92,6 @@ try {
     ]);
     
 } catch (Exception $e) {
-    error_log("Error in get_academic_terms.php: " . $e->getMessage());
     echo json_encode([
         'success' => false,
         'message' => 'Database error: ' . $e->getMessage(),

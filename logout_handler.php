@@ -19,7 +19,6 @@ function updateUserLogoutStatus(?string $employeeNo): void
         $stmt->execute();
         $stmt->close();
     } catch (Throwable $e) {
-        error_log('Error updating user logout status: ' . $e->getMessage());
     }
 }
 

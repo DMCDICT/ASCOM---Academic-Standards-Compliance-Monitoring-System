@@ -7,9 +7,6 @@ set_error_handler(function($severity, $message, $file, $line) {
 
 try {
     // Log the incoming POST data for debugging
-    error_log("=== COURSE APPROVAL/REJECTION DEBUG START ===");
-    error_log("File reached: approve_reject_course.php");
-    error_log("POST data: " . print_r($_POST, true));
     
     // Include session configuration
     $sessionConfigPath = dirname(dirname(__FILE__)) . '/../session_config.php';
@@ -30,7 +27,6 @@ try {
     
     // Check if selected role is dean
     if (!isset($_SESSION['selected_role']) || $_SESSION['selected_role']['type'] !== 'dean') {
-        error_log("ERROR: Selected role is not dean");
         throw new Exception('Unauthorized access - Dean role required');
     }
     
@@ -46,9 +42,6 @@ try {
     $action = trim($_POST['action'] ?? '');
     
     // Debug: Log form data
-    error_log("Form data received:");
-    error_log("- Course ID: $courseId");
-    error_log("- Action: '$action'");
     
     // Validate inputs
     if ($courseId <= 0) {
@@ -115,8 +108,6 @@ try {
     ob_clean();
     
     // Log the error
-    error_log("=== COURSE APPROVAL/REJECTION ERROR ===");
-    error_log("Error message: " . $e->getMessage());
     
     // Return error response
     echo json_encode([

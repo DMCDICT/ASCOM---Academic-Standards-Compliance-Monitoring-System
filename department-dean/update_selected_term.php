@@ -22,7 +22,6 @@ try {
     $_SESSION['selectedTermId'] = $termId;
     
     // Log the update for debugging
-    error_log("Session updated - selectedTermId: " . $termId);
     
     // Return success response
     echo json_encode([

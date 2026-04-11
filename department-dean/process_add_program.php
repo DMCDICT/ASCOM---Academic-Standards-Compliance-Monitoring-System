@@ -103,7 +103,6 @@ if (!$deanDepartmentId && isset($_SESSION['selected_role']['department_code'])) 
         }
     } catch (Exception $e) {
         // Log error but continue
-        error_log("Error getting department ID from code: " . $e->getMessage());
     }
 }
 
@@ -119,7 +118,6 @@ if (!$deanDepartmentId && isset($_SESSION['user_id'])) {
         }
     } catch (Exception $e) {
         // Log error but continue
-        error_log("Error getting department ID: " . $e->getMessage());
     }
 }
 
@@ -186,7 +184,6 @@ if ($insertStmt->execute([$programCode, $programName, $major, $departmentColorCo
         $logStmt->execute([$username, $activityDescription, $deanDepartmentId]);
     } catch (Exception $e) {
         // If activity_logs table doesn't exist, just continue
-        error_log("Activity logging failed: " . $e->getMessage());
     }
     
     // Send notifications to Super Admin, Librarian, Quality Assurance, and Teachers/Faculty
@@ -207,7 +204,6 @@ if ($insertStmt->execute([$programCode, $programName, $major, $departmentColorCo
                 }
             }
         } catch (Exception $e) {
-            error_log("Failed to get dean name: " . $e->getMessage());
         }
         
         $departmentName = $_SESSION['selected_role']['department_name'] ?? 'Department';
@@ -362,7 +358,6 @@ if ($insertStmt->execute([$programCode, $programName, $major, $departmentColorCo
         
     } catch (Exception $e) {
         // Log notification error but don't fail the program creation
-        error_log("Notification creation failed: " . $e->getMessage());
         file_put_contents('../login_debug.txt', 'process_add_program.php - Notification error: ' . $e->getMessage() . PHP_EOL, FILE_APPEND);
         
         // Try to create a simple notification without sender details

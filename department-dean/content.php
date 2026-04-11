@@ -285,14 +285,12 @@ async function loadCourseSelectionPrograms() {
         const response = await fetch('api/get_programs.php');
         const data = await response.json();
         
-        console.log('Programs API response:', data);
         
         const select = document.getElementById('courseSelectionProgram');
         if (!select) return;
         
         if (data.success && data.programs) {
             courseSelectionPrograms = data.programs;
-            console.log('Loaded programs:', courseSelectionPrograms.length);
             
             // Clear existing options except the first one
             select.innerHTML = '<option value="">Select Program</option>';
@@ -360,10 +358,8 @@ function loadCourseSelectionCourses() {
         const stored = sessionStorage.getItem('courseSelectionCourses');
         if (stored) {
             courseSelectionCourses = JSON.parse(stored);
-            console.log('Loaded courses from sessionStorage:', courseSelectionCourses.length);
         } else {
             courseSelectionCourses = [];
-            console.log('No courses in sessionStorage');
         }
         // No need to render since the course list element was removed from the modal
     } catch (error) {
@@ -614,7 +610,6 @@ function closeQASubmitErrorModal() {
 // Save courses as draft (no longer used since course list was removed, but keeping for compatibility)
 async function saveCoursesAsDraft() {
     // This function is no longer needed since we removed the course list from the modal
-    console.log('saveCoursesAsDraft called but course list was removed from modal');
     return;
 }
 
@@ -647,10 +642,6 @@ function selectCourseType(type) {
     
     if (type === 'proposal') {
         // Open the existing course proposal modal with program check
-        console.log('=== selectCourseType: proposal ===');
-        console.log('Context BEFORE opening modal:', window.courseSelectionContext);
-        console.log('Context type:', typeof window.courseSelectionContext);
-        console.log('Context keys:', window.courseSelectionContext ? Object.keys(window.courseSelectionContext) : 'null');
         
         // Double-check context is set
         if (!window.courseSelectionContext) {
@@ -661,7 +652,6 @@ function selectCourseType(type) {
         
         // Check context AFTER opening
         setTimeout(() => {
-            console.log('Context AFTER opening modal:', window.courseSelectionContext);
         }, 100);
     } else if (type === 'cross-department') {
         // Open cross-department courses modal (to be implemented)
@@ -692,7 +682,6 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 function openCourseProposalModal() {
-    console.log('openCourseProposalModal called, context:', window.courseSelectionContext);
     
     // Clear draft resume data unless we're explicitly resuming a draft
     const isResumingDraft = window.courseSelectionContext && window.courseSelectionContext.isResumingDraft === true;
@@ -701,14 +690,12 @@ function openCourseProposalModal() {
         if (window.courseSelectionContext) {
             delete window.courseSelectionContext.isResumingDraft;
         }
-        console.log('📝 Cleared draft resume data in openCourseProposalModal - opening fresh modal');
     }
     
     // Check if we're on the course-details page - just open the course modal directly
     const currentPage = window.location.search;
     if (currentPage.includes('course-details')) {
         if (typeof openAddCourseModal === 'function') {
-            console.log('Calling openAddCourseModal from course-details page');
             openAddCourseModal();
         }
         return;
@@ -815,14 +802,12 @@ document.addEventListener('DOMContentLoaded', function() {
         if (typeof window.checkProgramsAndOpenCourseModal === 'function') {
             const originalCheckProgramsAndOpenCourseModal = window.checkProgramsAndOpenCourseModal;
             window.checkProgramsAndOpenCourseModal = function() {
-                console.log('🔧 checkProgramsAndOpenCourseModal called - showing selection modal');
                 
                 // Clear any draft resume data when opening a new course proposal
                 window.draftToResume = null;
                 if (window.courseSelectionContext) {
                     delete window.courseSelectionContext.isResumingDraft;
                 }
-                console.log('📝 Cleared draft resume data - opening new course proposal');
                 
                 // Show selection modal instead of directly opening course modal
                 if (typeof openCourseSelectionModal === 'function') {
@@ -832,7 +817,6 @@ document.addEventListener('DOMContentLoaded', function() {
                     originalCheckProgramsAndOpenCourseModal();
                 }
             };
-            console.log('✅ Overrode checkProgramsAndOpenCourseModal to show selection modal');
         }
     }, 200);
 });
@@ -1177,16 +1161,12 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 // TOOLTIP SYSTEM - Fixed and working
-console.log('🚨 DEAN: Tooltip system enabled');
 
 function createEmergencyTooltips() {
-    console.log('🚨 DEAN: Creating tooltips...');
     
     const navButtons = document.querySelectorAll('.nav-button');
-    console.log(`🚨 DEAN: Found ${navButtons.length} nav buttons`);
     
     if (navButtons.length === 0) {
-        console.log('🚨 DEAN: No nav buttons found');
         return;
     }
     
@@ -1199,13 +1179,11 @@ function createEmergencyTooltips() {
             // Get innerHTML and replace <br> tags with spaces
             tooltipText = spanElement.innerHTML.replace(/<br\s*\/?>/gi, ' ').replace(/\s+/g, ' ').trim();
         }
-        console.log(`🚨 DEAN: Setting up tooltip for button ${index + 1}: "${tooltipText}"`);
         
         button.addEventListener('mouseenter', function() {
             const sidebar = document.getElementById('sidebar');
             const isCollapsed = sidebar ? sidebar.classList.contains('collapsed') : false;
             
-            console.log(`🚨 DEAN: Hover on button ${index + 1}, sidebar collapsed: ${isCollapsed}`);
             
             if (isCollapsed) {
                 if (emergencyTooltip) {
@@ -1213,7 +1191,6 @@ function createEmergencyTooltips() {
                 }
                 
                 const buttonRect = button.getBoundingClientRect();
-                console.log(`🚨 DEAN: Button ${index + 1} position:`, buttonRect);
                 
                 emergencyTooltip = document.createElement('div');
                 emergencyTooltip.innerHTML = `
@@ -1257,21 +1234,17 @@ function createEmergencyTooltips() {
                 `;
                 
                 document.body.appendChild(emergencyTooltip);
-                console.log(`🚨 DEAN: Tooltip created for button ${index + 1}`);
             }
         });
         
         button.addEventListener('mouseleave', function() {
-            console.log(`🚨 DEAN: Leave button ${index + 1}`);
             if (emergencyTooltip) {
                 emergencyTooltip.remove();
                 emergencyTooltip = null;
-                console.log(`🚨 DEAN: Tooltip removed for button ${index + 1}`);
             }
         });
     });
     
-    console.log('🚨 DEAN: Emergency tooltips created successfully');
 }
 
 // Create emergency tooltips multiple times
@@ -1282,52 +1255,40 @@ setTimeout(createEmergencyTooltips, 5000);
 // Make it available globally
 window.createEmergencyTooltips = createEmergencyTooltips;
 
-console.log('🚨 DEAN: Emergency tooltip system ready');
 
 // CHAT AND NOTIFICATION FUNCTIONALITY
-console.log('🚨 DEAN: Initializing chat and notification functionality');
 
 // Initialize chats and notifications
 const chatsIcon = document.querySelector('.chats-icon');
 if (chatsIcon) {
-    console.log('🚨 DEAN: Chats icon found, adding click handler');
     chatsIcon.onclick = function(e) {
         e.preventDefault();
         e.stopPropagation();
-        console.log('🚨 DEAN: Chats icon clicked');
         const dropdown = document.getElementById('chatsDropdown');
         if (dropdown) {
             const currentDisplay = dropdown.style.display;
             dropdown.style.display = currentDisplay === 'block' ? 'none' : 'block';
-            console.log('🚨 DEAN: Chats dropdown toggled:', dropdown.style.display);
         }
     };
     chatsIcon.style.cursor = 'pointer';
     chatsIcon.style.pointerEvents = 'auto';
-    console.log('🚨 DEAN: Chats initialized');
 } else {
-    console.log('🚨 DEAN: Chats icon not found');
 }
 
 const notificationIcon = document.querySelector('.notification-icon');
 if (notificationIcon) {
-    console.log('🚨 DEAN: Notification icon found, adding click handler');
     notificationIcon.onclick = function(e) {
         e.preventDefault();
         e.stopPropagation();
-        console.log('🚨 DEAN: Notification icon clicked');
         const dropdown = document.getElementById('notificationDropdown');
         if (dropdown) {
             const currentDisplay = dropdown.style.display;
             dropdown.style.display = currentDisplay === 'block' ? 'none' : 'block';
-            console.log('🚨 DEAN: Notification dropdown toggled:', dropdown.style.display);
         }
     };
     notificationIcon.style.cursor = 'pointer';
     notificationIcon.style.pointerEvents = 'auto';
-    console.log('🚨 DEAN: Notifications initialized');
 } else {
-    console.log('🚨 DEAN: Notification icon not found');
 }
 
 // Close dropdowns when clicking outside
@@ -1347,14 +1308,11 @@ document.addEventListener('click', function(e) {
     }
 });
 
-console.log('🚨 DEAN: Chat and notification functionality ready');
 
 // DIAGNOSTIC: Check if all critical functions are available
-console.log('🔍 DIAGNOSTIC: Checking critical functions...');
 const criticalFunctions = ['openAddCourseModal', 'toggleSidebar', 'checkProgramsAndOpenCourseModal'];
 criticalFunctions.forEach(funcName => {
     if (typeof window[funcName] === 'function') {
-        console.log('✅ Function available:', funcName);
     } else {
         console.error('❌ Function missing:', funcName);
     }
@@ -1363,12 +1321,10 @@ criticalFunctions.forEach(funcName => {
 // Note: The override is handled in DOMContentLoaded event above
 
 // DIAGNOSTIC: Check if modal elements exist
-console.log('🔍 DIAGNOSTIC: Checking modal elements...');
 const modalElements = ['addCourseModal', 'programSelectModal', 'courseSelectionModal'];
 modalElements.forEach(elementId => {
     const element = document.getElementById(elementId);
     if (element) {
-        console.log('✅ Element found:', elementId);
     } else {
         console.error('❌ Element missing:', elementId);
     }
@@ -1379,7 +1335,6 @@ window.addEventListener('error', function(e) {
     console.error('🚨 JAVASCRIPT ERROR:', e.message, 'at', e.filename, 'line', e.lineno);
 });
 
-console.log('🔍 DIAGNOSTIC: All checks complete');
 </script>
 
 <!-- Notification System -->

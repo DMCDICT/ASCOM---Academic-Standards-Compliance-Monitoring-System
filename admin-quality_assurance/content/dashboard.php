@@ -779,7 +779,6 @@
   // Fetch and render department compliance statistics
   function fetchDepartmentCompliance(termValue = 'all') {
     const apiUrl = 'api/get_department_compliance.php?term=' + encodeURIComponent(termValue);
-    console.log('Fetching department compliance from:', apiUrl);
     
     fetch(apiUrl)
       .then(response => {
@@ -789,7 +788,6 @@
         return response.json();
       })
       .then(data => {
-        console.log('Department compliance API response:', data);
         if (data.success) {
           renderDepartmentCards(data.data);
         } else {
@@ -857,36 +855,20 @@
   // Fetch compliance statistics from API
   function fetchComplianceStats(termValue = 'all') {
     const apiUrl = 'api/get_compliance_stats.php?term=' + encodeURIComponent(termValue);
-    console.log('Fetching compliance stats from:', apiUrl);
     fetch(apiUrl)
       .then(response => {
-        console.log('Compliance stats API response status:', response.status);
         if (!response.ok) {
           throw new Error('Network response was not ok: ' + response.status);
         }
         return response.json();
       })
       .then(data => {
-        console.log('Compliance stats API response:', data);
         if (data.debug) {
-          console.log('🔍 DEBUG INFO:');
-          console.log('  - Total courses in DB:', data.debug.total_courses_in_db || 0);
-          console.log('  - All courses in DB:', data.debug.all_courses_details || []);
-          console.log('  - Courses found by query:', data.debug.courses_found?.length || 0);
-          console.log('  - Courses details:', data.debug.courses_found);
-          console.log('  - Term filter:', data.debug.term_filter);
-          console.log('  - Calculated total:', data.debug.calculated_total);
-          console.log('  - Actual total:', data.debug.actual_total);
           if (data.debug.total_courses_in_db !== data.debug.courses_found?.length) {
             console.warn('⚠️ MISMATCH: Query found', data.debug.courses_found?.length, 'courses but there are', data.debug.total_courses_in_db, 'courses in DB!');
           }
         }
         if (data.success) {
-          console.log('📊 STATS RECEIVED:');
-          console.log('  - Total Courses:', data.data.total_courses);
-          console.log('  - Compliant Courses:', data.data.compliant_courses);
-          console.log('  - Non-Compliant Courses:', data.data.non_compliant_courses);
-          console.log('  - Compliance %:', data.data.compliance_percentage);
           updateComplianceStats({
             compliancePercentage: data.data.compliance_percentage,
             compliantCourses: data.data.compliant_courses,
@@ -910,7 +892,6 @@
 
   // Load academic terms into dropdown
   function loadAcademicTerms() {
-    console.log('Loading academic terms...');
     // Try different path options (since dashboard is included via PHP, paths are relative to content.php)
     const apiPaths = [
       'api/get_academic_terms.php',
@@ -919,17 +900,14 @@
     ];
     
     let apiUrl = apiPaths[0];
-    console.log('Loading academic terms from:', apiUrl);
     fetch(apiUrl)
       .then(response => {
-        console.log('API response status:', response.status);
         if (!response.ok) {
           throw new Error('Network response was not ok: ' + response.status);
         }
         return response.json();
       })
       .then(data => {
-        console.log('Academic terms API response:', data);
         const select = document.getElementById('academicTermSelect');
         if (!select) {
           console.error('Academic term select element not found!');
@@ -956,7 +934,6 @@
             select.appendChild(option);
           });
           
-          console.log('Added', data.terms.length, 'terms to dropdown');
           
           // Set initial date indicator for "All Terms" if available
           if (data.all_terms_date_range) {
@@ -972,11 +949,9 @@
               const activeTerm = academicTerms.find(t => t.status == 1 || t.status === '1' || t.status === true);
               if (activeTerm) {
                 currentAcademicTerm = activeTerm;
-                console.log('Found active term:', activeTerm);
               } else {
                 // Use first term as default
                 currentAcademicTerm = academicTerms[0];
-                console.log('Using first term as default:', currentAcademicTerm);
               }
             }
           } else {
@@ -996,11 +971,9 @@
         function tryNextPath() {
           if (pathIndex < apiPaths.length) {
             apiUrl = apiPaths[pathIndex];
-            console.log('Trying alternative path:', apiUrl);
             fetch(apiUrl)
               .then(response => response.json())
               .then(data => {
-                console.log('Fallback API response:', data);
                 // Process the response (same as above)
                 const select = document.getElementById('academicTermSelect');
                 if (select && data.success && data.terms && data.terms.length > 0) {
@@ -1259,7 +1232,6 @@
       if (termSelect) {
         termSelect.addEventListener('change', function() {
           const selectedTerm = this.value;
-          console.log('Term changed to:', selectedTerm);
           
           // If a specific term is selected, optionally update date immediately from option attributes
           if (selectedTerm !== 'all' && selectedTerm) {
@@ -1927,7 +1899,6 @@
     
     // Debug: log the data to see what we're working with (only if hours are missing)
     if (!formattedOutline.includes('hrs') && !formattedOutline.includes('hours')) {
-      console.log('Course Outline Data (no hours found):', {
         courseOutline: courseOutline,
         courseOutlineHours: courseOutlineHours,
         formattedOutline: formattedOutline.substring(0, 200) + '...',
@@ -2061,7 +2032,6 @@
     
     if (confirm('Are you sure you want to approve this curriculum proposal?')) {
       // TODO: Implement API call to approve the proposal
-      console.log('Approving proposal:', requestId, requestData);
       alert('Proposal approved successfully! (This is a demo - API integration needed)');
       closeCurriculumDetailsModal();
       // Reload cards to reflect the change
@@ -2077,7 +2047,6 @@
     
     if (confirm('Are you sure you want to reject this curriculum proposal?')) {
       // TODO: Implement API call to reject the proposal
-      console.log('Rejecting proposal:', requestId, requestData);
       alert('Proposal rejected. (This is a demo - API integration needed)');
       closeCurriculumDetailsModal();
       // Reload cards to reflect the change

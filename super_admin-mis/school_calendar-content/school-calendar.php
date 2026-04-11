@@ -22,7 +22,6 @@ if ($table_check->num_rows === 0) {
     )";
     
     if (!$conn->query($create_table)) {
-        error_log("Failed to create school_years table: " . $conn->error);
     }
 }
 
@@ -43,7 +42,6 @@ if ($terms_table_check->num_rows === 0) {
     )";
     
     if (!$conn->query($create_terms_table)) {
-        error_log("Failed to create school_terms table: " . $conn->error);
     }
 }
 
@@ -160,7 +158,6 @@ try {
                     }
                     
                     // Debug logging
-                    error_log("Filtering: $year_label (start: $year_start, min: $min_year, current: $current_year) - " . 
                              ($year_label === $current_school_year || ($year_start >= $min_year && $year_start <= $current_year) ? "INCLUDED" : "EXCLUDED"));
                 }
             }
@@ -169,7 +166,6 @@ try {
         }
     }
 } catch (Exception $e) {
-    error_log("Error in school calendar: " . $e->getMessage());
     // Fallback to dummy data
     $school_years_for_dropdown = [
         [
@@ -247,7 +243,6 @@ try {
         }
     }
 } catch (Exception $e) {
-    error_log("Error fetching current term: " . $e->getMessage());
     // Keep default currentTerm values
 }
 ?>
@@ -353,9 +348,7 @@ try {
     <?php 
     // Debug: Check if school_years_for_dropdown is set
     if (isset($school_years_for_dropdown)) {
-        error_log("School years for dropdown: " . count($school_years_for_dropdown) . " items");
     } else {
-        error_log("School years for dropdown is NOT set");
     }
     
     include 'school-calendar-modals.php'; 

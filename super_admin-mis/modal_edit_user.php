@@ -7,7 +7,6 @@ if (!isset($conn) || $conn instanceof mysqli || $conn->connect_error) {
         require_once __DIR__ . '/includes/db_connection.php';
     }
     if (!isset($conn) || $conn->connect_error) {
-        error_log("Database connection failed or not available in modal_edit_user.php for fetching departments. Check content.php inclusion and status.");
         $departments = [];
     }
 }
@@ -23,7 +22,6 @@ if (isset($conn) && $conn instanceof mysqli && !$conn->connect_error) {
         }
         $departmentsResult->free();
     } else {
-        error_log("Failed to fetch departments in modal_edit_user.php: " . $conn->error);
     }
 }
 ?>

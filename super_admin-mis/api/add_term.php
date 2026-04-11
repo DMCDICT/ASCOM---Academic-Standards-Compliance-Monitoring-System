@@ -9,7 +9,6 @@ require_once '../includes/db_connection.php';
 function send_response($status, $message) {
     // Ensure no output has been sent before
     if (headers_sent()) {
-        error_log("Headers already sent in add_term.php");
     }
     
     $response = ['status' => $status, 'message' => $message];
@@ -35,21 +34,17 @@ try {
         )";
         
         if (!$conn->query($create_table)) {
-            error_log("Failed to create school_terms table: " . $conn->error);
             send_response('error', 'Failed to create school_terms table: ' . $conn->error);
         }
     }
 } catch (Exception $e) {
-    error_log("Error checking/creating school_terms table: " . $e->getMessage());
     send_response('error', 'Database error: ' . $e->getMessage());
 }
 
 $jsonData = file_get_contents('php://input');
-error_log("Received JSON data: " . $jsonData);
 
 $data = json_decode($jsonData);
 if (json_last_error() !== JSON_ERROR_NONE) {
-    error_log("JSON decode error: " . json_last_error_msg());
     send_response('error', 'Invalid JSON data received');
 }
 
@@ -114,7 +109,6 @@ try {
 
     $stmt = $conn->prepare($sql);
     if ($stmt === false) {
-        error_log("Prepare statement failed: " . $conn->error);
         send_response('error', 'Server error: Could not prepare the statement. ' . $conn->error);
     }
 
@@ -126,13 +120,11 @@ try {
     }
     
     if (!$bind_result) {
-        error_log("Bind parameter failed: " . $stmt->error);
         send_response('error', 'Server error: Could not bind parameters. ' . $stmt->error);
     }
 
     if ($stmt->execute()) {
         $new_term_id = $conn->insert_id;
-        error_log("Term added successfully with ID: " . $new_term_id . " with status: " . $term_is_active);
         
         $status_message = $has_status ? " (Status: " . $term_is_active . ")" : "";
         send_response('success', 'New term has been added successfully!' . $status_message);
@@ -140,14 +132,12 @@ try {
         if ($conn->errno == 1062) {
             send_response('error', 'This term already exists for the selected academic year.');
         } else {
-            error_log("Execute failed: " . $stmt->error . " (errno: " . $conn->errno . ")");
             send_response('error', 'Database error: Could not add the term. ' . $stmt->error);
         }
     }
 
     $stmt->close();
 } catch (Exception $e) {
-    error_log("Exception in add_term.php: " . $e->getMessage());
     send_response('error', 'Server error: ' . $e->getMessage());
 } finally {
     if (isset($stmt)) {

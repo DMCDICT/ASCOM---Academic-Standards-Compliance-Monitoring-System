@@ -17,7 +17,6 @@ try {
     $pdo = new PDO("mysql:host=$host;dbname=$dbname;charset=utf8", $username, $password);
     $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 } catch(PDOException $e) {
-    error_log("Database connection failed: " . $e->getMessage());
     echo json_encode([
         'success' => false,
         'message' => 'Database connection failed.'
@@ -49,7 +48,6 @@ try {
     ]);
     
 } catch (Exception $e) {
-    error_log("Error in get_school_years.php: " . $e->getMessage());
     echo json_encode([
         'success' => false,
         'message' => 'Database error occurred.'

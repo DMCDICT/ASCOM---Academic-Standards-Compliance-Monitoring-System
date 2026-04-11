@@ -53,7 +53,6 @@ try {
     ]);
     
 } catch (Exception $e) {
-    error_log("Error in get_current_qa_access.php: " . $e->getMessage());
     echo json_encode([
         'success' => false, 
         'message' => 'Failed to fetch current QA access: ' . $e->getMessage()

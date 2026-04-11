@@ -638,17 +638,14 @@ function formatMergedPrograms(programs, courseCount) {
 // Load courses data from database
 async function loadCoursesData() {
     try {
-        console.log('Loading courses data from database...');
         
         // NO FILTERING - Quality Assurance shows ALL courses (both compliant and non-compliant)
         // Build params with NO filter parameters - just fetch everything
         const params = new URLSearchParams();
         
-        console.log('✅ Quality Assurance - Fetching ALL courses (no filters)');
         
         // API path relative to content.php (which is in admin-quality_assurance/)
         const apiPath = 'api/get_courses_data.php';
-        console.log('Fetching from: ' + apiPath);
         
         const response = await fetch(apiPath + '?' + params.toString());
         
@@ -660,7 +657,6 @@ async function loadCoursesData() {
         
         // Get response as text first to check if it's valid JSON
         const responseText = await response.text();
-        console.log('Raw API response:', responseText.substring(0, 200)); // Log first 200 chars
         
         let result;
         try {
@@ -671,7 +667,6 @@ async function loadCoursesData() {
             throw new Error('Invalid JSON response from server: ' + responseText.substring(0, 100));
         }
         
-        console.log('API Response:', result);
         
         if (result.success) {
             allCourses = result.data || [];
@@ -687,23 +682,12 @@ async function loadCoursesData() {
             window.currentMergedCourses = mergedCourses;
             
             // Debug: Log the raw API response
-            console.log(`Loaded ${allCourses.length} courses from database`);
-            console.log('Total merged courses:', mergedCourses.length);
-            console.log('Items per page:', libraryItemsPerPage);
-            console.log('Total pages:', totalPages);
-            console.log('Current page:', currentLibraryPage);
             
             // Debug: Count compliant vs non-compliant
             const compliantCount = allCourses.filter(c => c.status === 'Compliant').length;
             const nonCompliantCount = allCourses.filter(c => c.status === 'Non-Compliant').length;
-            console.log(`=== COURSES BREAKDOWN ===`);
-            console.log(`Total courses: ${allCourses.length}`);
-            console.log(`Compliant: ${compliantCount}`);
-            console.log(`Non-Compliant: ${nonCompliantCount}`);
-            console.log(`========================`);
             
             if (allCourses.length === 0) {
-                console.log('No courses found in database');
             }
             
             displayCourses();
@@ -769,13 +753,6 @@ function displayCourses() {
     const paginatedCourses = mergedCourses.slice(startIndex, endIndex);
     
     // Debug: Log pagination info
-    console.log('Display Courses Debug:');
-    console.log('- Total merged courses:', mergedCourses.length);
-    console.log('- Current page:', currentLibraryPage);
-    console.log('- Items per page:', libraryItemsPerPage);
-    console.log('- Start index:', startIndex);
-    console.log('- End index:', endIndex);
-    console.log('- Courses to display:', paginatedCourses.length);
     
     paginatedCourses.forEach(courseGroup => {
         const row = document.createElement('tr');
@@ -821,8 +798,6 @@ function displayCourses() {
         let totalBooks = 0;
         if (courseGroup.courses && courseGroup.courses.length > 0) {
             // Debug: Log all courses in the group
-            console.log(`\n=== Course Group: ${courseGroup.course_code} ===`);
-            console.log('All courses in group:', courseGroup.courses.map(c => ({
                 id: c.id,
                 course_code: c.course_code,
                 compliant_book_count: c.compliant_book_count,
@@ -849,7 +824,6 @@ function displayCourses() {
             
             totalBooks = maxCount;
             
-            console.log(`Selected course ID: ${selectedCourse.id}, compliant_book_count: ${totalBooks}`);
         }
         
         // Format: X / 5 (Red if < 5, Green if >= 5)
@@ -968,13 +942,10 @@ function changePage(direction) {
 
 // Go to specific page - EXACT copy from Library Management
 function goToPage(page) {
-    console.log(`goToPage called with page: ${page}, currentLibraryPage: ${currentLibraryPage}, totalPages: ${totalPages}`);
     if (page >= 0 && page < totalPages) {
         currentLibraryPage = page;
-        console.log(`Setting currentLibraryPage to: ${currentLibraryPage}`);
         displayCourses();
     } else {
-        console.log(`Page ${page} is out of range (0-${totalPages-1})`);
     }
 }
 
@@ -1002,7 +973,6 @@ function closeNotifyLibrarianModal() {
 // Initialize on page load
 document.addEventListener('DOMContentLoaded', function() {
     // NO FILTERING - Quality Assurance shows ALL courses
-    console.log('✅ Quality Assurance - Loading ALL courses (no filters)');
     
     // Set up event delegation for page numbers - this WILL work
     const pageNumbers = document.getElementById('pageNumbers');
@@ -1012,7 +982,6 @@ document.addEventListener('DOMContentLoaded', function() {
                 e.preventDefault();
                 e.stopPropagation();
                 const page = parseInt(e.target.getAttribute('data-page'));
-                console.log('🔥 Event delegation clicked page:', page);
                 if (!isNaN(page) && page >= 0 && page < totalPages) {
                     goToPage(page);
                 }
