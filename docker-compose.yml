@@ -1,39 +1,274 @@
+# ASCOM Docker Compose Configuration
+# Phase 1: Environment Setup & Docker Foundation
+# Supports: development, staging, production environments
+
 services:
+  # ============================================
+  # Application Container
+  # ============================================
   app:
-    build: .
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
     container_name: ascom_app
+    restart: unless-stopped
     ports:
       - "8080:80"
+    environment:
+      - APP_ENV=development
+      - APP_DEBUG=true
+      - APP_URL=http://localhost:8080
+      - DB_CONNECTION=mysql
+      - DB_HOST=db
+      - DB_PORT=3306
+      - DB_DATABASE=${DB_DATABASE:-ascom_db}
+      - DB_USERNAME=${DB_USERNAME:-ascom_user}
+      - DB_PASSWORD=${DB_PASSWORD:-ascom_password_secure_123}
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+      - CACHE_DRIVER=redis
+      - SESSION_DRIVER=redis
+      - QUEUE_CONNECTION=redis
+      - SOCKETIO_HOST=socketio
+      - SOCKETIO_PORT=3001
+      - XDEBUG_CLIENT_HOST=host.docker.internal
     volumes:
-      - .:/var/www/html
-    environment:
-      - DOCKER_ENV=true
+      - ./:/var/www/html
+      - ascom_storage:/var/www/html/storage
+      - ascom_cache:/var/www/html/bootstrap/cache
     depends_on:
-      - db
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_started
+    networks:
+      - ascom-backend
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost/"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
 
+  # ============================================
+  # Application Container (Production - Phase 2)
+  # Uncomment when Laravel is installed
+  # ============================================
+  # app-prod:
+  #   build:
+  #     context: .
+  #     dockerfile: Dockerfile
+  #     target: production
+  #   container_name: ascom_app_prod
+  #   restart: unless-stopped
+  #   ports:
+  #     - "8082:80"
+  #   environment:
+  #     - APP_ENV=production
+  #     - APP_DEBUG=false
+  #     - APP_URL=${APP_URL:-https://ascom.example.com}
+  #     - DB_CONNECTION=mysql
+  #     - DB_HOST=db
+  #     - DB_PORT=3306
+  #     - DB_DATABASE=${DB_DATABASE:-ascom_db}
+  #     - DB_USERNAME=${DB_USERNAME:-ascom_user}
+  #     - DB_PASSWORD=${DB_PASSWORD}
+  #     - REDIS_HOST=redis
+  #     - REDIS_PORT=6379
+  #     - CACHE_DRIVER=redis
+  #     - SESSION_DRIVER=redis
+  #     - QUEUE_CONNECTION=redis
+  #   volumes:
+  #     - ascom_storage:/var/www/html/storage
+  #     - ascom_cache:/var/www/html/bootstrap/cache
+  #   depends_on:
+  #     db:
+  #       condition: service_healthy
+  #     redis:
+  #       condition: service_started
+  #   networks:
+  #     - ascom-backend
+
+  # ============================================
+  # Database Container (MariaDB)
+  # ============================================
   db:
-    image: mariadb:10.4
-    container_name: ascom_db_container
-    restart: always
+    image: mariadb:10.11
+    container_name: ascom_db
+    restart: unless-stopped
     environment:
-      MARIADB_DATABASE: ascom_db
-      MARIADB_ALLOW_EMPTY_ROOT_PASSWORD: "yes"
+      - MARIADB_DATABASE=${DB_DATABASE:-ascom_db}
+      - MARIADB_USER=${DB_USERNAME:-ascom_user}
+      - MARIADB_PASSWORD=${DB_PASSWORD:-ascom_password_secure_123}
+      - MARIADB_ROOT_PASSWORD=${DB_ROOT_PASSWORD:-root_password_secure_456}
+      - MARIADB_AUTO_SQL_MODE=true
+      - MARIADB_SQL_MODE=NO_ENGINE_SUBSTITUTION
     ports:
       - "3307:3306"
     volumes:
       - ascom_db_data:/var/lib/mysql
-      - ./ascom_db_full_export.sql:/docker-entrypoint-initdb.d/import.sql:ro
+      - ./docker/mysql/init:/docker-entrypoint-initdb.d:ro
+    command: --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci
+    networks:
+      - ascom-backend
+    healthcheck:
+      test: ["CMD", "healthcheck.sh", "--connect", "--innodb_initialized"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
 
+  # ============================================
+  # Redis Cache/Queue Container
+  # ============================================
+  redis:
+    image: redis:alpine
+    container_name: ascom_redis
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+    volumes:
+      - ascom_redis_data:/data
+    networks:
+      - ascom-backend
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+
+  # ============================================
+  # Queue Worker Container (Phase 2 - Laravel)
+  # ============================================
+  # queue:
+  #   build:
+  #     context: .
+  #     dockerfile: Dockerfile.dev
+  #   container_name: ascom_queue
+  #   restart: unless-stopped
+  #   command: php /var/www/html/artisan queue:work --sleep=3 --tries=3 --max-time=3600
+  #   environment:
+  #     - APP_ENV=development
+  #     - DB_CONNECTION=mysql
+  #     - DB_HOST=db
+  #     - DB_DATABASE=${DB_DATABASE:-ascom_db}
+  #     - DB_USERNAME=${DB_USERNAME:-ascom_user}
+  #     - DB_PASSWORD=${DB_PASSWORD:-ascom_password_secure_123}
+  #     - REDIS_HOST=redis
+  #     - REDIS_PORT=6379
+  #     - QUEUE_CONNECTION=redis
+  #   volumes:
+  #     - ./:/var/www/html
+  #   depends_on:
+  #     - redis
+  #     - db
+  #   networks:
+  #     - ascom-backend
+
+  # ============================================
+  # Scheduler Container (Phase 2 - Laravel)
+  # ============================================
+  # scheduler:
+  #   build:
+  #     context: .
+  #     dockerfile: Dockerfile.dev
+  #   container_name: ascom_scheduler
+  #   restart: unless-stopped
+  #   command: sh -c "while true; do php /var/www/html/artisan schedule:run --verbose --no-interaction & sleep 60; done"
+  #   environment:
+  #     - APP_ENV=development
+  #     - DB_CONNECTION=mysql
+  #     - DB_HOST=db
+  #     - DB_DATABASE=${DB_DATABASE:-ascom_db}
+  #     - DB_USERNAME=${DB_USERNAME:-ascom_user}
+  #     - DB_PASSWORD=${DB_PASSWORD:-ascom_password_secure_123}
+  #     - REDIS_HOST=redis
+  #     - REDIS_PORT=6379
+  #   volumes:
+  #     - ./:/var/www/html
+  #   depends_on:
+  #     - redis
+  #     - db
+  #   networks:
+  #     - ascom-backend
+
+  # ============================================
+  # PHPMyAdmin Container
+  # ============================================
   phpmyadmin:
-    image: phpmyadmin:latest
+    image: phpmyadmin/phpmyadmin:5.2
     container_name: ascom_phpmyadmin
+    restart: unless-stopped
     ports:
       - "8081:80"
     environment:
-      PMA_HOST: db
-      PMA_ARBITRARY: 1
+      - PMA_HOST=db
+      - PMA_PORT=3306
+      - PMA_USER=root
+      - PMA_PASSWORD=${DB_ROOT_PASSWORD:-root_password_secure_456}
+      - PMA_BLOWFISH_SECRET=a3f8d9c2e1b4h7g6f5d4c3b2a1e0f9g8h7i6j5k4l3m2n1o0p
+      - PHP_UPLOAD_MAX_FILESIZE=128M
+      - PHP_MEMORY_LIMIT=256M
+    volumes:
+      - phpmyadmin_sessions:/sessions
     depends_on:
       - db
+    networks:
+      - ascom-backend
+
+  # ============================================
+  # Socket.IO Server (Phase 3 - Real-time)
+  # ============================================
+  # socketio:
+  #   build:
+  #     context: ./docker/socketio
+  #     dockerfile: Dockerfile
+  #   container_name: ascom_socketio
+  #   restart: unless-stopped
+  #   ports:
+  #     - "3001:3001"
+  #   environment:
+  #     - NODE_ENV=development
+  #     - SOCKETIO_PORT=3001
+  #     - REDIS_HOST=redis
+  #     - REDIS_PORT=6379
+  #   volumes:
+  #     - ./docker/socketio:/app
+  #   depends_on:
+  #     - redis
+  #   networks:
+  #     - ascom-backend
+
+  # ============================================
+  # Node.js for Frontend Build (Phase 3 - React)
+  # ============================================
+  # node:
+  #   image: node:20-alpine
+  #   container_name: ascom_node
+  #   restart: unless-stopped
+  #   working_dir: /app
+  #   volumes:
+  #     - ./:/app
+  #   command: sh -c "npm install && npm run dev"
+  #   ports:
+  #     - "3000:3000"
+  #   environment:
+  #     - NODE_ENV=development
+  #     - VITE_DEV_HOST=0.0.0.0
+  #   networks:
+  #     - ascom-backend
+
+networks:
+  ascom-backend:
+    driver: bridge
+    ipam:
+      driver: default
+      config:
+        - subnet: 172.28.0.0/16
 
 volumes:
   ascom_db_data:
+  ascom_redis_data:
+  ascom_storage:
+  ascom_cache:
+  phpmyadmin_sessions:

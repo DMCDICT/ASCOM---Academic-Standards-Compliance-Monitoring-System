@@ -15,10 +15,16 @@ desktop.ini
 
 # Dependencies
 vendor/
+node_modules/
 
 # Local configuration
 .env
 .codex
+.opencode
+
+# Docker
+docker-compose.override.yml
+.docker/
 
 # XAMPP/Temp files
 *.tmp
@@ -27,3 +33,17 @@ vendor/
 *.zip
 *.rar
 *.7z
+
+# Build artifacts
+public/build/
+public/hot
+public/storage
+
+# IDE
+.idea/
+.vscode/
+*.code-workspace
+
+# OS
+__pycache__/
+*.pyc
