@@ -1,4 +1,5 @@
-<?php
+// Clear any output first
+ob_start();
 
 require_once 'session_config.php';
 
@@ -30,20 +31,7 @@ updateUserLogoutStatus($employeeNo);
 $_SESSION = [];
 session_destroy();
 
-$redirectUrl = $userRole === 'super_admin' ? 'super_admin_login.php' : 'user_login.php';
-
-if (
-    isset($_SERVER['HTTP_X_REQUESTED_WITH']) &&
-    $_SERVER['HTTP_X_REQUESTED_WITH'] === 'XMLHttpRequest'
-) {
-    header('Content-Type: application/json');
-    echo json_encode([
-        'success' => true,
-        'message' => 'Logged out successfully',
-        'redirect' => $redirectUrl,
-    ]);
-    exit;
-}
-
-header("Location: {$redirectUrl}");
+// Redirect to main entry page
+ob_end_clean();
+header("Location: index.php");
 exit();
