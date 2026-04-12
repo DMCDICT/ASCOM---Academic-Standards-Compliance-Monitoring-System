@@ -35,7 +35,7 @@ if (isset($_COOKIE['ASCOM_SUPER_ADMIN_SESSION'])) {
 // Clear any output and redirect
 ob_end_clean();
 
-// Redirect to Super Admin login page
-header("Location: super_admin_login.php");
+// Redirect to main entry page
+header("Location: index.php");
 exit();
 ?> 
