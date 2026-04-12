@@ -90,7 +90,7 @@ window.refreshUserList = function() {
                 // Update tooltip to show countdown
                 updateRefreshButtonTooltip();
             } else {
-                console.error('❌ Failed to refresh user list:', data.message);
+                // Silent fail - just update UI
                 const refreshStatusIcon = document.getElementById('refreshStatusIcon');
                 if (refreshStatusIcon) {
                     refreshStatusIcon.classList.remove('show');
@@ -109,7 +109,7 @@ window.refreshUserList = function() {
                     }
                 })
                 .catch(error => {
-            console.error('❌ Error refreshing user list:', error);
+            // Silent fail
             const refreshStatusIcon = document.getElementById('refreshStatusIcon');
             if (refreshStatusIcon) {
                 refreshStatusIcon.classList.remove('show');
@@ -195,7 +195,7 @@ window.renderTable = function(users = filteredUsers) {
                             if (employeeNo && employeeNo !== 'undefined' && employeeNo !== 'null') {
                                 window.openUserDetailsModal(employeeNo);
                             } else {
-                                console.warn('Invalid employee number:', employeeNo);
+                                // Invalid - ignore silently
                             }
                         }
                     });
@@ -207,7 +207,7 @@ window.renderTable = function(users = filteredUsers) {
                         if (typeof window.openEditUserModal === 'function') {
                             window.openEditUserModal(this.dataset.employeeNo);
                         } else {
-                            console.warn('openEditUserModal function not available yet');
+                            // Function not available - fallback handles it
                         }
                     });
                     row.querySelector('.delete-btn').addEventListener('click', function(event) {
@@ -297,25 +297,21 @@ window.openUserDetailsModal = function(employeeNo) {
     
     // STRICT CHECK - Only allow if employee number is valid
     if (!employeeNo || employeeNo === 'undefined' || employeeNo === 'null' || employeeNo === '') {
-        console.warn('🚫 Modal opening blocked - invalid employee number:', employeeNo);
         return;
     }
     
     // Prevent opening if page isn't ready
     if (!isPageReady) {
-        console.warn('Page not ready, preventing modal opening');
         return;
     }
     
     // Validate input
     if (!employeeNo) {
-        console.error('No employee number provided');
         return;
     }
     
     // Check if usersData is loaded
     if (!usersData || usersData.length === 0) {
-        console.error('No users data available');
         alert('User data not loaded. Please refresh the page.');
         return;
     }
@@ -323,7 +319,6 @@ window.openUserDetailsModal = function(employeeNo) {
     // Find the user data
     const user = usersData.find(u => u.employee_no === employeeNo);
     if (!user) {
-        console.error('User not found:', employeeNo);
         alert('User not found. Please refresh the page.');
         return;
     }
@@ -402,25 +397,19 @@ window.openUserDetailsModal = function(employeeNo) {
             </div>
         `;
     } else {
-        console.error('User details content element not found');
         return;
     }
     
     // Show the modal
     const modal = document.getElementById('userDetailsModal');
     if (modal) {
-        // Use class-based modal display
         modal.classList.add('show');
         modal.style.display = 'flex';
         modal.style.visibility = 'visible';
-        document.body.style.overflow = 'hidden'; // Disable body scroll
+        document.body.style.overflow = 'hidden';
         
-        // Store the employee number for edit/delete actions
         document.getElementById('editFromDetailsBtn').setAttribute('data-employee-no', employeeNo);
         document.getElementById('deleteFromDetailsBtn').setAttribute('data-employee-no', employeeNo);
-        
-    } else {
-        console.error('User details modal not found');
     }
 };
 
@@ -449,7 +438,6 @@ window.openDeleteUserModal = function(employeeNo) {
     // Find the user data
     const user = usersData.find(u => u.employee_no === employeeNo);
     if (!user) {
-        console.error('User not found:', employeeNo);
         return;
     }
     
@@ -528,7 +516,6 @@ window.confirmDeleteUser = function() {
         }
     })
     .catch(error => {
-        console.error('Error deleting user:', error);
         document.getElementById('deleteUserErrorHeading').textContent = 'Network Error';
         document.getElementById('deleteUserErrorMessage').textContent = 'Failed to delete user. Please try again.';
         document.getElementById('deleteUserModal').style.display = 'none';
@@ -608,7 +595,6 @@ window.addEventListener('DOMContentLoaded', function() {
                 }
             })
             .catch(error => {
-                console.error('Error updating user:', error);
                 document.getElementById('editUserErrorHeading').textContent = 'Network Error';
                 document.getElementById('editUserErrorMessage').textContent = 'Failed to update user. Please try again.';
                 document.getElementById('editUserModal').style.display = 'none';
@@ -781,23 +767,6 @@ window.addEventListener('DOMContentLoaded', () => {
             userDetailsModal.style.visibility = 'hidden';
         }
         
-        // Debug: Check edit user modal state on page load
-        const editUserModal = document.getElementById('editUserModal');
-        if (editUserModal) {
-        } else {
-        }
-            } else {
-                        console.error('❌ Failed to load initial data:', data.message);
-                        userTableBody.innerHTML = '<tr><td colspan="8" style="text-align: center; color: red;">Error loading users</td></tr>';
-            }
-        })
-        .catch(error => {
-                    console.error('❌ Error loading initial data:', error);
-                    console.error('❌ Error details:', error.message);
-                    userTableBody.innerHTML = '<tr><td colspan="8" style="text-align: center; color: red;">Network error loading users</td></tr>';
-                });
-        }
-
         // Set up event listeners
         if (searchInput) {
             // Remove real-time search - only search on button click or Enter key
@@ -870,8 +839,6 @@ window.addEventListener('DOMContentLoaded', () => {
                     window.filterUsers('');
                 }
             });
-        } else {
-            console.error('❌ Search button not found!');
         }
         
         // Set up auto-refresh indicator click handler
@@ -996,7 +963,6 @@ function autoRefreshUserList() {
             
             updateRefreshButtonTooltip();
         } else {
-            console.error('❌ Auto-refresh failed:', data.message);
             const autoRefreshIndicator = document.getElementById('autoRefreshIndicator');
             if (autoRefreshIndicator) {
                 autoRefreshIndicator.style.display = 'none';
@@ -1005,7 +971,6 @@ function autoRefreshUserList() {
         }
     })
     .catch(error => {
-        console.error('❌ Auto-refresh error:', error);
         const autoRefreshIndicator = document.getElementById('autoRefreshIndicator');
         if (autoRefreshIndicator) {
             autoRefreshIndicator.style.display = 'none';
