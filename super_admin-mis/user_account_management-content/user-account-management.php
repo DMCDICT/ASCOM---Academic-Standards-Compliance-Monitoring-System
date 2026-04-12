@@ -76,6 +76,7 @@ if (isset($conn) && !$conn->connect_error) {
         <h2 class="main-page-title" style="padding-left: 0px;">User Account Management</h2> 
         <div class="header-buttons">
             <button class="activity-button">Activity Logs</button>
+            <button class="create-btn" onclick="openAddUserModal()" style="min-width: 140px;">+ Add User</button>
         </div>
     </div>
 

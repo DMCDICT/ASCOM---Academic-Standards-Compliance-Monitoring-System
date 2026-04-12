@@ -7,12 +7,14 @@ class NotificationSystem {
         this.notifications = [];
         this.unreadCount = 0;
         
+        console.log({
             icon: !!this.notificationIcon,
             dropdown: !!this.notificationDropdown,
             count: !!this.notificationCount
         });
         
         // Debug: Log all elements with notification classes
+        console.log({
             allIcons: document.querySelectorAll('.notification-icon'),
             allDropdowns: document.querySelectorAll('[id*="notification"]'),
             allCounts: document.querySelectorAll('.notification-count')
