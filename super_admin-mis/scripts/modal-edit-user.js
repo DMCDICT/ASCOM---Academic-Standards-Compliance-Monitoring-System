@@ -43,7 +43,6 @@ window.openEditUserModal = function(userId) {
             document.addEventListener('click', window.editModalOutsideClickHandler);
         }
     } else {
-        console.error('❌ Modal not found!');
         return;
     }
     
@@ -78,27 +77,12 @@ async function fetchUserDataForEdit(userId) {
         const response = await fetch(`./api/get_user_data.php?employee_no=${userId}`);
         const data = await response.json();
         
-        console.log({
-            success: data.success,
-            hasData: !!data.data,
-            dataType: typeof data.data,
-            message: data.message
-        });
-        
         if (data.success && data.data) {
-            console.log({
-                hasCurrentPassword: !!data.data.current_password,
-                currentPasswordLength: data.data.current_password ? data.data.current_password.length : 0,
-                currentPasswordValue: data.data.current_password ? '***' + data.data.current_password.slice(-3) : 'null'
-            });
             populateEditForm(data.data);
         } else {
-            console.error('❌ Failed to fetch user data:', data.message);
-            console.error('Full response:', data);
             openEditUserErrorModal('Failed to fetch user data: ' + (data.message || 'Unknown error'));
         }
     } catch (error) {
-        console.error('Error fetching user data:', error);
         openEditUserErrorModal('Error fetching user data. Please try again.');
     }
 }
@@ -173,10 +157,6 @@ function populateEditForm(user) {
         
         // Additional check: Verify password field hasn't been cleared
         if (user.current_password && passwordInput && passwordInput.value !== user.current_password) {
-            console.error('❌ WARNING: Password field was cleared after population!');
-            console.error('  - Expected:', user.current_password);
-            console.error('  - Actual:', passwordInput.value);
-            // Restore the password
             passwordInput.value = user.current_password;
         }
     }, 100);
@@ -187,56 +167,11 @@ function setupPasswordToggle() {
     const passwordInput = document.getElementById('edit_password');
     const toggleIcon = document.querySelector('.toggle-password[data-target="edit_password"]');
     
-    
-    // Debug: Check all elements with toggle-password class
-    const allToggleIcons = document.querySelectorAll('.toggle-password');
-    allToggleIcons.forEach((icon, index) => {
-        console.log({
-            classList: icon.classList.toString(),
-            dataTarget: icon.getAttribute('data-target'),
-            src: icon.src,
-            visible: icon.offsetParent !== null
-        });
-    });
-    
     if (toggleIcon && passwordInput) {
-        
-        // Remove any existing event listeners to prevent duplicates
         toggleIcon.removeEventListener('click', handlePasswordToggle);
         toggleIcon.addEventListener('click', handlePasswordToggle);
-        
-        // Add input event listener to password field for change detection
         passwordInput.removeEventListener('input', handlePasswordInput);
         passwordInput.addEventListener('input', handlePasswordInput);
-        
-        
-        // Test if the icon is clickable
-        console.log({
-            src: toggleIcon.src,
-            width: toggleIcon.offsetWidth,
-            height: toggleIcon.offsetHeight,
-            cursor: window.getComputedStyle(toggleIcon).cursor,
-            pointerEvents: window.getComputedStyle(toggleIcon).pointerEvents
-        });
-    } else {
-        console.error('❌ Password input or toggle icon not found!');
-        console.error('❌ Password input:', passwordInput);
-        console.error('❌ Toggle icon:', toggleIcon);
-        
-        // Additional debugging
-        if (!toggleIcon) {
-            console.error('❌ Toggle icon not found. Checking for elements with similar selectors...');
-            const similarIcons = document.querySelectorAll('[class*="toggle"], [class*="password"]');
-            console.error('❌ Similar elements found:', similarIcons.length);
-            similarIcons.forEach((el, index) => {
-                console.error(`❌ Similar element ${index}:`, {
-                    tagName: el.tagName,
-                    className: el.className,
-                    id: el.id,
-                    src: el.src
-                });
-            });
-        }
     }
 }
 
@@ -261,8 +196,6 @@ function handlePasswordToggle(e) {
         
         // Trigger form change detection
         passwordInput.dispatchEvent(new Event('input'));
-    } else {
-        console.error('❌ Password input or toggle icon not found in handler!');
     }
 }
 
@@ -486,9 +419,19 @@ function setupFormChangeDetection() {
                     updateResetButtonState();
                 }
             });
-        } else {
-            console.error(`❌ Field ${fieldId} not found during event listener setup!`);
+} else {
         }
+    });
+
+
+    // Update button setup
+    const updateBtn = document.getElementById('edit_update_btn');
+    if (updateBtn) {
+        updateBtn.addEventListener('click', function(e) {
+            e.preventDefault();
+            handleEditFormSubmit();
+        });
+    }
     });
 }
 
@@ -496,30 +439,11 @@ function setupFormChangeDetection() {
 function updateUpdateButton() {
     const updateBtn = document.getElementById('edit_update_btn');
     if (!updateBtn) {
-        console.error('Update button not found!');
         return;
     }
     
     const hasChanges = checkFormChanges();
     const isFormValid = checkFormValidity();
-    
-        hasChanges,
-        isFormValid,
-        buttonDisabled: updateBtn.disabled,
-        buttonElement: updateBtn
-    });
-    
-    // Debug: Show what fields are being monitored
-        'edit_employee_no',
-        'edit_department_id', 
-        'edit_first_name',
-        'edit_last_name',
-        'edit_middle_name',
-        'edit_title',
-        'edit_institutional_email',
-        'edit_mobile_no',
-        'edit_password'
-    ]);
     
     if (hasChanges && isFormValid) {
         updateBtn.disabled = false;
@@ -567,12 +491,9 @@ function checkFormChanges() {
                 fieldRequired: field.required
             });
             
-            if (currentValue !== originalValue) {
+if (currentValue !== originalValue) {
                 return true;
             }
-        } else {
-            console.error(`❌ Field ${fieldId} not found!`);
-        }
     }
     
     return false;
@@ -902,7 +823,6 @@ function setupMobileNumberValidation() {
         });
         
     } else {
-        console.error('❌ Mobile number input field not found!');
     }
 }
 
@@ -969,14 +889,28 @@ async function handleEditFormSubmit(event) {
         const responseText = await response.text();
         
         let data;
-        try {
+try {
             data = JSON.parse(responseText);
         } catch (parseError) {
-            console.error('❌ Failed to parse JSON response:', parseError);
-            console.error('❌ Raw response that failed to parse:', responseText);
             openEditUserErrorModal('Invalid response from server. Please try again.');
             return;
         }
+        
+        
+        
+        if (data.success === true) {
+            openEditUserSuccessModal(data.message || 'User updated successfully!');
+                
+                if (typeof loadInitialData === 'function') {
+                    loadInitialData();
+                }
+        } else {
+            openEditUserErrorModal(data.message || 'Failed to update user. Please try again.');
+        }
+    } catch (error) {
+        openEditUserErrorModal('An error occurred while updating the user. Please try again.');
+    }
+}
         
         
         if (data.success === true) {
@@ -990,7 +924,6 @@ async function handleEditFormSubmit(event) {
             openEditUserErrorModal(data.message || 'Failed to update user. Please try again.');
         }
     } catch (error) {
-        console.error('❌ Error updating user:', error);
         openEditUserErrorModal('An error occurred while updating the user. Please try again.');
     }
 }
