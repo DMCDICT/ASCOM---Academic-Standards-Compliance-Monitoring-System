@@ -7,11 +7,17 @@ function ascom_is_docker_environment(): bool
 
 function ascom_db_config(): array
 {
+    // Check for docker-compose style env vars first, then legacy
+    $host = getenv('DB_HOST') ?: (ascom_is_docker_environment() ? 'db' : 'localhost');
+    $database = getenv('DB_DATABASE') ?: getenv('ASCOM_DB_NAME') ?: 'ascom_db';
+    $username = getenv('DB_USERNAME') ?: getenv('ASCOM_DB_USER') ?: 'root';
+    $password = getenv('DB_PASSWORD') ?: getenv('ASCOM_DB_PASSWORD') ?: '';
+
     return [
-        'host' => ascom_is_docker_environment() ? 'db' : 'localhost',
-        'database' => getenv('ASCOM_DB_NAME') ?: 'ascom_db',
-        'username' => getenv('ASCOM_DB_USER') ?: 'root',
-        'password' => getenv('ASCOM_DB_PASSWORD') !== false ? getenv('ASCOM_DB_PASSWORD') : '',
+        'host' => $host,
+        'database' => $database,
+        'username' => $username,
+        'password' => $password,
     ];
 }
 

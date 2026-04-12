@@ -1,0 +1,24 @@
+# Docker ignore
+.git
+.gitignore
+*.log
+*_log.txt
+debug_*.txt
+*.tmp
+*.bak
+*.swp
+*.zip
+*.rar
+*.7z
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+node_modules/
+vendor/
+.env
+.env.example
+.docker/
+ascom_db_full_export.sql
+ascom_db_utf8.sql
+*.sql
