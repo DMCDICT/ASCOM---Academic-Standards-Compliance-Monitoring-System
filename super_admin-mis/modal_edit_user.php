@@ -2,13 +2,11 @@
 // modal_edit_user.php
 // This file is an HTML fragment, included by content.php.
 // Activate PHP Data Fetching for departments
-if (!isset($conn) || $conn instanceof mysqli || $conn->connect_error) {
-    if (!isset($conn)) {
-        require_once __DIR__ . '/includes/db_connection.php';
-    }
-    if (!isset($conn) || $conn->connect_error) {
-        $departments = [];
-    }
+if (!isset($conn)) {
+    require_once __DIR__ . '/includes/db_connection.php';
+}
+if (!isset($conn) || $conn->connect_error) {
+    $departments = [];
 }
 global $conn;
 $departments = $departments ?? [];
@@ -125,7 +123,7 @@ if (isset($conn) && $conn instanceof mysqli && !$conn->connect_error) {
       
       <div style="display: flex; justify-content: flex-end; gap: 10px; margin-top: 10px;">
         <button type="button" onclick="closeEditUserModal()" style="width: 125px; height: 50px; background-color: #C9C9C9; color: black; border: none; border-radius: 10px; cursor: pointer; font-size: 14px; font-weight: bold; text-transform: uppercase;">CANCEL</button>
-        <button type="submit" id="edit_update_btn" disabled style="width: 125px; height: 50px; background-color: #C9C9C9; color: #666; border: none; border-radius: 10px; cursor: not-allowed; font-size: 14px; font-weight: bold; text-transform: uppercase;">UPDATE</button>
+        <button type="submit" id="edit_update_btn" style="width: 125px; height: 50px; background-color: #007bff; color: white; border: none; border-radius: 10px; cursor: pointer; font-size: 14px; font-weight: bold; text-transform: uppercase;">UPDATE</button>
       </div>
     </form>
   </div>

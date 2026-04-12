@@ -135,16 +135,7 @@ try {
             $currentStmt->execute();
             $currentResult = $currentStmt->get_result();
             $currentUser = $currentResult->fetch_assoc();
-            
-                'employee_no' => $employee_no,
-                'first_name' => $first_name,
-                'middle_name' => $middle_name,
-                'last_name' => $last_name,
-                'title' => $title,
-                'institutional_email' => $institutional_email,
-                'mobile_no' => $mobile_no,
-                'department_id' => $department_id
-            ]));
+            $currentStmt->close();
             
             // Don't throw an error - this is actually successful
             // The user's data is already in the desired state

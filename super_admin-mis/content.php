@@ -3459,22 +3459,24 @@ $notifRead = array_filter($notifList, function($n) { return ($n['is_read'] ?? fa
 // Check if modal files exist and include them
 $modalFiles = [
     './modal_user_details.php',
+    './modal_add_user.php',  
     './modal_edit_user.php', 
     './modal_delete_user.php'
 ];
 
-// modal_add_user.php is no longer needed - modal is created dynamically in content.php
-
+$currentDir = getcwd();
 foreach ($modalFiles as $modalFile) {
-    if (file_exists($modalFile)) {
+    $fullPath = __DIR__ . '/' . $modalFile;
+    if (file_exists($fullPath)) {
         try {
-            include $modalFile;
-            echo "<!-- Successfully included: $modalFile -->";
+            include $fullPath;
         } catch (Exception $e) {
             echo "<!-- ERROR including $modalFile: " . $e->getMessage() . " -->";
+        } catch (ParseError $e) {
+            echo "<!-- PARSE ERROR in $modalFile: " . $e->getMessage() . " -->";
         }
     } else {
-        echo "<!-- ERROR: $modalFile not found -->";
+        echo "<!-- DEBUG: $modalFile not found at: $fullPath (cwd: $currentDir) -->";
     }
 }
 ?>
@@ -3959,7 +3961,86 @@ if (typeof window.closeSuccessModal === 'undefined') {
 </script>
 <script src="./scripts/modal-add-user.js?v=<?php echo time(); ?>&ultra=1"></script>
 <script src="./scripts/user-account-management.js?v=2.8"></script>
-<script src="./scripts/modal-edit-user.js?v=<?php echo time(); ?>"></script>
+<script src="./scripts/modal-edit-user.js?v=<?php echo time(); ?>&edit=1"></script>
+<script>
+// Ensure modal functions are available with proper data fetching
+window.ensureModalFunctions = function() {
+    // Add User - just opens modal
+    if (!window.openAddUserModal) {
+        window.openAddUserModal = function() {
+            var m = document.getElementById('addUserModal');
+            if (m) { m.style.display = 'flex'; document.body.style.overflow = 'hidden'; }
+        };
+    }
+    // Edit User - MUST fetch and populate data
+    if (!window.openEditUserModal) {
+        window.openEditUserModal = async function(userId) {
+            var m = document.getElementById('editUserModal');
+            if (m) { 
+                m.style.display = 'flex'; 
+                document.body.style.overflow = 'hidden';
+                // Fetch user data
+                try {
+                    var resp = await fetch('./api/get_user_data.php?employee_no=' + userId);
+                    var data = await resp.json();
+                    if (data.success && data.data) {
+                        // Populate form fields
+                        document.getElementById('edit_employee_no').value = data.data.employee_no || '';
+                        document.getElementById('employee_no_original').value = data.data.employee_no || '';
+                        document.getElementById('edit_department_id').value = data.data.department_id || '';
+                        document.getElementById('edit_first_name').value = data.data.first_name || '';
+                        document.getElementById('edit_middle_name').value = data.data.middle_name || '';
+                        document.getElementById('edit_last_name').value = data.data.last_name || '';
+                        document.getElementById('edit_title').value = data.data.title || '';
+                        document.getElementById('edit_institutional_email').value = data.data.institutional_email || '';
+                        document.getElementById('edit_mobile_no').value = data.data.mobile_no || '';
+                        document.getElementById('edit_password').value = data.data.current_password || '';
+                    }
+                } catch(e) { console.error('Error:', e); }
+            }
+        };
+    }
+    // Delete User
+    if (!window.openDeleteUserModal) {
+        window.openDeleteUserModal = function(userId) {
+            var m = document.getElementById('deleteUserModal');
+            if (m) { m.style.display = 'flex'; document.body.style.overflow = 'hidden'; }
+            var btn = document.getElementById('confirmDeleteBtn');
+            if (btn) btn.setAttribute('data-employee-no', userId);
+        };
+    }
+    // Close functions
+    if (!window.closeAddUserModal) {
+        window.closeAddUserModal = function() {
+            var m = document.getElementById('addUserModal');
+            if (m) { m.style.display = 'none'; }
+            document.body.style.overflow = '';
+        };
+    }
+    if (!window.closeEditUserModal) {
+        window.closeEditUserModal = function() {
+            var m = document.getElementById('editUserModal');
+            if (m) { m.style.display = 'none'; }
+            document.body.style.overflow = '';
+        };
+    }
+    if (!window.closeDeleteUserModal) {
+        window.closeDeleteUserModal = function() {
+            var m = document.getElementById('deleteUserModal');
+            if (m) { m.style.display = 'none'; }
+            document.body.style.overflow = '';
+        };
+    }
+    if (!window.closeUserDetailsModal) {
+        window.closeUserDetailsModal = function() {
+            var m = document.getElementById('userDetailsModal');
+            if (m) { m.style.display = 'none'; m.classList.remove('show'); }
+            document.body.style.overflow = '';
+        };
+    }
+};
+window.ensureModalFunctions();
+</script>
 <?php if (isset($_GET['page']) && $_GET['page'] === 'school-calendar'): ?>
 <script src="./scripts/school-calendar.js"></script>
 <?php endif; ?>

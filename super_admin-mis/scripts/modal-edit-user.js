@@ -78,6 +78,7 @@ async function fetchUserDataForEdit(userId) {
         const response = await fetch(`./api/get_user_data.php?employee_no=${userId}`);
         const data = await response.json();
         
+        console.log({
             success: data.success,
             hasData: !!data.data,
             dataType: typeof data.data,
@@ -85,6 +86,7 @@ async function fetchUserDataForEdit(userId) {
         });
         
         if (data.success && data.data) {
+            console.log({
                 hasCurrentPassword: !!data.data.current_password,
                 currentPasswordLength: data.data.current_password ? data.data.current_password.length : 0,
                 currentPasswordValue: data.data.current_password ? '***' + data.data.current_password.slice(-3) : 'null'
@@ -189,6 +191,7 @@ function setupPasswordToggle() {
     // Debug: Check all elements with toggle-password class
     const allToggleIcons = document.querySelectorAll('.toggle-password');
     allToggleIcons.forEach((icon, index) => {
+        console.log({
             classList: icon.classList.toString(),
             dataTarget: icon.getAttribute('data-target'),
             src: icon.src,
@@ -208,6 +211,7 @@ function setupPasswordToggle() {
         
         
         // Test if the icon is clickable
+        console.log({
             src: toggleIcon.src,
             width: toggleIcon.offsetWidth,
             height: toggleIcon.offsetHeight,
