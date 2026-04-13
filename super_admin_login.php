@@ -41,22 +41,12 @@ if (session_status() == PHP_SESSION_ACTIVE) {
       z-index: 1;
     }
 
-    .logo-container {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      margin-bottom: 40px;
-      z-index: 3;
-      position: relative;
-    }
-
     .logo-image {
+      display: block;
       width: 280px;
       height: auto;
-      margin-bottom: 20px;
+      margin: 0 auto 10px auto;
       z-index: 3;
-      position: relative;
     }
 
     .portal-label {
@@ -64,7 +54,7 @@ if (session_status() == PHP_SESSION_ACTIVE) {
       font-size: 22px;
       font-weight: bold;
       letter-spacing: 2px;
-      margin-top: 5px;
+      margin-bottom: 15px;
       text-shadow: 0px 2px 4px rgba(0, 0, 0, 0.3);
       position: relative;
       z-index: 3;
@@ -73,6 +63,7 @@ if (session_status() == PHP_SESSION_ACTIVE) {
     .login-container {
       position: relative;
       z-index: 3;
+      margin-top: 50px;
       background: rgba(217, 217, 217, 0.1);
       backdrop-filter: blur(35px);
       padding: 25px;
@@ -217,12 +208,9 @@ if (session_status() == PHP_SESSION_ACTIVE) {
 
   <div class="overlay" id="mainOverlay"></div>
 
-  <div class="logo-container">
+  <div class="login-container" id="loginContainer">
     <img src="src/assets/images/ASCOM_Monitoring_System.png" alt="Logo" class="logo-image" id="logoImage">
     <div class="portal-label">Super Admin Portal</div>
-  </div>
-
-  <div class="login-container" id="loginContainer">
     <form id="loginForm" action="super_admin_auth.php" method="POST">
       <input type="text" id="username" name="username" placeholder="Enter Email" required>
       <div class="password-container">

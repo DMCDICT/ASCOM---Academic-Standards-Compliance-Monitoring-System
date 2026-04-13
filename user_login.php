@@ -64,13 +64,22 @@ if ($employee_no && $employee_no !== 'SUPER_ADMIN') {
       z-index: 2;
     }
 
-    .logo-image {
-      position: absolute;
-      top: 50px;
-      left: 50%;
-      transform: translateX(-50%);
+.logo-image {
+      display: block;
       width: 280px;
+      margin: 0 auto 15px auto;
       z-index: 3;
+    }
+
+    .login-container {
+      position: relative;
+      z-index: 3;
+      margin-top: 50px;
+      background: rgba(217, 217, 217, 0.1);
+      backdrop-filter: blur(35px);
+      padding: 25px;
+      border-radius: 20px;
+      box-shadow: 0px 4px 20px rgba(0, 0, 0, 0.2);
     }
 
     .login-container {
@@ -213,9 +222,9 @@ if ($employee_no && $employee_no !== 'SUPER_ADMIN') {
 
   <img src="src/assets/images/scc_buena_building.png" alt="SCC Building" class="corner-image" id="buildingImage">
   <div class="overlay" id="mainOverlay"></div>
-  <img src="src/assets/images/ASCOM_Monitoring_System.png" alt="Logo" class="logo-image" id="logoImage">
 
       <div class="login-container" id="loginContainer">
+    <img src="src/assets/images/ASCOM_Monitoring_System.png" alt="Logo" class="logo-image" id="logoImage">
     <form id="loginForm" action="user_auth.php" method="POST">
       <input type="text" id="username" name="username" placeholder="Enter Email" required>
       <div class="password-container">
