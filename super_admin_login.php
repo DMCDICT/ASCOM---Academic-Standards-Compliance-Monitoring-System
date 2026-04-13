@@ -49,6 +49,23 @@ if (session_status() == PHP_SESSION_ACTIVE) {
       z-index: 3;
     }
 
+    .back-button {
+      position: absolute;
+      top: 30px;
+      left: 30px;
+      color: white;
+      text-decoration: none;
+      font-size: 16px;
+      z-index: 4;
+      padding: 10px 15px;
+      transition: background 0.3s ease;
+      border-radius: 8px;
+    }
+
+    .back-button:hover {
+      background: rgba(255, 255, 255, 0.15);
+    }
+
     .portal-label {
       color: white;
       font-size: 22px;
@@ -207,6 +224,8 @@ if (session_status() == PHP_SESSION_ACTIVE) {
 <body>
 
   <div class="overlay" id="mainOverlay"></div>
+
+  <a href="index.php" class="back-button">← Back</a>
 
   <div class="login-container" id="loginContainer">
     <img src="src/assets/images/ASCOM_Monitoring_System.png" alt="Logo" class="logo-image" id="logoImage">
