@@ -71,21 +71,27 @@ if ($employee_no && $employee_no !== 'SUPER_ADMIN') {
       z-index: 3;
     }
 
-    .login-container {
-      position: relative;
-      z-index: 3;
-      margin-top: 50px;
-      background: rgba(217, 217, 217, 0.1);
-      backdrop-filter: blur(35px);
-      padding: 25px;
-      border-radius: 20px;
-      box-shadow: 0px 4px 20px rgba(0, 0, 0, 0.2);
+    .back-button {
+      position: absolute;
+      top: 30px;
+      left: 30px;
+      color: white;
+      text-decoration: none;
+      font-size: 16px;
+      z-index: 4;
+      padding: 10px 15px;
+      transition: background 0.3s ease;
+      border-radius: 8px;
+    }
+
+    .back-button:hover {
+      background: rgba(255, 255, 255, 0.15);
     }
 
     .login-container {
       position: relative;
       z-index: 3;
-      margin-top: 150px;
+      margin-top: 50px;
       background: rgba(217, 217, 217, 0.1);
       backdrop-filter: blur(35px);
       padding: 25px;
@@ -222,6 +228,8 @@ if ($employee_no && $employee_no !== 'SUPER_ADMIN') {
 
   <img src="src/assets/images/scc_buena_building.png" alt="SCC Building" class="corner-image" id="buildingImage">
   <div class="overlay" id="mainOverlay"></div>
+
+  <a href="index.php" class="back-button">← Back</a>
 
       <div class="login-container" id="loginContainer">
     <img src="src/assets/images/ASCOM_Monitoring_System.png" alt="Logo" class="logo-image" id="logoImage">
