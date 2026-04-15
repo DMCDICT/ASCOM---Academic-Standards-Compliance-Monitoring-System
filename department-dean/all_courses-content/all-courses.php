@@ -1610,12 +1610,21 @@ if (isset($pdo)) {
     </button>
 </div>
 
+<?php
+// Get dean's department ID for JavaScript
+$deanDepartmentIdJS = $_SESSION['selected_role']['department_id'] ?? 'null';
+?>
+
 <script>
     // This variable will be accessed by scripts if needed
     const courses = <?php echo json_encode($courses); ?>;
     const hasPrograms = <?php echo json_encode(count($programs) > 0); ?>;
     const programsCount = <?php echo json_encode(count($programs)); ?>;
     const programs = <?php echo json_encode($programs); ?>;
+    const deanDepartmentId = <?php echo json_encode($deanDepartmentIdJS); ?>;
+    
+    // Make available globally for other functions
+    window.deanDepartmentId = deanDepartmentId;
     
 
     // Global Modal Scroll Prevention - SIMPLE AND EFFECTIVE
@@ -1973,25 +1982,30 @@ if (isset($pdo)) {
          document.getElementById('courseDetailsTitle').textContent = `${courseCode} - ${courseTitle}`;
          
          // Get book references for this course
-         const bookReferences = getBookReferencesForCourse(courseCode);
-         
-         // Create course details HTML
-         const courseDetailsHTML = createCourseDetailsHTML(course, bookReferences);
-         
-         // Update modal content
-         const contentDiv = document.getElementById('courseDetailsContent');
-         contentDiv.innerHTML = courseDetailsHTML;
-         
-         // Show modal
-         const modal = document.getElementById('courseDetailsModal');
-         modal.style.display = 'flex';
-         
-         // Prevent body scroll
-         document.body.style.overflow = 'hidden';
-         document.body.style.position = 'fixed';
-         document.body.style.width = '100%';
-         document.body.style.height = '100%';
-     }
+          const bookReferences = getBookReferencesForCourse(courseCode);
+          
+          // Create course details HTML
+          const courseDetailsHTML = createCourseDetailsHTML(course, bookReferences);
+          
+          // Update modal content
+          const contentDiv = document.getElementById('courseDetailsContent');
+          contentDiv.innerHTML = courseDetailsHTML;
+          
+          // Show modal
+          const modal = document.getElementById('courseDetailsModal');
+          modal.style.display = 'flex';
+          
+          // Prevent body scroll
+          document.body.style.overflow = 'hidden';
+          document.body.style.position = 'fixed';
+          document.body.style.width = '100%';
+          document.body.style.height = '100%';
+          
+          // Load assigned teachers for this course
+          if (course.id) {
+              loadCourseTeachersList(course.id);
+          }
+      }
 
      function closeCourseDetailsModal() {
          const modal = document.getElementById('courseDetailsModal');
@@ -2051,10 +2065,12 @@ if (isset($pdo)) {
                         <div class="detail-card" style="background: #f8f9fa; border-radius: 8px; padding: 16px;">
                             <div style="display: flex; align-items: flex-start; justify-content: space-between;">
                                 <div>
-                                    <div style="font-weight: 600; color: #333; font-size: 13px; margin-bottom: 6px;">Faculty Assigned :</div>
-                                    <div style="color: #dc3545; font-size: 13px; font-weight: 500;">${course.faculty || 'Unassigned'}</div>
+                                    <div style="font-weight: 600; color: #333; font-size: 13px; margin-bottom: 6px;">Teachers Assigned :</div>
+                                    <div id="courseTeachersList" style="font-size: 13px;">
+                                        <span style="color: #999;">Loading...</span>
+                                    </div>
                                 </div>
-                                <button class="assign-btn" style="background: #28a745; color: white; border: none; padding: 6px 12px; border-radius: 6px; font-size: 13px; font-weight: 600; cursor: pointer;">Assign</button>
+                                <button class="assign-btn" onclick="openAssignTeacherModal('${course.id}', '${course.course_code}')" style="background: #0C4B34; color: white; border: none; padding: 6px 12px; border-radius: 6px; font-size: 13px; font-weight: 600; cursor: pointer;">Assign</button>
                             </div>
                         </div>
 
@@ -2878,4 +2894,176 @@ if (isset($pdo)) {
      function navigateToProgramCourses(programCode) {
          window.location.href = 'content.php?page=course-details&program=' + encodeURIComponent(programCode);
      }
- </script>
+     
+     // ============================================
+     // Course Teacher Assignment Functions
+     // ============================================
+     
+     let currentCourseId = null;
+     let currentCourseCode = null;
+     
+     function openAssignTeacherModal(courseId, courseCode) {
+         currentCourseId = courseId;
+         currentCourseCode = courseCode;
+         
+         const modalHtml = `
+             <div id="assignTeacherModal" class="modal-overlay" style="display: flex; position: fixed; z-index: 10003; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); align-items: center; justify-content: center;">
+                 <div class="modal-box" style="background: white; border-radius: 12px; padding: 24px; width: 90%; max-width: 500px; max-height: 80vh; overflow-y: auto;">
+                     <div class="modal-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; border-bottom: 1px solid #eee; padding-bottom: 12px;">
+                         <h2 style="margin: 0; font-size: 18px; color: #0C4B34;">Assign Teachers</h2>
+                         <span class="close-button" onclick="closeAssignTeacherModal()" style="font-size: 24px; cursor: pointer; color: #666;">&times;</span>
+                     </div>
+                     <p style="margin: 0 0 15px 0; color: #666; font-size: 14px;">Select teachers from your department to assign to course <strong>${courseCode}</strong></p>
+                     <div id="teacherListForCourse" style="max-height: 300px; overflow-y: auto; border: 1px solid #eee; border-radius: 8px;">
+                         <div style="padding: 20px; text-align: center; color: #999;">Loading teachers...</div>
+                     </div>
+                 </div>
+             </div>
+         `;
+         
+         const existingModal = document.getElementById('assignTeacherModal');
+         if (existingModal) existingModal.remove();
+         
+         document.body.insertAdjacentHTML('beforeend', modalHtml);
+         
+         loadTeachersForCourse(courseId);
+     }
+     
+     function closeAssignTeacherModal() {
+         const modal = document.getElementById('assignTeacherModal');
+         if (modal) modal.remove();
+     }
+     
+     function loadTeachersForCourse(courseId) {
+         if (!window.deanDepartmentId) {
+             document.getElementById('teacherListForCourse').innerHTML = 
+                 '<div style="padding: 20px; text-align: center; color: #dc3545;">Department not found</div>';
+             return;
+         }
+         
+         // Load available teachers
+         fetch(`api/get_department_teachers.php?department_id=${window.deanDepartmentId}`)
+             .then(res => res.json())
+             .then(data => {
+                 const container = document.getElementById('teacherListForCourse');
+                 
+                 if (!data.success || !data.teachers || data.teachers.length === 0) {
+                     container.innerHTML = '<div style="padding: 20px; text-align: center; color: #999;">No teachers found in your department</div>';
+                     return;
+                 }
+                 
+                 // Load already assigned teachers for this course
+                 fetch(`api/get_course_teachers.php?course_id=${courseId}`)
+                     .then(res => res.json())
+                     .then(assignedData => {
+                         const assignedTeacherIds = assignedData.teachers ? assignedData.teachers.map(t => t.teacher_id) : [];
+                         
+                         container.innerHTML = data.teachers.map(teacher => {
+                             const fullName = (teacher.title ? teacher.title + ' ' : '') + teacher.first_name + ' ' + teacher.last_name;
+                             const isAssigned = assignedTeacherIds.includes(teacher.id);
+                             const style = isAssigned 
+                                 ? 'background: #e8f5e9; border-left: 4px solid #0C4B34;' 
+                                 : 'cursor: pointer;';
+                             const action = isAssigned
+                                 ? `onclick="removeCourseTeacher(${courseId}, ${teacher.id}, '${fullName.replace(/'/g, "\\'")}')"`
+                                 : `onclick="assignCourseTeacher(${courseId}, ${teacher.id}, '${fullName.replace(/'/g, "\\'")}')"`;
+                             const label = isAssigned
+                                 ? '<span style="color: #0C4B34; font-size: 11px;">Assigned</span>'
+                                 : '<span style="color: #28a745; font-size: 11px;">Click to assign</span>';
+                             
+                             return `
+                                 <div class="teacher-option" ${action} style="padding: 12px 16px; border-bottom: 1px solid #f0f0f0; transition: background 0.2s; ${style}">
+                                     <div style="font-weight: 600; color: #333; font-size: 14px;">${fullName}</div>
+                                     <div style="color: #666; font-size: 12px;">${teacher.employee_no || 'No employee number'}</div>
+                                     ${label}
+                                 </div>
+                             `;
+                         }).join('');
+                         
+                         container.innerHTML += `
+                             <div style="padding: 12px 16px; border-top: 1px solid #eee; background: #f9f9f9;">
+                                 <button onclick="closeAssignTeacherModal()" style="width: 100%; padding: 10px; background: #eee; border: none; border-radius: 6px; cursor: pointer; font-size: 13px;">Close</button>
+                             </div>
+                         `;
+                     });
+             })
+             .catch(err => {
+                 document.getElementById('teacherListForCourse').innerHTML = 
+                     '<div style="padding: 20px; text-align: center; color: #dc3545;">Error loading teachers</div>';
+             });
+     }
+     
+     function assignCourseTeacher(courseId, teacherId, teacherName) {
+         if (!confirm(`Are you sure you want to assign ${teacherName} to this course?`)) {
+             return;
+         }
+         
+         fetch('api/assign_course_teacher.php', {
+             method: 'POST',
+             headers: { 'Content-Type': 'application/json' },
+             body: JSON.stringify({ course_id: courseId, teacher_id: teacherId })
+         })
+         .then(res => res.json())
+         .then(data => {
+             if (data.success) {
+                 alert('Teacher assigned successfully!');
+                 loadTeachersForCourse(courseId);
+                 loadCourseTeachersList(courseId);
+             } else {
+                 alert(data.message || 'Failed to assign teacher');
+             }
+         })
+         .catch(err => {
+             alert('Error assigning teacher');
+         });
+     }
+     
+     function removeCourseTeacher(courseId, teacherId, teacherName) {
+         if (!confirm(`Are you sure you want to remove ${teacherName} from this course?`)) {
+             return;
+         }
+         
+         fetch('api/remove_course_teacher.php', {
+             method: 'POST',
+             headers: { 'Content-Type': 'application/json' },
+             body: JSON.stringify({ course_id: courseId, teacher_id: teacherId })
+         })
+         .then(res => res.json())
+         .then(data => {
+             if (data.success) {
+                 alert('Teacher removed successfully!');
+                 loadTeachersForCourse(courseId);
+                 loadCourseTeachersList(courseId);
+             } else {
+                 alert(data.message || 'Failed to remove teacher');
+             }
+         })
+         .catch(err => {
+             alert('Error removing teacher');
+         });
+     }
+     
+     function loadCourseTeachersList(courseId) {
+         const container = document.getElementById('courseTeachersList');
+         if (!container) return;
+         
+         fetch(`api/get_course_teachers.php?course_id=${courseId}`)
+             .then(res => res.json())
+             .then(data => {
+                 if (data.success && data.teachers && data.teachers.length > 0) {
+                     container.innerHTML = data.teachers.map(t => {
+                         const name = (t.title ? t.title + ' ' : '') + t.first_name + ' ' + t.last_name;
+                         return `<span style="display: inline-block; background: #e8f5e9; color: #0C4B34; padding: 2px 8px; border-radius: 4px; margin: 2px; font-size: 12px;">${name}</span>`;
+                     }).join('');
+                 } else {
+                     container.innerHTML = '<span style="color: #999; font-style: italic;">No teachers assigned</span>';
+                 }
+             })
+             .catch(err => {
+                 container.innerHTML = '<span style="color: #999; font-style: italic;">Unable to load</span>';
+             });
+     }
+     
+     // Load teachers when course details are shown
+     window.loadCourseTeachersList = loadCourseTeachersList;
+  </script>

@@ -42,7 +42,7 @@ if (isset($conn) && !$conn->connect_error) {
         $deptNames = [];
         $deptCodes = []; // Initialize $deptCodes
 
-        $roleMapQuery = "SELECT id, role FROM roles";
+        $roleMapQuery = "SELECT id, role_name as role FROM roles";
         $roleMapResult = $conn->query($roleMapQuery);
         if ($roleMapResult) {
             while($row = $roleMapResult->fetch_assoc()) { $roleNames[$row['id']] = $row['role']; }
@@ -124,8 +124,25 @@ if (isset($conn) && !$conn->connect_error) {
                 </tr>
             </thead>
             <tbody id="userTableBody">
-                <!-- Table will be populated by JavaScript -->
-                <tr><td colspan="8" style="text-align: center;">Loading users...</td></tr>
+                <?php if (empty($users)): ?>
+                <tr><td colspan="8" style="text-align: center;">No users found.</td></tr>
+                <?php else: ?>
+                <?php foreach ($users as $user): ?>
+                <tr>
+                    <td><?php echo htmlspecialchars($user['employee_no'] ?? 'N/A'); ?></td>
+                    <td><?php echo htmlspecialchars(trim(($user['first_name'] ?? '') . ' ' . ($user['middle_name'] ?? '') . ' ' . ($user['last_name'] ?? ''))); ?></td>
+                    <td><?php echo htmlspecialchars($user['institutional_email'] ?? 'N/A'); ?></td>
+                    <td><?php echo htmlspecialchars($user['mobile_no'] ?? 'N/A'); ?></td>
+                    <td><?php echo htmlspecialchars($user['role_name'] ?? 'N/A'); ?></td>
+                    <td><?php echo htmlspecialchars($user['department_code'] ?? 'N/A'); ?></td>
+                    <td><?php echo htmlspecialchars($user['status'] ?? 'N/A'); ?></td>
+                    <td>
+                        <button class="edit-btn" data-employee="<?php echo htmlspecialchars($user['employee_no']); ?>">Edit</button>
+                        <button class="delete-btn" data-employee="<?php echo htmlspecialchars($user['employee_no']); ?>">Delete</button>
+                    </td>
+                </tr>
+                <?php endforeach; ?>
+                <?php endif; ?>
             </tbody>
         </table>
 

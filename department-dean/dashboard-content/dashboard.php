@@ -14,11 +14,6 @@ $departmentColor = '#C41E3A'; // Default red color
 
 try {
 	if (isset($_SESSION['user_id'])) {
-		// Debug: Log session data
-		$debugInfo = "Dashboard - User ID: " . ($_SESSION['user_id'] ?? 'NOT_SET') . ", ";
-		$debugInfo .= "Session data: " . json_encode($_SESSION);
-		file_put_contents('../debug_dashboard.txt', $debugInfo . PHP_EOL, FILE_APPEND);
-
 		// Get dean's information from session data
 		if (isset($_SESSION['user_title']) && isset($_SESSION['user_first_name']) && isset($_SESSION['user_last_name'])) {
 			$title = $_SESSION['user_title'] ? $_SESSION['user_title'] . ' ' : '';
@@ -55,19 +50,11 @@ try {
 				}
 			} catch (Exception $e) {
 				// Keep default color if database query fails
-				file_put_contents('../debug_dashboard.txt', 'Error fetching department color: ' . $e->getMessage() . PHP_EOL, FILE_APPEND);
 			}
 		}
-
-		// Debug: Log final values
-		$debugFinal = "Final values - Dean: $deanName, Dept: $departmentName, Code: $departmentCode, Color: $departmentColor";
-		file_put_contents('../debug_dashboard.txt', $debugFinal . PHP_EOL, FILE_APPEND);
-	} else {
-		file_put_contents('../debug_dashboard.txt', 'Missing user_id' . PHP_EOL, FILE_APPEND);
 	}
 } catch (Exception $e) {
-	// Log the error
-	file_put_contents('../debug_dashboard.txt', 'Error: ' . $e->getMessage() . PHP_EOL, FILE_APPEND);
+	// Keep default values on error
 }
 
 // Initialize overview values
@@ -2462,12 +2449,12 @@ function toggleSection() {
             
             if (data.debug) {
             }
-        
-        // Store data globally for access by viewCourseProposalDetails
+            
+            // Store data globally for access by viewCourseProposalDetails
             window.courseProposalsData = proposals;
         
         // Clear existing content
-        proposalsGrid.innerHTML = '';
+            proposalsGrid.innerHTML = '';
             
             if (proposals.length === 0) {
                 
@@ -2477,55 +2464,48 @@ function toggleSection() {
                 
                 // If debug info shows drafts exist, show a message
                 if (data.debug && data.debug.total_drafts_in_db > 0) {
-                    console.error('❌ ISSUE DETECTED: Drafts exist in DB but not returned!');
+                    console.error('ISSUE DETECTED: Drafts exist in DB but not returned!');
                     console.error('Debug info:', data.debug);
-                    proposalsGrid.innerHTML = `
-                        <div style="text-align: center; padding: 20px; color: #f44336;">
-                            <p>⚠️ Drafts exist in database but couldn't be loaded.</p>
-                            <p style="font-size: 12px; color: #666;">Check console for details.</p>
-                            <p style="font-size: 12px; color: #666;">Total drafts in DB: ${data.debug.total_drafts_in_db}</p>
-                            <p style="font-size: 12px; color: #666;">Drafts for your user: ${data.debug.total_drafts_for_user}</p>
-                        </div>
-                    `;
+                    proposalsGrid.innerHTML = '<div style="text-align: center; padding: 20px; color: #f44336;"><p>Drafts exist in database but could not be loaded.</p></div>';
                 }
             } else {
                 // Hide empty state
                 emptyState.style.display = 'none';
         
-        // Create and append cards
-                proposals.forEach((cardData, index) => {
+                // Create and append cards
+                proposals.forEach(function(cardData, index) {
                     try {
-            const card = createCourseProposalCard(cardData);
+                        var card = createCourseProposalCard(cardData);
                         if (card) {
-            proposalsGrid.appendChild(card);
+                            proposalsGrid.appendChild(card);
                         } else {
-                            console.error(`❌ Card ${index + 1} creation returned null/undefined`);
+                            console.error('Card ' + (index + 1) + ' creation returned null/undefined');
                         }
                     } catch (error) {
-                        console.error(`❌ Error creating card ${index + 1}:`, error, cardData);
+                        console.error('Error creating card ' + (index + 1) + ':', error, cardData);
                     }
                 });
         
                 // Ensure grid is set up to match other cards
-            proposalsGrid.style.flexWrap = 'wrap';
-            proposalsGrid.style.justifyContent = 'flex-start';
-            proposalsGrid.style.gap = '20px';
+                proposalsGrid.style.flexWrap = 'wrap';
+                proposalsGrid.style.justifyContent = 'flex-start';
+                proposalsGrid.style.gap = '20px';
                 proposalsGrid.style.width = '100%';
                 proposalsGrid.style.maxWidth = '100%';
             
                 // Adjust card widths to match other reference request cards (fixed 250px)
-            const cards = proposalsGrid.querySelectorAll('.reference-request-card');
-            cards.forEach(card => {
+                var cards = proposalsGrid.querySelectorAll('.reference-request-card');
+                cards.forEach(function(card) {
                     // Force fixed width - override any CSS that might make it grow
                     card.style.minWidth = '250px';
-                card.style.maxWidth = '250px';
+                    card.style.maxWidth = '250px';
                     card.style.width = '250px';
                     card.style.flex = '0 0 250px';
                     card.style.flexGrow = '0';
                     card.style.flexShrink = '0';
                     card.style.flexBasis = '250px';
                     card.style.boxSizing = 'border-box';
-            });
+                });
             }
         } catch (error) {
             console.error('Error loading course proposals:', error);
@@ -2810,6 +2790,7 @@ function toggleSection() {
     
     // Load draft data into the form
     async function loadDraftIntoForm(draftData, proposal) {
+        console.log('Loading draft data:', {
             has_outcomes: !!(draftData.learning_outcomes && draftData.learning_outcomes.length),
             outcomes_count: draftData.learning_outcomes?.length || 0,
             has_outline: !!(draftData.course_outline && draftData.course_outline.length),
@@ -3273,7 +3254,7 @@ function toggleSection() {
             const loadedOutcomes = outcomesContainer ? outcomesContainer.querySelectorAll('.outcome-input').length : 0;
             const loadedAssessments = assessmentTableBody ? assessmentTableBody.querySelectorAll('tr').length : 0;
             const loadedMaterials = materialsTableBody ? materialsTableBody.querySelectorAll('tr').length : 0;
-            
+            console.log('Verification data:', {
                 course_outline_rows: loadedOutlineRows,
                 learning_outcomes: loadedOutcomes,
                 assessment_methods: loadedAssessments,

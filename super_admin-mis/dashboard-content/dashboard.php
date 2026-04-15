@@ -127,7 +127,8 @@ if (isset($conn) && !$conn->connect_error) {
 }
 ?>
 
-<h2 class="main-page-title" style="padding-left: 0px;">Overview</h2> <div class="dashboard-container">
+<h2 class="main-page-title" style="padding-left: 0px;">Overview</h2> 
+<div class="dashboard-container">
     <div class="box">
         <h2>Departments</h2>
         <div class="amount"><?php echo $totalDepartments; ?></div>

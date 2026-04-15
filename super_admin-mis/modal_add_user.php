@@ -24,7 +24,7 @@ if (isset($conn) && $conn instanceof mysqli && !$conn->connect_error) {
     } else {
     }
     // Fetch roles
-    $rolesQuery = "SELECT id, role FROM roles ORDER BY id ASC";
+    $rolesQuery = "SELECT id, role_name as role FROM roles ORDER BY id ASC";
     $rolesResult = $conn->query($rolesQuery);
     if ($rolesResult) {
         while ($row = $rolesResult->fetch_assoc()) {

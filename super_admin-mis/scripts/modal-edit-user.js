@@ -278,6 +278,7 @@ function updateResetButtonState() {
     const currentPassword = passwordInput.value.trim();
     const defaultPassword = window.editFormDefaultPassword;
     
+    console.log({
         currentPassword: currentPassword ? '***' : '(empty)',
         defaultPassword: defaultPassword,
         isDefault: currentPassword === defaultPassword,
@@ -397,48 +398,32 @@ function setupFormChangeDetection() {
     monitoredFields.forEach(fieldId => {
         const field = document.getElementById(fieldId);
         if (field) {
-            
             field.addEventListener('input', () => {
                 updateUpdateButton();
-                // Update reset button state for employee number and department changes
                 if (fieldId === 'edit_employee_no' || fieldId === 'edit_department_id') {
                     updateResetButtonState();
                 }
             });
             field.addEventListener('change', () => {
                 updateUpdateButton();
-                // Update reset button state for employee number and department changes
                 if (fieldId === 'edit_employee_no' || fieldId === 'edit_department_id') {
                     updateResetButtonState();
                 }
             });
             field.addEventListener('blur', () => {
                 updateUpdateButton();
-                // Update reset button state for employee number and department changes
                 if (fieldId === 'edit_employee_no' || fieldId === 'edit_department_id') {
                     updateResetButtonState();
                 }
             });
-} else {
         }
-    });
-
-
-    // Update button setup
-    const updateBtn = document.getElementById('edit_update_btn');
-    if (updateBtn) {
-        updateBtn.addEventListener('click', function(e) {
-            e.preventDefault();
-            handleEditFormSubmit();
-        });
-    }
     });
 }
 
 // Function to update the UPDATE button state
 function updateUpdateButton() {
-    const updateBtn = document.getElementById('edit_update_btn');
-    if (!updateBtn) {
+    const editUpdateBtn = document.getElementById('edit_update_btn');
+    if (!editUpdateBtn) {
         return;
     }
     
@@ -446,15 +431,15 @@ function updateUpdateButton() {
     const isFormValid = checkFormValidity();
     
     if (hasChanges && isFormValid) {
-        updateBtn.disabled = false;
-        updateBtn.style.background = '#007bff';
-        updateBtn.style.color = 'white';
-        updateBtn.style.cursor = 'pointer';
+        editUpdateBtn.disabled = false;
+        editUpdateBtn.style.background = '#007bff';
+        editUpdateBtn.style.color = 'white';
+        editUpdateBtn.style.cursor = 'pointer';
     } else {
-        updateBtn.disabled = true;
-        updateBtn.style.background = '#C9C9C9';
-        updateBtn.style.color = '#666';
-        updateBtn.style.cursor = 'not-allowed';
+        editUpdateBtn.disabled = true;
+        editUpdateBtn.style.background = '#C9C9C9';
+        editUpdateBtn.style.color = '#666';
+        editUpdateBtn.style.cursor = 'not-allowed';
     }
 }
 
@@ -484,16 +469,10 @@ function checkFormChanges() {
             const currentValue = field.value;
             const originalValue = window.editFormOriginalValues[fieldId] || '';
             
-                current: currentValue,
-                original: originalValue,
-                changed: currentValue !== originalValue,
-                fieldType: field.type,
-                fieldRequired: field.required
-            });
-            
-if (currentValue !== originalValue) {
+            if (currentValue !== originalValue) {
                 return true;
             }
+        }
     }
     
     return false;
@@ -885,41 +864,22 @@ async function handleEditFormSubmit(event) {
             body: formData
         });
         
-        
         const responseText = await response.text();
         
         let data;
-try {
+        try {
             data = JSON.parse(responseText);
         } catch (parseError) {
             openEditUserErrorModal('Invalid response from server. Please try again.');
             return;
         }
         
-        
-        
         if (data.success === true) {
             openEditUserSuccessModal(data.message || 'User updated successfully!');
-                
-                if (typeof loadInitialData === 'function') {
-                    loadInitialData();
-                }
-        } else {
-            openEditUserErrorModal(data.message || 'Failed to update user. Please try again.');
-        }
-    } catch (error) {
-        openEditUserErrorModal('An error occurred while updating the user. Please try again.');
-    }
-}
-        
-        
-        if (data.success === true) {
-            openEditUserSuccessModal(data.message || 'User updated successfully!');
-                
-                // Refresh the user list if the function exists
-                if (typeof loadInitialData === 'function') {
-                    loadInitialData();
-                }
+            
+            if (typeof loadInitialData === 'function') {
+                loadInitialData();
+            }
         } else {
             openEditUserErrorModal(data.message || 'Failed to update user. Please try again.');
         }

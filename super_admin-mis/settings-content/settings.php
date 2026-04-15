@@ -18,7 +18,7 @@
   </aside>
 
   <!-- Main Content -->
-  <main id="settingsMainContent" class="settings-main-content" style="flex: 1; background: #fff; border-radius: 16px; height: calc(100vh - 102px); padding: 40px 24px 20px 24px; box-sizing: border-box; box-shadow: 0 2px 8px rgba(0,0,0,0.03); display: flex; flex-direction: column; justify-content: flex-start; overflow: auto;">
+  <main id="settingsMainContent" class="settings-main-content" style="flex: 1; background: #fff; border-radius: 16px; height: calc(100vh - 70px); padding: 30px 20px 20px 20px; box-sizing: border-box; box-shadow: 0 2px 8px rgba(0,0,0,0.03); display: flex; flex-direction: column; justify-content: flex-start; overflow: auto;">
     <!-- Main content intentionally left empty -->
   </main>
 </div>
