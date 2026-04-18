@@ -3917,7 +3917,7 @@ if (typeof window.closeSuccessModal === 'undefined') {
 // Modal functions are already defined in the earlier script block
 </script>
 <script src="./scripts/modal-add-user.js?v=<?php echo time(); ?>&ultra=1"></script>
-<script src="./scripts/user-account-management.js?v=2.9"></script>
+<script src="./scripts/user-account-management.js?v=3.0"></script>
 <script src="./scripts/modal-edit-user.js?v=<?php echo time(); ?>&edit=1"></script>
 <script>
 // Ensure modal functions are available with proper data fetching
@@ -3959,11 +3959,121 @@ window.ensureModalFunctions = function() {
     }
     // Delete User
     if (!window.openDeleteUserModal) {
-        window.openDeleteUserModal = function(userId) {
+        window.openDeleteUserModal = function(employeeNo) {
+            console.log('>>> openDeleteUserModal called with:', employeeNo);
+            
+            // Store employee number
+            window.currentDeleteEmployeeNo = employeeNo;
+            
+            // Get modal
             var m = document.getElementById('deleteUserModal');
-            if (m) { m.style.display = 'flex'; document.body.style.overflow = 'hidden'; }
+            if (!m) {
+                console.error('Delete modal not found');
+                return;
+            }
+            
+            // Try to get user info from window.allUsers if available
+            var userName = '';
+            var userEmail = '';
+            var userRole = '';
+            
+            if (typeof window.allUsers !== 'undefined') {
+                var user = window.allUsers.find(function(u) { return u.employee_no === employeeNo; });
+                if (user) {
+                    userName = user.first_name + ' ' + user.last_name;
+                    userEmail = user.email || 'N/A';
+                    var roleMap = {'1': 'Super Admin', '2': 'Dean', '3': 'Teacher', '4': 'QA'};
+                    userRole = roleMap[user.role] || user.role || 'N/A';
+                }
+            }
+            
+            // Update modal content
+            var nameEl = document.getElementById('deleteUserName');
+            var emailEl = document.getElementById('deleteUserEmail');
+            var roleEl = document.getElementById('deleteUserRole');
+            var msgEl = document.getElementById('deleteUserMessage');
+            
+            if (nameEl) nameEl.textContent = 'Name: ' + userName;
+            if (emailEl) emailEl.textContent = 'Email: ' + userEmail;
+            if (roleEl) roleEl.textContent = 'Role: ' + userRole;
+            if (msgEl) msgEl.textContent = 'Are you sure you want to delete user "' + userName + '"? This action cannot be undone.';
+            
+            // Show modal
+            m.style.display = 'flex';
+            document.body.style.overflow = 'hidden';
+            console.log('Modal displayed');
+        };
+    }
+    
+    // Confirm delete user
+    if (!window.confirmDeleteUser) {
+        window.confirmDeleteUser = function() {
+            var empNo = window.currentDeleteEmployeeNo;
+            if (!empNo) {
+                alert('No employee selected');
+                return;
+            }
+            
+            console.log('Confirming delete for:', empNo);
+            
             var btn = document.getElementById('confirmDeleteBtn');
-            if (btn) btn.setAttribute('data-employee-no', userId);
+            if (btn) {
+                btn.disabled = true;
+                btn.textContent = 'Deleting...';
+            }
+            
+            fetch('./process_delete_user.php', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({employee_no: empNo})
+            })
+            .then(function(res) { return res.json(); })
+            .then(function(data) {
+                if (data.success) {
+                    // Close modal
+                    var m = document.getElementById('deleteUserModal');
+                    if (m) m.style.display = 'none';
+                    document.body.style.overflow = '';
+                    
+                    // Show success
+                    var sm = document.getElementById('deleteUserSuccessModal');
+                    var smsg = document.getElementById('deleteUserSuccessMessage');
+                    if (smsg) smsg.textContent = data.message || 'User deleted successfully!';
+                    if (sm) sm.style.display = 'flex';
+                    
+                    // Refresh
+                    if (typeof window.refreshUserList === 'function') {
+                        window.refreshUserList();
+                    } else {
+                        location.reload();
+                    }
+                } else {
+                    var em = document.getElementById('deleteUserErrorModal');
+                    var emsg = document.getElementById('deleteUserErrorMessage');
+                    if (emsg) emsg.textContent = data.message || 'Failed to delete user';
+                    if (em) em.style.display = 'flex';
+                }
+            })
+            .catch(function(err) {
+                console.error('Delete error:', err);
+                alert('Network error. Please try again.');
+            })
+            .finally(function() {
+                if (btn) {
+                    btn.disabled = false;
+                    btn.textContent = 'DELETE';
+                }
+            });
+        };
+    }
+    
+    // Close delete modal
+    if (!window.closeDeleteUserModal) {
+        window.closeDeleteUserModal = function() {
+            var m = document.getElementById('deleteUserModal');
+            if (m) m.style.display = 'none';
+            document.body.style.overflow = '';
+            window.currentDeleteEmployeeNo = null;
         };
     }
     // Close functions
