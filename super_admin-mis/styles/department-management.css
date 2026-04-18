@@ -131,7 +131,24 @@
 .department-management-page .dept-actions {
     display: flex;
     align-items: center;
-    gap: 15px;
+    gap: 10px;
+}
+
+.department-management-page .dept-actions .dean-btn {
+    padding: 8px 14px;
+    background: #6f42c1;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 13px;
+    font-weight: 500;
+    transition: background 0.2s;
+    white-space: nowrap;
+}
+
+.department-management-page .dept-actions .dean-btn:hover {
+    background: #5a32a3;
 }
 
 .department-management-page .dept-actions .edit-btn {

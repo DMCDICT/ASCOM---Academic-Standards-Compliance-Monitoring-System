@@ -1,9 +1,9 @@
 <?php
-// modal_add_department.php
+// modal_department.php
 // Add Department Modal
 
 if (!isset($conn)) {
-    require_once __DIR__ . '/../includes/db_connection.php';
+    require_once __DIR__ . '/includes/db_connection.php';
 }
 ?>
 
@@ -104,26 +104,26 @@ if (!isset($conn)) {
 </div>
 
 <script>
-function closeAddDepartmentModal() {
+window.closeAddDepartmentModal = function() {
     const modal = document.getElementById('addDepartmentModal');
     if (modal) modal.style.display = 'none';
     document.body.style.overflow = '';
 }
 
-function closeEditDepartmentModal() {
+window.closeEditDepartmentModal = function() {
     const modal = document.getElementById('editDepartmentModal');
     if (modal) modal.style.display = 'none';
     document.body.style.overflow = '';
 }
 
-function closeDeptSuccessModal() {
+window.closeDeptSuccessModal = function() {
     const modal = document.getElementById('deptSuccessModal');
     if (modal) modal.style.display = 'none';
     document.body.style.overflow = '';
     location.reload();
 }
 
-function closeDeptErrorModal() {
+window.closeDeptErrorModal = function() {
     const modal = document.getElementById('deptErrorModal');
     if (modal) modal.style.display = 'none';
     document.body.style.overflow = '';
@@ -257,7 +257,7 @@ document.addEventListener('DOMContentLoaded', function() {
 </div>
 
 <script>
-function openAssignDeanModal(deptId, deptCode) {
+window.openAssignDeanModal = function(deptId, deptCode) {
     document.getElementById('assign_dept_id').value = deptId;
     document.getElementById('assignDeanDeptName').textContent = 'Department: ' + deptCode;
     
@@ -299,12 +299,12 @@ function openAssignDeanModal(deptId, deptCode) {
     document.body.style.overflow = 'hidden';
 }
 
-function closeAssignDeanModal() {
+window.closeAssignDeanModal = function() {
     document.getElementById('assignDeanModal').style.display = 'none';
     document.body.style.overflow = '';
 }
 
-function removeDean() {
+window.removeDean = function() {
     const deptId = document.getElementById('assign_dept_id').value;
     if (confirm('Are you sure you want to remove this dean?')) {
         fetch('./api/remove_dean.php', {

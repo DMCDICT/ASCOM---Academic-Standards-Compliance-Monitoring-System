@@ -2,92 +2,57 @@
 // get_department_teachers.php
 // API endpoint to fetch teachers from a specific department
 
-require_once '../includes/db_connection.php';
-
 header('Content-Type: application/json');
+require_once __DIR__ . '/../includes/db_connection.php';
 
-// Check if department code is provided
-if (!isset($_GET['dept_code']) || empty($_GET['dept_code'])) {
-    echo json_encode([
-        'success' => false,
-        'message' => 'Department code is required'
-    ]);
-    exit;
-}
+$response = ['success' => false, 'teachers' => []];
 
-$deptCode = $_GET['dept_code'];
-
-try {
-    // Get department ID first
+// Support both department_id and dept_code for backward compatibility
+if (isset($_GET['department_id'])) {
+    $department_id = (int)$_GET['department_id'];
+    
+    if ($department_id > 0) {
+        $stmt = $conn->prepare("SELECT id, employee_no, first_name, last_name, email FROM users WHERE department_id = ? AND (role_id = 4 OR role = 'teacher') AND is_active = 1 ORDER BY first_name ASC");
+        $stmt->bind_param("i", $department_id);
+        $stmt->execute();
+        $result = $stmt->get_result();
+        
+        while ($row = $result->fetch_assoc()) {
+            $response['teachers'][] = $row;
+        }
+        
+        $response['success'] = true;
+        $stmt->close();
+    }
+} elseif (isset($_GET['dept_code'])) {
+    // Original implementation
+    $deptCode = $_GET['dept_code'];
+    
     $deptQuery = "SELECT id FROM departments WHERE department_code = ?";
     $deptStmt = $conn->prepare($deptQuery);
     $deptStmt->bind_param("s", $deptCode);
     $deptStmt->execute();
     $deptResult = $deptStmt->get_result();
     
-    if ($deptResult->num_rows === 0) {
-        echo json_encode([
-            'success' => false,
-            'message' => 'Department not found'
-        ]);
-        exit;
+    if ($deptResult->num_rows > 0) {
+        $deptRow = $deptResult->fetch_assoc();
+        $deptId = $deptRow['id'];
+        
+        $teachersQuery = "SELECT id, employee_no, first_name, last_name, title, institutional_email FROM users WHERE department_id = ? AND role_id = 4 AND is_active = 1 ORDER BY first_name ASC";
+        $teachersStmt = $conn->prepare($teachersQuery);
+        $teachersStmt->bind_param("i", $deptId);
+        $teachersStmt->execute();
+        $teachersResult = $teachersStmt->get_result();
+        
+        while ($row = $teachersResult->fetch_assoc()) {
+            $response['teachers'][] = $row;
+        }
+        
+        $response['success'] = true;
+        $teachersStmt->close();
     }
-    
-    $deptRow = $deptResult->fetch_assoc();
-    $deptId = $deptRow['id'];
-    
-    // Get teachers from this department (role_id = 4 for Teacher), including the dean
-    $teachersQuery = "
-        SELECT 
-            u.id,
-            u.employee_no,
-            u.first_name,
-            u.last_name,
-            u.title,
-            u.institutional_email,
-            u.mobile_no,
-            u.created_at,
-            0 as total_units
-        FROM 
-            users u
-        WHERE 
-            u.department_id = ? 
-            AND u.role_id = 4
-            AND u.is_active = 1
-        ORDER BY 
-            u.last_name ASC, u.first_name ASC
-    ";
-    
-    $teachersStmt = $conn->prepare($teachersQuery);
-    $teachersStmt->bind_param("i", $deptId);
-    $teachersStmt->execute();
-    $teachersResult = $teachersStmt->get_result();
-    
-    $teachers = [];
-    while ($row = $teachersResult->fetch_assoc()) {
-        $teachers[] = [
-            'id' => $row['id'],
-            'employee_no' => $row['employee_no'],
-            'first_name' => $row['first_name'],
-            'last_name' => $row['last_name'],
-            'title' => $row['title'],
-            'institutional_email' => $row['institutional_email'],
-            'mobile_no' => $row['mobile_no'],
-            'created_at' => $row['created_at'],
-            'total_units' => $row['total_units']
-        ];
-    }
-    
-    echo json_encode([
-        'success' => true,
-        'teachers' => $teachers,
-        'count' => count($teachers)
-    ]);
-    
-} catch (Exception $e) {
-    echo json_encode([
-        'success' => false,
-        'message' => 'Database error occurred'
-    ]);
+    $deptStmt->close();
 }
-?> 
+
+echo json_encode($response);
+$conn->close(); 

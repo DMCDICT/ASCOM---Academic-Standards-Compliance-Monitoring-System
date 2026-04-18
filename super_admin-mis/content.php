@@ -3462,22 +3462,13 @@ $modalFiles = [
     './modal_add_user.php',  
     './modal_edit_user.php', 
     './modal_delete_user.php',
-    './department_management-content/modal_department.php'
+    './modal_department.php'
 ];
 
-$currentDir = getcwd();
 foreach ($modalFiles as $modalFile) {
     $fullPath = __DIR__ . '/' . $modalFile;
     if (file_exists($fullPath)) {
-        try {
-            include $fullPath;
-        } catch (Exception $e) {
-            echo "<!-- ERROR including $modalFile: " . $e->getMessage() . " -->";
-        } catch (ParseError $e) {
-            echo "<!-- PARSE ERROR in $modalFile: " . $e->getMessage() . " -->";
-        }
-    } else {
-        echo "<!-- DEBUG: $modalFile not found at: $fullPath (cwd: $currentDir) -->";
+        include $fullPath;
     }
 }
 ?>

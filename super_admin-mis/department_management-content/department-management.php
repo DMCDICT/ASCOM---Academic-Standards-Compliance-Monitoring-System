@@ -143,6 +143,9 @@ if (isset($conn) && !$conn->connect_error) {
                     </span>
                 </div>
                 <div class="dept-actions">
+                    <button class="dean-btn" onclick="openAssignDeanModal(<?php echo $dept['id']; ?>, '<?php echo htmlspecialchars($dept['department_code']); ?>'); event.stopPropagation();">
+                        <?php echo $dept['dean_user_id'] ? 'Change Dean' : 'Assign Dean'; ?>
+                    </button>
                     <label class="toggle-switch">
                         <input type="checkbox" class="dept-toggle" 
                             <?php echo ($dept['is_active'] ?? 1) ? 'checked' : ''; ?>
@@ -150,7 +153,7 @@ if (isset($conn) && !$conn->connect_error) {
                             onclick="event.stopPropagation()">
                         <span class="slider"></span>
                     </label>
-                    <button class="edit-btn" onclick="openEditDepartmentModal(<?php echo $dept['id']; ?>)" onclick="event.stopPropagation()">
+                    <button class="edit-btn" onclick="openEditDepartmentModal(<?php echo $dept['id']; ?>); event.stopPropagation();">
                         Edit
                     </button>
                     <span class="expand-icon">▼</span>
@@ -165,7 +168,7 @@ if (isset($conn) && !$conn->connect_error) {
                         <?php if ($dept['dean_user_id']): ?>
                         <div class="detail-item">
                             <span class="detail-label">Name:</span>
-                            <span><?php echo htmlspecialchars($dept['dean_name'] ?? 'N/A'); ?></span>
+                            <span class="dean-name"><?php echo htmlspecialchars($dept['dean_name'] ?? 'N/A'); ?></span>
                         </div>
                         <div class="detail-item">
                             <span class="detail-label">Employee No:</span>
@@ -256,6 +259,86 @@ if (isset($conn) && !$conn->connect_error) {
     </div>
 </div>
 
+<!-- Assign Dean Modal (Inline) -->
+<div id="assignDeanModal" class="modal-overlay" style="display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background-color: rgba(0, 0, 0, 0.5); z-index: 9999;">
+  <div class="modal-box" style="background-color: #EFEFEF; padding: 25px; border: 1px solid #888; border-radius: 15px; width: 90%; max-width: 500px; box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3); animation: fadeIn 0.3s; max-height: 90vh; overflow-y: auto; margin: 20px auto;">
+    <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #e5e5e5; padding-bottom: 15px; margin-bottom: 20px;">
+      <h2 style="margin: 0; font-size: 22px; font-weight: 700; color: #333;">Assign Dean</h2>
+      <span onclick="window.closeAssignDeanModal()" style="color: #aaa; font-size: 28px; font-weight: 700; cursor: pointer;">&times;</span>
+    </div>
+    <p id="assignDeanDeptName" style="font-size: 16px; color: #666; margin-bottom: 20px;"></p>
+    <form id="assignDeanForm" style="display: flex; flex-direction: column; gap: 15px;">
+      <input type="hidden" name="department_id" id="assign_dept_id">
+      <div>
+        <label style="font-size: 14px; font-weight: bold; margin-bottom: 6px; display: block;">Select Teacher/Faculty <span style="color: #dc3545;">*</span></label>
+        <select name="user_id" id="assign_user_id" required style="width: 100%; height: 50px; padding: 0 12px; border: 1px solid #ccc; border-radius: 12px; box-sizing: border-box; background-color: #FFFFFF;">
+          <option value="">-- Select Teacher --</option>
+        </select>
+      </div>
+      <div id="currentDeanSection" style="display: none; background: #fff3cd; padding: 15px; border-radius: 8px;">
+        <strong>Current Dean:</strong> <span id="currentDeanName"></span>
+        <button type="button" onclick="window.removeDean()" style="margin-left: 10px; color: #dc3545; background: none; border: none; cursor: pointer; text-decoration: underline;">Remove</button>
+      </div>
+      <div style="display: flex; justify-content: flex-end; gap: 10px; margin-top: 10px;">
+        <button type="button" onclick="window.closeAssignDeanModal()" style="width: 125px; height: 50px; background-color: #C9C9C9; color: black; border: none; border-radius: 10px; cursor: pointer; font-size: 14px; font-weight: bold; text-transform: uppercase;">CANCEL</button>
+        <button type="submit" class="create-btn" style="width: 125px; height: 50px;">ASSIGN</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- Success Modal -->
+<div id="deptSuccessModal" style="display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background-color: rgba(0, 0, 0, 0.8); z-index: 9999;">
+  <div style="max-width: 400px; text-align: center; background-color: #FFFFFF; padding: 30px; border-radius: 15px; margin: 0; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);">
+    <div style="margin-bottom: 20px;"><span style="font-size: 60px;">✓</span></div>
+    <h2 style="color: #28a745; margin-bottom: 15px;">Success!</h2>
+    <p id="deptSuccessMessage" style="font-size: 16px; margin-bottom: 25px;">Operation completed successfully!</p>
+    <button onclick="document.getElementById('deptSuccessModal').style.display='none'; location.reload();" style="min-width: 120px; height: 45px; background-color: #28a745; color: white; border: none; border-radius: 10px; cursor: pointer; font-size: 16px;">OK</button>
+  </div>
+</div>
+
+<!-- Error Modal -->
+<div id="deptErrorModal" style="display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background-color: rgba(0, 0, 0, 0.8); z-index: 9999;">
+  <div style="max-width: 400px; text-align: center; background-color: #FFFFFF; padding: 30px; border-radius: 15px; margin: 0; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);">
+    <div style="margin-bottom: 20px;"><span style="font-size: 60px; color: #dc3545;">✕</span></div>
+    <h2 style="color: #dc3545; margin-bottom: 15px;">Error!</h2>
+    <p id="deptErrorMessage" style="font-size: 16px; margin-bottom: 25px;">An error occurred.</p>
+    <button onclick="document.getElementById('deptErrorModal').style.display='none';" style="min-width: 120px; height: 45px; background-color: #dc3545; color: white; border: none; border-radius: 10px; cursor: pointer; font-size: 16px;">OK</button>
+  </div>
+</div>
+
+<!-- Edit Department Modal -->
+<div id="editDepartmentModal" class="modal-overlay" style="display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background-color: rgba(0, 0, 0, 0.5); z-index: 9999;">
+  <div class="modal-box" style="background-color: #EFEFEF; padding: 25px; border: 1px solid #888; border-radius: 15px; width: 90%; max-width: 500px; box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3); animation: fadeIn 0.3s; max-height: 90vh; overflow-y: auto; margin: 20px auto;">
+    <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #e5e5e5; padding-bottom: 15px; margin-bottom: 20px;">
+      <h2 style="margin: 0; font-size: 22px; font-weight: 700; color: #333;">Edit Department</h2>
+      <span onclick="closeEditDepartmentModal()" style="color: #aaa; font-size: 28px; font-weight: 700; cursor: pointer;">&times;</span>
+    </div>
+    <form id="editDepartmentForm" style="display: flex; flex-direction: column; gap: 15px;">
+      <input type="hidden" name="department_id" id="edit_dept_id">
+      <div>
+        <label style="font-size: 14px; font-weight: bold; margin-bottom: 6px; display: block;">Department Name <span style="color: #dc3545;">*</span></label>
+        <input type="text" name="department_name" id="edit_department_name" required placeholder="e.g., College of Computing Studies" style="width: 100%; height: 50px; padding: 0 12px; border: 1px solid #ccc; border-radius: 12px; box-sizing: border-box; background-color: #FFFFFF;">
+      </div>
+      <div>
+        <label style="font-size: 14px; font-weight: bold; margin-bottom: 6px; display: block;">Department Code <span style="color: #dc3545;">*</span></label>
+        <input type="text" name="department_code" id="edit_department_code" required placeholder="e.g., CCS" maxlength="10" style="width: 100%; height: 50px; padding: 0 12px; border: 1px solid #ccc; border-radius: 12px; box-sizing: border-box; background-color: #FFFFFF; text-transform: uppercase;">
+      </div>
+      <div>
+        <label style="font-size: 14px; font-weight: bold; margin-bottom: 6px; display: block;">Color Code</label>
+        <div style="display: flex; gap: 10px; align-items: center;">
+          <input type="color" id="edit_color_picker" value="#1976d2" style="width: 50px; height: 40px; border: none; border-radius: 8px; cursor: pointer;">
+          <input type="text" id="edit_color_hex" value="#1976d2" maxlength="7" style="flex: 1; height: 50px; padding: 0 12px; border: 1px solid #ccc; border-radius: 12px; box-sizing: border-box; background-color: #FFFFFF;">
+        </div>
+      </div>
+      <div style="display: flex; justify-content: flex-end; gap: 10px; margin-top: 10px;">
+        <button type="button" onclick="closeEditDepartmentModal()" style="width: 125px; height: 50px; background-color: #C9C9C9; color: black; border: none; border-radius: 10px; cursor: pointer; font-size: 14px; font-weight: bold; text-transform: uppercase;">CANCEL</button>
+        <button type="submit" class="create-btn" style="width: 125px; height: 50px;">UPDATE</button>
+      </div>
+    </form>
+  </div>
+</div>
+
 <script>
 function toggleDepartmentDetails(deptId) {
     const detailsSection = document.getElementById('dept-details-' + deptId);
@@ -288,22 +371,200 @@ function openAddDepartmentModal() {
 
 function openEditDepartmentModal(deptId) {
     const modal = document.getElementById('editDepartmentModal');
-    if (modal) {
-        // Fetch department data
-        fetch('./api/get_department_data.php?id=' + deptId)
+    if (!modal) {
+        console.error('Edit Department Modal not found');
+        alert('Error: Modal not loaded. Please refresh the page.');
+        return;
+    }
+    
+    // Fetch department data
+    fetch('./api/get_department_data.php?id=' + deptId)
+    .then(res => res.json())
+    .then(data => {
+        if (data.success) {
+            document.getElementById('edit_dept_id').value = data.data.id;
+            document.getElementById('edit_department_name').value = data.data.department_name;
+            document.getElementById('edit_department_code').value = data.data.department_code;
+            document.getElementById('edit_color_picker').value = data.data.color_code || '#1976d2';
+            document.getElementById('edit_color_hex').value = data.data.color_code || '#1976d2';
+            
+            modal.style.display = 'flex';
+            document.body.style.overflow = 'hidden';
+        } else {
+            alert('Error: ' + (data.message || 'Failed to load department data'));
+        }
+    })
+    .catch(function(error) {
+        console.error('Error:', error);
+        alert('Error loading department data');
+    });
+}
+
+function closeEditDepartmentModal() {
+    const modal = document.getElementById('editDepartmentModal');
+    if (modal) modal.style.display = 'none';
+    document.body.style.overflow = '';
+    const form = document.getElementById('editDepartmentForm');
+    if (form) form.reset();
+}
+</script>
+
+<script>
+// Dean assignment modal functions (defined globally)
+window.openAssignDeanModal = function(deptId, deptCode) {
+    // Check if modal exists, if not show error
+    const assignDeptId = document.getElementById('assign_dept_id');
+    const assignDeanModal = document.getElementById('assignDeanModal');
+    
+    if (!assignDeptId || !assignDeanModal) {
+        console.error('Assign Dean Modal not found in DOM');
+        alert('Error: Modal not loaded. Please refresh the page.');
+        return;
+    }
+    
+    assignDeptId.value = deptId;
+    document.getElementById('assignDeanDeptName').textContent = 'Department: ' + deptCode;
+    
+    // Show current dean info if exists
+    const currentDeanSection = document.getElementById('currentDeanSection');
+    const deptCard = document.querySelector('.department-card[data-dept-id="' + deptId + '"]');
+    if (deptCard) {
+        const deanName = deptCard.querySelector('.dean-name');
+        if (deanName && deanName.textContent.trim()) {
+            document.getElementById('currentDeanName').textContent = deanName.textContent;
+            currentDeanSection.style.display = 'block';
+        } else {
+            currentDeanSection.style.display = 'none';
+        }
+    }
+    
+    // Fetch teachers for this department
+    fetch('./api/get_department_teachers.php?department_id=' + deptId)
+    .then(res => res.json())
+    .then(data => {
+        const select = document.getElementById('assign_user_id');
+        select.innerHTML = '<option value="">-- Select Teacher --</option>';
+        
+        if (data.success && data.teachers) {
+            data.teachers.forEach(function(teacher) {
+                const option = document.createElement('option');
+                option.value = teacher.id;
+                option.textContent = teacher.first_name + ' ' + teacher.last_name + ' (' + teacher.employee_no + ')';
+                select.appendChild(option);
+            });
+        }
+        
+        if (select.options.length <= 1) {
+            select.innerHTML = '<option value="">No teachers available</option>';
+        }
+    });
+    
+    document.getElementById('assignDeanModal').style.display = 'flex';
+    document.body.style.overflow = 'hidden';
+}
+
+window.closeAssignDeanModal = function() {
+    document.getElementById('assignDeanModal').style.display = 'none';
+    document.body.style.overflow = '';
+}
+
+window.removeDean = function() {
+    const deptId = document.getElementById('assign_dept_id').value;
+    if (confirm('Are you sure you want to remove this dean?')) {
+        fetch('./api/remove_dean.php', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/x-www-form-urlencoded'},
+            body: 'department_id=' + deptId
+        })
         .then(res => res.json())
         .then(data => {
             if (data.success) {
-                document.getElementById('edit_dept_id').value = data.data.id;
-                document.getElementById('edit_department_name').value = data.data.department_name;
-                document.getElementById('edit_department_code').value = data.data.department_code;
-                document.getElementById('edit_color_picker').value = data.data.color_code || '#1976d2';
-                document.getElementById('edit_color_hex').value = data.data.color_code || '#1976d2';
-                
-                modal.style.display = 'flex';
-                document.body.style.overflow = 'hidden';
+                document.getElementById('deptSuccessMessage').textContent = 'Dean removed successfully!';
+                document.getElementById('deptSuccessModal').style.display = 'flex';
+                window.closeAssignDeanModal();
+            } else {
+                document.getElementById('deptErrorMessage').textContent = data.message;
+                document.getElementById('deptErrorModal').style.display = 'flex';
             }
         });
     }
 }
+
+// Handle assign dean form submission
+document.addEventListener('DOMContentLoaded', function() {
+    // Color picker sync for edit modal
+    const editColorPicker = document.getElementById('edit_color_picker');
+    const editColorHex = document.getElementById('edit_color_hex');
+    if (editColorPicker && editColorHex) {
+        editColorPicker.addEventListener('input', function() {
+            editColorHex.value = this.value.toUpperCase();
+        });
+        editColorHex.addEventListener('input', function() {
+            if (/^#[0-9A-F]{6}$/i.test(this.value)) {
+                editColorPicker.value = this.value;
+            }
+        });
+    }
+    
+    // Handle edit department form
+    const editForm = document.getElementById('editDepartmentForm');
+    if (editForm) {
+        editForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const formData = new FormData(editForm);
+            formData.append('color_code', document.getElementById('edit_color_hex').value);
+            
+            fetch('./api/edit_department.php', {
+                method: 'POST',
+                body: formData
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data.success) {
+                    document.getElementById('deptSuccessMessage').textContent = data.message || 'Department updated successfully!';
+                    document.getElementById('deptSuccessModal').style.display = 'flex';
+                    closeEditDepartmentModal();
+                } else {
+                    document.getElementById('deptErrorMessage').textContent = data.message;
+                    document.getElementById('deptErrorModal').style.display = 'flex';
+                }
+            })
+            .catch(function(error) {
+                document.getElementById('deptErrorMessage').textContent = 'Network error. Please try again.';
+                document.getElementById('deptErrorModal').style.display = 'flex';
+            });
+        });
+    }
+    
+    // Handle assign dean form
+    const assignDeanForm = document.getElementById('assignDeanForm');
+    if (assignDeanForm) {
+        assignDeanForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const formData = new FormData(assignDeanForm);
+            
+            fetch('./api/assign_dean.php', {
+                method: 'POST',
+                body: formData
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data.success) {
+                    document.getElementById('deptSuccessMessage').textContent = data.message || 'Dean assigned successfully!';
+                    document.getElementById('deptSuccessModal').style.display = 'flex';
+                    window.closeAssignDeanModal();
+                } else {
+                    document.getElementById('deptErrorMessage').textContent = data.message;
+                    document.getElementById('deptErrorModal').style.display = 'flex';
+                }
+            })
+            .catch(function(error) {
+                document.getElementById('deptErrorMessage').textContent = 'Network error. Please try again.';
+                document.getElementById('deptErrorModal').style.display = 'flex';
+            });
+        });
+    }
+});
 </script>
