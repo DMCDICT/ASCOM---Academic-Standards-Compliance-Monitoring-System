@@ -143,7 +143,17 @@ function submitAddUserForm(formData) {
         method: 'POST',
         body: formData
     })
-    .then(response => response.json())
+    .then(response => {
+        // Log raw response for debugging
+        return response.text().then(text => {
+            console.log('Raw response:', text);
+            try {
+                return JSON.parse(text);
+            } catch (e) {
+                throw new Error('Invalid JSON: ' + text.substring(0, 200));
+            }
+        });
+    })
     .then(data => {
         if (data.success) {
             // Show success modal
@@ -163,7 +173,7 @@ function submitAddUserForm(formData) {
     })
     .catch(error => {
         console.error('Error creating user:', error);
-        showAddUserValidation('Network error. Please try again.');
+        showAddUserValidation('Error: ' + error.message);
     })
     .finally(() => {
         // Reset button state

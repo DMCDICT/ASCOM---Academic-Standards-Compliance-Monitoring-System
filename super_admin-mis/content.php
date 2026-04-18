@@ -1313,39 +1313,19 @@ function toggleSidebar() {
 }
 
 function openAddUserModal() {
-    // Disable body scroll
-    document.body.style.overflow = 'hidden';
-    
-    if (typeof createCompleteModal === 'function') {
-        createCompleteModal();
+    // Directly show the existing addUserModal instead of calling non-existent createCompleteModal
+    const modal = document.getElementById('addUserModal');
+    if (modal) {
+        modal.style.display = 'flex';
+        document.body.style.overflow = 'hidden';
+        
+        // Reset form if exists
+        const form = document.getElementById('addUserForm');
+        if (form) {
+            form.reset();
+        }
     } else {
-        console.error('❌ createCompleteModal function not found');
-        // Fallback: create a simple modal
-        const modal = document.createElement('div');
-        modal.id = 'fallbackUserModal';
-        modal.style.cssText = `
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0,0,0,0.6);
-            z-index: 9999;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-        `;
-        modal.innerHTML = `
-            <div style="background-color: #EFEFEF; padding: 25px; border: 1px solid #888; border-radius: 15px; width: 90%; max-width: 600px; box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);">
-                <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #e5e5e5; padding-bottom: 15px; margin-bottom: 20px;">
-                    <h2 style="margin: 0; font-size: 22px; font-weight: 700; color: #333;">Create Teacher Account</h2>
-                    <span onclick="closeFallbackModal()" style="color: #aaa; font-size: 28px; font-weight: 700; cursor: pointer;">&times;</span>
-                </div>
-                <p>Modal is working! This is a fallback modal.</p>
-                <button onclick="closeFallbackModal()" style="padding: 10px 20px; background: #007bff; color: white; border: none; border-radius: 4px; cursor: pointer;">Close</button>
-            </div>
-        `;
-        document.body.appendChild(modal);
+        console.error('addUserModal not found in DOM');
     }
 }
 
@@ -3602,78 +3582,50 @@ window.closeSuccessModal = function() {
 
 
 
-// Removed problematic window statement and its orphaned function body
-
-
-
-    // Teacher Account Creation Functions
-    window.openAddUserModal = function() {
-        if (typeof createCompleteModal === 'function') {
-            createCompleteModal();
-        } else {
-            console.error('❌ createCompleteModal function not found');
-            // Fallback: create a simple modal
-            const modal = document.createElement('div');
-            modal.id = 'fallbackUserModal';
-            modal.style.cssText = `
-                position: fixed;
-                top: 0;
-                left: 0;
-                width: 100%;
-                height: 100%;
-                background: rgba(0,0,0,0.6);
-                z-index: 9999;
-                display: flex;
-                justify-content: center;
-                align-items: center;
-            `;
-            modal.innerHTML = `
-                <div style="background-color: #EFEFEF; padding: 25px; border: 1px solid #888; border-radius: 15px; width: 90%; max-width: 600px; box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);">
-                    <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #e5e5e5; padding-bottom: 15px; margin-bottom: 20px;">
-                        <h2 style="margin: 0; font-size: 22px; font-weight: 700; color: #333;">Create Teacher Account</h2>
-                        <span onclick="closeFallbackModal()" style="color: #aaa; font-size: 28px; font-weight: 700; cursor: pointer;">&times;</span>
-                    </div>
-                    <p>Modal is working! This is a fallback modal.</p>
-                    <button onclick="closeFallbackModal()" style="padding: 10px 20px; background: #007bff; color: white; border: none; border-radius: 4px; cursor: pointer;">Close</button>
-                </div>
-            `;
-            document.body.appendChild(modal);
-        }
-    };
-    
-    window.closeFallbackModal = function() {
-        const modal = document.getElementById('fallbackUserModal');
-        if (modal) {
-            modal.remove();
-        }
-    };
-
-    window.closeAddUserModal = function() {
-        closeCompleteModal();
-    };
-
-    window.openAddUserSuccessModal = function(message) {
-        const successMessage = document.getElementById('addUserSuccessMessage');
-        const successModal = document.getElementById('addUserSuccessModal');
+// Teacher Account Creation Functions - Simple modal open
+window.openAddUserModal = function() {
+    const modal = document.getElementById('addUserModal');
+    if (modal) {
+        modal.style.display = 'flex';
+        document.body.style.overflow = 'hidden';
         
-        if (successMessage && successModal) {
-            successMessage.innerText = message;
-            successModal.style.display = 'flex';
-            successModal.style.zIndex = '10000';
-        } else {
-            console.error('❌ Teacher account success modal elements not found');
-            alert('Success: ' + message);
+        const form = document.getElementById('addUserForm');
+        if (form) {
+            form.reset();
         }
-    };
+    } else {
+        console.error('addUserModal not found');
+    }
+};
 
-    window.closeAddUserSuccessModal = function() {
-        const successModal = document.getElementById('addUserSuccessModal');
-        if (successModal) {
-            successModal.style.display = 'none';
-        }
-    };
+window.closeAddUserModal = function() {
+    const modal = document.getElementById('addUserModal');
+    if (modal) {
+        modal.style.display = 'none';
+        document.body.style.overflow = '';
+    }
+};
 
-}
+window.openAddUserSuccessModal = function(message) {
+    const successMessage = document.getElementById('addUserSuccessMessage');
+    const successModal = document.getElementById('addUserSuccessModal');
+    
+    if (successMessage && successModal) {
+        successMessage.innerText = message;
+        successModal.style.display = 'flex';
+        successModal.style.zIndex = '10000';
+    } else {
+        alert('Success: ' + message);
+    }
+};
+
+window.closeAddUserSuccessModal = function() {
+    const successModal = document.getElementById('addUserSuccessModal');
+    if (successModal) {
+        successModal.style.display = 'none';
+        document.body.style.overflow = '';
+    }
+};
 
 // Define functions immediately to prevent ReferenceError
 window.openAddDepartmentModal = function() {
@@ -3812,14 +3764,7 @@ window.checkFormValidity = function() {
         createBtn.style.color = '#666';
         createBtn.style.cursor = 'not-allowed';
     }
-    
-        otherFieldsFilled,
-        isColorHexValid,
-        isColorHexFormatValid,
-        isValid,
-        buttonDisabled: createBtn.disabled
-    });
-    */
+    */ // End of original validation code comment
 };
 
 // Duplicate function removed - using the one defined earlier
@@ -3960,7 +3905,7 @@ if (typeof window.closeSuccessModal === 'undefined') {
 // Modal functions are already defined in the earlier script block
 </script>
 <script src="./scripts/modal-add-user.js?v=<?php echo time(); ?>&ultra=1"></script>
-<script src="./scripts/user-account-management.js?v=2.8"></script>
+<script src="./scripts/user-account-management.js?v=2.9"></script>
 <script src="./scripts/modal-edit-user.js?v=<?php echo time(); ?>&edit=1"></script>
 <script>
 // Ensure modal functions are available with proper data fetching

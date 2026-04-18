@@ -7,8 +7,8 @@
 
 
 // Define animated icon path relative to this JS file's location (department-dean/scripts/)
-const ANIMATED_CHECK_ICON_PROGRAM = '/DataDrift/ASCOM%20Monitoring%20System/src/assets/animated_icons/check-animated-icon.gif';
-const ANIMATED_ERROR_ICON_PROGRAM = '/DataDrift/ASCOM%20Monitoring%20System/src/assets/animated_icons/error2-animated-icon.gif';
+const ANIMATED_CHECK_ICON_PROGRAM = '../src/assets/animated_icons/check-animated-icon.gif';
+const ANIMATED_ERROR_ICON_PROGRAM = '../src/assets/animated_icons/error2-animated-icon.gif';
 
 // Functions to open/close modals (global scope for onclick attributes in HTML)
 function openAddProgramModal() {
@@ -51,6 +51,7 @@ function openAddProgramModal() {
             // Double-check the button state
             const createBtn = document.querySelector('#addProgramModal .create-btn');
             if (createBtn) {
+                console.log({
                     disabled: createBtn.disabled,
                     text: createBtn.textContent,
                     classes: createBtn.className
@@ -175,10 +176,7 @@ function checkFormValidity() {
     });
 
     const otherFieldsFilled = requiredFields.every(field => field.value.trim() !== "");
-
-        otherFieldsFilled
-    });
-
+    
     if (createBtn) {
         const shouldBeDisabled = !otherFieldsFilled;
         createBtn.disabled = shouldBeDisabled;

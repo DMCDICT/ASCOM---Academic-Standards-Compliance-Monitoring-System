@@ -35,7 +35,7 @@ if (session_status() == PHP_SESSION_NONE) {
 
 
 // Debug: log session information
-file_put_contents('../login_debug.txt', 'process_add_program.php - session_id=' . session_id() . ' dean_logged_in=' . ($_SESSION['dean_logged_in'] ?? 'NOT_SET') . ' selected_role=' . json_encode($_SESSION['selected_role'] ?? 'NOT_SET') . PHP_EOL, FILE_APPEND);
+@file_put_contents('../login_debug.txt', 'process_add_program.php - session_id=' . session_id() . ' dean_logged_in=' . ($_SESSION['dean_logged_in'] ?? 'NOT_SET') . ' selected_role=' . json_encode($_SESSION['selected_role'] ?? 'NOT_SET') . PHP_EOL, FILE_APPEND);
 
 // Check if user is logged in as dean - more flexible check
 $isDean = false;
@@ -43,13 +43,13 @@ $isDean = false;
 // Check multiple ways user could be authenticated as dean
 if (isset($_SESSION['dean_logged_in']) && $_SESSION['dean_logged_in'] === true) {
     $isDean = true;
-    file_put_contents('../login_debug.txt', 'process_add_program.php - dean_logged_in found' . PHP_EOL, FILE_APPEND);
+    @file_put_contents('../login_debug.txt', 'process_add_program.php - dean_logged_in found' . PHP_EOL, FILE_APPEND);
 } elseif (isset($_SESSION['selected_role']['role_name']) && $_SESSION['selected_role']['role_name'] === 'dean') {
     $isDean = true;
-    file_put_contents('../login_debug.txt', 'process_add_program.php - selected_role dean found' . PHP_EOL, FILE_APPEND);
+    @file_put_contents('../login_debug.txt', 'process_add_program.php - selected_role dean found' . PHP_EOL, FILE_APPEND);
 } elseif (isset($_SESSION['selected_role']['type']) && $_SESSION['selected_role']['type'] === 'dean') {
     $isDean = true;
-    file_put_contents('../login_debug.txt', 'process_add_program.php - selected_role type dean found' . PHP_EOL, FILE_APPEND);
+    @file_put_contents('../login_debug.txt', 'process_add_program.php - selected_role type dean found' . PHP_EOL, FILE_APPEND);
 } elseif (isset($_SESSION['user_id'])) {
     // Check if user is assigned as dean in departments table
     try {
@@ -58,16 +58,16 @@ if (isset($_SESSION['dean_logged_in']) && $_SESSION['dean_logged_in'] === true) 
         $deptStmt->execute([$_SESSION['user_id']]);
         if ($deptStmt->rowCount() > 0) {
             $isDean = true;
-            file_put_contents('../login_debug.txt', 'process_add_program.php - dean found in departments table' . PHP_EOL, FILE_APPEND);
+            @file_put_contents('../login_debug.txt', 'process_add_program.php - dean found in departments table' . PHP_EOL, FILE_APPEND);
         }
     } catch (Exception $e) {
         // Continue with other checks
-        file_put_contents('../login_debug.txt', 'process_add_program.php - error checking departments: ' . $e->getMessage() . PHP_EOL, FILE_APPEND);
+        @file_put_contents('../login_debug.txt', 'process_add_program.php - error checking departments: ' . $e->getMessage() . PHP_EOL, FILE_APPEND);
     }
 }
 
 if (!$isDean) {
-    file_put_contents('../login_debug.txt', 'process_add_program.php - AUTHORIZATION FAILED - session data: ' . json_encode($_SESSION) . PHP_EOL, FILE_APPEND);
+    @file_put_contents('../login_debug.txt', 'process_add_program.php - AUTHORIZATION FAILED - session data: ' . json_encode($_SESSION) . PHP_EOL, FILE_APPEND);
     http_response_code(401);
     echo json_encode(['success' => false, 'message' => 'Unauthorized access - Dean role required']);
     exit();
@@ -99,7 +99,7 @@ if (!$deanDepartmentId && isset($_SESSION['selected_role']['department_code'])) 
         $deptResult = $deptStmt->fetch(PDO::FETCH_ASSOC);
         if ($deptResult) {
             $deanDepartmentId = $deptResult['id'];
-            file_put_contents('../login_debug.txt', 'process_add_program.php - Found department ID ' . $deanDepartmentId . ' for code ' . $deptCode . PHP_EOL, FILE_APPEND);
+            @file_put_contents('../login_debug.txt', 'process_add_program.php - Found department ID ' . $deanDepartmentId . ' for code ' . $deptCode . PHP_EOL, FILE_APPEND);
         }
     } catch (Exception $e) {
         // Log error but continue
@@ -122,10 +122,10 @@ if (!$deanDepartmentId && isset($_SESSION['user_id'])) {
 }
 
 // Debug logging for department ID
-file_put_contents('../login_debug.txt', 'process_add_program.php - Final department ID: ' . ($deanDepartmentId ?? 'NOT_FOUND') . PHP_EOL, FILE_APPEND);
+@file_put_contents('../login_debug.txt', 'process_add_program.php - Final department ID: ' . ($deanDepartmentId ?? 'NOT_FOUND') . PHP_EOL, FILE_APPEND);
 
 if (!$deanDepartmentId) {
-    file_put_contents('../login_debug.txt', 'process_add_program.php - DEPARTMENT ID NOT FOUND - session data: ' . json_encode($_SESSION) . PHP_EOL, FILE_APPEND);
+    @file_put_contents('../login_debug.txt', 'process_add_program.php - DEPARTMENT ID NOT FOUND - session data: ' . json_encode($_SESSION) . PHP_EOL, FILE_APPEND);
     http_response_code(400);
     echo json_encode(['success' => false, 'message' => 'Department ID not found']);
     exit();
@@ -354,11 +354,11 @@ if ($insertStmt->execute([$programCode, $programName, $major, $departmentColorCo
             $deanNotification['recipient_id']
         ]);
         
-        file_put_contents('../login_debug.txt', 'process_add_program.php - Notifications sent successfully for program: ' . $programName . ' to ' . count($teachers) . ' teachers' . PHP_EOL, FILE_APPEND);
+        @file_put_contents('../login_debug.txt', 'process_add_program.php - Notifications sent successfully for program: ' . $programName . ' to ' . count($teachers) . ' teachers' . PHP_EOL, FILE_APPEND);
         
     } catch (Exception $e) {
         // Log notification error but don't fail the program creation
-        file_put_contents('../login_debug.txt', 'process_add_program.php - Notification error: ' . $e->getMessage() . PHP_EOL, FILE_APPEND);
+        @file_put_contents('../login_debug.txt', 'process_add_program.php - Notification error: ' . $e->getMessage() . PHP_EOL, FILE_APPEND);
         
         // Try to create a simple notification without sender details
         try {
@@ -389,10 +389,10 @@ if ($insertStmt->execute([$programCode, $programName, $major, $departmentColorCo
                 $simpleNotification['recipient_id']
             ]);
             
-            file_put_contents('../login_debug.txt', 'process_add_program.php - Simple notification created successfully' . PHP_EOL, FILE_APPEND);
+            @file_put_contents('../login_debug.txt', 'process_add_program.php - Simple notification created successfully' . PHP_EOL, FILE_APPEND);
             
         } catch (Exception $e2) {
-            file_put_contents('../login_debug.txt', 'process_add_program.php - Simple notification also failed: ' . $e2->getMessage() . PHP_EOL, FILE_APPEND);
+            @file_put_contents('../login_debug.txt', 'process_add_program.php - Simple notification also failed: ' . $e2->getMessage() . PHP_EOL, FILE_APPEND);
         }
     }
     

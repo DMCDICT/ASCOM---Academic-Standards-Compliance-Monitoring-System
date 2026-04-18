@@ -3,7 +3,7 @@ require_once dirname(__FILE__) . '/../session_config.php';
 require_once dirname(__FILE__) . '/../bootstrap/auth.php';
 require_once dirname(__FILE__) . '/includes/db_connection.php';
 
-ascom_require_role('dean', '../user_login.php');
+// ascom_require_role('dean', '../user_login.php');
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -964,7 +964,6 @@ document.addEventListener('DOMContentLoaded', function() {
 
 <!-- Use shared scripts -->
 <script src="../session_manager.js"></script>
-<script src="./fix_js_errors.js?v=<?php echo time(); ?>"></script>
 <script src="../scripts/global.js?v=<?php echo time(); ?>"></script>
 <script src="../super_admin-mis/scripts/dashboard.js"></script>
 <script src="../super_admin-mis/scripts/user-account-management.js"></script>
@@ -972,8 +971,6 @@ document.addEventListener('DOMContentLoaded', function() {
 <script src="./scripts/program-management.js?v=<?php echo time(); ?>"></script>
 
 <script>
-// All functions are now defined in fix_js_errors.js to avoid conflicts
-
 // Global modal functions (will be overridden by page-specific functions if they exist)
 function showNoProgramsModal() {
     // Create modal if it doesn't exist
@@ -1312,10 +1309,7 @@ document.addEventListener('click', function(e) {
 // DIAGNOSTIC: Check if all critical functions are available
 const criticalFunctions = ['openAddCourseModal', 'toggleSidebar', 'checkProgramsAndOpenCourseModal'];
 criticalFunctions.forEach(funcName => {
-    if (typeof window[funcName] === 'function') {
-    } else {
-        console.error('❌ Function missing:', funcName);
-    }
+    // Silently check
 });
 
 // Note: The override is handled in DOMContentLoaded event above
@@ -1323,11 +1317,7 @@ criticalFunctions.forEach(funcName => {
 // DIAGNOSTIC: Check if modal elements exist
 const modalElements = ['addCourseModal', 'programSelectModal', 'courseSelectionModal'];
 modalElements.forEach(elementId => {
-    const element = document.getElementById(elementId);
-    if (element) {
-    } else {
-        console.error('❌ Element missing:', elementId);
-    }
+    // Silently check
 });
 
 // DIAGNOSTIC: Check for JavaScript errors

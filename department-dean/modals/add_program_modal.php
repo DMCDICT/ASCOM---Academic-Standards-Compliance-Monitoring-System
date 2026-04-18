@@ -44,7 +44,7 @@
 
 <div id="successModal" class="department-modal-overlay" style="display: none;">
     <div class="department-modal-box" style="width: 400px; text-align: center; animation: fadeIn 0.3s;">
-        <img id="modalIcon" src="/DataDrift/ASCOM%20Monitoring%20System/src/assets/animated_icons/check-animated-icon.gif" alt="Icon" style="width: 64px; height: 64px; margin-bottom: 8px;">
+        <img id="modalIcon" src="../src/assets/animated_icons/check-animated-icon.gif" alt="Icon" style="width: 64px; height: 64px; margin-bottom: 8px;">
         <h2 id="modalTitle" style="color: green; margin-bottom: 10px;">Success!</h2>
         <p id="successMessage" style="font-size: 16px; margin-bottom: 20px;"></p>
         <button type="button" class="create-btn" onclick="closeSuccessModal()">OK</button>
