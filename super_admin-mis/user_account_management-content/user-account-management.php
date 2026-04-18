@@ -18,7 +18,6 @@ if (isset($conn) && !$conn->connect_error) {
         $row = $userCountResult->fetch_assoc();
         $totalUsers = $row['total_users'];
         $userCountResult->free();
-    } else {
     }
 
     // Fetch New Accounts count (created in last 7 days, only if created_at exists)
@@ -33,22 +32,15 @@ if (isset($conn) && !$conn->connect_error) {
         }
     }
 
-    // Fetch all users for the table
-    $fetchUsersQuery = "SELECT employee_no, first_name, middle_name, last_name, institutional_email, mobile_no, role_id, department_id, is_active, last_activity, online_status, last_login, last_logout FROM users ORDER BY id DESC";
+    // Fetch all users for the table - use actual database columns
+    $fetchUsersQuery = "SELECT id, employee_no, first_name, middle_name, last_name, title, email, institutional_email, mobile_no, role, role_id, department_id, is_active, created_at FROM users ORDER BY id DESC";
     $fetchUsersResult = $conn->query($fetchUsersQuery);
 
     if ($fetchUsersResult) {
-        $roleNames = [];
         $deptNames = [];
-        $deptCodes = []; // Initialize $deptCodes
+        $deptCodes = [];
 
-        $roleMapQuery = "SELECT id, role_name as role FROM roles";
-        $roleMapResult = $conn->query($roleMapQuery);
-        if ($roleMapResult) {
-            while($row = $roleMapResult->fetch_assoc()) { $roleNames[$row['id']] = $row['role']; }
-            $roleMapResult->free();
-        }
-
+        // Get department info
         $deptMapQuery = "SELECT id, department_name, department_code FROM departments";
         $deptMapResult = $conn->query($deptMapQuery);
         if ($deptMapResult) {
@@ -59,10 +51,43 @@ if (isset($conn) && !$conn->connect_error) {
             $deptMapResult->free();
         }
 
+        // Get role names from roles table if exists
+        $roleNames = [];
+        $roleMapResult = $conn->query("SELECT id, role_name FROM roles");
+        if ($roleMapResult) {
+            while($row = $roleMapResult->fetch_assoc()) { 
+                $roleNames[$row['id']] = $row['role_name'];
+            }
+            $roleMapResult->free();
+        }
+
         while ($row = $fetchUsersResult->fetch_assoc()) {
-            $row['role_name'] = $roleNames[$row['role_id']] ?? 'Unknown Role';
-            $row['department_name'] = ($row['department_id'] !== NULL) ? ($deptNames[$row['department_id']] ?? 'N/A') : 'N/A';
-            $row['department_code'] = ($row['department_id'] !== NULL) ? ($deptCodes[$row['department_id']] ?? '') : '';
+            // Build full name with title
+            $fullName = trim(($row['title'] ?? '') . ' ' . ($row['first_name'] ?? '') . ' ' . ($row['middle_name'] ?? '') . ' ' . ($row['last_name'] ?? ''));
+            
+            // Get role display - prefer role_id lookup, fallback to role string
+            $roleId = $row['role_id'] ?? null;
+            $roleStr = $row['role'] ?? 'faculty';
+            if ($roleId && isset($roleNames[$roleId])) {
+                $roleDisplay = ucfirst($roleNames[$roleId]);
+            } else {
+                $roleDisplay = ucfirst($roleStr);
+            }
+            
+            // Get department info
+            $deptId = $row['department_id'] ?? null;
+            $deptCode = $deptId ? ($deptCodes[$deptId] ?? '') : '';
+            $deptName = $deptId ? ($deptNames[$deptId] ?? '') : '';
+            
+            // Use institutional_email if email is empty
+            $email = $row['email'] ?: ($row['institutional_email'] ?? '');
+            
+            $row['full_name'] = $fullName;
+            $row['role_display'] = $roleDisplay;
+            $row['department_code'] = $deptCode;
+            $row['department_name'] = $deptName;
+            $row['display_email'] = $email;
+            $row['display_mobile'] = $row['mobile_no'] ?? '-';
             $row['status'] = ($row['is_active'] == 1) ? 'Active' : 'Inactive';
             $users[] = $row;
         }
@@ -130,15 +155,15 @@ if (isset($conn) && !$conn->connect_error) {
                 <?php foreach ($users as $user): ?>
                 <tr>
                     <td><?php echo htmlspecialchars($user['employee_no'] ?? 'N/A'); ?></td>
-                    <td><?php echo htmlspecialchars(trim(($user['first_name'] ?? '') . ' ' . ($user['middle_name'] ?? '') . ' ' . ($user['last_name'] ?? ''))); ?></td>
-                    <td><?php echo htmlspecialchars($user['institutional_email'] ?? 'N/A'); ?></td>
-                    <td><?php echo htmlspecialchars($user['mobile_no'] ?? 'N/A'); ?></td>
-                    <td><?php echo htmlspecialchars($user['role_name'] ?? 'N/A'); ?></td>
-                    <td><?php echo htmlspecialchars($user['department_code'] ?? 'N/A'); ?></td>
+                    <td><?php echo htmlspecialchars($user['full_name'] ?? 'N/A'); ?></td>
+                    <td><?php echo htmlspecialchars($user['display_email'] ?? 'N/A'); ?></td>
+                    <td><?php echo htmlspecialchars($user['display_mobile'] ?? '-'); ?></td>
+                    <td><?php echo htmlspecialchars($user['role_display'] ?? 'N/A'); ?></td>
+                    <td><?php echo htmlspecialchars($user['department_code'] ?: '-'); ?></td>
                     <td><?php echo htmlspecialchars($user['status'] ?? 'N/A'); ?></td>
                     <td>
-                        <button class="edit-btn" data-employee="<?php echo htmlspecialchars($user['employee_no']); ?>">Edit</button>
-                        <button class="delete-btn" data-employee="<?php echo htmlspecialchars($user['employee_no']); ?>">Delete</button>
+                        <button class="edit-btn" onclick="openEditUserModal('<?php echo htmlspecialchars($user['employee_no']); ?>')">Edit</button>
+                        <button class="delete-btn" onclick="openDeleteUserModal('<?php echo htmlspecialchars($user['employee_no']); ?>')">Delete</button>
                     </td>
                 </tr>
                 <?php endforeach; ?>
