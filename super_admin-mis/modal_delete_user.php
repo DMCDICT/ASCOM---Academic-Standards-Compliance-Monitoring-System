@@ -19,8 +19,8 @@
             <p id="deleteUserRole" style="margin: 0; color: #666;"></p>
         </div>
         <div style="display: flex; gap: 12px; justify-content: center; width: 100%;">
-            <button type="button" class="cancel-btn" style="flex: 1; max-width: 120px;" onclick="closeDeleteUserModal()">CANCEL</button>
-            <button type="button" class="delete-btn" id="confirmDeleteBtn" style="flex: 1; max-width: 120px; background: #d32f2f; color: #fff; border: none; border-radius: 8px; padding: 10px 16px; font-size: 1em; font-weight: 600; cursor: pointer;" onclick="confirmDeleteUser()">DELETE</button>
+            <button type="button" class="cancel-btn" style="flex: 1; max-width: 120px;" onclick="window.closeDeleteUserModal()">CANCEL</button>
+            <button type="button" class="delete-btn" id="confirmDeleteBtn" style="flex: 1; max-width: 120px; background: #d32f2f; color: #fff; border: none; border-radius: 8px; padding: 10px 16px; font-size: 1em; font-weight: 600; cursor: pointer;" onclick="window.confirmDeleteUser()">DELETE</button>
         </div>
     </div>
 </div>

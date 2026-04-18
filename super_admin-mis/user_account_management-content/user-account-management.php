@@ -162,8 +162,8 @@ if (isset($conn) && !$conn->connect_error) {
                     <td><?php echo htmlspecialchars($user['department_code'] ?: '-'); ?></td>
                     <td><?php echo htmlspecialchars($user['status'] ?? 'N/A'); ?></td>
                     <td>
-                        <button class="edit-btn" onclick="openEditUserModal('<?php echo htmlspecialchars($user['employee_no']); ?>')">Edit</button>
-                        <button class="delete-btn" onclick="openDeleteUserModal('<?php echo htmlspecialchars($user['employee_no']); ?>')">Delete</button>
+                        <button class="edit-btn" onclick="window.openEditUserModal('<?php echo htmlspecialchars($user['employee_no']); ?>')">Edit</button>
+                        <button type="button" class="delete-btn" onclick="window.openDeleteUserModal('<?php echo htmlspecialchars($user['employee_no']); ?>', '<?php echo addslashes(htmlspecialchars($user['full_name'] ?? 'N/A')); ?>', '<?php echo addslashes(htmlspecialchars($user['display_email'] ?? 'N/A')); ?>', '<?php echo addslashes(htmlspecialchars($user['role_display'] ?? 'N/A')); ?>')">Delete</button>
                     </td>
                 </tr>
                 <?php endforeach; ?>

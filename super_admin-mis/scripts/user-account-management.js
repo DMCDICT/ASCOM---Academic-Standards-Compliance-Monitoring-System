@@ -26,6 +26,7 @@ window.initializeUserAccountManagement = initializeUserAccountManagement;
 let autoRefreshInterval = null;
 let nextAutoRefreshTime = null;
 let isPageVisible = true;
+let currentDeleteEmployeeNo = null; // Store employee number for delete
 
 // Role display name helper
 function getRoleDisplayName(roleName) {
@@ -71,8 +72,8 @@ function renderTable(users = filteredUsers) {
             <td>${getRoleDisplayName(user.role) || 'N/A'}</td>
             <td>${user.email || 'N/A'}</td>
             <td>
-                <button class="edit-btn" data-employee="${user.employee_no}">Edit</button>
-                <button class="delete-btn" data-employee="${user.employee_no}">Delete</button>
+                <button class="edit-btn" onclick="window.openEditUserModal('${user.employee_no}')">Edit</button>
+                <button class="delete-btn" onclick="window.openDeleteUserModal('${user.employee_no}', '${user.first_name} ${user.last_name}', '${user.email || ''}', '${getRoleDisplayName(user.role) || ''}')">Delete</button>
             </td>
         `;
         tableBody.appendChild(row);
@@ -97,14 +98,54 @@ function closeUserDetailsModal() {
 }
 
 // Open delete user modal
-function openDeleteUserModal(employeeNo) {
-    console.log('Opening delete for:', employeeNo);
+function openDeleteUserModal(employeeNo, userName = '', userEmail = '', userRole = '') {
+    console.log('>>> openDeleteUserModal called with:', employeeNo, userName);
+    console.log('deleteUserModal exists:', !!document.getElementById('deleteUserModal'));
+    
+    // Store employee number for confirmDeleteUser
+    currentDeleteEmployeeNo = employeeNo;
+    
+    // Get user details from the table or data
+    const modal = document.getElementById('deleteUserModal');
+    if (!modal) {
+        console.error('Delete modal not found in DOM');
+        alert('Delete modal not found. Please refresh the page.');
+        return;
+    }
+    
+    console.log('Modal found, showing...');
+    
+    // Set fallback display texts if empty
+    if (!userName || userName === 'N/A') userName = employeeNo;
+    if (!userEmail) userEmail = 'N/A';
+    if (!userRole) userRole = 'N/A';
+    
+    // Update modal content
+    const nameEl = document.getElementById('deleteUserName');
+    const emailEl = document.getElementById('deleteUserEmail');
+    const roleEl = document.getElementById('deleteUserRole');
+    const messageEl = document.getElementById('deleteUserMessage');
+    
+    if (nameEl) nameEl.textContent = 'Name: ' + userName;
+    if (emailEl) emailEl.textContent = 'Email: ' + userEmail;
+    if (roleEl) roleEl.textContent = 'Role: ' + userRole;
+    if (messageEl) messageEl.textContent = 'Are you sure you want to delete user "' + userName + '"? This action cannot be undone.';
+
+    
+    // Show modal
+    console.log('Setting modal display to flex');
+    modal.style.display = 'flex';
+    console.log('Modal display is now:', modal.style.display);
+    document.body.style.overflow = 'hidden';
+    console.log('Done - modal should be visible');
 }
 
 // Close delete modal
 function closeDeleteUserModal() {
     const modal = document.getElementById('deleteUserModal');
     if (modal) modal.style.display = 'none';
+    document.body.style.overflow = '';
+    currentDeleteEmployeeNo = null;
 }
 
 // Edit from details
@@ -119,7 +160,81 @@ function deleteFromDetails() {
 
 // Confirm delete user
 function confirmDeleteUser() {
-    console.log('Confirming delete');
+    console.log('>>> confirmDeleteUser called');
+    console.log('currentDeleteEmployeeNo:', currentDeleteEmployeeNo);
+    
+    if (!currentDeleteEmployeeNo) {
+        console.error('No employee selected for deletion');
+        alert('No employee selected for deletion');
+        return;
+    }
+    
+    console.log('Confirming delete for:', currentDeleteEmployeeNo);
+    
+    // Show loading state
+    const confirmBtn = document.getElementById('confirmDeleteBtn');
+    if (confirmBtn) {
+        confirmBtn.disabled = true;
+        confirmBtn.textContent = 'Deleting...';
+    }
+    
+    // Call delete API with JSON
+    fetch('./process_delete_user.php', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ employee_no: currentDeleteEmployeeNo })
+    })
+    .then(res => res.json())
+    .then(data => {
+        if (data.success) {
+            // Close delete modal
+            closeDeleteUserModal();
+            
+            // Show success modal
+            const successModal = document.getElementById('deleteUserSuccessModal');
+            const successMessage = document.getElementById('deleteUserSuccessMessage');
+            if (successMessage) {
+                successMessage.textContent = data.message || 'User deleted successfully!';
+            }
+            if (successModal) {
+                successModal.style.display = 'flex';
+            }
+            
+            // Refresh user list
+            refreshUserList();
+        } else {
+            // Show error modal
+            const errorModal = document.getElementById('deleteUserErrorModal');
+            const errorMessage = document.getElementById('deleteUserErrorMessage');
+            if (errorMessage) {
+                errorMessage.textContent = data.message || 'Failed to delete user';
+            }
+            if (errorModal) {
+                errorModal.style.display = 'flex';
+            }
+        }
+    })
+    .catch(function(error) {
+        console.error('Error:', error);
+        // Show error modal
+        const errorModal = document.getElementById('deleteUserErrorModal');
+        const errorMessage = document.getElementById('deleteUserErrorMessage');
+        if (errorMessage) {
+            errorMessage.textContent = 'Network error. Please try again.';
+        }
+        if (errorModal) {
+            errorModal.style.display = 'flex';
+        }
+    })
+    .finally(function() {
+        // Reset button state
+        if (confirmBtn) {
+            confirmBtn.disabled = false;
+            confirmBtn.textContent = 'DELETE';
+        }
+    });
 }
 
 // Close delete success modal
