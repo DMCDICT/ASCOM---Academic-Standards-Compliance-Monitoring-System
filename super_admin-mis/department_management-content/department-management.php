@@ -261,7 +261,7 @@ if (isset($conn) && !$conn->connect_error) {
 
 <!-- Assign Dean Modal (Inline) -->
 <div id="assignDeanModal" class="modal-overlay" style="display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background-color: rgba(0, 0, 0, 0.5); z-index: 9999;">
-  <div class="modal-box" style="background-color: #EFEFEF; padding: 25px; border: 1px solid #888; border-radius: 15px; width: 90%; max-width: 500px; box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3); animation: fadeIn 0.3s; max-height: 90vh; overflow-y: auto; margin: 20px auto;">
+  <div class="modal-box" style="background-color: #EFEFEF; padding: 25px; border: 1px solid #888; border-radius: 15px; width: 90%; max-width: 500px; box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3); animation: fadeIn 0.3s; height: auto; max-height: 90vh; overflow-y: auto; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);">
     <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #e5e5e5; padding-bottom: 15px; margin-bottom: 20px;">
       <h2 style="margin: 0; font-size: 22px; font-weight: 700; color: #333;">Assign Dean</h2>
       <span onclick="window.closeAssignDeanModal()" style="color: #aaa; font-size: 28px; font-weight: 700; cursor: pointer;">&times;</span>
@@ -309,10 +309,10 @@ if (isset($conn) && !$conn->connect_error) {
 
 <!-- Edit Department Modal -->
 <div id="editDepartmentModal" class="modal-overlay" style="display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background-color: rgba(0, 0, 0, 0.5); z-index: 9999;">
-  <div class="modal-box" style="background-color: #EFEFEF; padding: 25px; border: 1px solid #888; border-radius: 15px; width: 90%; max-width: 500px; box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3); animation: fadeIn 0.3s; max-height: 90vh; overflow-y: auto; margin: 20px auto;">
+  <div class="modal-box" style="background-color: #EFEFEF; padding: 25px; border: 1px solid #888; border-radius: 15px; width: 90%; max-width: 500px; box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3); animation: fadeIn 0.3s; height: auto; max-height: 90vh; overflow-y: auto; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);">
     <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #e5e5e5; padding-bottom: 15px; margin-bottom: 20px;">
       <h2 style="margin: 0; font-size: 22px; font-weight: 700; color: #333;">Edit Department</h2>
-      <span onclick="closeEditDepartmentModal()" style="color: #aaa; font-size: 28px; font-weight: 700; cursor: pointer;">&times;</span>
+      <span onclick="window.closeEditDepartmentModal()" style="color: #aaa; font-size: 28px; font-weight: 700; cursor: pointer;">&times;</span>
     </div>
     <form id="editDepartmentForm" style="display: flex; flex-direction: column; gap: 15px;">
       <input type="hidden" name="department_id" id="edit_dept_id">
@@ -332,8 +332,39 @@ if (isset($conn) && !$conn->connect_error) {
         </div>
       </div>
       <div style="display: flex; justify-content: flex-end; gap: 10px; margin-top: 10px;">
-        <button type="button" onclick="closeEditDepartmentModal()" style="width: 125px; height: 50px; background-color: #C9C9C9; color: black; border: none; border-radius: 10px; cursor: pointer; font-size: 14px; font-weight: bold; text-transform: uppercase;">CANCEL</button>
+        <button type="button" onclick="window.closeEditDepartmentModal()" style="width: 125px; height: 50px; background-color: #C9C9C9; color: black; border: none; border-radius: 10px; cursor: pointer; font-size: 14px; font-weight: bold; text-transform: uppercase;">CANCEL</button>
         <button type="submit" class="create-btn" style="width: 125px; height: 50px;">UPDATE</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- Add Department Modal -->
+<div id="addDepartmentModal" class="modal-overlay" style="display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background-color: rgba(0, 0, 0, 0.5); z-index: 9999;">
+  <div class="modal-box" style="background-color: #EFEFEF; padding: 25px; border: 1px solid #888; border-radius: 15px; width: 90%; max-width: 500px; box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3); animation: fadeIn 0.3s; height: auto; max-height: 90vh; overflow-y: auto; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);">
+    <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #e5e5e5; padding-bottom: 15px; margin-bottom: 20px;">
+      <h2 style="margin: 0; font-size: 22px; font-weight: 700; color: #333;">Add Department</h2>
+      <span onclick="window.closeAddDepartmentModal()" style="color: #aaa; font-size: 28px; font-weight: 700; cursor: pointer;">&times;</span>
+    </div>
+    <form id="addDepartmentForm" style="display: flex; flex-direction: column; gap: 15px;">
+      <div>
+        <label style="font-size: 14px; font-weight: bold; margin-bottom: 6px; display: block;">Department Name <span style="color: #dc3545;">*</span></label>
+        <input type="text" name="department_name" id="add_department_name" required placeholder="e.g., College of Computing Studies" style="width: 100%; height: 50px; padding: 0 12px; border: 1px solid #ccc; border-radius: 12px; box-sizing: border-box; background-color: #FFFFFF;">
+      </div>
+      <div>
+        <label style="font-size: 14px; font-weight: bold; margin-bottom: 6px; display: block;">Department Code <span style="color: #dc3545;">*</span></label>
+        <input type="text" name="department_code" id="add_department_code" required placeholder="e.g., CCS" maxlength="10" style="width: 100%; height: 50px; padding: 0 12px; border: 1px solid #ccc; border-radius: 12px; box-sizing: border-box; background-color: #FFFFFF; text-transform: uppercase;">
+      </div>
+      <div>
+        <label style="font-size: 14px; font-weight: bold; margin-bottom: 6px; display: block;">Color Code</label>
+        <div style="display: flex; gap: 10px; align-items: center;">
+          <input type="color" id="add_color_picker" value="#1976d2" style="width: 50px; height: 40px; border: none; border-radius: 8px; cursor: pointer;">
+          <input type="text" id="add_color_hex" value="#1976d2" maxlength="7" style="flex: 1; height: 50px; padding: 0 12px; border: 1px solid #ccc; border-radius: 12px; box-sizing: border-box; background-color: #FFFFFF;">
+        </div>
+      </div>
+      <div style="display: flex; justify-content: flex-end; gap: 10px; margin-top: 10px;">
+        <button type="button" onclick="window.closeAddDepartmentModal()" style="width: 125px; height: 50px; background-color: #C9C9C9; color: black; border: none; border-radius: 10px; cursor: pointer; font-size: 14px; font-weight: bold; text-transform: uppercase;">CANCEL</button>
+        <button type="submit" class="create-btn" style="width: 125px; height: 50px;">ADD</button>
       </div>
     </form>
   </div>
@@ -345,6 +376,8 @@ function toggleDepartmentDetails(deptId) {
     const card = detailsSection.closest('.department-card');
     card.classList.toggle('expanded');
 }
+
+window.toggleDepartmentDetails = toggleDepartmentDetails;
 
 function toggleDepartmentStatus(deptId, isActive) {
     fetch('./api/update_department_status.php', {
@@ -361,13 +394,20 @@ function toggleDepartmentStatus(deptId, isActive) {
     });
 }
 
+window.toggleDepartmentStatus = toggleDepartmentStatus;
+
 function openAddDepartmentModal() {
     const modal = document.getElementById('addDepartmentModal');
     if (modal) {
         modal.style.display = 'flex';
         document.body.style.overflow = 'hidden';
+    } else {
+        console.error('Add Department Modal not found');
+        alert('Error: Modal not loaded. Please refresh the page.');
     }
 }
+
+window.openAddDepartmentModal = openAddDepartmentModal;
 
 function openEditDepartmentModal(deptId) {
     const modal = document.getElementById('editDepartmentModal');
@@ -400,13 +440,7 @@ function openEditDepartmentModal(deptId) {
     });
 }
 
-function closeEditDepartmentModal() {
-    const modal = document.getElementById('editDepartmentModal');
-    if (modal) modal.style.display = 'none';
-    document.body.style.overflow = '';
-    const form = document.getElementById('editDepartmentForm');
-    if (form) form.reset();
-}
+window.openEditDepartmentModal = openEditDepartmentModal;
 </script>
 
 <script>
@@ -492,6 +526,20 @@ window.removeDean = function() {
 
 // Handle assign dean form submission
 document.addEventListener('DOMContentLoaded', function() {
+    // Color picker sync for add modal
+    const addColorPicker = document.getElementById('add_color_picker');
+    const addColorHex = document.getElementById('add_color_hex');
+    if (addColorPicker && addColorHex) {
+        addColorPicker.addEventListener('input', function() {
+            addColorHex.value = this.value.toUpperCase();
+        });
+        addColorHex.addEventListener('input', function() {
+            if (/^#[0-9A-F]{6}$/i.test(this.value)) {
+                addColorPicker.value = this.value;
+            }
+        });
+    }
+    
     // Color picker sync for edit modal
     const editColorPicker = document.getElementById('edit_color_picker');
     const editColorHex = document.getElementById('edit_color_hex');
@@ -503,6 +551,37 @@ document.addEventListener('DOMContentLoaded', function() {
             if (/^#[0-9A-F]{6}$/i.test(this.value)) {
                 editColorPicker.value = this.value;
             }
+        });
+    }
+    
+    // Handle add department form
+    const addForm = document.getElementById('addDepartmentForm');
+    if (addForm) {
+        addForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const formData = new FormData(addForm);
+            formData.append('color_code', document.getElementById('add_color_hex').value);
+            
+            fetch('./api/add_department.php', {
+                method: 'POST',
+                body: formData
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data.success) {
+                    document.getElementById('deptSuccessMessage').textContent = data.message || 'Department added successfully!';
+                    document.getElementById('deptSuccessModal').style.display = 'flex';
+                    window.closeAddDepartmentModal();
+                } else {
+                    document.getElementById('deptErrorMessage').textContent = data.message;
+                    document.getElementById('deptErrorModal').style.display = 'flex';
+                }
+            })
+            .catch(function(error) {
+                document.getElementById('deptErrorMessage').textContent = 'Network error. Please try again.';
+                document.getElementById('deptErrorModal').style.display = 'flex';
+            });
         });
     }
     
@@ -524,7 +603,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 if (data.success) {
                     document.getElementById('deptSuccessMessage').textContent = data.message || 'Department updated successfully!';
                     document.getElementById('deptSuccessModal').style.display = 'flex';
-                    closeEditDepartmentModal();
+                    window.closeEditDepartmentModal();
                 } else {
                     document.getElementById('deptErrorMessage').textContent = data.message;
                     document.getElementById('deptErrorModal').style.display = 'flex';
