@@ -21,6 +21,10 @@ if ($isAjax) {
         include './user_account_management-content/user-account-management.php';
         break;
 
+      case 'department-management':
+        include './department_management-content/department-management.php';
+        break;
+
       case 'school-calendar':
         include './school_calendar-content/school-calendar.php';
         break;
@@ -1274,6 +1278,9 @@ switch ($page) {
         break;
     case 'user-account-management':
         echo '<link rel="stylesheet" href="./styles/user-account-management.css?v=1.0">';
+        break;
+    case 'department-management':
+        echo '<link rel="stylesheet" href="./styles/department-management.css?v=1.0">';
         break;
     case 'school-calendar':
         echo '<link rel="stylesheet" href="./styles/school-calendar.css?v=1.0">';
@@ -3374,6 +3381,15 @@ $notifRead = array_filter($notifList, function($n) { return ($n['is_read'] ?? fa
       </span>
     </a>
 
+    <a href="content.php?page=department-management" class="nav-button hoverable <?php if ($currentPage == 'department-management') echo 'active'; ?>" data-page="department-management" style="height: 76px;">
+      <span class="nav-icon-wrapper">
+        <img src="../src/assets/icons/faculty-icon.png" alt="Department Icon" class="nav-icon" />
+      </span>
+      <span style="line-height: 1.2;">
+        College Department<br />Management
+      </span>
+    </a>
+
     <a href="content.php?page=school-calendar" class="nav-button hoverable <?php if ($currentPage == 'school-calendar') echo 'active'; ?>" data-page="school-calendar">
       <span class="nav-icon-wrapper">
         <img src="../src/assets/icons/calendar-icon.png" alt="Calendar Icon" class="nav-icon" />
@@ -3417,6 +3433,10 @@ $notifRead = array_filter($notifList, function($n) { return ($n['is_read'] ?? fa
         include './user_account_management-content/user-account-management.php';
         break;
 
+      case 'department-management':
+        include './department_management-content/department-management.php';
+        break;
+
       case 'school-calendar':
         include './school_calendar-content/school-calendar.php';
         break;
@@ -3441,7 +3461,8 @@ $modalFiles = [
     './modal_user_details.php',
     './modal_add_user.php',  
     './modal_edit_user.php', 
-    './modal_delete_user.php'
+    './modal_delete_user.php',
+    './department_management-content/modal_department.php'
 ];
 
 $currentDir = getcwd();

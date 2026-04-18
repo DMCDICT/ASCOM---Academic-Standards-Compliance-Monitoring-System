@@ -21,12 +21,13 @@ if ($conn->connect_error) {
 
 $conn->set_charset('utf8mb4');
 
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $employee_no = trim($_POST['employee_no'] ?? '');
     $first_name = trim($_POST['first_name'] ?? '');
     $last_name = trim($_POST['last_name'] ?? '');
     $name_prefix = trim($_POST['title'] ?? ''); 
     $institutional_email = trim($_POST['institutional_email'] ?? '');
+    $mobile_no = trim($_POST['mobile_no'] ?? ''); 
     $password = $_POST['password'] ?? ''; 
     $confirm_password = $_POST['confirm_password'] ?? '';
     $role_id = $_POST['role_id'] ?? '4';
@@ -87,14 +88,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         $stmt_insert = $conn->prepare("
             INSERT INTO users 
-            (employee_no, username, password, first_name, last_name, title, email, role, department_id, is_active) 
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, 1)
+            (employee_no, username, password, first_name, last_name, title, email, mobile_no, role, role_id, department_id, is_active) 
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 1)
         ");
 
         if ($stmt_insert) {
-            $stmt_insert->bind_param("ssssssssi",
+            $stmt_insert->bind_param("sssssssssii",
                 $employee_no, $username, $password, $first_name, $last_name, 
-                $name_prefix, $institutional_email, $role_name, $department_id
+                $name_prefix, $institutional_email, $mobile_no, $role_name, $role_id, $department_id
             );
             
             if ($stmt_insert->execute()) {

@@ -22,9 +22,8 @@ try {
     $employee_no = trim($_GET['employee_no']);
 
     // Fetch user data with role and department information
-    $query = "SELECT u.*, r.role as role_name, d.department_name, d.department_code 
+    $query = "SELECT u.*, d.department_name, d.department_code 
               FROM users u 
-              LEFT JOIN roles r ON u.role_id = r.id 
               LEFT JOIN departments d ON u.department_id = d.id 
               WHERE u.employee_no = ?";
     

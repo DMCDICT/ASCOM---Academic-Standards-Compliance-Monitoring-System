@@ -55,10 +55,10 @@ try {
     }
     $checkEmployeeStmt->close();
 
-    // Check if email already exists (excluding the current user)
-    $checkEmailQuery = "SELECT id FROM users WHERE institutional_email = ? AND employee_no != ?";
+    // Check if email already exists (excluding the current user) - check both columns
+    $checkEmailQuery = "SELECT id FROM users WHERE (email = ? OR institutional_email = ?) AND employee_no != ?";
     $checkEmailStmt = $conn->prepare($checkEmailQuery);
-    $checkEmailStmt->bind_param("ss", $institutional_email, $employee_no_original);
+    $checkEmailStmt->bind_param("sss", $institutional_email, $institutional_email, $employee_no_original);
     $checkEmailStmt->execute();
     $checkEmailResult = $checkEmailStmt->get_result();
     
@@ -67,13 +67,14 @@ try {
     }
     $checkEmailStmt->close();
 
-    // Start building the update query
+    // Start building the update query - use both email and institutional_email
     $updateFields = [
         "employee_no = ?",
         "first_name = ?",
         "middle_name = ?",
         "last_name = ?",
         "title = ?",
+        "email = ?",
         "institutional_email = ?",
         "mobile_no = ?",
         "department_id = ?",
@@ -85,6 +86,7 @@ try {
         $middle_name,
         $last_name,
         $title,
+        $institutional_email,
         $institutional_email,
         $mobile_no,
         $department_id,
