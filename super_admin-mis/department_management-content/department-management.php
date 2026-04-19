@@ -105,40 +105,64 @@ function ascom_on_color_for_hex($hex) {
 
 <div class="department-management-page">
     <div class="header-row">
-        <h2 class="main-page-title" style="padding-left: 0px;">College Department Management</h2>
+        <div class="section-header">
+            <div class="label-bar"></div>
+            <div>
+                <h2 class="main-page-title">College Department Management</h2>
+                <p>Monitor and organize academic departments and their leadership.</p>
+            </div>
+        </div>
         <div class="header-buttons">
-            <button class="create-btn" onclick="openAddDepartmentModal()" style="min-width: 160px;">+ Add Department</button>
+            <button class="create-btn" onclick="openAddDepartmentModal()">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+                Add Department
+            </button>
         </div>
     </div>
 
     <!-- Stats Cards -->
     <div class="stats-container">
-        <div class="stat-box">
+        <div class="stat-box" style="animation-delay: 0.05s;">
             <div class="label-icon">
-                <span>Total Departments</span>
+                <div class="icon-container" style="background: rgba(12, 75, 52, 0.1); color: #0C4B34;">
+                    <i class="fas fa-university"></i>
+                </div>
+                <span>Total Depts</span>
             </div>
             <div class="stat-amount"><?php echo $stats['total']; ?></div>
         </div>
-        <div class="stat-box">
+        <div class="stat-box" style="animation-delay: 0.1s;">
             <div class="label-icon">
-                <span>Active Departments</span>
+                <div class="icon-container" style="background: rgba(40, 167, 69, 0.1); color: #28a745;">
+                    <i class="fas fa-check-circle"></i>
+                </div>
+                <span>Active</span>
             </div>
-            <div class="stat-amount" style="color: #28a745;"><?php echo $stats['active']; ?></div>
+            <div class="stat-amount"><?php echo $stats['active']; ?></div>
         </div>
-        <div class="stat-box">
+        <div class="stat-box" style="animation-delay: 0.15s;">
             <div class="label-icon">
+                <div class="icon-container" style="background: rgba(21, 101, 192, 0.1); color: #1565C0;">
+                    <i class="fas fa-book"></i>
+                </div>
                 <span>Programs</span>
             </div>
             <div class="stat-amount"><?php echo $stats['total_programs']; ?></div>
         </div>
-        <div class="stat-box">
+        <div class="stat-box" style="animation-delay: 0.2s;">
             <div class="label-icon">
+                <div class="icon-container" style="background: rgba(255, 152, 0, 0.1); color: #FF9800;">
+                    <i class="fas fa-graduation-cap"></i>
+                </div>
                 <span>Courses</span>
             </div>
             <div class="stat-amount"><?php echo $stats['total_courses']; ?></div>
         </div>
-        <div class="stat-box">
+        <div class="stat-box" style="animation-delay: 0.25s;">
             <div class="label-icon">
+                <div class="icon-container" style="background: rgba(156, 39, 176, 0.1); color: #9C27B0;">
+                    <i class="fas fa-chalkboard-teacher"></i>
+                </div>
                 <span>Teachers</span>
             </div>
             <div class="stat-amount"><?php echo $stats['total_teachers']; ?></div>
@@ -149,42 +173,27 @@ function ascom_on_color_for_hex($hex) {
     <div class="department-list">
         <?php if (empty($departments)): ?>
         <div class="empty-state">
+            <i class="fas fa-folder-open" style="font-size: 48px; margin-bottom: 20px; opacity: 0.3;"></i>
             <p>No departments found. Click "Add Department" to create one.</p>
         </div>
         <?php else: ?>
-        <?php foreach ($departments as $dept): ?>
+        <?php foreach ($departments as $index => $dept): ?>
         <?php
-            $deptColor = ascom_normalize_hex_color($dept['color_code'] ?? '', '#1976d2');
-            $deptOnColor = ascom_on_color_for_hex($deptColor);
-            $isLightHeader = ascom_is_light_hex_color($deptColor);
-            $deptChipBg = $isLightHeader ? 'rgba(0,0,0,0.08)' : 'rgba(255,255,255,0.18)';
-            $deptChipBorder = $isLightHeader ? 'rgba(0,0,0,0.12)' : 'rgba(255,255,255,0.26)';
-            $deptActionBorder = $isLightHeader ? 'rgba(17,24,39,0.45)' : 'rgba(255,255,255,0.55)';
-            $deptFocusRing = $isLightHeader ? 'rgba(17,24,39,0.55)' : 'rgba(255,255,255,0.80)';
-            $deptHeaderDivider = $isLightHeader ? 'rgba(0,0,0,0.10)' : 'rgba(255,255,255,0.22)';
-            $deptActionHover = $isLightHeader ? 'rgba(0,0,0,0.08)' : 'rgba(255,255,255,0.16)';
-            $deptActionActive = $isLightHeader ? 'rgba(0,0,0,0.14)' : 'rgba(255,255,255,0.22)';
+            $deptColor = ascom_normalize_hex_color($dept['color_code'] ?? '', '#0C4B34');
+            $staggerDelay = 0.1 + ($index * 0.05);
         ?>
-        <div class="department-card" data-dept-id="<?php echo $dept['id']; ?>">
+        <div class="department-card <?php echo ($dept['is_active'] ?? 1) ? '' : 'inactive'; ?>" 
+             data-dept-id="<?php echo $dept['id']; ?>"
+             style="animation-delay: <?php echo $staggerDelay; ?>s;">
             <div class="dept-main">
                 <div
                     class="dept-row dept-row-top"
-                    style="
-                        --dept-color: <?php echo htmlspecialchars($deptColor); ?>;
-                        --dept-on-color: <?php echo htmlspecialchars($deptOnColor); ?>;
-                        --dept-chip-bg: <?php echo htmlspecialchars($deptChipBg); ?>;
-                        --dept-chip-border: <?php echo htmlspecialchars($deptChipBorder); ?>;
-                        --dept-action-border: <?php echo htmlspecialchars($deptActionBorder); ?>;
-                        --dept-focus-ring: <?php echo htmlspecialchars($deptFocusRing); ?>;
-                        --dept-header-divider: <?php echo htmlspecialchars($deptHeaderDivider); ?>;
-                        --dept-action-hover: <?php echo htmlspecialchars($deptActionHover); ?>;
-                        --dept-action-active: <?php echo htmlspecialchars($deptActionActive); ?>;
-                    "
+                    style="--dept-color: <?php echo htmlspecialchars($deptColor); ?>;"
                 >
                     <div class="dept-name"><?php echo htmlspecialchars($dept['department_name']); ?></div>
                     <div class="dept-code-badge"><?php echo htmlspecialchars($dept['department_code']); ?></div>
                     <button class="view-details-btn" onclick="openDepartmentDetailsModal(<?php echo $dept['id']; ?>); event.stopPropagation();">
-                        View Details
+                        Details
                     </button>
                 </div>
                 <div class="dept-row dept-row-middle">
@@ -196,7 +205,7 @@ function ascom_on_color_for_hex($hex) {
                     <?php endif; ?>
                 </div>
                 <div class="dept-row dept-row-bottom">
-                    <div>
+                    <div class="action-buttons">
                         <button class="dean-btn" onclick="openAssignDeanModal(<?php echo $dept['id']; ?>, '<?php echo htmlspecialchars($dept['department_code']); ?>'); event.stopPropagation();">
                             <?php echo $dept['dean_user_id'] ? 'Change Dean' : 'Assign Dean'; ?>
                         </button>
@@ -219,16 +228,16 @@ function ascom_on_color_for_hex($hex) {
 
 <!-- Assign Dean Modal -->
 <div id="assignDeanModal" class="modal-overlay" style="display: none;">
-  <div class="modal-box dept-details-modal dept-form-modal" role="dialog" aria-modal="true" aria-labelledby="assignDeanTitle">
+  <div class="modal-box dept-details-modal" role="dialog" aria-modal="true">
     <div class="dept-details-modal__header">
       <div class="dept-details-modal__titlewrap">
         <span class="dept-details-modal__badge">DEAN</span>
         <div class="dept-details-modal__titles">
-          <h2 id="assignDeanTitle" class="dept-details-modal__title">Assign Dean</h2>
+          <h2 class="dept-details-modal__title">Assign Dean</h2>
           <div id="assignDeanDeptName" class="dept-details-modal__subtitle"></div>
         </div>
       </div>
-      <button type="button" class="dept-details-modal__close" onclick="window.closeAssignDeanModal()" aria-label="Close modal">&times;</button>
+      <button type="button" class="dept-details-modal__close" onclick="window.closeAssignDeanModal()">&times;</button>
     </div>
     <div class="dept-details-modal__content">
       <form id="assignDeanForm" class="dept-form">
@@ -254,16 +263,16 @@ function ascom_on_color_for_hex($hex) {
 
 <!-- Success Modal -->
 <div id="deptSuccessModal" class="modal-overlay" style="display: none;">
-  <div class="modal-box dept-details-modal dept-feedback-modal" role="dialog" aria-modal="true" aria-labelledby="deptSuccessTitle">
+  <div class="modal-box dept-details-modal" role="dialog" aria-modal="true">
     <div class="dept-details-modal__header">
       <div class="dept-details-modal__titlewrap">
-        <span class="dept-details-modal__badge">OK</span>
+        <span class="dept-details-modal__badge" style="background: #28a745;">OK</span>
         <div class="dept-details-modal__titles">
-          <h2 id="deptSuccessTitle" class="dept-details-modal__title">Success</h2>
-          <div class="dept-details-modal__subtitle">Action completed.</div>
+          <h2 class="dept-details-modal__title">Success</h2>
+          <div class="dept-details-modal__subtitle">Action completed successfully.</div>
         </div>
       </div>
-      <button type="button" class="dept-details-modal__close" onclick="window.closeDeptSuccessModal()" aria-label="Close modal">&times;</button>
+      <button type="button" class="dept-details-modal__close" onclick="window.closeDeptSuccessModal()">&times;</button>
     </div>
     <div class="dept-details-modal__content">
       <div class="dept-feedback-modal__icon dept-feedback-modal__icon--success">✓</div>
@@ -277,16 +286,16 @@ function ascom_on_color_for_hex($hex) {
 
 <!-- Error Modal -->
 <div id="deptErrorModal" class="modal-overlay" style="display: none;">
-  <div class="modal-box dept-details-modal dept-feedback-modal" role="dialog" aria-modal="true" aria-labelledby="deptErrorTitle">
+  <div class="modal-box dept-details-modal" role="dialog" aria-modal="true">
     <div class="dept-details-modal__header">
       <div class="dept-details-modal__titlewrap">
-        <span class="dept-details-modal__badge">ERR</span>
+        <span class="dept-details-modal__badge" style="background: #dc3545;">ERR</span>
         <div class="dept-details-modal__titles">
-          <h2 id="deptErrorTitle" class="dept-details-modal__title">Error</h2>
+          <h2 class="dept-details-modal__title">Error</h2>
           <div class="dept-details-modal__subtitle">Something went wrong.</div>
         </div>
       </div>
-      <button type="button" class="dept-details-modal__close" onclick="window.closeDeptErrorModal()" aria-label="Close modal">&times;</button>
+      <button type="button" class="dept-details-modal__close" onclick="window.closeDeptErrorModal()">&times;</button>
     </div>
     <div class="dept-details-modal__content">
       <div class="dept-feedback-modal__icon dept-feedback-modal__icon--error">✕</div>
@@ -300,16 +309,16 @@ function ascom_on_color_for_hex($hex) {
 
 <!-- Edit Department Modal -->
 <div id="editDepartmentModal" class="modal-overlay" style="display: none;">
-  <div class="modal-box dept-details-modal dept-form-modal" role="dialog" aria-modal="true" aria-labelledby="editDepartmentTitle">
+  <div class="modal-box dept-details-modal" role="dialog" aria-modal="true">
     <div class="dept-details-modal__header">
       <div class="dept-details-modal__titlewrap">
         <span class="dept-details-modal__badge">EDIT</span>
         <div class="dept-details-modal__titles">
-          <h2 id="editDepartmentTitle" class="dept-details-modal__title">Edit Department</h2>
+          <h2 class="dept-details-modal__title">Edit Department</h2>
           <div class="dept-details-modal__subtitle">Update department information.</div>
         </div>
       </div>
-      <button type="button" class="dept-details-modal__close" onclick="window.closeEditDepartmentModal()" aria-label="Close modal">&times;</button>
+      <button type="button" class="dept-details-modal__close" onclick="window.closeEditDepartmentModal()">&times;</button>
     </div>
     <div class="dept-details-modal__content">
       <form id="editDepartmentForm" class="dept-form">
@@ -340,16 +349,16 @@ function ascom_on_color_for_hex($hex) {
 
 <!-- Add Department Modal -->
 <div id="addDepartmentModal" class="modal-overlay" style="display: none;">
-  <div class="modal-box dept-details-modal dept-form-modal" role="dialog" aria-modal="true" aria-labelledby="addDepartmentTitle">
+  <div class="modal-box dept-details-modal" role="dialog" aria-modal="true">
     <div class="dept-details-modal__header">
       <div class="dept-details-modal__titlewrap">
         <span class="dept-details-modal__badge">ADD</span>
         <div class="dept-details-modal__titles">
-          <h2 id="addDepartmentTitle" class="dept-details-modal__title">Add Department</h2>
+          <h2 class="dept-details-modal__title">Add Department</h2>
           <div class="dept-details-modal__subtitle">Create a new department.</div>
         </div>
       </div>
-      <button type="button" class="dept-details-modal__close" onclick="window.closeAddDepartmentModal()" aria-label="Close modal">&times;</button>
+      <button type="button" class="dept-details-modal__close" onclick="window.closeAddDepartmentModal()">&times;</button>
     </div>
     <div class="dept-details-modal__content">
       <form id="addDepartmentForm" class="dept-form">
@@ -379,7 +388,7 @@ function ascom_on_color_for_hex($hex) {
 
 <!-- Department Details Modal -->
 <div id="departmentDetailsModal" class="modal-overlay" style="display: none;">
-  <div class="modal-box dept-details-modal" role="dialog" aria-modal="true" aria-labelledby="detailsModalTitle">
+  <div class="modal-box dept-details-modal" role="dialog" aria-modal="true">
     <div class="dept-details-modal__header">
       <div class="dept-details-modal__titlewrap">
         <span id="deptDetailsBadge" class="dept-details-modal__badge">DEPT</span>
@@ -388,7 +397,7 @@ function ascom_on_color_for_hex($hex) {
           <div id="deptDetailsSubtitle" class="dept-details-modal__subtitle"></div>
         </div>
       </div>
-      <button type="button" class="dept-details-modal__close" onclick="window.closeDepartmentDetailsModal()" aria-label="Close modal">&times;</button>
+      <button type="button" class="dept-details-modal__close" onclick="window.closeDepartmentDetailsModal()">&times;</button>
     </div>
     <div id="departmentDetailsContent" class="dept-details-modal__content" aria-live="polite">
       <div class="dept-details-modal__loading">Loading...</div>
