@@ -23,9 +23,28 @@ require_once dirname(__FILE__) . '/includes/db_connection.php';
 <link rel="stylesheet" href="./styles/course-modal.css?v=<?php echo time(); ?>&r=<?php echo rand(1000, 9999); ?>">
 <link rel="stylesheet" href="./styles/notifications.css?v=<?php echo time(); ?>">
 
+<!-- Lucide Icons (CDN) -->
+<script defer src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+
 <!-- FORCE FACULTY HEADER LEFT ALIGNMENT - LOADS LAST -->
 <style>
 /* All conflicting CSS rules removed to allow individual program table to work properly */
+
+/* Lucide: make SVGs match existing icon sizing */
+.nav-icon-wrapper svg,
+.nav-icon svg,
+.search-bar svg,
+.chats-icon svg,
+.notification-icon svg {
+  width: 20px;
+  height: 20px;
+}
+
+.search-bar svg,
+.chats-icon svg,
+.notification-icon svg {
+  opacity: 0.8;
+}
 </style>
 
 <script>
@@ -52,7 +71,9 @@ require_once dirname(__FILE__) . '/includes/db_connection.php';
             <div style="display: flex; flex-direction: column; gap: 15px; padding: 0px; margin-top: 10px;">
                 <button type="button" class="course-type-option" onclick="selectCourseType('proposal')">
                     <div style="display: flex; align-items: center; gap: 15px;">
-                        <div style="font-size: 32px;">📝</div>
+                        <div style="width: 36px; height: 36px; display: flex; align-items: center; justify-content: center;">
+                            <i data-lucide="file-plus-2" style="width: 32px; height: 32px; color: #1565C0;"></i>
+                        </div>
                         <div style="text-align: left; flex: 1;">
                             <h3 style="margin: 0 0 5px 0; font-size: 18px; color: #333;">New Course Proposal</h3>
                             <p style="margin: 0; font-size: 14px; color: #666;">Create a new course proposal to submit to Quality Assurance for review</p>
@@ -62,7 +83,9 @@ require_once dirname(__FILE__) . '/includes/db_connection.php';
                 
                 <button type="button" class="course-type-option" onclick="selectCourseType('cross-department')">
                     <div style="display: flex; align-items: center; gap: 15px;">
-                        <div style="font-size: 32px;">🔗</div>
+                        <div style="width: 36px; height: 36px; display: flex; align-items: center; justify-content: center;">
+                            <i data-lucide="link-2" style="width: 32px; height: 32px; color: #0C4B34;"></i>
+                        </div>
                         <div style="text-align: left; flex: 1;">
                             <h3 style="margin: 0 0 5px 0; font-size: 18px; color: #333;">Add Cross-Department Courses</h3>
                             <p style="margin: 0; font-size: 14px; color: #666;">Add existing courses from other departments to your program</p>
@@ -72,7 +95,9 @@ require_once dirname(__FILE__) . '/includes/db_connection.php';
                 
                 <button type="button" class="course-type-option" onclick="selectCourseType('course-revision')">
                     <div style="display: flex; align-items: center; gap: 15px;">
-                        <div style="font-size: 32px;">✏️</div>
+                        <div style="width: 36px; height: 36px; display: flex; align-items: center; justify-content: center;">
+                            <i data-lucide="pencil-line" style="width: 32px; height: 32px; color: #0F7A53;"></i>
+                        </div>
                         <div style="text-align: left; flex: 1;">
                             <h3 style="margin: 0 0 5px 0; font-size: 18px; color: #333;">Request Course Revision</h3>
                             <p style="margin: 0; font-size: 14px; color: #666;">Request revisions to existing courses, update content, or modify course requirements</p>
@@ -825,26 +850,20 @@ document.addEventListener('DOMContentLoaded', function() {
 
 <div class="top-navbar">
   <div class="top-navbar-content">
-    <div class="hamburger" onclick="toggleSidebar()" role="button" tabindex="0" aria-label="Toggle sidebar">
-      <span></span>
-      <span></span>
-      <span></span>
-    </div>
-    <img src="../src/assets/images/ASCOM_Monitoring_System.png" alt="Logo" class="logo-img" />
-    <div class="search-bar">
-      <img src="../src/assets/icons/search-icon.png" alt="Search Icon" />
-      <input type="text" placeholder="Search Here..." />
-    </div>
-    <div class="chats-icon">
-      <img src="../src/assets/icons/chats-icon.png" alt="Chats" />
-      <div class="chat-count">0</div>
-      <div class="chat-dropdown" id="chatsDropdown">
-        <h3>Chats</h3>
-        <div class="chats-empty">No new messages</div>
+    <div class="top-nav-left">
+      <div class="hamburger" onclick="toggleSidebar()" role="button" tabindex="0" aria-label="Toggle sidebar">
+        <span></span>
+        <span></span>
+        <span></span>
+      </div>
+      <img src="../src/assets/images/ASCOM_Monitoring_System.png" alt="Logo" class="logo-img" />
+      <div class="search-bar">
+        <i data-lucide="search" aria-hidden="true"></i>
+        <input type="text" placeholder="Search Here..." />
       </div>
     </div>
     <div class="notification-icon">
-      <img src="../src/assets/icons/notifications-icon.png" alt="Notifications" />
+      <i data-lucide="bell" aria-hidden="true"></i>
       <div class="notification-count">0</div>
       <div class="notification-dropdown" id="notificationDropdown">
         <h3>Notifications</h3>
@@ -858,7 +877,7 @@ document.addEventListener('DOMContentLoaded', function() {
   <div class="nav-buttons">
     <a href="#" class="nav-button new-account-button" id="newCourseBtn" onclick="checkProgramsAndOpenCourseModal(); return false;">
       <span class="nav-icon-wrapper">
-        <img src="../src/assets/icons/add-icon.png" alt="Add Icon" class="nav-icon" />
+        <i data-lucide="plus" class="nav-icon" aria-hidden="true"></i>
       </span>
       <span>Add Course</span>
     </a>
@@ -867,7 +886,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
     <a href="content.php?page=dashboard" class="nav-button hoverable <?php if ($currentPage == 'dashboard' || $currentPage == 'all-courses' || $currentPage == 'course-details' || $currentPage == 'program-courses' || $currentPage == 'reference-requests' || $currentPage == 'course-proposals') echo 'active'; ?>">
       <span class="nav-icon-wrapper">
-        <img src="../src/assets/icons/dashboard-icon.png" alt="Dashboard Icon" class="nav-icon" />
+        <i data-lucide="layout-dashboard" class="nav-icon" aria-hidden="true"></i>
       </span>
       <span>Dashboard</span>
     </a>
@@ -876,7 +895,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
     <a href="content.php?page=faculty-management" class="nav-button hoverable <?php if ($currentPage == 'academic-management' || $currentPage == 'faculty-management' || $currentPage == 'faculty-details') echo 'active'; ?>" style="height: 76px;">
       <span class="nav-icon-wrapper">
-        <img src="../src/assets/icons/faculty-icon.png" alt="Faculty Management Icon" class="nav-icon" />
+        <i data-lucide="users" class="nav-icon" aria-hidden="true"></i>
       </span>
       <span style="line-height: 1.2;">
         Faculty<br />Management
@@ -885,14 +904,14 @@ document.addEventListener('DOMContentLoaded', function() {
 
     <a href="content.php?page=school-calendar" class="nav-button hoverable <?php if ($currentPage == 'school-calendar') echo 'active'; ?>">
       <span class="nav-icon-wrapper">
-        <img src="../src/assets/icons/calendar-icon.png" alt="Calendar Icon" class="nav-icon" />
+        <i data-lucide="calendar" class="nav-icon" aria-hidden="true"></i>
       </span>
       <span>School Calendar</span>
     </a>
 
     <a href="content.php?page=settings" class="nav-button hoverable <?php if ($currentPage == 'settings') echo 'active'; ?>">
       <span class="nav-icon-wrapper">
-        <img src="../src/assets/icons/settings-icon.png" alt="Settings Icon" class="nav-icon" />
+        <i data-lucide="settings" class="nav-icon" aria-hidden="true"></i>
       </span>
       <span>Settings</span>
     </a>
@@ -901,14 +920,14 @@ document.addEventListener('DOMContentLoaded', function() {
   <div class="bottom-nav-buttons">
     <a href="#" class="nav-button switch-role-button" onclick="openSwitchRoleModal(); return false;">
       <span class="nav-icon-wrapper">
-        <img src="../src/assets/icons/switch.png" class="nav-icon" />
+        <i data-lucide="repeat-2" class="nav-icon" aria-hidden="true"></i>
       </span>
       <span>Switch Role</span>
     </a>
 
     <a href="./logout.php" class="nav-button logout-button">
       <span class="nav-icon-wrapper">
-        <img src="../src/assets/icons/logout-icon.png" class="nav-icon" />
+        <i data-lucide="log-out" class="nav-icon" aria-hidden="true"></i>
       </span>
       <span>Log Out</span>
     </a>
@@ -971,6 +990,16 @@ document.addEventListener('DOMContentLoaded', function() {
 <script src="./scripts/program-management.js?v=<?php echo time(); ?>"></script>
 
 <script>
+  function ascomRefreshIcons() {
+    if (window.lucide && typeof window.lucide.createIcons === 'function') {
+      window.lucide.createIcons();
+    }
+  }
+
+  document.addEventListener('DOMContentLoaded', ascomRefreshIcons);
+</script>
+
+<script>
 // Global modal functions (will be overridden by page-specific functions if they exist)
 function showNoProgramsModal() {
     // Create modal if it doesn't exist
@@ -982,7 +1011,7 @@ function showNoProgramsModal() {
         modal.innerHTML = `
             <div class="modal-box">
                 <div class="modal-content">
-                    <img src="../src/assets/animated_icons/info-animated-icon.gif" alt="Info" style="width: 64px; height: 64px; margin-bottom: 16px;">
+                    <i data-lucide="info" aria-hidden="true" style="width: 64px; height: 64px; margin-bottom: 16px; color: #0C4B34;"></i>
                     <h2>No Programs Available</h2>
                     <p>You need to create at least one program before you can add courses. Programs help organize your courses by department and specialization.</p>
                 </div>
@@ -1256,21 +1285,6 @@ window.createEmergencyTooltips = createEmergencyTooltips;
 // CHAT AND NOTIFICATION FUNCTIONALITY
 
 // Initialize chats and notifications
-const chatsIcon = document.querySelector('.chats-icon');
-if (chatsIcon) {
-    chatsIcon.onclick = function(e) {
-        e.preventDefault();
-        e.stopPropagation();
-        const dropdown = document.getElementById('chatsDropdown');
-        if (dropdown) {
-            const currentDisplay = dropdown.style.display;
-            dropdown.style.display = currentDisplay === 'block' ? 'none' : 'block';
-        }
-    };
-    chatsIcon.style.cursor = 'pointer';
-    chatsIcon.style.pointerEvents = 'auto';
-} else {
-}
 
 const notificationIcon = document.querySelector('.notification-icon');
 if (notificationIcon) {
@@ -1290,13 +1304,6 @@ if (notificationIcon) {
 
 // Close dropdowns when clicking outside
 document.addEventListener('click', function(e) {
-    if (!e.target.closest('.chats-icon')) {
-        const chatsDropdown = document.getElementById('chatsDropdown');
-        if (chatsDropdown) {
-            chatsDropdown.style.display = 'none';
-        }
-    }
-    
     if (!e.target.closest('.notification-icon')) {
         const notificationDropdown = document.getElementById('notificationDropdown');
         if (notificationDropdown) {

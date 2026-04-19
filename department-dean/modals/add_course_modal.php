@@ -1313,12 +1313,6 @@ window.validateCurrentStep = function() {
             
             fieldLabel = fieldLabel.replace(/\s+/g, ' ').trim();
             
-                name: fieldName,
-                label: fieldLabel,
-                value: fieldValue,
-                isEmpty: isEmpty,
-                type: field.type || field.tagName
-            });
             
             if (isEmpty) {
                 isValid = false;
@@ -5381,8 +5375,6 @@ window.totalSteps = window.totalSteps || totalSteps;
 
 
 // Use global variables
-let currentStep = window.currentStep || 1;
-const totalSteps = window.totalSteps || 5;
 
 // Learning Outcomes Management
 let outcomeCount = 0;
