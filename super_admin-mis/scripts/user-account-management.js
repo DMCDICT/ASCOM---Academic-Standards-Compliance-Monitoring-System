@@ -58,22 +58,44 @@ function refreshUserList() {
 }
 
 // Render table with user data
-function renderTable(users = filteredUsers) {
+function renderTable(users) {
     const tableBody = document.getElementById('userTableBody');
     if (!tableBody) return;
     
     tableBody.innerHTML = '';
     
+    if (users.length === 0) {
+        tableBody.innerHTML = '<tr><td colspan="7" style="text-align: center; padding: 40px;">No users found.</td></tr>';
+        return;
+    }
+    
     users.forEach(user => {
+        // Ensure properties exist
+        const fullName = user.full_name || (user.first_name + ' ' + (user.last_name || ''));
+        const role = user.role_display || getRoleDisplayName(user.role) || 'User';
+        const dept = user.department_code || user.dept || '-';
+        const status = (user.is_active == 1 || user.status === 'Active') ? 'Active' : 'Inactive';
+        const statusClass = status.toLowerCase();
+        const email = user.display_email || user.email || 'N/A';
+
         const row = document.createElement('tr');
         row.innerHTML = `
             <td>${user.employee_no || 'N/A'}</td>
-            <td>${user.first_name} ${user.last_name}</td>
-            <td>${getRoleDisplayName(user.role) || 'N/A'}</td>
-            <td>${user.email || 'N/A'}</td>
+            <td>${fullName}</td>
+            <td>${email}</td>
+            <td>${role}</td>
+            <td>${dept}</td>
             <td>
-                <button class="edit-btn" onclick="window.openEditUserModal('${user.employee_no}')">Edit</button>
-                <button class="delete-btn" onclick="window.openDeleteUserModal('${user.employee_no}', '${user.first_name} ${user.last_name}', '${user.email || ''}', '${getRoleDisplayName(user.role) || ''}')">Delete</button>
+                <div class="status-pill">
+                    <span class="status-dot ${statusClass}"></span>
+                    ${status}
+                </div>
+            </td>
+            <td>
+                <div class="action-btn-group">
+                    <button class="table-edit-btn" onclick="window.openEditUserModal('${user.employee_no}')">Edit</button>
+                    <button class="table-delete-btn" onclick="window.openDeleteUserModal('${user.employee_no}', '${fullName.replace(/'/g, "\\'")}', '${email.replace(/'/g, "\\'")}', '${role}')">Delete</button>
+                </div>
             </td>
         `;
         tableBody.appendChild(row);
