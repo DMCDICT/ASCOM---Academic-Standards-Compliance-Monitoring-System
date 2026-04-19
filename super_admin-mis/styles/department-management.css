@@ -95,8 +95,10 @@
     align-items: center;
     gap: 12px;
     padding: 16px 20px;
-    border-bottom: 1px solid #f0f0f0;
+    border-bottom: 1px solid var(--dept-header-divider, rgba(0,0,0,0.08));
     min-height: 70px; /* Ensure consistent height */
+    background: linear-gradient(0deg, rgba(0,0,0,0.10), rgba(0,0,0,0.10)), var(--dept-color, #ffffff);
+    color: var(--dept-on-color, #2d3748);
 }
 
 .department-management-page .dept-color {
@@ -109,7 +111,7 @@
 .department-management-page .dept-name {
     font-size: 15px;
     font-weight: 600;
-    color: #2d3748;
+    color: inherit;
     flex: 1;
     display: -webkit-box;
     -webkit-line-clamp: 2; /* Max 2 lines */
@@ -122,29 +124,40 @@
 .department-management-page .dept-code-badge {
     font-size: 11px;
     font-weight: 700;
-    color: #4a5568;
-    background: #edf2f7;
+    color: inherit;
+    background: var(--dept-chip-bg, rgba(255,255,255,0.18));
     padding: 4px 8px;
     border-radius: 6px;
     white-space: nowrap;
+    border: 1px solid var(--dept-chip-border, rgba(255,255,255,0.26));
 }
 
 .department-management-page .view-details-btn {
     padding: 8px 14px;
     background: transparent;
-    color: #007bff;
-    border: 1px solid #007bff;
+    color: inherit;
+    border: 1px solid var(--dept-action-border, rgba(0,0,0,0.2));
     border-radius: 8px;
     cursor: pointer;
     font-size: 12px;
     font-weight: 500;
     transition: all 0.2s;
     margin-left: auto;
+    backdrop-filter: blur(6px);
 }
 
 .department-management-page .view-details-btn:hover {
-    background: #007bff;
-    color: white;
+    background: var(--dept-action-hover, rgba(255,255,255,0.16));
+}
+
+.department-management-page .view-details-btn:active {
+    background: var(--dept-action-active, rgba(255,255,255,0.22));
+    transform: translateY(0.5px);
+}
+
+.department-management-page .dept-row-top .view-details-btn:focus-visible {
+    outline: 2px solid var(--dept-focus-ring, rgba(17,24,39,0.45));
+    outline-offset: 2px;
 }
 
 .department-management-page .expand-icon {
@@ -422,9 +435,8 @@
     opacity: 0.6;
 }
 
-.department-management-page .department-card.inactive .dept-name,
-.department-management-page .department-card.inactive .dept-code-badge {
-    color: #999;
+.department-management-page .department-card.inactive .dept-row-top {
+    filter: grayscale(0.25);
 }
 
 /* Responsive */

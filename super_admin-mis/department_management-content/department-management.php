@@ -70,6 +70,37 @@ if (isset($conn) && !$conn->connect_error) {
         }
     }
 }
+
+function ascom_normalize_hex_color($color, $fallback = '#1976d2') {
+    if (!is_string($color)) {
+        return $fallback;
+    }
+    $trimmed = trim($color);
+    if ($trimmed === '') {
+        return $fallback;
+    }
+    if ($trimmed[0] !== '#') {
+        $trimmed = '#' . $trimmed;
+    }
+    if (!preg_match('/^#[0-9a-fA-F]{6}$/', $trimmed)) {
+        return $fallback;
+    }
+    return strtoupper($trimmed);
+}
+
+function ascom_is_light_hex_color($hex) {
+    $normalized = ascom_normalize_hex_color($hex, '#FFFFFF');
+    $r = hexdec(substr($normalized, 1, 2)) / 255;
+    $g = hexdec(substr($normalized, 3, 2)) / 255;
+    $b = hexdec(substr($normalized, 5, 2)) / 255;
+    // Perceived luminance (good enough for UI contrast decisions)
+    $luminance = 0.2126 * $r + 0.7152 * $g + 0.0722 * $b;
+    return $luminance > 0.62;
+}
+
+function ascom_on_color_for_hex($hex) {
+    return ascom_is_light_hex_color($hex) ? '#111827' : '#FFFFFF';
+}
 ?>
 
 <div class="department-management-page">
@@ -122,10 +153,34 @@ if (isset($conn) && !$conn->connect_error) {
         </div>
         <?php else: ?>
         <?php foreach ($departments as $dept): ?>
+        <?php
+            $deptColor = ascom_normalize_hex_color($dept['color_code'] ?? '', '#1976d2');
+            $deptOnColor = ascom_on_color_for_hex($deptColor);
+            $isLightHeader = ascom_is_light_hex_color($deptColor);
+            $deptChipBg = $isLightHeader ? 'rgba(0,0,0,0.08)' : 'rgba(255,255,255,0.18)';
+            $deptChipBorder = $isLightHeader ? 'rgba(0,0,0,0.12)' : 'rgba(255,255,255,0.26)';
+            $deptActionBorder = $isLightHeader ? 'rgba(17,24,39,0.45)' : 'rgba(255,255,255,0.55)';
+            $deptFocusRing = $isLightHeader ? 'rgba(17,24,39,0.55)' : 'rgba(255,255,255,0.80)';
+            $deptHeaderDivider = $isLightHeader ? 'rgba(0,0,0,0.10)' : 'rgba(255,255,255,0.22)';
+            $deptActionHover = $isLightHeader ? 'rgba(0,0,0,0.08)' : 'rgba(255,255,255,0.16)';
+            $deptActionActive = $isLightHeader ? 'rgba(0,0,0,0.14)' : 'rgba(255,255,255,0.22)';
+        ?>
         <div class="department-card" data-dept-id="<?php echo $dept['id']; ?>">
             <div class="dept-main">
-                <div class="dept-row dept-row-top">
-                    <div class="dept-color" style="background-color: <?php echo htmlspecialchars($dept['color_code'] ?? '#1976d2'); ?>;"></div>
+                <div
+                    class="dept-row dept-row-top"
+                    style="
+                        --dept-color: <?php echo htmlspecialchars($deptColor); ?>;
+                        --dept-on-color: <?php echo htmlspecialchars($deptOnColor); ?>;
+                        --dept-chip-bg: <?php echo htmlspecialchars($deptChipBg); ?>;
+                        --dept-chip-border: <?php echo htmlspecialchars($deptChipBorder); ?>;
+                        --dept-action-border: <?php echo htmlspecialchars($deptActionBorder); ?>;
+                        --dept-focus-ring: <?php echo htmlspecialchars($deptFocusRing); ?>;
+                        --dept-header-divider: <?php echo htmlspecialchars($deptHeaderDivider); ?>;
+                        --dept-action-hover: <?php echo htmlspecialchars($deptActionHover); ?>;
+                        --dept-action-active: <?php echo htmlspecialchars($deptActionActive); ?>;
+                    "
+                >
                     <div class="dept-name"><?php echo htmlspecialchars($dept['department_name']); ?></div>
                     <div class="dept-code-badge"><?php echo htmlspecialchars($dept['department_code']); ?></div>
                     <button class="view-details-btn" onclick="openDepartmentDetailsModal(<?php echo $dept['id']; ?>); event.stopPropagation();">
