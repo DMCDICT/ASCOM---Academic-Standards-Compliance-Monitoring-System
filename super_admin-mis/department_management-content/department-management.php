@@ -173,9 +173,9 @@ if (isset($conn) && !$conn->connect_error) {
     <form id="assignDeanForm" style="display: flex; flex-direction: column; gap: 15px;">
       <input type="hidden" name="department_id" id="assign_dept_id">
       <div>
-        <label style="font-size: 14px; font-weight: bold; margin-bottom: 6px; display: block;">Select Teacher/Faculty <span style="color: #dc3545;">*</span></label>
+        <label style="font-size: 14px; font-weight: bold; margin-bottom: 6px; display: block;">Select User with Dean Role <span style="color: #dc3545;">*</span></label>
         <select name="user_id" id="assign_user_id" required style="width: 100%; height: 50px; padding: 0 12px; border: 1px solid #ccc; border-radius: 12px; box-sizing: border-box; background-color: #FFFFFF;">
-          <option value="">-- Select Teacher --</option>
+          <option value="">-- Select Dean --</option>
         </select>
       </div>
       <div id="currentDeanSection" style="display: none; background: #fff3cd; padding: 15px; border-radius: 8px;">
@@ -493,24 +493,30 @@ window.openAssignDeanModal = function(deptId, deptCode) {
         }
     }
     
-    // Fetch teachers for this department
+    // Fetch potential deans for this department (users with Dean role)
     fetch('./api/get_department_teachers.php?department_id=' + deptId)
     .then(res => res.json())
     .then(data => {
         const select = document.getElementById('assign_user_id');
-        select.innerHTML = '<option value="">-- Select Teacher --</option>';
+        select.innerHTML = '<option value="">-- Select Dean --</option>';
         
-        if (data.success && data.teachers) {
+        if (data.success && data.teachers && data.teachers.length > 0) {
             data.teachers.forEach(function(teacher) {
                 const option = document.createElement('option');
                 option.value = teacher.id;
-                option.textContent = teacher.first_name + ' ' + teacher.last_name + ' (' + teacher.employee_no + ')';
+                // Show name, employee no, and their roles
+                const rolesText = teacher.roles ? ' [' + teacher.roles + ']' : '';
+                option.textContent = teacher.display_name + ' (' + teacher.employee_no + ')' + rolesText;
                 select.appendChild(option);
             });
+        } else {
+            select.innerHTML = '<option value="">No users with Dean role found in this department</option>';
         }
         
-        if (select.options.length <= 1) {
-            select.innerHTML = '<option value="">No teachers available</option>';
+        // Add helper message if no users available
+        const helperMsg = document.getElementById('assignDeanDeptName');
+        if (data.teachers && data.teachers.length === 0 && helperMsg) {
+            helperMsg.innerHTML = 'Department: ' + deptCode + '<br><small style="color: #dc3545;">No users with Dean role found. Please assign Dean role to a user first.</small>';
         }
     });
     
