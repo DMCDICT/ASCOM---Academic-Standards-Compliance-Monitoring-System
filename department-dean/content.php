@@ -3,7 +3,7 @@ require_once dirname(__FILE__) . '/../session_config.php';
 require_once dirname(__FILE__) . '/../bootstrap/auth.php';
 require_once dirname(__FILE__) . '/includes/db_connection.php';
 
-// ascom_require_role('dean', '../user_login.php');
+ascom_require_role('dean', '../user_login.php');
 ?>
 <!DOCTYPE html>
 <html lang="en">

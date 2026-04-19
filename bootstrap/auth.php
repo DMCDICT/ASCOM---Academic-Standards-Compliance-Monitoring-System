@@ -62,6 +62,12 @@ function ascom_require_super_admin(string $redirectPath = '../super_admin_login.
         session_start();
     }
 
+    // Security Hardening: Ensure no regular user flags exist in a Super Admin session
+    if (!empty($_SESSION['user_roles']) || !empty($_SESSION['selected_role'])) {
+        ascom_clear_role_flags();
+        unset($_SESSION['user_roles'], $_SESSION['selected_role']);
+    }
+
     // Check for explicit super_admin_logged_in flag AND the user_role string
     // Also check 'super_admin_session' to ensure session came from the dedicated login
     if (empty($_SESSION['super_admin_logged_in']) || 
@@ -77,6 +83,13 @@ function ascom_require_role(string $roleType, string $redirectPath = '../user_lo
 {
     if (session_status() === PHP_SESSION_NONE) {
         session_start();
+    }
+
+    // Security Hardening: Ensure no super admin flags exist in a regular user session
+    if (!empty($_SESSION['super_admin_logged_in']) || !empty($_SESSION['super_admin_session'])) {
+        $_SESSION = [];
+        header("Location: {$redirectPath}");
+        exit();
     }
 
     if (!ascom_authenticated_for_regular_user()) {
