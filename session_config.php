@@ -2,13 +2,15 @@
 
 require_once __DIR__ . '/bootstrap/database.php';
 
-function ascom_session_is_secure(): bool
-{
-    if (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') {
-        return true;
-    }
+if (!function_exists('ascom_session_is_secure')) {
+    function ascom_session_is_secure(): bool
+    {
+        if (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') {
+            return true;
+        }
 
-    return (int) ($_SERVER['SERVER_PORT'] ?? 80) === 443;
+        return (int) ($_SERVER['SERVER_PORT'] ?? 80) === 443;
+    }
 }
 
 function configureExtendedSession(): void

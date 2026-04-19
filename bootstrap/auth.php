@@ -55,13 +55,19 @@ function ascom_authenticated_for_regular_user(): bool
     return !empty($_SESSION['is_authenticated']) && !empty($_SESSION['user_id']);
 }
 
-function ascom_require_super_admin(string $redirectPath = 'super_admin_login.php'): void
+function ascom_require_super_admin(string $redirectPath = '../super_admin_login.php'): void
 {
+    // The calling script should have included super_admin_session_config.php already
     if (session_status() === PHP_SESSION_NONE) {
         session_start();
     }
 
-    if (empty($_SESSION['super_admin_logged_in']) || ($_SESSION['user_role'] ?? null) !== 'super_admin') {
+    // Check for explicit super_admin_logged_in flag AND the user_role string
+    // Also check 'super_admin_session' to ensure session came from the dedicated login
+    if (empty($_SESSION['super_admin_logged_in']) || 
+        ($_SESSION['user_role'] ?? null) !== 'super_admin' ||
+        empty($_SESSION['super_admin_session'])) {
+        
         header("Location: {$redirectPath}");
         exit();
     }

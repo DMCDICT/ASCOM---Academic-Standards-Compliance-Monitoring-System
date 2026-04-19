@@ -22,8 +22,8 @@ if ($captchaVerified && !ascom_authenticated_for_regular_user()) {
         exit();
     }
 
-    $stmt = $conn->prepare('SELECT id, employee_no, institutional_email, role_id, is_active, first_name, last_name, title, department_id FROM users WHERE institutional_email = ? AND is_active = 1');
-    $stmt->bind_param('s', $captchaUsername);
+    $stmt = $conn->prepare('SELECT id, employee_no, institutional_email, email, role_id, is_active, first_name, last_name, title, department_id FROM users WHERE (institutional_email = ? OR email = ?) AND is_active = 1');
+    $stmt->bind_param('ss', $captchaUsername, $captchaUsername);
     $stmt->execute();
     $result = $stmt->get_result();
     $user = $result ? $result->fetch_assoc() : null;
@@ -41,7 +41,8 @@ if ($captchaVerified && !ascom_authenticated_for_regular_user()) {
 
     $userRoles = [];
 
-    if ((int) $user['role_id'] === 4) {
+    // If role is Dean (2) or Teacher (3), they get the Teacher role
+    if ((int) $user['role_id'] === 2 || (int) $user['role_id'] === 3) {
         $deptCode = null;
         $deptName = null;
         if (!empty($user['department_id'])) {
@@ -79,13 +80,15 @@ if ($captchaVerified && !ascom_authenticated_for_regular_user()) {
     }
     $deanQuery->close();
 
-    $roleStmt = $conn->prepare("SELECT role_name, assigned_at FROM user_roles WHERE user_id = ? AND is_active = 1 AND role_name IN ('librarian','quality_assurance')");
+    $roleStmt = $conn->prepare("SELECT r.role_name, ur.assigned_at FROM user_roles ur JOIN roles r ON ur.role_id = r.id WHERE ur.user_id = ? AND r.role_name IN ('librarian','quality_assurance','qa')");
     $roleStmt->bind_param('i', $user['id']);
     $roleStmt->execute();
     $roleRes = $roleStmt->get_result();
     while ($roleRes && ($row = $roleRes->fetch_assoc())) {
+        $roleType = strtolower($row['role_name']);
+        if ($roleType === 'qa') $roleType = 'quality_assurance';
         $userRoles[] = [
-            'type' => strtolower($row['role_name']),
+            'type' => $roleType,
             'department_code' => null,
             'department_name' => null,
             'assigned_at' => $row['assigned_at'],
@@ -96,7 +99,7 @@ if ($captchaVerified && !ascom_authenticated_for_regular_user()) {
     $_SESSION['is_authenticated'] = true;
     $_SESSION['user_id'] = (int) $user['id'];
     $_SESSION['employee_no'] = $user['employee_no'];
-    $_SESSION['username'] = $user['institutional_email'];
+    $_SESSION['username'] = $user['institutional_email'] ?? $user['email'];
     $_SESSION['user_first_name'] = $user['first_name'];
     $_SESSION['user_last_name'] = $user['last_name'];
     $_SESSION['user_title'] = $user['title'];
