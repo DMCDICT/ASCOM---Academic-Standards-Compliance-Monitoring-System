@@ -1277,7 +1277,7 @@ switch ($page) {
         echo '<link rel="stylesheet" href="./styles/dashboard.css?v=2.0">';
         break;
     case 'user-account-management':
-        echo '<link rel="stylesheet" href="./styles/user-account-management.css?v=1.0">';
+        echo '<link rel="stylesheet" href="./styles/user-account-management.css?v=2.0">';
         break;
     case 'department-management':
         echo '<link rel="stylesheet" href="./styles/department-management.css?v=1.2">';
