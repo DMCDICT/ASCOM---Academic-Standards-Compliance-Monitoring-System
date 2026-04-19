@@ -49,47 +49,38 @@ if (!isset($school_years_for_dropdown) || empty($school_years_for_dropdown)) {
     <div class="modal-content">
         <div class="modal-header">
             <h3>Add New Term</h3>
-            <span class="close-button" onclick="closeAddTermModal()">&times;</span>
+            <button type="button" class="close-button" onclick="closeAddTermModal()">&times;</button>
         </div>
         <div class="modal-body">
             <form id="addTermForm">
-                <div class="form-row">
-                    <div class="form-group">
-                        <label for="termTitle">Term Title</label>
-                        <div class="custom-select-wrapper">
-                            <select id="termTitle" name="termTitle" required>
-                                <option value="" disabled selected>-- Select a Term --</option>
-                                <option value="1st Semester">1st Semester</option>
-                                <option value="2nd Semester">2nd Semester</option>
-                                <option value="Summer Semester">Summer Semester</option>
-                            </select>
-                        </div>
-                    </div>
-                    <div class="form-group">
-                        <label for="schoolYearId">School Year</label>
-                        <div class="custom-select-wrapper">
-                            <select id="schoolYearId" name="schoolYearId" required>
-                                <option value="" disabled selected>-- Select a School Year --</option>
-                                <?php 
-                                // Ensure we have school years data
-                                if (isset($school_years_for_dropdown) && !empty($school_years_for_dropdown)) {
-                                                    foreach ($school_years_for_dropdown as $sy): 
-                    // Check if this is the current school year based on date range
-                    $today = date('Y-m-d');
-                    $is_current = ($today >= $sy['start_date'] && $today <= $sy['end_date']) ? ' (Current)' : '';
-                ?>
-                    <option value="<?php echo htmlspecialchars($sy['id']); ?>" data-start="<?php echo htmlspecialchars($sy['start_date']); ?>" data-end="<?php echo htmlspecialchars($sy['end_date']); ?>">
-                        <?php echo htmlspecialchars($sy['school_year_label'] . $is_current); ?>
-                    </option>
-                <?php endforeach;
-                                } else {
-                                    // Fallback if no school years are available
-                                    echo '<option value="" disabled>No school years available</option>';
-                                }
-                                ?>
-                            </select>
-                        </div>
-                    </div>
+                <div class="form-group">
+                    <label for="termTitle">Term Title</label>
+                    <select id="termTitle" name="termTitle" required>
+                        <option value="" disabled selected>-- Select a Term --</option>
+                        <option value="1st Semester">1st Semester</option>
+                        <option value="2nd Semester">2nd Semester</option>
+                        <option value="Summer Semester">Summer Semester</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="schoolYearId">School Year</label>
+                    <select id="schoolYearId" name="schoolYearId" required>
+                        <option value="" disabled selected>-- Select a School Year --</option>
+                        <?php 
+                        if (isset($school_years_for_dropdown) && !empty($school_years_for_dropdown)) {
+                            foreach ($school_years_for_dropdown as $sy): 
+                            $today = date('Y-m-d');
+                            $is_current = ($today >= $sy['start_date'] && $today <= $sy['end_date']) ? ' (Current)' : '';
+                        ?>
+                        <option value="<?php echo htmlspecialchars($sy['id']); ?>" data-start="<?php echo htmlspecialchars($sy['start_date']); ?>" data-end="<?php echo htmlspecialchars($sy['end_date']); ?>">
+                            <?php echo htmlspecialchars($sy['school_year_label'] . $is_current); ?>
+                        </option>
+                        <?php endforeach;
+                        } else {
+                            echo '<option value="" disabled>No school years available</option>';
+                        }
+                        ?>
+                    </select>
                 </div>
                 <div class="form-row">
                     <div class="form-group">
@@ -115,43 +106,113 @@ if (!isset($school_years_for_dropdown) || empty($school_years_for_dropdown)) {
     <div class="modal-content">
         <div class="modal-header">
             <h3>Add New School Year</h3>
-            <span class="close-button" onclick="closeAddSchoolYearModal()">&times;</span>
+            <button type="button" class="close-button" onclick="closeAddSchoolYearModal()">&times;</button>
         </div>
         <div class="modal-body">
             <form id="addSchoolYearForm">
                 <div class="form-group">
                     <label for="schoolYearLabel">School Year Label</label>
-                    <input type="text" id="schoolYearLabel" name="schoolYearLabel" placeholder="A.Y. 2025 - 2026" autocomplete="off" required readonly>
+                    <input type="text" id="schoolYearLabel" name="schoolYearLabel" placeholder="Auto-filled from start year" autocomplete="off" required>
                 </div>
                 <div class="form-row">
                     <div class="form-group">
                         <label for="syStartYear">Start Year</label>
-                        <input type="number" id="syStartYear" name="syStartYear" min="2000" max="2100" placeholder="2025" required>
+                        <input type="number" id="syStartYear" name="syStartYear" min="2000" max="2100" placeholder="e.g., 2025" required onchange="autoFillEndYear()">
                     </div>
                     <div class="form-group">
                         <label for="syEndYear">End Year</label>
-                        <input type="number" id="syEndYear" name="syEndYear" min="2000" max="2100" placeholder="2026" required readonly>
+                        <input type="number" id="syEndYear" name="syEndYear" min="2000" max="2100" placeholder="Auto-filled" readonly>
                     </div>
                 </div>
                 <div class="form-row">
                     <div class="form-group">
-                        <label for="syStartMonthDay">Start Month & Day</label>
+                        <label for="syStartMonthDay">Start Date</label>
                         <input type="date" id="syStartMonthDay" name="syStartMonthDay" required>
                     </div>
                     <div class="form-group">
-                        <label for="syEndMonthDay">End Month & Day</label>
+                        <label for="syEndMonthDay">End Date</label>
                         <input type="date" id="syEndMonthDay" name="syEndMonthDay" required>
                     </div>
                 </div>
-
                 <div class="form-actions">
                     <button type="button" class="form-btn-cancel" onclick="closeAddSchoolYearModal()">Cancel</button>
-                    <button type="submit" class="form-btn-save" disabled>Save School Year</button>
+                    <button type="button" class="form-btn-save" id="saveSchoolYearBtn" onclick="doSaveSchoolYear()">Save School Year</button>
                 </div>
             </form>
         </div>
     </div>
 </div>
+
+<script>
+function autoFillEndYear() {
+    const startYear = document.getElementById('syStartYear')?.value;
+    const endYearField = document.getElementById('syEndYear');
+    const labelField = document.getElementById('schoolYearLabel');
+    
+    if (startYear && endYearField) {
+        const endYear = parseInt(startYear) + 1;
+        endYearField.value = endYear;
+        if (labelField) {
+            labelField.value = startYear + '-' + endYear;
+        }
+    }
+}
+
+async function doSaveSchoolYear() {
+    const schoolYearLabel = document.getElementById('schoolYearLabel')?.value;
+    const syStartYear = document.getElementById('syStartYear')?.value;
+    const syEndYear = document.getElementById('syEndYear')?.value;
+    const syStartMonthDay = document.getElementById('syStartMonthDay')?.value;
+    const syEndMonthDay = document.getElementById('syEndMonthDay')?.value;
+    
+    // Debug - show what's missing
+    let missing = [];
+    if (!schoolYearLabel) missing.push('Label');
+    if (!syStartYear) missing.push('Start Year');
+    if (!syEndYear) missing.push('End Year');
+    if (!syStartMonthDay) missing.push('Start Date');
+    if (!syEndMonthDay) missing.push('End Date');
+    
+    if (missing.length > 0) {
+        alert('Missing fields: ' + missing.join(', '));
+        return;
+    }
+    
+    // Construct full dates
+    const startParts = syStartMonthDay.split('-');
+    const endParts = syEndMonthDay.split('-');
+    const startDate = syStartYear + '-' + startParts[1] + '-' + startParts[2];
+    const endDate = syEndYear + '-' + endParts[1] + '-' + endParts[2];
+    
+    try {
+        const response = await fetch('./api/add_school_year.php', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ 
+                school_year_label: schoolYearLabel, 
+                year_start: parseInt(syStartYear), 
+                year_end: parseInt(syEndYear),
+                start_date: startDate,
+                end_date: endDate,
+                status: 'Inactive'
+            })
+        });
+        
+        const data = await response.json();
+        
+        if (data.status === 'success') {
+            alert(data.message);
+            closeAddSchoolYearModal();
+            document.getElementById('addSchoolYearForm').reset();
+            window.location.reload();
+        } else {
+            alert('Error: ' + data.message);
+        }
+    } catch (error) {
+        alert('Error: ' + error.message);
+    }
+}
+</script>
 
 <!-- Success Modal -->
 <div id="successModal" class="modal-overlay" style="display: none;">
@@ -207,7 +268,7 @@ document.getElementById('successOkBtn')?.addEventListener('click', closeSuccessM
     <div class="modal-content">
         <div class="modal-header">
             <h3>Add New Holiday</h3>
-            <span class="close-button" onclick="closeAddHolidayModal()">&times;</span>
+            <button type="button" class="close-button" onclick="closeAddHolidayModal()">&times;</button>
         </div>
         <div class="modal-body">
             <form id="addHolidayForm">
@@ -226,13 +287,10 @@ document.getElementById('successOkBtn')?.addEventListener('click', closeSuccessM
                     </div>
                 </div>
                 <div class="form-group">
-                    <div class="all-day-row">
-                        <label class="switch">
-                            <input type="checkbox" id="holidayAllDay" name="holidayAllDay">
-                            <span class="slider"></span>
-                        </label>
-                        <span>All Day</span>
-                    </div>
+                    <label class="switch-label">
+                        <input type="checkbox" id="holidayAllDay" name="holidayAllDay">
+                        <span class="switch-text">All Day Event</span>
+                    </label>
                 </div>
                 <div class="form-group">
                     <label for="holidayDescription">Description (Optional)</label>
@@ -252,7 +310,7 @@ document.getElementById('successOkBtn')?.addEventListener('click', closeSuccessM
     <div class="modal-content">
         <div class="modal-header">
             <h3>Schedule Maintenance</h3>
-            <span class="close-button" onclick="closeScheduleMaintenanceModal()">&times;</span>
+            <button type="button" class="close-button" onclick="closeScheduleMaintenanceModal()">&times;</button>
         </div>
         <div class="modal-body">
             <form id="scheduleMaintenanceForm">
@@ -285,7 +343,7 @@ document.getElementById('successOkBtn')?.addEventListener('click', closeSuccessM
                     <textarea id="maintenanceDescription" name="maintenanceDescription" rows="4" placeholder="Detailed description of the maintenance work..." required></textarea>
                 </div>
                 <div class="form-actions">
-                    <button type="button" class="form-btn-cancel">Cancel</button>
+                    <button type="button" class="form-btn-cancel" onclick="closeScheduleMaintenanceModal()">Cancel</button>
                     <button type="submit" class="form-btn-save" disabled>Schedule Maintenance</button>
                 </div>
             </form>
