@@ -93,22 +93,16 @@ include './modals/request_book_modal.php';
 
 <div class="top-navbar">
   <div class="top-navbar-content">
-    <div class="hamburger" onclick="toggleSidebar()" role="button" tabindex="0" aria-label="Toggle sidebar">
-      <span></span>
-      <span></span>
-      <span></span>
-    </div>
-    <img src="../src/assets/images/ASCOM_Monitoring_System.png" alt="Logo" class="logo-img" />
-    <div class="search-bar">
-      <img src="../src/assets/icons/search-icon.png" alt="Search Icon" />
-      <input type="text" placeholder="Search Here..." />
-    </div>
-    <div class="chats-icon">
-      <img src="../src/assets/icons/chats-icon.png" alt="Chats" />
-      <div class="chat-count">0</div>
-      <div class="chat-dropdown" id="chatsDropdown">
-        <h3>Chats</h3>
-        <div class="chats-empty">No new messages</div>
+    <div class="top-nav-left">
+      <div class="hamburger" onclick="toggleSidebar()" role="button" tabindex="0" aria-label="Toggle sidebar">
+        <span></span>
+        <span></span>
+        <span></span>
+      </div>
+      <img src="../src/assets/images/ASCOM_Monitoring_System.png" alt="Logo" class="logo-img" />
+      <div class="search-bar">
+        <img src="../src/assets/icons/search-icon.png" alt="Search Icon" />
+        <input type="text" placeholder="Search Here..." />
       </div>
     </div>
     <div class="notification-icon">
@@ -354,21 +348,6 @@ window.createEmergencyTooltips = createEmergencyTooltips;
 // CHAT AND NOTIFICATION FUNCTIONALITY
 
 // Initialize chats and notifications
-const chatsIcon = document.querySelector('.chats-icon');
-if (chatsIcon) {
-    chatsIcon.onclick = function(e) {
-        e.preventDefault();
-        e.stopPropagation();
-        const dropdown = document.getElementById('chatsDropdown');
-        if (dropdown) {
-            const currentDisplay = dropdown.style.display;
-            dropdown.style.display = currentDisplay === 'block' ? 'none' : 'block';
-        }
-    };
-    chatsIcon.style.cursor = 'pointer';
-    chatsIcon.style.pointerEvents = 'auto';
-} else {
-}
 
 const notificationIcon = document.querySelector('.notification-icon');
 if (notificationIcon) {
@@ -388,13 +367,6 @@ if (notificationIcon) {
 
 // Close dropdowns when clicking outside
 document.addEventListener('click', function(e) {
-    if (!e.target.closest('.chats-icon')) {
-        const chatsDropdown = document.getElementById('chatsDropdown');
-        if (chatsDropdown) {
-            chatsDropdown.style.display = 'none';
-        }
-    }
-    
     if (!e.target.closest('.notification-icon')) {
         const notificationDropdown = document.getElementById('notificationDropdown');
         if (notificationDropdown) {

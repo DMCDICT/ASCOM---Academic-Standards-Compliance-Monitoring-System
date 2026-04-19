@@ -249,1153 +249,611 @@ try {
 ?>
 
 <style>
-.dashboard-container {
-    margin-top: 0 !important;
-    padding-top: 0 !important;
+/* 
+ * Dean Dashboard Modernized Styles
+ * Aligned with DESIGN.md tokens
+ */
+
+/* 1. Entrance Animations */
+@keyframes fadeSlideUp {
+    from {
+        opacity: 0;
+        transform: translateY(18px) scale(0.985);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
 }
-.main-page-title {
-    margin-top: 0 !important;
-    padding-top: 0 !important;
+
+@keyframes statusPulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.55; }
 }
+
+/* 2. Page Container & Layout Overrides */
 .content-wrapper {
     margin-top: 102px !important;
     padding-top: 0 !important;
+    transition: all 0.3s ease;
 }
-.department-card {
-    /* Removed cursor: pointer - cards are no longer clickable */
+
+/* 3. Personalized Greeting Banner */
+.dashboard-greeting {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 24px;
+    margin-top: 0;
+    animation: fadeSlideUp 0.4s ease-out both;
 }
-    .program-card:hover {
-        transform: translateY(-5px);
-        box-shadow: 0 8px 25px rgba(0,0,0,0.15);
-    }
-
-    /* Empty Program Card Styling */
-    .empty-program-card {
-        background: #e3f2fd;
-        border: 2px dashed #90caf9;
-        cursor: default;
-        transition: all 0.3s ease;
-    }
-
-    .empty-program-card:hover {
-        transform: translateY(-3px);
-        box-shadow: 0 8px 20px rgba(33, 150, 243, 0.2);
-        border-color: #64b5f6;
-    }
-
-    .empty-program-card h3 {
-        color: #1976d2;
-    }
-
-    .empty-program-card p {
-        color: #64b5f6;
-        margin-bottom: 15px;
-    }
-
-    /* View Details Button Styling */
-    .view-details-btn {
-        background: #1976d2;
-        color: white;
-        border: none;
-        padding: 6px 18px;
-        border-radius: 6px;
-        font-size: 1rem;
-        font-weight: bold;
-        cursor: pointer;
-        transition: all 0.3s ease;
-        font-family: 'TT Interphases', sans-serif;
-        margin-top: auto;
-        align-self: flex-end;
-        width: auto;
-        box-shadow: 0 1px 4px rgba(0,0,0,0.07);
-    }
-
-    .view-details-btn:hover {
-        background: #1565c0;
-        transform: translateY(-1px);
-        box-shadow: 0 2px 8px rgba(25, 118, 210, 0.3);
-    }
-
-    /* Reference Requests Section Styling */
-    .dashboard-section {
-        margin-top: 30px;
-        background: white;
-        border-radius: 12px;
-        padding: 24px;
-        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-        width: 100%;
-        box-sizing: border-box;
-    }
-
-    .header-actions {
-        display: flex;
-        align-items: center;
-        gap: 12px;
-        transition: all 0.3s ease;
-        align-self: flex-end;
-    }
-
-    .section-header {
-        display: flex;
-        justify-content: space-between;
-        align-items: flex-start;
-        margin-bottom: 0;
-        padding: 0;
-        transition: all 0.3s ease;
-        align-items: center;
-    }
-
-    .header-left {
-        flex: 1;
-    }
-
-    .section-description {
-        color: #666;
-        font-size: 14px;
-        margin-top: 4px;
-        font-family: 'TT Interphases', sans-serif;
-    }
-
-    .header-left h3 {
-        margin: 0 0 8px 0;
-        color: #333;
-        font-size: 20px;
-        font-weight: 600;
-        font-family: 'TT Interphases', sans-serif;
-    }
-
-    .section-description {
-        font-size: 14px;
-        color: #666;
-        font-family: 'TT Interphases', sans-serif;
-        line-height: 1.4;
-    }
-
-    .header-actions {
-        display: flex;
-        align-items: center;
-        gap: 12px;
-    }
-
-    .view-all-btn {
-        background: #f5f5f5;
-        border: 1px solid #e0e0e0;
-        border-radius: 6px;
-        padding: 8px 16px;
-        font-size: 14px;
-        font-weight: 500;
-        color: #666;
-        text-decoration: none;
-        transition: all 0.2s ease;
-        font-family: 'TT Interphases', sans-serif;
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        margin-top: 0;
-        margin-bottom: 0;
-        margin-left: 0;
-        margin-right: 0;
-        cursor: pointer;
-    }
-    
-    /* Button container for program management expand/collapse */
-    .program-buttons-container {
-        width: 100% !important;
-        display: flex !important;
-        justify-content: center !important;
-        align-items: center !important;
-        gap: 10px;
-        margin-top: 20px;
-        margin-bottom: 80px;
-        text-align: center;
-    }
-
-    .view-all-btn:hover {
-        color: #1565c0;
-        background: #1976d2;
-        color: white;
-        border-color: #1976d2;
-    }
-
-    .nav-btn {
-        background: #f5f5f5;
-        border: 1px solid #e0e0e0;
-        border-radius: 6px;
-        padding: 8px 12px;
-        font-size: 16px;
-        font-weight: 600;
-        color: #666;
-        cursor: pointer;
-        transition: all 0.2s ease;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        width: 40px;
-        height: 40px;
-        font-family: 'TT Interphases', sans-serif;
-    }
-
-    .nav-btn:hover {
-        background: #1976d2;
-        color: white;
-        border-color: #1976d2;
-        transform: translateY(-1px);
-    }
-
-    .nav-btn:disabled {
-        background: #f0f0f0;
-        color: #ccc;
-        cursor: not-allowed;
-        transform: none;
-    }
-
-    .section-footer {
-        display: flex;
-        justify-content: flex-end;
-        align-items: center;
-        margin-top: 20px;
-        gap: 12px;
-    }
-
-    .collapse-btn {
-        background: #f5f5f5;
-        border: 1px solid #e0e0e0;
-        border-radius: 6px;
-        padding: 8px 16px;
-        font-size: 14px;
-        font-weight: 500;
-        color: #666;
-        cursor: pointer;
-        transition: all 0.2s ease;
-        font-family: 'TT Interphases', sans-serif;
-        display: flex;
-        align-items: center;
-        gap: 8px;
-        white-space: nowrap;
-    }
-
-    .collapse-btn:hover {
-        background: #1976d2;
-        color: white;
-        border-color: #1976d2;
-        transform: translateY(-1px);
-    }
-
-    .collapse-icon {
-        font-size: 12px;
-        font-weight: bold;
-    }
-
-    .request-count-badge {
-        background: #ff4c4c;
-        color: white;
-        border-radius: 50%;
-        width: 32px;
-        height: 32px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 14px;
-        font-weight: 700;
-        font-family: 'TT Interphases', sans-serif;
-        box-shadow: 0 2px 4px rgba(0,0,0,0.2);
-    }
-
-    .collapsed-header {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        padding: 20px;
-        border-radius: 12px;
-        border: 1px solid #e9ecef;
-        margin: 10px 0;
-    }
-
-    .collapsed-header-left {
-        flex: 1;
-    }
-
-    .collapsed-header-right {
-        display: flex;
-        align-items: center;
-        gap: 12px;
-    }
-
-    .request-count {
-        background: #e3f2fd;
-        color: #1976d2;
-        padding: 4px 8px;
-        border-radius: 12px;
-        font-size: 12px;
-        font-weight: 600;
-        min-width: 20px;
-        text-align: center;
-        display: inline-block;
-        margin-left: 8px;
-        vertical-align: middle;
-        order: 2;
-    }
-
-    .reference-requests-container {
-        background: transparent;
-        border-radius: 12px;
-        padding: 10px;
-        margin: 10px 0;
-        border: none;
-        overflow: visible;
-        position: relative;
-        width: 100%;
-        max-width: 1000px;
-        margin-left: auto;
-        margin-right: auto;
-    }
-
-    .reference-requests-grid {
-        display: flex;
-        gap: 15px;
-        padding: 0;
-        overflow: visible;
-        flex-wrap: nowrap;
-        align-items: stretch;
-        min-height: 200px;
-        justify-content: center;
-        width: 100%;
-        max-width: none;
-        margin: 0 auto;
-        margin-top: 20px !important;
-    }
-
-    .reference-request-card {
-        min-width: 280px;
-        max-width: none;
-        background: white;
-        border: 1px solid #e9ecef;
-        border-radius: 10px;
-        padding: 20px;
-        cursor: pointer;
-        transition: all 0.3s ease;
-        box-shadow: 0 2px 8px rgba(0,0,0,0.06);
-        flex-shrink: 0;
-        flex-basis: 280px;
-        flex-grow: 1;
-        display: flex;
-        flex-direction: column;
-        justify-content: space-between;
-        position: relative;
-        overflow: hidden;
-        margin: 0;
-    }
-
-    .reference-request-card::before {
-        content: '';
-        position: absolute;
-        top: 0;
-        left: 0;
-        right: 0;
-        height: 4px;
-        background: linear-gradient(90deg, #1976d2, #42a5f5, #90caf9);
-        opacity: 0;
-        transition: opacity 0.3s ease;
-    }
-
-    .reference-request-card:hover {
-        transform: translateY(-6px);
-        box-shadow: 0 8px 24px rgba(0,0,0,0.15);
-        border-color: #1976d2;
-    }
-
-    .reference-request-card:hover::before {
-        opacity: 1;
-    }
-
-    .request-header {
-        display: flex;
-        justify-content: space-between;
-        align-items: flex-start;
-        margin-bottom: 16px;
-    }
-
-    .requester-info {
-        flex: 1;
-    }
-
-    .requester-name {
-        font-weight: 600;
-        color: #333;
-        font-size: 14px;
-        margin-bottom: 4px;
-        font-family: 'TT Interphases', sans-serif;
-    }
-
-    .requester-role {
-        font-size: 11px;
-        color: #1976d2;
-        font-weight: 600;
-        text-transform: uppercase;
-        margin-bottom: 2px;
-        font-family: 'TT Interphases', sans-serif;
-    }
-
-    .faculty-department {
-        font-size: 12px;
-        font-weight: 600;
-        text-transform: uppercase;
-        margin-bottom: 4px;
-        font-family: 'TT Interphases', sans-serif;
-        padding: 0;
-        display: inline-block;
-    }
-
-    .requester-id {
-        font-size: 12px;
-        color: #666;
-        font-family: 'TT Interphases', sans-serif;
-    }
-
-    .priority-badge {
-        padding: 4px 12px;
-        border-radius: 20px;
-        font-size: 11px;
-        font-weight: 600;
-        text-transform: uppercase;
-        font-family: 'TT Interphases', sans-serif;
-        white-space: nowrap;
-        letter-spacing: 0.5px;
-    }
-
-    .priority-high {
-        background: #FF4C4C;
-        color: white;
-    }
-
-    .priority-medium {
-        background: #FFA500;
-        color: white;
-    }
-
-    .priority-low {
-        background: #4CAF50;
-        color: white;
-    }
-
-    .course-info {
-        display: flex;
-        align-items: center;
-        gap: 8px;
-        margin-bottom: 12px;
-        background: #f5f5f5;
-        padding: 8px 12px;
-        border-radius: 6px;
-    }
-
-    .course-code {
-        background: #1976d2;
-        color: white;
-        padding: 4px 8px;
-        border-radius: 4px;
-        font-size: 12px;
-        font-weight: 600;
-        font-family: 'TT Interphases', sans-serif;
-    }
-
-    .course-name {
-        font-size: 13px;
-        color: #666;
-        font-family: 'TT Interphases', sans-serif;
-        flex: 1;
-    }
-
-    .semester-info {
-        font-size: 11px;
-        color: #666;
-        font-family: 'TT Interphases', sans-serif;
-        font-style: italic;
-    }
-
-
-
-
-
-    .request-footer {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        margin-top: auto;
-    }
-
-    .status-badge {
-        padding: 6px 10px;
-        border-radius: 12px;
-        font-size: 10px;
-        font-weight: 600;
-        text-transform: uppercase;
-        font-family: 'TT Interphases', sans-serif;
-        white-space: nowrap;
-    }
-
-    .status-pending {
-        background: #fff3e0;
-        color: #ef6c00;
-    }
-
-    .status-pending-approval {
-        background: #fff3e0;
-        color: #ef6c00;
-    }
-
-    .status-approved {
-        background: #e8f5e8;
-        color: #2e7d32;
-    }
-
-    .status-rejected {
-        background: #ffebee;
-        color: #c62828;
-    }
-
-    .status-draft {
-        background: #C0C0C0;
-        color: white;
-    }
-
-    .resume-draft-btn:hover {
-        background: #1565c0 !important;
-    }
-
-    .delete-draft-btn:hover {
-        background: #c82333 !important;
-    }
-
-    .request-date {
-        font-size: 11px;
-        color: #999;
-        font-family: 'TT Interphases', sans-serif;
-        text-align: center;
-        margin-top: 8px;
-        font-style: italic;
-    }
-
-    .view-all-btn {
-        display: inline-block;
-        background: linear-gradient(135deg, #1976d2 0%, #1565c0 100%);
-        color: white;
-        text-decoration: none;
-        padding: 12px 24px;
-        border-radius: 8px;
-        font-weight: 600;
-        font-size: 14px;
-        transition: all 0.3s ease;
-        font-family: 'TT Interphases', sans-serif;
-        box-shadow: 0 4px 12px rgba(25, 118, 210, 0.3);
-        border: 1px solid rgba(255, 255, 255, 0.2);
-        text-transform: uppercase;
-        letter-spacing: 0.5px;
-    }
-
-    .view-all-btn:hover {
-        background: linear-gradient(135deg, #1565c0 0%, #0d47a1 100%);
-        color: white;
-        text-decoration: none;
-        transform: translateY(-2px);
-        box-shadow: 0 6px 16px rgba(25, 118, 210, 0.4);
-    }
-
-    .request-summary {
-        margin-bottom: 16px;
-        flex: 1;
-    }
-
-    .request-type {
-        font-size: 11px;
-        color: #666;
-        margin-bottom: 8px;
-        font-family: 'TT Interphases', sans-serif;
-        text-transform: uppercase;
-        letter-spacing: 0.5px;
-        background: #f0f0f0;
-        padding: 4px 8px;
-        border-radius: 4px;
-        display: inline-block;
-    }
-
-    .material-title {
-        font-size: 13px;
-        color: #333;
-        font-family: 'Georgia', serif;
-        line-height: 1.4;
-        font-style: italic;
-    }
-
-    .action-buttons {
-        display: flex;
-        gap: 8px;
-        margin-bottom: 16px;
-    }
-
-    .approve-btn, .reject-btn {
-        flex: 1;
-        padding: 8px 16px;
-        border: none;
-        border-radius: 6px;
-        font-size: 12px;
-        font-weight: 600;
-        font-family: 'TT Interphases', sans-serif;
-        cursor: pointer;
-        transition: all 0.2s ease;
-    }
-
-    .approve-btn {
-        background: #4caf50;
-        color: white;
-    }
-
-    .approve-btn:hover {
-        background: #45a049;
-        transform: translateY(-1px);
-    }
-
-    .reject-btn {
-        background: #f44336;
-        color: white;
-    }
-
-    .reject-btn:hover {
-        background: #da190b;
-        transform: translateY(-1px);
-    }
-
-    .status-display {
-        width: 100%;
-        padding: 8px 16px;
-        border-radius: 6px;
-        font-size: 12px;
-        font-weight: 600;
-        font-family: 'TT Interphases', sans-serif;
-        text-align: center;
-        text-transform: uppercase;
-        box-sizing: border-box;
-        overflow: hidden;
-        text-overflow: ellipsis;
-        white-space: nowrap;
-    }
-
-    .collapsed-controls {
-        display: flex;
-        align-items: center;
-        gap: 12px;
-        margin-top: 10px;
-    }
-
-    .expand-btn {
-        background: #f5f5f5;
-        border: 1px solid #e0e0e0;
-        border-radius: 6px;
-        padding: 8px 16px;
-        font-size: 14px;
-        font-weight: 500;
-        color: #666;
-        cursor: pointer;
-        transition: all 0.2s ease;
-        font-family: 'TT Interphases', sans-serif;
-        display: flex;
-        align-items: center;
-        gap: 8px;
-        white-space: nowrap;
-    }
-
-    .expand-btn:hover {
-        background: #1976d2;
-        color: white;
-        border-color: #1976d2;
-        transform: translateY(-1px);
-    }
-
-    .nav-icon {
-        width: 16px;
-        height: 16px;
-        object-fit: contain;
-    }
-        
-    .collapse-icon {
-        width: 14px;
-        height: 14px;
-        object-fit: contain;
-    }
-        
-        /* Color effects ONLY for the specific Course Material Requests icons */
-        .course-nav-btn .nav-icon,
-        .course-nav-btn .collapse-icon {
-            filter: brightness(0) saturate(100%);
-            transition: filter 0.2s ease;
-        }
-        
-        /* Hover effects ONLY for Course Material Requests navigation and collapse/expand icons */
-        .course-nav-btn:hover .nav-icon,
-        .course-nav-btn:hover .collapse-icon {
-            filter: brightness(0) saturate(100%) invert(1);
-        }
-        
-        /* Course Material Requests Section - Full Width Layout */
-        .reference-requests-container {
-            width: 100% !important;
-            max-width: 100% !important;
-            padding: 0 !important;
-            margin: 0 !important;
-            margin-top: 20px !important;
-            box-sizing: border-box !important;
-        }
-        
-        .reference-requests-container .reference-requests-grid {
-            display: flex !important;
-            flex-wrap: wrap !important;
-            gap: 20px !important;
-            justify-content: flex-start !important;
-            width: 100% !important;
-            max-width: 100% !important;
-            margin: 0 !important;
-            padding: 0 !important;
-        }
-        
-        .reference-requests-container .reference-request-card {
-            flex: 0 0 calc((100% - 60px) / 4) !important;
-            min-width: calc((100% - 60px) / 4) !important;
-            max-width: calc((100% - 60px) / 4) !important;
-            padding: 20px !important;
-            box-sizing: border-box !important;
-            transition: all 0.3s ease !important;
-            width: calc((100% - 60px) / 4) !important;
-            flex-grow: 0 !important;
-            flex-shrink: 0 !important;
-        }
-        
-        /* Specifically for course proposals grid - ensure fixed width */
-        #courseProposalsGrid .reference-request-card {
-            width: 280px !important;
-            min-width: 280px !important;
-            max-width: 280px !important;
-            flex: 0 0 280px !important;
-            flex-grow: 0 !important;
-            flex-shrink: 0 !important;
-        }
-        
-        /* Cards automatically adjust to fill available space */
-        .reference-requests-container .reference-request-card:hover {
-            transform: translateY(-2px) !important;
-            box-shadow: 0 8px 25px rgba(0,0,0,0.15) !important;
-        }
-        
-        /* Responsive breakpoints for 4-card layout */
-        @media screen and (max-width: 1400px) {
-            .reference-requests-container .reference-request-card {
-                flex: 0 0 calc(33.333% - 20px) !important;
-                min-width: 300px !important;
-            }
-        }
-        
-        @media screen and (max-width: 1200px) {
-            .reference-requests-container .reference-request-card {
-                flex: 0 0 calc(50% - 20px) !important;
-            }
-        }
-        
-        @media screen and (max-width: 768px) {
-            .reference-requests-container .reference-requests-grid {
-                flex-direction: column !important;
-                align-items: stretch !important;
-            }
-            
-            .reference-requests-container .reference-request-card {
-                flex: 1 1 100% !important;
-                min-width: 100% !important;
-                max-width: 100% !important;
-                padding: 20px !important;
-            }
-        }
-        
-        /* Very small screens */
-        @media screen and (max-width: 480px) {
-            .reference-requests-container .reference-request-card {
-                padding: 16px !important;
-                border: 2px solid #2196F3 !important;
-            }
-        }
-
-        /* Summary line styling */
-        .reference-requests-summary {
-            background: #f8f9fa;
-            border: 1px solid #e9ecef;
-        border-radius: 8px;
-            padding: 20px;
-            margin: 20px 0;
-            text-align: center;
-        }
-        
-        .summary-content {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 20px;
-            flex-wrap: wrap;
-        }
-        
-        .summary-item {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 8px;
-        }
-        
-        .summary-number {
-            font-size: 24px;
-            font-weight: 700;
-            color: #1976d2;
-        }
-        
-        .summary-label {
-        font-size: 14px;
-            color: #666;
-        text-transform: uppercase;
-        letter-spacing: 0.5px;
-    }
-
-        .summary-divider {
-            width: 1px;
-            height: 40px;
-            background: #dee2e6;
-        }
-    
-    .status-approved-btn {
-        background: #e8f5e8;
-        color: #2e7d32;
-        cursor: default;
-        opacity: 0.8;
-        padding: 8px 16px;
-        border-radius: 6px;
-        font-size: 12px;
-        font-weight: 600;
-        text-transform: none;
-        font-family: 'TT Interphases', sans-serif;
-        border: none;
-        width: 100%;
-    }
-    
-    .status-rejected-btn {
-        background: #ffebee;
-        color: #c62828;
-        cursor: default;
-        opacity: 0.8;
-        padding: 8px 16px;
-        border-radius: 6px;
-        font-size: 12px;
-        font-weight: 600;
-        text-transform: none;
-        font-family: 'TT Interphases', sans-serif;
-        border: none;
-        width: 100%;
-    }
-
-    /* Floating Back to Top Button Styles */
-    .back-to-top-btn {
-        position: fixed !important;
-        bottom: 30px !important;
-        right: 30px !important;
-        left: auto !important;
-        width: 50px;
-        height: 50px;
-        background: #1976d2;
-        color: white;
-        border: none;
-        border-radius: 25px;
-        font-size: 20px;
-        font-weight: bold;
-        cursor: pointer;
-        transition: all 0.3s ease;
-        box-shadow: 0 4px 12px rgba(25, 118, 210, 0.3);
-        z-index: 1000;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        opacity: 0;
-        visibility: hidden;
-        transform: translateY(20px);
-        overflow: hidden;
-        white-space: nowrap;
-    }
-    
-    /* Ensure no duplicate buttons appear on the left */
-    .back-to-top-btn:not(:first-of-type) {
-        display: none !important;
-    }
-
-    .back-to-top-btn:hover {
-        background: #1565c0;
-        transform: translateY(-5px);
-        box-shadow: 0 6px 16px rgba(25, 118, 210, 0.4);
-        width: 140px;
-        border-radius: 25px;
-    }
-
-    .back-to-top-btn:active {
-        transform: translateY(-2px);
-        box-shadow: 0 4px 12px rgba(25, 118, 210, 0.3);
-    }
-
-    .back-to-top-btn.show {
-        opacity: 1;
-        visibility: visible;
-        transform: translateY(0);
-    }
-
-    .back-to-top-btn .arrow {
-        width: 20px;
-        height: 20px;
-        transition: all 0.3s ease;
-        position: absolute;
-        left: 50%;
-        transform: translateX(-50%) rotate(90deg);
-        filter: brightness(0) invert(1);
-    }
-
-    .back-to-top-btn .text {
-        position: absolute;
-        left: 50%;
-        transform: translateX(-50%) translateX(-10px);
-        font-size: 14px;
-        font-weight: 500;
-        font-family: 'TT Interphases', sans-serif;
-        opacity: 0;
-        transition: all 0.3s ease;
-        white-space: nowrap;
-    }
-
-    .back-to-top-btn:hover .arrow {
-        left: 20px;
-        transform: translateX(0) rotate(90deg);
-        margin-right: 8px;
-    }
-
-    .back-to-top-btn:hover .text {
-        opacity: 1;
-        left: 43px;
-        transform: translateX(0);
-    }
-
-    /* Responsive floating back to top button */
-    @media (max-width: 768px) {
-        .back-to-top-btn {
-            bottom: 20px;
-            right: 20px;
-            width: 45px;
-            height: 45px;
-            font-size: 18px;
-        }
-        
-        .back-to-top-btn:hover {
-            width: 120px;
-        }
-        
-        .back-to-top-btn .arrow {
-            width: 18px;
-            height: 18px;
-        }
-        
-        .back-to-top-btn .text {
-            font-size: 13px;
-        }
-    }
-
-    /* Academic Term Selector Styles */
-    .term-selector-container {
-        display: flex;
-        align-items: center;
-        gap: 12px;
-        margin-top: 15px;
-        margin-bottom: 15px;
-    }
-
-    .term-selector-label {
-        font-size: 14px;
-        font-weight: 600;
-        color: #333;
-        font-family: 'TT Interphases', sans-serif;
-    }
-
-    .term-dropdown {
-        flex: 1;
-        max-width: 300px;
-        padding: 10px 16px;
-        border: 2px solid #e0e0e0;
-        border-radius: 8px;
-        font-size: 14px;
-        font-weight: 500;
-        color: #333;
-        font-family: 'TT Interphases', sans-serif;
-        background: white;
-        cursor: pointer;
-        transition: all 0.2s ease;
-        outline: none;
-    }
-
-    .term-dropdown:hover {
-        border-color: #1976d2;
-    }
-
-    .term-dropdown:focus {
-        border-color: #1976d2;
-        box-shadow: 0 0 0 3px rgba(25, 118, 210, 0.1);
-    }
-
-    .current-term-btn {
-        padding: 10px 20px;
-        background: linear-gradient(135deg, #1976d2 0%, #1565c0 100%);
-        color: white;
-        border: none;
-        border-radius: 8px;
-        font-size: 14px;
-        font-weight: 600;
-        font-family: 'TT Interphases', sans-serif;
-        cursor: pointer;
-        transition: all 0.3s ease;
-        box-shadow: 0 2px 8px rgba(25, 118, 210, 0.3);
-        white-space: nowrap;
-    }
-
-    .current-term-btn:hover {
-        background: linear-gradient(135deg, #1565c0 0%, #0d47a1 100%);
-        transform: translateY(-2px);
-        box-shadow: 0 4px 12px rgba(25, 118, 210, 0.4);
-    }
-
-    .current-term-btn:active {
-        transform: translateY(0);
-    }
-
-    .current-term-btn:disabled {
-        background: #9e9e9e;
-        color: #ffffff;
-        cursor: not-allowed;
-        opacity: 0.85;
-        box-shadow: none;
-    }
-
-    .current-term-btn:disabled:hover {
-        background: #9e9e9e;
-        color: #ffffff;
-        transform: none;
-        box-shadow: none;
-    }
-
-    .selected-term-display {
-        display: inline-flex;
-        align-items: center;
-        gap: 8px;
-        padding: 8px 16px;
-        background: #e3f2fd;
-        border: 1px solid #90caf9;
-        border-radius: 6px;
-        font-size: 13px;
-        font-weight: 600;
-        color: #1976d2;
-        font-family: 'TT Interphases', sans-serif;
-    }
-
-    .selected-term-display .term-icon {
-        width: 16px;
-        height: 16px;
-    }
-
-    @media (max-width: 768px) {
-        .term-selector-container {
-            flex-direction: column;
-            align-items: stretch;
-        }
-
-        .term-dropdown {
-            max-width: 100%;
-        }
-    }
-    
-    /* Loading animation for term selector */
-    @keyframes loading {
-        0% {
-            background-position: 200% 0;
-        }
-        100% {
-            background-position: -200% 0;
-        }
-    }
-    /* Course Proposal Details Modal */
-    .course-proposal-details-modal {
-        display: none;
-        position: fixed;
-        z-index: 10000;
-        left: 0;
-        top: 0;
-        width: 100%;
-        height: 100%;
-        background-color: rgba(0, 0, 0, 0.5);
-        align-items: center;
-        justify-content: center;
-        animation: fadeIn 0.3s ease;
-    }
-    
-    @keyframes fadeIn {
-        from {
-            opacity: 0;
-        }
-        to {
-            opacity: 1;
-        }
-    }
-    
-    .course-proposal-details-modal .modal-content-details {
-        animation: slideUp 0.3s ease;
-    }
-    
-    @keyframes slideUp {
-        from {
-            transform: translateY(50px);
-            opacity: 0;
-        }
-        to {
-            transform: translateY(0);
-            opacity: 1;
-        }
-    }
-    
-    .view-attachment-btn:hover {
-        background: #1565c0 !important;
-    }
-    
-    .download-attachment-btn:hover {
-        background: #45a049 !important;
-    }
-    
-    .close-modal:hover {
-        color: #333 !important;
-    }
+
+.greeting-text h2 {
+    font-size: 24px;
+    font-weight: 800;
+    color: #053423;
+    margin: 0 0 4px 0;
+    font-family: 'TT Interphases', sans-serif;
+    line-height: 1.25;
+}
+
+.greeting-text p {
+    font-size: 14px;
+    color: rgba(17, 24, 39, 0.55);
+    margin: 0;
+    font-weight: 600;
+    letter-spacing: 0.2px;
+}
+
+.dept-badge-container {
+    display: flex;
+    align-items: center;
+}
+
+.dept-badge {
+    background: #0C4B34;
+    color: #ffffff;
+    font-weight: 800;
+    border-radius: 12px;
+    padding: 10px 20px;
+    font-size: 14px;
+    letter-spacing: 1px;
+    box-shadow: 0 4px 12px rgba(12, 75, 52, 0.2);
+    text-transform: uppercase;
+}
+
+/* 4. Overview Section & Stats */
+.section-label {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 20px;
+    margin-top: 32px;
+    animation: fadeSlideUp 0.4s ease-out 0.05s both;
+    gap: 14px;
+}
+
+.label-left {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.label-left h2 {
+    font-size: 18px;
+    font-weight: 800;
+    color: #0C4B34;
+    margin: 0;
+    font-family: 'TT Interphases', sans-serif;
+}
+
+.label-bar {
+    width: 4px;
+    height: 20px;
+    border-radius: 2px;
+    background: linear-gradient(180deg, #0C4B34 0%, #0F7A53 100%);
+    flex-shrink: 0;
+}
+
+/* 5. Overview Cards System */
+.dashboard-stats-grid { 
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 18px; 
+    padding: 0;
+    margin-bottom: 28px;
+}
+
+.box {
+    background-color: #ffffff; 
+    padding: 24px;
+    border-radius: 18px; 
+    border: 1px solid rgba(12, 75, 52, 0.14);
+    box-shadow: 0 4px 18px rgba(0,0,0,0.04); 
+    display: flex;
+    align-items: center;
+    gap: 18px;
+    position: relative;
+    overflow: hidden;
+    transition: all 0.28s cubic-bezier(.4,0,.2,1);
+    animation: fadeSlideUp 0.45s ease-out both;
+}
+
+.box.box-link {
+    width: 100%;
+    text-align: left;
+    cursor: pointer;
+}
+
+.box.box-link:focus-visible {
+    outline: 3px solid rgba(12, 75, 52, 0.28);
+    outline-offset: 3px;
+}
+
+.box:nth-child(1) { animation-delay: 0.1s; }
+.box:nth-child(2) { animation-delay: 0.2s; }
+.box:nth-child(3) { animation-delay: 0.3s; }
+
+.box:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 12px 36px rgba(12, 75, 52, 0.12);
+    border-color: rgba(12, 75, 52, 0.25);
+}
+
+.box::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 3px;
+    background: linear-gradient(90deg, #0C4B34 0%, #0F7A53 100%);
+}
+
+.box-icon {
+    width: 48px;
+    height: 48px;
+    border-radius: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(12, 75, 52, 0.08);
+    color: #0C4B34;
+    font-size: 22px;
+}
+
+.box-icon svg,
+.qa-icon svg,
+.nav-btn svg,
+.collapse-btn svg,
+.expand-btn svg,
+.back-to-top-btn svg,
+.lucide-inline-icon svg {
+    width: 20px;
+    height: 20px;
+}
+
+.box-icon svg {
+    width: 22px;
+    height: 22px;
+}
+
+.qa-icon svg {
+    width: 18px;
+    height: 18px;
+}
+
+.nav-btn svg {
+    width: 18px;
+    height: 18px;
+    opacity: 0.7;
+}
+
+.course-nav-btn svg {
+    width: 18px;
+    height: 18px;
+    opacity: 0.8;
+}
+
+.box-content {
+    display: flex;
+    flex-direction: column;
+}
+
+.box-label {
+    font-size: 12px;
+    font-weight: 700;
+    color: rgba(17, 24, 39, 0.5);
+    text-transform: uppercase;
+    letter-spacing: 0.6px;
+    margin-bottom: 4px;
+}
+
+.amount {
+    font-size: 28px;
+    font-weight: 800;
+    color: #111827;
+    line-height: 1;
+    margin: 0;
+}
+
+/* 6. Dashboard Sections Components */
+.dashboard-section {
+    margin-top: 32px;
+    background: #ffffff;
+    border-radius: 20px;
+    padding: 26px;
+    border: 1px solid rgba(12, 75, 52, 0.12);
+    box-shadow: 0 4px 20px rgba(0,0,0,0.03);
+    width: 100%;
+    box-sizing: border-box;
+    animation: fadeSlideUp 0.5s ease-out 0.4s both;
+}
+
+.section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 24px;
+}
+
+.header-left h3 {
+    margin: 0 0 4px 0;
+    color: #053423;
+    font-size: 20px;
+    font-weight: 800;
+}
+
+.section-description {
+    color: rgba(17, 24, 39, 0.55);
+    font-size: 13px;
+    font-weight: 600;
+}
+
+/* 7. Action Buttons & Controls */
+.view-all-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(12, 75, 52, 0.06);
+    color: #0C4B34;
+    border: 1px solid rgba(12, 75, 52, 0.12);
+    padding: 10px 20px;
+    border-radius: 10px;
+    font-size: 13px;
+    font-weight: 700;
+    text-decoration: none;
+    transition: all 0.2s ease;
+}
+
+.view-all-btn:focus-visible {
+    outline: 3px solid rgba(12, 75, 52, 0.28);
+    outline-offset: 3px;
+}
+
+.view-all-btn:hover {
+    background: #0C4B34;
+    color: #ffffff;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(12, 75, 52, 0.2);
+}
+
+.nav-btn {
+    background: #ffffff;
+    border: 1px solid #e5e7eb;
+    border-radius: 10px;
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.nav-btn:hover:not(:disabled) {
+    border-color: #0C4B34;
+    color: #0C4B34;
+    background: rgba(12, 75, 52, 0.04);
+}
+
+.nav-btn:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+}
+
+/* Term Selector */
+.term-selector-wrapper {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 12px;
+    border-radius: 12px;
+    background: rgba(12, 75, 52, 0.04);
+    border: 1px solid rgba(12, 75, 52, 0.12);
+}
+
+.term-label {
+    font-size: 12px;
+    font-weight: 700;
+    color: rgba(12, 75, 52, 0.6);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    white-space: nowrap;
+}
+
+.term-dropdown {
+    border: none;
+    background: transparent;
+    color: #0C4B34;
+    font-weight: 800;
+    font-size: 13px;
+    padding: 6px 8px;
+    border-radius: 10px;
+    outline: none;
+    cursor: pointer;
+}
+
+.term-dropdown:focus-visible {
+    outline: 3px solid rgba(12, 75, 52, 0.22);
+    outline-offset: 2px;
+}
+
+.current-term-btn {
+    background: #0C4B34;
+    color: #ffffff;
+    border: none;
+    border-radius: 10px;
+    padding: 8px 12px;
+    font-size: 12px;
+    font-weight: 800;
+    letter-spacing: 0.2px;
+    cursor: pointer;
+    transition: all 0.22s cubic-bezier(.4,0,.2,1);
+}
+
+.current-term-btn:hover:not(:disabled) {
+    background: #0a3a28;
+    transform: translateY(-1px);
+    box-shadow: 0 8px 18px rgba(12, 75, 52, 0.16);
+}
+
+.current-term-btn:focus-visible {
+    outline: 3px solid rgba(12, 75, 52, 0.28);
+    outline-offset: 3px;
+}
+
+.current-term-btn:disabled {
+    opacity: 0.55;
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: none;
+}
+
+/* Quick Actions */
+.quick-actions {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 12px;
+    margin: 8px 0 4px 0;
+    animation: fadeSlideUp 0.45s ease-out 0.12s both;
+}
+
+.quick-action {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    background: #ffffff;
+    border: 1px solid rgba(12, 75, 52, 0.14);
+    border-radius: 14px;
+    padding: 12px 14px;
+    color: #0C4B34;
+    font-weight: 800;
+    font-size: 13px;
+    text-decoration: none;
+    cursor: pointer;
+    transition: all 0.28s cubic-bezier(.4,0,.2,1);
+    box-shadow: 0 4px 18px rgba(0,0,0,0.03);
+}
+
+.quick-action:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 12px 28px rgba(12, 75, 52, 0.10);
+    border-color: rgba(12, 75, 52, 0.25);
+}
+
+.quick-action:focus-visible {
+    outline: 3px solid rgba(12, 75, 52, 0.28);
+    outline-offset: 3px;
+}
+
+.quick-action .qa-icon {
+    width: 28px;
+    height: 28px;
+    border-radius: 10px;
+    background: rgba(12, 75, 52, 0.08);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #0C4B34;
+}
+
+/* 8. Card Grid Systems */
+.reference-requests-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 18px;
+}
+
+.reference-request-card {
+    background: #ffffff;
+    border-radius: 16px;
+    border: 1px solid rgba(12, 75, 52, 0.1);
+    padding: 20px;
+    transition: all 0.3s ease;
+    display: flex;
+    flex-direction: column;
+    position: relative;
+    overflow: hidden;
+    height: 100%;
+}
+
+.reference-request-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 12px 30px rgba(0,0,0,0.08);
+    border-color: rgba(12, 75, 52, 0.2);
+}
+
+.reference-request-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 4px;
+    background: #0C4B34;
+    opacity: 0.8;
+}
+
+/* 9. Specialized Badges & Indicators */
+.status-badge {
+    padding: 6px 12px;
+    border-radius: 8px;
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.4px;
+    display: inline-flex;
+    align-items: center;
+    width: fit-content;
+}
+
+.status-pending { background: #fff7ed; color: #9a3412; border: 1px solid #ffedd5; }
+.status-approved { background: #f0fdf4; color: #166534; border: 1px solid #dcfce7; }
+.status-rejected { background: #fef2f2; color: #991b1b; border: 1px solid #fee2e2; }
+.status-draft { background: #f9fafb; color: #374151; border: 1px solid #f3f4f6; }
+
+/* 10. Custom Scrollbar for Grids */
+.reference-requests-container::-webkit-scrollbar {
+    height: 6px;
+}
+
+.reference-requests-container::-webkit-scrollbar-track {
+    background: #f1f1f1;
+}
+
+.reference-requests-container::-webkit-scrollbar-thumb {
+    background: #ccc;
+    border-radius: 3px;
+}
+
+.reference-requests-container::-webkit-scrollbar-thumb:hover {
+    background: #999;
+}
+
+/* 12. Floating Back to Top Modernization */
+.back-to-top-btn {
+    position: fixed !important;
+    bottom: 32px !important;
+    right: 32px !important;
+    width: 48px !important;
+    height: 48px !important;
+    background: #0C4B34 !important;
+    color: white !important;
+    border-radius: 14px !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    cursor: pointer !important;
+    box-shadow: 0 8px 25px rgba(12, 75, 52, 0.3) !important;
+    transition: all 0.3s cubic-bezier(.4,0,.2,1) !important;
+    z-index: 999 !important;
+    border: none !important;
+    padding: 0 !important;
+}
+
+.back-to-top-btn:hover {
+    transform: translateY(-5px) scale(1.05) !important;
+    box-shadow: 0 12px 30px rgba(12, 75, 52, 0.4) !important;
+    background: #0a3a28 !important;
+}
+
+.back-to-top-btn span {
+    display: none !important; /* Hide the legacy text */
+}
+
+.back-to-top-btn img {
+    width: 22px !important;
+    height: 22px !important;
+    filter: brightness(0) invert(1) !important;
+    transform: rotate(270deg) !important;
+}
+
+.back-to-top-btn .arrow {
+    width: 22px !important;
+    height: 22px !important;
+    color: #ffffff !important;
+}
+
+/* Dark Mode Integration */
+html[data-theme="dark"] .dashboard-greeting h2 { color: #f0f0f0; }
+html[data-theme="dark"] .box { background: #1e1e1e; border-color: #333; }
+html[data-theme="dark"] .amount { color: #f0f0f0; }
+html[data-theme="dark"] .dashboard-section { background: #1e1e1e; border-color: #333; }
+html[data-theme="dark"] .header-left h3 { color: #f0f0f0; }
+html[data-theme="dark"] .reference-request-card { background: #1a1a1a; border-color: #333; }
+html[data-theme="dark"] .view-all-btn { background: rgba(255,255,255,0.05); color: #81C784; }
+html[data-theme="dark"] .term-selector-wrapper { background: rgba(255,255,255,0.05); border-color: #333; }
+html[data-theme="dark"] .term-dropdown { color: #81C784; }
+html[data-theme="dark"] .quick-action { background: #1e1e1e; border-color: #333; color: #81C784; }
+html[data-theme="dark"] .quick-action .qa-icon { background: rgba(255,255,255,0.06); }
+html[data-theme="dark"] .qa-icon { color: #81C784; }
+html[data-theme="dark"] .box-icon { color: #81C784; background: rgba(129, 199, 132, 0.10); }
+html[data-theme="dark"] .nav-btn { border-color: #333; background: rgba(255,255,255,0.02); }
+html[data-theme="dark"] .nav-btn:hover:not(:disabled) { border-color: #81C784; color: #81C784; background: rgba(255,255,255,0.04); }
+
+/* Responsive */
+@media (max-width: 1200px) {
+    .dashboard-stats-grid { grid-template-columns: repeat(2, 1fr); }
+    .reference-requests-grid { grid-template-columns: repeat(2, 1fr); }
+    .quick-actions { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+
+@media (max-width: 760px) {
+    .dashboard-greeting { flex-direction: column; align-items: flex-start; gap: 12px; }
+    .section-label { flex-direction: column; align-items: flex-start; }
+    .term-selector-wrapper { width: 100%; justify-content: space-between; flex-wrap: wrap; }
+    .dashboard-stats-grid { grid-template-columns: 1fr; }
+    .reference-requests-grid { grid-template-columns: 1fr; }
+    .header-actions { display: flex; gap: 10px; flex-wrap: wrap; justify-content: flex-start; }
+}
+
 </style>
 
-<div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; margin-top: 120px;">
-  <div>
-                 <div style="font-size: 1.15rem; font-weight: bold; color: #053423;">Panagdait Department Dean of <?php echo htmlspecialchars($departmentName); ?></div>
-    <div style="font-size: 1.05rem; color: #222;"><?php echo htmlspecialchars($deanName); ?></div>
-  </div>
-  <div style="display: flex; align-items: center;">
-    <span style="display: inline-block; background: <?php echo htmlspecialchars($departmentColor); ?>; color: #fff; font-weight: bold; border-radius: 8px; padding: 8px 18px; font-size: 1.1rem; letter-spacing: 1px; box-shadow: 0 2px 6px rgba(0,0,0,0.08);"><?php echo htmlspecialchars($departmentCode); ?></span>
-  </div>
+<div class="dashboard-greeting">
+    <div class="greeting-text">
+        <h2>Welcome back, <?php echo htmlspecialchars($deanName); ?></h2>
+        <p>Department Dean • <?php echo htmlspecialchars($departmentName); ?></p>
+    </div>
+    <div class="dept-badge-container">
+        <span class="dept-badge" style="background: <?php echo htmlspecialchars($departmentColor); ?>;"><?php echo htmlspecialchars($departmentCode); ?></span>
+    </div>
 </div>
 
 <!-- Overview Header with Academic Term Selector -->
-<div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 15px; margin-top: 30px; gap: 20px;">
-    <h2 class="main-page-title" style="padding-left: 0px; margin: 0; line-height: 1;">Overview</h2>
+<div class="section-label">
+    <div class="label-left">
+        <div class="label-bar"></div>
+        <h2>Dashboard Overview</h2>
+    </div>
     
-    <!-- Academic Term Selector -->
-    <div class="term-selector-container" style="margin: 0; display: flex; align-items: center;">
-        <label class="term-selector-label" for="academicTermSelect" style="margin-bottom: 0;">Academic Term:</label>
-        <select id="academicTermSelect" class="term-dropdown" style="margin-top: 0; margin-bottom: 0;" onchange="handleTermChangeFromDropdown()">
+    <!-- Academic Term Selector Premium -->
+    <div class="term-selector-wrapper">
+        <span class="term-label">Term</span>
+        <select id="academicTermSelect" class="term-dropdown" onchange="handleTermChangeFromDropdown()">
             <option value="">Select a term...</option>
-            <option value="all" <?php echo ($selectedTermId === 'all') ? 'selected' : ''; ?>>All Terms (Current Academic Year)</option>
+            <option value="all" <?php echo ($selectedTermId === 'all') ? 'selected' : ''; ?>>All Terms (<?php echo htmlspecialchars($currentAcademicYear['school_year_label'] ?? 'Current Year'); ?>)</option>
             <?php foreach ($academicTerms as $term): ?>
                 <option value="<?php echo htmlspecialchars($term['id']); ?>" 
                         data-term-name="<?php echo htmlspecialchars($term['term_name']); ?>"
@@ -1406,25 +864,53 @@ try {
                 </option>
             <?php endforeach; ?>
         </select>
-        <button id="currentTermBtn" class="current-term-btn" onclick="selectCurrentTerm()" style="margin-top: 0; margin-bottom: 0;">
+        <button id="currentTermBtn" class="current-term-btn" onclick="selectCurrentTerm()">
             Current Term
         </button>
     </div>
 </div>
 
-<div class="dashboard-container" style="margin-top: 15px;">
-  <div class="box stat-box stat-box-row">
-    <span class="stat-title">Programs</span>
-    <span class="stat-amount"><?php echo $totalPrograms; ?></span>
-  </div>
-  <div class="box stat-box stat-box-row">
-    <span class="stat-title">Courses</span>
-    <span class="stat-amount"><?php echo $totalCourses; ?></span>
-  </div>
-  <div class="box stat-box stat-box-row">
-    <span class="stat-title">Faculty Members</span>
-    <span class="stat-amount"><?php echo $totalFaculty; ?></span>
-  </div>
+<div class="dashboard-stats-grid">
+  <button type="button" class="box box-link" onclick="window.location.href='content.php?page=academic-management'">
+    <div class="box-icon"><i data-lucide="folder-kanban"></i></div>
+    <div class="box-content">
+        <span class="box-label">Total Programs</span>
+        <span class="amount"><?php echo $totalPrograms; ?></span>
+    </div>
+  </button>
+  <button type="button" class="box box-link" onclick="navigateToAllCourses()">
+    <div class="box-icon"><i data-lucide="book-open"></i></div>
+    <div class="box-content">
+        <span class="box-label">Active Courses</span>
+        <span class="amount"><?php echo $totalCourses; ?></span>
+    </div>
+  </button>
+  <button type="button" class="box box-link" onclick="window.location.href='content.php?page=faculty-management'">
+    <div class="box-icon"><i data-lucide="users"></i></div>
+    <div class="box-content">
+        <span class="box-label">Faculty Members</span>
+        <span class="amount"><?php echo $totalFaculty; ?></span>
+    </div>
+  </button>
+</div>
+
+<div class="quick-actions" aria-label="Quick actions">
+    <button type="button" class="quick-action" onclick="openAddProgramModal()">
+        <span class="qa-icon"><i data-lucide="plus"></i></span>
+        Add Program
+    </button>
+    <button type="button" class="quick-action" onclick="openCourseSelectionModal()">
+        <span class="qa-icon"><i data-lucide="file-plus-2"></i></span>
+        Add Course
+    </button>
+    <a class="quick-action" href="content.php?page=reference-requests">
+        <span class="qa-icon"><i data-lucide="inbox"></i></span>
+        Material Requests
+    </a>
+    <a class="quick-action" href="content.php?page=school-calendar">
+        <span class="qa-icon"><i data-lucide="calendar"></i></span>
+        School Calendar
+    </a>
 </div>
 
 <!-- Review Course Material Requests Section -->
@@ -1433,16 +919,14 @@ try {
         <div class="header-left">
             <h3>Review Course Material Requests</h3>
             <div class="section-description">Review and manage all course material requests from faculty.</div>
-    </div>
+        </div>
         <div class="header-actions">
             <a href="content.php?page=reference-requests" class="view-all-btn">View All</a>
-            <button class="nav-btn prev-btn course-nav-btn" id="prevBtn" onclick="showPreviousRequests()">
-                <img src="../src/assets/icons/left-arrow-icon.png" alt="Previous" class="nav-icon" onerror="this.style.display='none'; this.nextElementSibling.style.display='inline';">
-                <span style="display: none;">&lt;</span>
-                            </button>
-            <button class="nav-btn next-btn course-nav-btn" id="nextBtn" onclick="showNextRequests()">
-                <img src="../src/assets/icons/right-arrow-icon.png" alt="Next" class="nav-icon" onerror="this.style.display='none'; this.nextElementSibling.style.display='inline';">
-                <span style="display: none;">&gt;</span>
+            <button class="nav-btn prev-btn" id="prevBtn" onclick="showPreviousRequests()">
+                <i data-lucide="chevron-left" aria-label="Previous"></i>
+            </button>
+            <button class="nav-btn next-btn" id="nextBtn" onclick="showNextRequests()">
+                <i data-lucide="chevron-right" aria-label="Next"></i>
             </button>
         </div>
     </div>
@@ -1690,8 +1174,7 @@ try {
     <div class="section-footer">
         <button class="collapse-btn course-nav-btn" onclick="toggleSection()">
             <span>Collapse</span>
-            <img src="../src/assets/icons/right-arrow-icon.png" alt="Collapse" class="collapse-icon" style="transform: rotate(-90deg);" onerror="this.style.display='none'; this.nextElementSibling.style.display='inline';">
-            <span style="display: none;">^</span>
+            <i data-lucide="chevron-up" class="collapse-icon" aria-hidden="true"></i>
         </button>
     </div>
 </div>
@@ -1704,7 +1187,7 @@ try {
             <div class="section-description">Review and manage new course proposals and course revision requests from faculty.</div>
         </div>
         <div class="header-actions">
-            <a href="content.php?page=course-proposals" class="view-all-btn">View All</a>
+            <a href="content.php?page=all-courses" class="view-all-btn">View All Proposals</a>
         </div>
     </div>
     
@@ -1715,7 +1198,9 @@ try {
         
         <!-- Empty state -->
         <div id="courseProposalsEmptyState" style="display: none; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); text-align: center; padding: 0; color: #666; width: 100%;">
-            <div style="font-size: 28px; margin-bottom: 8px;">📝</div>
+            <div style="margin-bottom: 8px; display: flex; justify-content: center;">
+                <i data-lucide="file-text" style="width: 28px; height: 28px; color: #0C4B34;"></i>
+            </div>
             <h3 style="font-family: 'TT Interphases', sans-serif; font-size: 15px; color: #333; margin-bottom: 6px;">No Course Proposals</h3>
             <p style="font-family: 'TT Interphases', sans-serif; font-size: 13px; color: #666; margin: 0;">
                 View and track the Department Dean's submitted new courses and course revisions for QA review.
@@ -1724,52 +1209,50 @@ try {
     </div>
 </div>
 
-<div class="departments-section">
-    <div class="departments-header">
-        <div>
+<!-- Program & Courses Management Section -->
+<div class="dashboard-section">
+    <div class="section-header">
+        <div class="header-left">
             <h3>Program & Courses Management</h3>
-            <p>Manage academic programs and their configurations</p>
+            <div class="section-description">Manage academic programs and their configurations</div>
         </div>
-        <button class="add-dept-btn" id="addProgramButton" style="display: block;">Add Program</button>
+        <button class="view-all-btn" id="addProgramButton" style="background: #0C4B34; color: white; border: none;">Add Program</button>
     </div>
 
-    <div class="departments-container" id="programContainer">
+    <div class="reference-requests-grid" id="programContainer" style="margin-top: 10px;">
         <!-- All Courses Card -->
-        <div class='department-card all-courses-card'>
-            <div class='dept-code' style='background-color: #6c757d;'>ALL</div>
-            <h3>All Courses</h3>
-            <p style='font-weight: bold; color: #333;'>View All Courses</p>
-            <button class='view-details-btn' onclick="window.location.href='content.php?page=all-courses'">View Details</button>
+        <div class="reference-request-card">
+            <div class="status-badge" style="background: #6c757d20; color: #6c757d; border: 1px solid #6c757d40;">ALL</div>
+            <div style="margin-top: 12px; margin-bottom: 20px;">
+                <h3 style="margin: 0; font-size: 16px; color: #111827;">All Courses</h3>
+                <p style="margin: 4px 0 0 0; font-size: 13px; color: #6b7280; font-weight: 600;">View complete catalog</p>
+            </div>
+            <button class="view-all-btn" style="width: 100%; border-radius: 8px;" onclick="window.location.href='content.php?page=all-courses'">View Details</button>
         </div>
         
         <?php
         if (!empty($programs)) {
             $index = 0;
             foreach ($programs as $program) {
-                $hidden = ($index >= 5) ? "hidden" : "";
-                echo "<div class='department-card " . htmlspecialchars($hidden) . "'>";
-                echo "<div class='dept-code' style='background-color: " . htmlspecialchars($program['color_code']) . "'>" . htmlspecialchars($program['program_code']) . "</div>";
-                echo "<h3>" . htmlspecialchars($program['program_name']) . "</h3>";
-                echo "<p style='font-weight: bold; color: #333;'>" . htmlspecialchars($program['course_count']) . " Courses</p>";
-                echo "<button class='view-details-btn' onclick=\"window.location.href='content.php?page=program-courses&program=" . urlencode($program['program_code']) . "'\">View Courses</button>";
+                // Show 4 per row (including "All Courses" as the 1st one, so 3 more)
+                $isHidden = ($index >= 3); 
+                echo "<div class='reference-request-card " . ($isHidden ? "hidden" : "") . "' style='display: " . ($isHidden ? "none" : "flex") . "'>";
+                echo "<div class='status-badge' style='background: " . htmlspecialchars($program['color_code']) . "20; color: " . htmlspecialchars($program['color_code']) . "; border: 1px solid " . htmlspecialchars($program['color_code']) . "40;'>" . htmlspecialchars($program['program_code']) . "</div>";
+                echo "<div style='margin-top: 12px; margin-bottom: 20px;'>";
+                echo "<h3 style='margin: 0; font-size: 16px; color: #111827;'>" . htmlspecialchars($program['program_name']) . "</h3>";
+                echo "<p style='margin: 4px 0 0 0; font-size: 13px; color: #6b7280; font-weight: 600;'>" . htmlspecialchars($program['course_count']) . " Courses</p>";
+                echo "</div>";
+                echo "<button class='view-all-btn' style='width: 100%; border-radius: 8px;' onclick=\"window.location.href='content.php?page=program-courses&program=" . urlencode($program['program_code']) . "'\">View Courses</button>";
                 echo "</div>";
                 $index++;
             }
-        } else {
-            // No programs found - show empty state card
-            echo "<div class='department-card empty-program-card'>";
-            echo "<div style='display: flex; justify-content: space-between; align-items: center;'><div class='dept-code' style='background-color: #1976d2; color: white; font-weight: bold;'>NEW</div><span style='font-size: 1.5rem;'>📁</span></div>";
-            echo "<h3>No Programs Yet</h3>";
-            echo "<p style='font-weight: bold; color: #333;'>Start building your programs</p>";
-            echo "<button class='view-details-btn' onclick='openAddProgramModal()'>Create First Program</button>";
-            echo "</div>";
         }
         ?>
     </div>
 
     <div class="program-buttons-container">
         <button class="view-all-btn" id="viewAllProgramsButton" 
-                style="display: <?php echo (count($programs) > 5) ? 'inline-flex' : 'none'; ?>;">Expand to View More</button>
+                style="display: <?php echo (count($programs) > 3) ? 'inline-flex' : 'none'; ?>;">Expand to View More</button>
         <button class="view-all-btn" id="collapseProgramsButton" 
                 style="display: none;">Collapse to View Less</button>
     </div>
@@ -2063,13 +1546,14 @@ try {
             emptyCard.innerHTML = `
                 <div style='display: flex; justify-content: space-between; align-items: center;'>
                     <div class='dept-code' style='background-color: #1976d2; color: white; font-weight: bold;'>NEW</div>
-                    <span style='font-size: 1.5rem;'>📁</span>
+                    <span class="lucide-inline-icon"><i data-lucide="folder-plus"></i></span>
                 </div>
                 <h3>No Programs Yet</h3>
                 <p style='font-weight: bold; color: #333;'>Start building your programs</p>
                 <button class='view-details-btn' onclick='openAddProgramModal()'>Create First Program</button>
             `;
             programContainer.appendChild(emptyCard);
+            if (typeof window.ascomRefreshIcons === 'function') window.ascomRefreshIcons();
         }
         
     }
@@ -2146,13 +1630,14 @@ try {
         `;
         notification.innerHTML = `
             <div style="display: flex; align-items: center; gap: 12px;">
-                <span style="font-size: 20px;">📅</span>
+                <span class="lucide-inline-icon"><i data-lucide="calendar-days"></i></span>
                 <div>
                     <div style="font-weight: 700; margin-bottom: 4px;">Term Selected</div>
                     <div style="font-weight: 500; opacity: 0.9;">${termName}</div>
                 </div>
             </div>
         `;
+        if (typeof window.ascomRefreshIcons === 'function') window.ascomRefreshIcons();
         
         // Add animation keyframes
         if (!document.getElementById('notificationStyles')) {
@@ -2315,13 +1800,14 @@ function toggleSection() {
             <div class="request-count-badge">${totalRequests}</div>
             <button class="expand-btn course-nav-btn" onclick="toggleSection()">
                 <span>Expand</span>
-                <img src="../src/assets/icons/right-arrow-icon.png" alt="Expand" class="collapse-icon" style="transform: rotate(90deg);">
+                <i data-lucide="chevron-down" class="collapse-icon" aria-hidden="true"></i>
             </button>
         `;
         
         // Insert the collapsed controls in the same header area
         const sectionHeader = section.querySelector('.section-header');
         sectionHeader.appendChild(collapsedControls);
+        if (typeof window.ascomRefreshIcons === 'function') window.ascomRefreshIcons();
         
     }
 }
@@ -2366,31 +1852,6 @@ function toggleSection() {
         // Display current selected term info and update button state
         updateSelectedTermDisplay();
         updateCurrentTermButtonState();
-        
-        // Debug icon paths
-        const testImg = new Image();
-        testImg.onload = function() {
-        };
-        testImg.onerror = function() {
-            
-            // Try alternative paths
-            const altPaths = [
-                '../src/assets/icons/left-arrow-icon.png',
-                '../../src/assets/icons/left-arrow-icon.png',
-                'src/assets/icons/left-arrow-icon.png',
-                '/src/assets/icons/left-arrow-icon.png'
-            ];
-            
-            altPaths.forEach((path, index) => {
-                const testAlt = new Image();
-                testAlt.onload = function() {
-                };
-                testAlt.onerror = function() {
-                };
-                testAlt.src = path;
-            });
-        };
-        testImg.src = '../src/assets/icons/left-arrow-icon.png';
         
         // Load data from PHP
         const requestsData = document.getElementById('allRequestsData');
@@ -2520,114 +1981,68 @@ function toggleSection() {
         card.className = 'reference-request-card';
         card.setAttribute('data-proposal-id', cardData.id || cardData.programCode);
         
-        // Ensure card has consistent sizing with other cards (same as when 4 cards)
-        card.style.minWidth = '250px';
-        card.style.maxWidth = '250px'; // Fixed width to match other cards
-        card.style.flex = '0 0 250px';
-        card.style.flexGrow = '0'; // Don't grow - keep fixed width
-        card.style.flexShrink = '0'; // Don't shrink
-        card.style.flexBasis = '250px';
-        card.style.width = '250px'; // Fixed width
-        card.style.boxSizing = 'border-box'; // Include padding in width
-        
         // Check if this is a draft
         const isDraft = cardData.isDraft === true || cardData.status === 'Draft' || cardData.status.toLowerCase().includes('draft');
         
-        // Determine status class based on status text
+        // Determine status class and label
         let statusClass = 'status-pending';
+        let statusLabel = cardData.status;
+        
         if (isDraft) {
             statusClass = 'status-draft';
+            statusLabel = 'Draft';
         } else if (cardData.status.toLowerCase().includes('approved') || cardData.status.toLowerCase().includes('added')) {
             statusClass = 'status-approved';
         } else if (cardData.status.toLowerCase().includes('rejected')) {
             statusClass = 'status-rejected';
-        } else if (cardData.status.toLowerCase().includes('review') || cardData.status.toLowerCase().includes('pending')) {
-            statusClass = 'status-pending';
         }
         
         // Format date
         const date = new Date(cardData.submittedDate || cardData.createdAt || new Date());
         const formattedDate = date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
         
-        // Get course information - use first course if courses array exists, otherwise use direct properties
+        // Get course information
         const courseCode = cardData.courseCode || (cardData.courses && cardData.courses.length > 0 ? cardData.courses[0].courseCode : 'N/A');
         const courseName = cardData.courseName || (cardData.courses && cardData.courses.length > 0 ? cardData.courses[0].courseName : 'N/A');
         
-        // Get type color
-        let typeColor = '#1976d2';
-        if (cardData.courseType === 'Cross-Department') {
-            typeColor = '#42a5f5';
-        } else if (cardData.courseType === 'Course Revision') {
-            typeColor = '#66bb6a';
-        }
-        
-        // Buttons - Resume/Delete for drafts, View Details for submitted
+        // Action Buttons
         const actionButtons = isDraft ? `
-            <div style="display: flex; gap: 8px; width: 100%; margin-bottom: 8px;">
-                <button class="resume-draft-btn" onclick="event.stopPropagation(); resumeDraft('${cardData.id}', event);" style="flex: 1; background: #1976d2; color: white; border: none; padding: 8px 16px; border-radius: 6px; font-size: 12px; font-weight: 600; cursor: pointer; transition: all 0.3s ease; font-family: 'TT Interphases', sans-serif;">
-                    Resume
-                </button>
-                <button class="delete-draft-btn" onclick="event.stopPropagation(); deleteDraft('${cardData.id}', event);" style="flex: 1; background: #dc3545; color: white; border: none; padding: 8px 16px; border-radius: 6px; font-size: 12px; font-weight: 600; cursor: pointer; transition: all 0.3s ease; font-family: 'TT Interphases', sans-serif;">
-                    Delete
-                </button>
+            <div style="display: flex; gap: 8px; width: 100%; margin-top: auto;">
+                <button class="view-all-btn" onclick="event.stopPropagation(); resumeDraft('${cardData.id}', event);" style="flex: 1; height: 36px; padding: 0;">Resume</button>
+                <button class="view-all-btn" onclick="event.stopPropagation(); deleteDraft('${cardData.id}', event);" style="flex: 1; height: 36px; padding: 0; background: #fee2e2; color: #991b1b; border-color: #fecaca;">Delete</button>
             </div>
         ` : `
-            <button class="view-details-btn" onclick="event.stopPropagation(); viewCourseProposalDetails('${cardData.id}');" style="width: 100%; margin-bottom: 8px;">
+            <button class="view-all-btn" onclick="event.stopPropagation(); viewCourseProposalDetails('${cardData.id}');" style="width: 100%; margin-top: auto;">
                 View Details
             </button>
         `;
         
         card.innerHTML = `
-            <div class="request-header">
-                <div class="requester-info">
-                    <div class="requester-name" style="color: ${typeColor}; font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; display: flex; align-items: center;">
-                        ${cardData.courseType || 'Course Proposal'}
+            <div class="status-badge ${statusClass}">${statusLabel}</div>
+            
+            <div style="margin-top: 16px; margin-bottom: 12px; height: 40px; display: flex; align-items: center;">
+                <span style="font-size: 11px; font-weight: 800; color: #0C4B34; background: rgba(12, 75, 52, 0.08); padding: 4px 8px; border-radius: 6px; letter-spacing: 0.5px;">${courseCode}</span>
+                <span style="margin-left: auto; font-size: 11px; font-weight: 700; color: #6b7280; text-transform: uppercase;">${cardData.programCode || 'PROPOSAL'}</span>
+            </div>
+            
+            <h3 style="margin: 0 0 4px 0; font-size: 15px; color: #111827; line-height: 1.4; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; height: 42px;">${courseName}</h3>
+            
+            <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 20px;">
+                <div style="display: flex; align-items: center; gap: 4px; font-size: 11px; color: #6b7280; font-weight: 600;">
+                    <span class="lucide-inline-icon"><i data-lucide="calendar-days"></i></span>
+                    <span>${formattedDate}</span>
+                </div>
+                ${cardData.totalReferences > 0 ? `
+                    <div style="display: flex; align-items: center; gap: 4px; font-size: 11px; color: #6b7280; font-weight: 600;">
+                        <span class="lucide-inline-icon"><i data-lucide="book"></i></span>
+                        <span>${cardData.totalReferences} Ref</span>
                     </div>
-                    <div class="faculty-department" style="color: #666; font-size: 11px;">
-                        ${cardData.programCode || 'N/A'} Program
-                    </div>
-                </div>
-            </div>
-            
-            <div class="course-info" style="margin-bottom: 12px;">
-                <div class="course-code" style="background: #1976d2; color: white; padding: 4px 8px; border-radius: 4px; font-size: 12px; font-weight: 600; font-family: 'TT Interphases', sans-serif; display: inline-block; margin-bottom: 8px;">
-                    ${courseCode}
-                </div>
-                <div class="course-name" style="font-size: 13px; color: #666; font-family: 'TT Interphases', sans-serif;">
-                    ${courseName}
-                </div>
-            </div>
-            
-            <div class="request-summary" style="margin-bottom: 16px; flex: 1;">
-                <div style="display: flex; align-items: center; gap: 12px; margin-top: 8px; flex-wrap: wrap;">
-                    ${cardData.totalReferences > 0 ? `
-                        <div class="references-indicator" style="display: flex; align-items: center; gap: 6px; font-size: 11px; color: #666;">
-                            <span style="font-size: 14px;">📚</span>
-                            <span>${cardData.totalReferences} reference${cardData.totalReferences > 1 ? 's' : ''}</span>
-                        </div>
-                    ` : ''}
-                    ${cardData.totalAttachments > 0 ? `
-                        <div class="attachments-indicator" style="display: flex; align-items: center; gap: 6px; font-size: 11px; color: #666;">
-                            <span style="font-size: 14px;">📎</span>
-                            <span>${cardData.totalAttachments} attachment${cardData.totalAttachments > 1 ? 's' : ''}</span>
-                        </div>
-                    ` : ''}
-                </div>
-            </div>
-            
-            <div class="status-display ${statusClass}" style="margin-bottom: 12px; width: 100%; box-sizing: border-box;">
-                ${isDraft ? 'Draft' : cardData.status}
+                ` : ''}
             </div>
             
             ${actionButtons}
-            
-            <div class="request-date">${isDraft ? 'Drafted on: ' : 'Submitted on: '}${formattedDate}</div>
         `;
-        
-        // Add click handler to view details
-        card.addEventListener('click', function() {
-            // TODO: Navigate to details page or open modal
-        });
+        if (typeof window.ascomRefreshIcons === 'function') window.ascomRefreshIcons();
         
         return card;
     }
@@ -3455,22 +2870,22 @@ function toggleSection() {
             return Math.round(bytes / Math.pow(k, i) * 100) / 100 + ' ' + sizes[i];
         }
         
-        // Get file icon
+        // Get file icon (Lucide name)
         function getFileIcon(fileName) {
             const ext = fileName.split('.').pop().toLowerCase();
             const icons = {
-                'pdf': '📄',
-                'doc': '📝',
-                'docx': '📝',
-                'xls': '📊',
-                'xlsx': '📊',
-                'txt': '📄',
-                'jpg': '🖼️',
-                'jpeg': '🖼️',
-                'png': '🖼️',
-                'gif': '🖼️'
+                pdf: 'file-text',
+                doc: 'file-text',
+                docx: 'file-text',
+                xls: 'file-spreadsheet',
+                xlsx: 'file-spreadsheet',
+                txt: 'file-text',
+                jpg: 'image',
+                jpeg: 'image',
+                png: 'image',
+                gif: 'image'
             };
-            return icons[ext] || '📎';
+            return icons[ext] || 'paperclip';
         }
         
         // Build attachments HTML
@@ -3479,7 +2894,7 @@ function toggleSection() {
             attachmentsHTML = proposal.attachments.map((attachment, index) => `
                 <div class="attachment-item-detail" style="display: flex; align-items: center; justify-content: space-between; padding: 12px; background: #f9f9f9; border-radius: 6px; margin-bottom: 8px;">
                     <div style="display: flex; align-items: center; gap: 12px; flex: 1;">
-                        <span style="font-size: 24px;">${getFileIcon(attachment.name)}</span>
+                        <span class="lucide-inline-icon"><i data-lucide="${getFileIcon(attachment.name)}"></i></span>
                         <div style="flex: 1; min-width: 0;">
                             <div style="font-weight: 600; color: #333; font-size: 13px; margin-bottom: 4px; word-break: break-word;">${attachment.name}</div>
                             <div style="font-size: 11px; color: #666;">${formatFileSize(attachment.size)}</div>
@@ -3574,6 +2989,7 @@ function toggleSection() {
         
         // Show modal
         modal.style.display = 'flex';
+        if (typeof window.ascomRefreshIcons === 'function') window.ascomRefreshIcons();
     };
     
     // Close course proposal details modal
@@ -3621,6 +3037,7 @@ function toggleSection() {
             const card = createRequestCard(request);
             grid.appendChild(card);
         });
+        if (typeof window.ascomRefreshIcons === 'function') window.ascomRefreshIcons();
 
         // Update navigation buttons
         const prevBtn = document.getElementById('prevBtn');
@@ -3673,38 +3090,38 @@ function toggleSection() {
             apaCitation = request.book_title;
         }
         
-        // Get department code and color from session or use default
+        // Get department code
         const departmentCode = '<?php echo $_SESSION["selected_role"]["department_code"] ?? "CCS"; ?>';
-        const departmentColor = '<?php echo $_SESSION["selected_role"]["department_color"] ?? "#1976d2"; ?>';
         
         const card = document.createElement('div');
         card.className = 'reference-request-card';
         card.setAttribute('data-request-id', request.id);
         
         card.innerHTML = `
-                <div class="request-header">
-                <div class="requester-info">
-                    <div class="requester-name">${request.requester_name}</div>
-                    <div class="faculty-department" style="color: ${departmentColor};">${departmentCode} FACULTY</div>
-                    </div>
-                </div>
-                
-            <div class="course-info">
-                <div class="course-code">${request.course_code}</div>
-                <div class="course-name">${request.course_name}</div>
-                </div>
-                
-            <div class="request-summary">
-                <div class="request-type">Course Material Request</div>
-                <div class="material-title">${apaCitation}</div>
-                    </div>
+            <div class="status-badge status-pending">PENDING</div>
             
-            <div class="action-buttons">
-                <button class="approve-btn" onclick="approveRequest(${request.id})">Approve</button>
-                <button class="reject-btn" onclick="rejectRequest(${request.id})">Reject</button>
-                    </div>
-                <div class="request-date">Requested on: ${new Date().toLocaleDateString()}</div>
-            `;
+            <div style="margin-top: 16px; margin-bottom: 12px; height: 40px; display: flex; align-items: center;">
+                <span style="font-size: 11px; font-weight: 800; color: #0C4B34; background: rgba(12, 75, 52, 0.08); padding: 4px 8px; border-radius: 6px; letter-spacing: 0.5px;">${request.course_code}</span>
+                <span style="margin-left: auto; font-size: 11px; font-weight: 700; color: #6b7280; text-transform: uppercase;">${departmentCode} FACULTY</span>
+            </div>
+            
+            <div style="margin-bottom: 8px;">
+                <span style="font-size: 12px; font-weight: 700; color: #111827;">${request.requester_name}</span>
+            </div>
+            
+            <h3 style="margin: 0 0 12px 0; font-size: 14px; color: #4b5563; font-style: italic; font-family: 'TT Interphases', sans-serif; height: 40px; overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical;">
+                ${apaCitation}
+            </h3>
+            
+            <div class="action-buttons" style="margin-top: auto; display: flex; gap: 8px; width: 100%;">
+                <button class="view-all-btn" onclick="approveRequest(${request.id})" style="flex: 1; height: 36px; padding: 0; background: #0C4B34; color: white;">Approve</button>
+                <button class="view-all-btn" onclick="rejectRequest(${request.id})" style="flex: 1; height: 36px; padding: 0; background: #fee2e2; color: #991b1b; border-color: #fecaca;">Reject</button>
+            </div>
+            
+            <div style="margin-top: 12px; font-size: 11px; color: #9ca3af; font-weight: 600; text-align: center;">
+                Requested on: ${new Date().toLocaleDateString()}
+            </div>
+        `;
         
         return card;
     }
@@ -3926,7 +3343,7 @@ function toggleSection() {
 </style>
 
 <!-- Floating Back to Top Button -->
-<button id="backToTopBtn" class="back-to-top-btn" onclick="scrollToTop()">
-    <img src="../src/assets/icons/go-back-icon.png" alt="Back to Top" class="arrow">
+<button id="backToTopBtn" class="back-to-top-btn" onclick="scrollToTop()" aria-label="Back to top">
+    <i data-lucide="arrow-up" class="arrow" aria-hidden="true"></i>
     <span class="text">Back to Top</span>
 </button> 

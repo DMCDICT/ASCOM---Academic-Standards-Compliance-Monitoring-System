@@ -2,9 +2,10 @@
 // get_notifications.php - API endpoint to fetch notifications
 header('Content-Type: application/json');
 
+require_once __DIR__ . '/../bootstrap/database.php';
+
 try {
-    $pdo = new PDO('mysql:host=localhost;dbname=ascom_db', 'root', '');
-    $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+    $pdo = ascom_get_pdo();
     
     // Get user role from session or request
     session_start();
