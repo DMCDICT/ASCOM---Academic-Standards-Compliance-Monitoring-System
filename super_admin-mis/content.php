@@ -3227,12 +3227,6 @@ $notifRead = array_filter($notifList, function($n) { return ($n['is_read'] ?? fa
 
 <nav class="side-navbar" id="sidebar" aria-label="Sidebar navigation">
   <div class="nav-buttons">
-    <a href="#" class="nav-button new-account-button" id="newAccountBtn" onclick="openAddUserModal()">
-      <span class="nav-icon-wrapper">
-        <img src="../src/assets/icons/add-icon.png" alt="Add Icon" class="nav-icon" />
-      </span>
-      <span>New Account</span>
-    </a>
     
 
 
