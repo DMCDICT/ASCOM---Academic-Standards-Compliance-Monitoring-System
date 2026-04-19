@@ -56,8 +56,12 @@ if ($isAjax) {
 <meta name="current-user" content="<?php echo htmlspecialchars($_SESSION['employee_no']); ?>" />
 <?php endif; ?>
 <title>Super Admin - Content</title>
+<!-- Lucide Icons (CDN) -->
+<script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+
 <script>
 // API base path for notifications - project root (one level up from super_admin-mis)
+window.API_BASE_URL = '../';
 // Used for absolute path to root /api/ folder
 window.NOTIFICATIONS_API_BASE = '<?php echo rtrim(dirname(dirname($_SERVER["SCRIPT_NAME"] ?? "")), "/"); ?>';
 </script>
@@ -814,6 +818,7 @@ window.assignQAAccessToUser = function(userId, userName) {
 </script>
 
 <!-- Load dashboard.js immediately to avoid syntax errors -->
+<script src="./scripts/dashboard.js"></script>
 
 <!-- Department Details Modal Functions -->
 <script>
@@ -3117,13 +3122,13 @@ $notifRead = array_filter($notifList, function($n) { return ($n['is_read'] ?? fa
       </div>
       <img src="../src/assets/images/ASCOM_Monitoring_System.png" alt="Logo" class="logo-img" /> 
       <div class="search-bar">
-        <img src="../src/assets/icons/search-icon.png" alt="Search Icon" /> 
+        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="display: inline-block; vertical-align: middle; margin-right: 10px; opacity: 0.85;"><circle cx="11" cy="11" r="8"></circle><path d="m21 21-4.3-4.3"></path></svg>
         <input type="text" placeholder="Search Here..." />
       </div>
     </div>
     <!-- TOP, RIGHT - notification icon -->
     <div class="notification-icon" id="notificationIconBtn" onclick="event.stopPropagation(); var d=document.getElementById('notificationDropdown'); if(d) d.style.display=d.style.display==='block'?'none':'block'">
-      <img src="../src/assets/icons/notifications-icon.png" alt="Notifications" /> 
+      <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display: inline-block; vertical-align: middle;"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"></path><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"></path></svg>
       <div class="notification-count" data-count="<?php echo $unreadCount; ?>" style="<?php echo $unreadCount > 0 ? '' : 'display:none;'; ?>"><?php echo htmlspecialchars($displayCount); ?></div>
     </div>
   </div>
@@ -4257,6 +4262,23 @@ if (document.readyState === 'loading') {
         // Back-to-top button ready - will show when scrolling down
     }
 }
+
+// Initialize Lucide icons
+(function() {
+    function initLucide() {
+        if (typeof lucide !== 'undefined') {
+            lucide.createIcons();
+        } else {
+            setTimeout(initLucide, 100);
+        }
+    }
+
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', initLucide);
+    } else {
+        initLucide();
+    }
+})();
 </script>
 
 <!-- Notification System - pass server data to avoid fetch issues -->

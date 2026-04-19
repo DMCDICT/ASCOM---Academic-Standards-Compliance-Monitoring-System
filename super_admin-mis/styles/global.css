@@ -69,15 +69,23 @@ html[data-theme="dark"] body {
     overflow: visible;
 }
 
-/* Robust white color for navbar icons */
+/* Robust white color and consistent sizing for navbar icons */
 .top-navbar .notification-icon [data-lucide],
-.top-navbar .search-bar [data-lucide] {
+.top-navbar .search-bar [data-lucide],
+.top-navbar i[data-lucide],
+.top-navbar svg[data-lucide] {
     color: white !important;
     stroke: white !important;
+    stroke-width: 2.5px;
+    width: 20px !important;
+    height: 20px !important;
+    display: inline-block !important;
+    transition: transform 0.2s ease, opacity 0.2s ease;
+    vertical-align: middle;
 }
 
-.top-navbar i[data-lucide] {
-    color: white !important;
+.top-navbar [data-lucide] {
+    display: inline-block !important;
 }
 .top-navbar-content {
     width: 100%;
@@ -150,16 +158,14 @@ html[data-theme="dark"] body {
     box-shadow: 0 0 0 4px rgba(255, 255, 255, 0.05);
 }
 
-.search-bar i {
-    color: rgba(255, 255, 255, 0.5);
-    width: 18px;
-    height: 18px;
+.search-bar i[data-lucide] {
     margin-right: 12px;
-    transition: color 0.3s ease;
+    opacity: 0.7;
 }
 
-.search-bar:focus-within i {
-    color: rgba(255, 255, 255, 0.9);
+.search-bar:focus-within i[data-lucide] {
+    opacity: 1;
+    transform: scale(1.05);
 }
 
 .search-bar input {
@@ -393,6 +399,14 @@ html[data-theme="dark"] .content-card {
 .notification-icon:hover {
     background-color: rgba(255, 255, 255, 0.1);
     transform: translateY(-1px);
+}
+
+.notification-icon i[data-lucide] {
+    opacity: 0.85;
+}
+
+.notification-icon:hover i[data-lucide] {
+    opacity: 1;
 }
 
 .notification-count {
