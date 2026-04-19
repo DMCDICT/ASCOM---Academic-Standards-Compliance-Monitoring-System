@@ -8,74 +8,82 @@ if (!isset($conn)) {
 ?>
 
 <!-- Add Department Modal -->
-<div id="addDepartmentModal" class="modal-overlay" style="display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background-color: rgba(0, 0, 0, 0.5); z-index: 9999;">
-  <div class="modal-box" style="background-color: #EFEFEF; padding: 25px; border: 1px solid #888; border-radius: 15px; width: 90%; max-width: 500px; box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3); animation: fadeIn 0.3s; max-height: 98vh; overflow-y: auto; margin: 20px auto;">
-    <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #e5e5e5; padding-bottom: 15px; margin-bottom: 20px;">
-      <h2 style="margin: 0; font-size: 22px; font-weight: 700; color: #333;">Add New Department</h2>
-      <span onclick="closeAddDepartmentModal()" style="color: #aaa; font-size: 28px; font-weight: 700; cursor: pointer;">&times;</span>
+<div id="addDepartmentModal" class="modal-overlay" style="display: none;">
+  <div class="dept-details-modal">
+    <div class="dept-details-modal__header">
+      <div class="dept-details-modal__titlewrap">
+        <h2 class="dept-details-modal__title">Add New Department</h2>
+      </div>
+      <button type="button" class="dept-details-modal__close" onclick="closeAddDepartmentModal()">&times;</button>
     </div>
     
-    <form id="addDepartmentForm" style="display: flex; flex-direction: column; gap: 15px;">
-      <div>
-        <label style="font-size: 14px; font-weight: bold; margin-bottom: 6px; display: block;">Department Name <span style="color: #dc3545;">*</span></label>
-        <input type="text" name="department_name" id="department_name" required placeholder="e.g., College of Computing Studies" style="width: 100%; height: 50px; padding: 0 12px; border: 1px solid #ccc; border-radius: 12px; box-sizing: border-box; background-color: #FFFFFF;">
-      </div>
-      
-      <div>
-        <label style="font-size: 14px; font-weight: bold; margin-bottom: 6px; display: block;">Department Code <span style="color: #dc3545;">*</span></label>
-        <input type="text" name="department_code" id="department_code" required placeholder="e.g., CCS" maxlength="10" style="width: 100%; height: 50px; padding: 0 12px; border: 1px solid #ccc; border-radius: 12px; box-sizing: border-box; background-color: #FFFFFF; text-transform: uppercase;">
-      </div>
-      
-      <div>
-        <label style="font-size: 14px; font-weight: bold; margin-bottom: 6px; display: block;">Color Code</label>
-        <div style="display: flex; gap: 10px; align-items: center;">
-          <input type="color" id="colorPicker" value="#1976d2" style="width: 50px; height: 40px; border: none; border-radius: 8px; cursor: pointer;">
-          <input type="text" id="colorHex" value="#1976d2" maxlength="7" style="flex: 1; height: 50px; padding: 0 12px; border: 1px solid #ccc; border-radius: 12px; box-sizing: border-box; background-color: #FFFFFF;">
+    <div class="dept-details-modal__content">
+      <form id="addDepartmentForm" class="dept-form">
+        <div class="dept-form__group">
+          <label style="font-size: 13px; font-weight: 800; color: #0C4B34; margin-bottom: 4px;">Department Name <span style="color: #dc3545;">*</span></label>
+          <input type="text" name="department_name" id="department_name" required placeholder="e.g., College of Computing Studies" style="width: 100%; height: 46px; padding: 0 14px; border: 1px solid rgba(12, 75, 52, 0.2); border-radius: 12px; background: rgba(12, 75, 52, 0.03); color: #111827; font-size: 14px; font-weight: 600; outline: none; transition: all 0.2s;">
         </div>
-      </div>
-      
-      <div style="display: flex; justify-content: flex-end; gap: 10px; margin-top: 10px;">
-        <button type="button" onclick="closeAddDepartmentModal()" style="width: 125px; height: 50px; background-color: #C9C9C9; color: black; border: none; border-radius: 10px; cursor: pointer; font-size: 14px; font-weight: bold; text-transform: uppercase;">CANCEL</button>
-        <button type="submit" class="create-btn" style="width: 125px; height: 50px;">CREATE</button>
-      </div>
-    </form>
+        
+        <div class="dept-form__group" style="margin-top: 12px;">
+          <label style="font-size: 13px; font-weight: 800; color: #0C4B34; margin-bottom: 4px;">Department Code <span style="color: #dc3545;">*</span></label>
+          <input type="text" name="department_code" id="department_code" required placeholder="e.g., CCS" maxlength="10" style="width: 100%; height: 46px; padding: 0 14px; border: 1px solid rgba(12, 75, 52, 0.2); border-radius: 12px; background: rgba(12, 75, 52, 0.03); color: #111827; font-size: 14px; font-weight: 600; outline: none; text-transform: uppercase; transition: all 0.2s;">
+        </div>
+        
+        <div class="dept-form__group" style="margin-top: 12px;">
+          <label style="font-size: 13px; font-weight: 800; color: #0C4B34; margin-bottom: 4px;">Color Code</label>
+          <div class="dept-form__row">
+            <input type="color" id="colorPicker" value="#1976d2" style="width: 46px; height: 46px; padding: 0; border: 1px solid rgba(12, 75, 52, 0.2); border-radius: 12px; cursor: pointer; flex-shrink: 0;">
+            <input type="text" id="colorHex" value="#1976d2" maxlength="7" style="flex: 1; height: 46px; padding: 0 14px; border: 1px solid rgba(12, 75, 52, 0.2); border-radius: 12px; background: rgba(12, 75, 52, 0.03); color: #111827; font-size: 14px; font-weight: 600; outline: none;">
+          </div>
+        </div>
+        
+        <div style="display: flex; justify-content: flex-end; gap: 10px; margin-top: 20px; padding-top: 16px; border-top: 1px solid rgba(12, 75, 52, 0.08);">
+          <button type="button" onclick="closeAddDepartmentModal()" style="padding: 0 20px; height: 42px; background: rgba(12, 75, 52, 0.08); color: #0c4b34; border: none; border-radius: 10px; cursor: pointer; font-size: 13px; font-weight: 800; text-transform: uppercase; transition: all 0.2s;">CANCEL</button>
+          <button type="submit" class="create-btn" style="padding: 0 24px; height: 42px; background: #0c4b34; color: white; border: none; border-radius: 10px; cursor: pointer; font-size: 13px; font-weight: 800; text-transform: uppercase; transition: all 0.2s; box-shadow: 0 4px 12px rgba(12, 75, 52, 0.2);">CREATE</button>
+        </div>
+      </form>
+    </div>
   </div>
 </div>
 
 <!-- Edit Department Modal -->
-<div id="editDepartmentModal" class="modal-overlay" style="display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background-color: rgba(0, 0, 0, 0.5); z-index: 9999;">
-  <div class="modal-box" style="background-color: #EFEFEF; padding: 25px; border: 1px solid #888; border-radius: 15px; width: 90%; max-width: 500px; box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3); animation: fadeIn 0.3s; max-height: 98vh; overflow-y: auto; margin: 20px auto;">
-    <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #e5e5e5; padding-bottom: 15px; margin-bottom: 20px;">
-      <h2 style="margin: 0; font-size: 22px; font-weight: 700; color: #333;">Edit Department</h2>
-      <span onclick="closeEditDepartmentModal()" style="color: #aaa; font-size: 28px; font-weight: 700; cursor: pointer;">&times;</span>
+<div id="editDepartmentModal" class="modal-overlay" style="display: none;">
+  <div class="dept-details-modal">
+    <div class="dept-details-modal__header">
+      <div class="dept-details-modal__titlewrap">
+        <h2 class="dept-details-modal__title">Edit Department</h2>
+      </div>
+      <button type="button" class="dept-details-modal__close" onclick="closeEditDepartmentModal()">&times;</button>
     </div>
     
-    <form id="editDepartmentForm" style="display: flex; flex-direction: column; gap: 15px;">
-      <input type="hidden" name="department_id" id="edit_dept_id">
-      
-      <div>
-        <label style="font-size: 14px; font-weight: bold; margin-bottom: 6px; display: block;">Department Name <span style="color: #dc3545;">*</span></label>
-        <input type="text" name="department_name" id="edit_department_name" required style="width: 100%; height: 50px; padding: 0 12px; border: 1px solid #ccc; border-radius: 12px; box-sizing: border-box; background-color: #FFFFFF;">
-      </div>
-      
-      <div>
-        <label style="font-size: 14px; font-weight: bold; margin-bottom: 6px; display: block;">Department Code <span style="color: #dc3545;">*</span></label>
-        <input type="text" name="department_code" id="edit_department_code" required maxlength="10" style="width: 100%; height: 50px; padding: 0 12px; border: 1px solid #ccc; border-radius: 12px; box-sizing: border-box; background-color: #FFFFFF; text-transform: uppercase;">
-      </div>
-      
-      <div>
-        <label style="font-size: 14px; font-weight: bold; margin-bottom: 6px; display: block;">Color Code</label>
-        <div style="display: flex; gap: 10px; align-items: center;">
-          <input type="color" id="edit_color_picker" value="#1976d2" style="width: 50px; height: 40px; border: none; border-radius: 8px; cursor: pointer;">
-          <input type="text" id="edit_color_hex" value="#1976d2" maxlength="7" style="flex: 1; height: 50px; padding: 0 12px; border: 1px solid #ccc; border-radius: 12px; box-sizing: border-box; background-color: #FFFFFF;">
+    <div class="dept-details-modal__content">
+      <form id="editDepartmentForm" class="dept-form">
+        <input type="hidden" name="department_id" id="edit_dept_id">
+        
+        <div class="dept-form__group">
+          <label style="font-size: 13px; font-weight: 800; color: #0C4B34; margin-bottom: 4px;">Department Name <span style="color: #dc3545;">*</span></label>
+          <input type="text" name="department_name" id="edit_department_name" required style="width: 100%; height: 46px; padding: 0 14px; border: 1px solid rgba(12, 75, 52, 0.2); border-radius: 12px; background: rgba(12, 75, 52, 0.03); color: #111827; font-size: 14px; font-weight: 600; outline: none; transition: all 0.2s;">
         </div>
-      </div>
-      
-      <div style="display: flex; justify-content: flex-end; gap: 10px; margin-top: 10px;">
-        <button type="button" onclick="closeEditDepartmentModal()" style="width: 125px; height: 50px; background-color: #C9C9C9; color: black; border: none; border-radius: 10px; cursor: pointer; font-size: 14px; font-weight: bold; text-transform: uppercase;">CANCEL</button>
-        <button type="submit" class="create-btn" style="width: 125px; height: 50px;">UPDATE</button>
-      </div>
-    </form>
+        
+        <div class="dept-form__group" style="margin-top: 12px;">
+          <label style="font-size: 13px; font-weight: 800; color: #0C4B34; margin-bottom: 4px;">Department Code <span style="color: #dc3545;">*</span></label>
+          <input type="text" name="department_code" id="edit_department_code" required maxlength="10" style="width: 100%; height: 46px; padding: 0 14px; border: 1px solid rgba(12, 75, 52, 0.2); border-radius: 12px; background: rgba(12, 75, 52, 0.03); color: #111827; font-size: 14px; font-weight: 600; outline: none; text-transform: uppercase; transition: all 0.2s;">
+        </div>
+        
+        <div class="dept-form__group" style="margin-top: 12px;">
+          <label style="font-size: 13px; font-weight: 800; color: #0C4B34; margin-bottom: 4px;">Color Code</label>
+          <div class="dept-form__row">
+            <input type="color" id="edit_color_picker" value="#1976d2" style="width: 46px; height: 46px; padding: 0; border: 1px solid rgba(12, 75, 52, 0.2); border-radius: 12px; cursor: pointer; flex-shrink: 0;">
+            <input type="text" id="edit_color_hex" value="#1976d2" maxlength="7" style="flex: 1; height: 46px; padding: 0 14px; border: 1px solid rgba(12, 75, 52, 0.2); border-radius: 12px; background: rgba(12, 75, 52, 0.03); color: #111827; font-size: 14px; font-weight: 600; outline: none;">
+          </div>
+        </div>
+        
+        <div style="display: flex; justify-content: flex-end; gap: 10px; margin-top: 20px; padding-top: 16px; border-top: 1px solid rgba(12, 75, 52, 0.08);">
+          <button type="button" onclick="closeEditDepartmentModal()" style="padding: 0 20px; height: 42px; background: rgba(12, 75, 52, 0.08); color: #0c4b34; border: none; border-radius: 10px; cursor: pointer; font-size: 13px; font-weight: 800; text-transform: uppercase; transition: all 0.2s;">CANCEL</button>
+          <button type="submit" class="create-btn" style="padding: 0 24px; height: 42px; background: #0c4b34; color: white; border: none; border-radius: 10px; cursor: pointer; font-size: 13px; font-weight: 800; text-transform: uppercase; transition: all 0.2s; box-shadow: 0 4px 12px rgba(12, 75, 52, 0.2);">UPDATE</button>
+        </div>
+      </form>
+    </div>
   </div>
 </div>
 
@@ -224,35 +232,46 @@ document.addEventListener('DOMContentLoaded', function() {
 </script>
 
 <!-- Assign Dean Modal -->
-<div id="assignDeanModal" class="modal-overlay" style="display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background-color: rgba(0, 0, 0, 0.5); z-index: 9999;">
-  <div class="modal-box" style="background-color: #EFEFEF; padding: 25px; border: 1px solid #888; border-radius: 15px; width: 90%; max-width: 500px; box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3); animation: fadeIn 0.3s; max-height: 90vh; overflow-y: auto; margin: 20px auto;">
-    <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #e5e5e5; padding-bottom: 15px; margin-bottom: 20px;">
-      <h2 style="margin: 0; font-size: 22px; font-weight: 700; color: #333;">Assign Dean</h2>
-      <span onclick="closeAssignDeanModal()" style="color: #aaa; font-size: 28px; font-weight: 700; cursor: pointer;">&times;</span>
+<div id="assignDeanModal" class="modal-overlay" style="display: none;">
+  <div class="dept-details-modal">
+    <div class="dept-details-modal__header">
+      <div class="dept-details-modal__titlewrap">
+        <h2 class="dept-details-modal__title">Assign Dean</h2>
+      </div>
+      <button type="button" class="dept-details-modal__close" onclick="closeAssignDeanModal()">&times;</button>
     </div>
     
-    <p id="assignDeanDeptName" style="font-size: 16px; color: #666; margin-bottom: 20px;"></p>
-    
-    <form id="assignDeanForm" style="display: flex; flex-direction: column; gap: 15px;">
-      <input type="hidden" name="department_id" id="assign_dept_id">
-      
-      <div>
-        <label style="font-size: 14px; font-weight: bold; margin-bottom: 6px; display: block;">Select Teacher/Faculty <span style="color: #dc3545;">*</span></label>
-        <select name="user_id" id="assign_user_id" required style="width: 100%; height: 50px; padding: 0 12px; border: 1px solid #ccc; border-radius: 12px; box-sizing: border-box; background-color: #FFFFFF;">
-          <option value="">-- Select Teacher --</option>
-        </select>
+    <div class="dept-details-modal__content">
+      <div style="margin-bottom: 12px; padding: 12px; background: rgba(12, 75, 52, 0.04); border-radius: 10px; border: 1px solid rgba(12, 75, 52, 0.1);">
+        <span id="assignDeanDeptName" style="font-size: 14px; font-weight: 800; color: #0C4B34;"></span>
       </div>
       
-      <div id="currentDeanSection" style="display: none; background: #fff3cd; padding: 15px; border-radius: 8px;">
-        <strong>Current Dean:</strong> <span id="currentDeanName"></span>
-        <button type="button" onclick="removeDean()" style="margin-left: 10px; color: #dc3545; background: none; border: none; cursor: pointer; text-decoration: underline;">Remove</button>
-      </div>
-      
-      <div style="display: flex; justify-content: flex-end; gap: 10px; margin-top: 10px;">
-        <button type="button" onclick="closeAssignDeanModal()" style="width: 125px; height: 50px; background-color: #C9C9C9; color: black; border: none; border-radius: 10px; cursor: pointer; font-size: 14px; font-weight: bold; text-transform: uppercase;">CANCEL</button>
-        <button type="submit" class="create-btn" style="width: 125px; height: 50px;">ASSIGN</button>
-      </div>
-    </form>
+      <form id="assignDeanForm" class="dept-form">
+        <input type="hidden" name="department_id" id="assign_dept_id">
+        
+        <div class="dept-form__group">
+          <label style="font-size: 13px; font-weight: 800; color: #0C4B34; margin-bottom: 4px;">Select Teacher/Faculty <span style="color: #dc3545;">*</span></label>
+          <select name="user_id" id="assign_user_id" required style="width: 100%; height: 46px; padding: 0 14px; border: 1px solid rgba(12, 75, 52, 0.2); border-radius: 12px; background: rgba(12, 75, 52, 0.03); color: #111827; font-size: 14px; font-weight: 600; outline: none; transition: all 0.2s; cursor: pointer;">
+            <option value="">-- Select Teacher --</option>
+          </select>
+        </div>
+        
+        <div id="currentDeanSection" style="display: none; background: #fff3cd; padding: 14px; border-radius: 12px; border: 1px solid #ffeeba; margin-top: 12px;">
+          <div style="display: flex; justify-content: space-between; align-items: center;">
+            <div>
+              <strong style="color: #856404; font-size: 13px;">Current Dean:</strong>
+              <div id="currentDeanName" style="color: #856404; font-weight: 700; font-size: 14px; margin-top: 2px;"></div>
+            </div>
+            <button type="button" onclick="removeDean()" style="padding: 6px 14px; color: #dc3545; background: rgba(220, 53, 69, 0.1); border: 1px solid rgba(220, 53, 69, 0.2); border-radius: 8px; cursor: pointer; font-size: 12px; font-weight: 700; transition: all 0.2s;">Remove</button>
+          </div>
+        </div>
+        
+        <div style="display: flex; justify-content: flex-end; gap: 10px; margin-top: 20px; padding-top: 16px; border-top: 1px solid rgba(12, 75, 52, 0.08);">
+          <button type="button" onclick="closeAssignDeanModal()" style="padding: 0 20px; height: 42px; background: rgba(12, 75, 52, 0.08); color: #0c4b34; border: none; border-radius: 10px; cursor: pointer; font-size: 13px; font-weight: 800; text-transform: uppercase; transition: all 0.2s;">CANCEL</button>
+          <button type="submit" class="create-btn" style="padding: 0 24px; height: 42px; background: #0c4b34; color: white; border: none; border-radius: 10px; cursor: pointer; font-size: 13px; font-weight: 800; text-transform: uppercase; transition: all 0.2s; box-shadow: 0 4px 12px rgba(12, 75, 52, 0.2);">ASSIGN</button>
+        </div>
+      </form>
+    </div>
   </div>
 </div>
 

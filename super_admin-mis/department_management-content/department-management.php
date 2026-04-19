@@ -217,126 +217,181 @@ function ascom_on_color_for_hex($hex) {
     </div>
 </div>
 
-<!-- Assign Dean Modal (Inline) -->
-<div id="assignDeanModal" class="modal-overlay" style="display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background-color: rgba(0, 0, 0, 0.5); z-index: 9999;">
-  <div class="modal-box" style="background-color: #EFEFEF; padding: 25px; border: 1px solid #888; border-radius: 15px; width: 90%; max-width: 500px; box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3); animation: fadeInCentered 0.3s; height: auto; max-height: 90vh; overflow-y: auto; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);">
-    <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #e5e5e5; padding-bottom: 15px; margin-bottom: 20px;">
-      <h2 style="margin: 0; font-size: 22px; font-weight: 700; color: #333;">Assign Dean</h2>
-      <span onclick="window.closeAssignDeanModal()" style="color: #aaa; font-size: 28px; font-weight: 700; cursor: pointer;">&times;</span>
+<!-- Assign Dean Modal -->
+<div id="assignDeanModal" class="modal-overlay" style="display: none;">
+  <div class="modal-box dept-details-modal dept-form-modal" role="dialog" aria-modal="true" aria-labelledby="assignDeanTitle">
+    <div class="dept-details-modal__header">
+      <div class="dept-details-modal__titlewrap">
+        <span class="dept-details-modal__badge">DEAN</span>
+        <div class="dept-details-modal__titles">
+          <h2 id="assignDeanTitle" class="dept-details-modal__title">Assign Dean</h2>
+          <div id="assignDeanDeptName" class="dept-details-modal__subtitle"></div>
+        </div>
+      </div>
+      <button type="button" class="dept-details-modal__close" onclick="window.closeAssignDeanModal()" aria-label="Close modal">&times;</button>
     </div>
-    <p id="assignDeanDeptName" style="font-size: 16px; color: #666; margin-bottom: 20px;"></p>
-    <form id="assignDeanForm" style="display: flex; flex-direction: column; gap: 15px;">
-      <input type="hidden" name="department_id" id="assign_dept_id">
-      <div>
-        <label style="font-size: 14px; font-weight: bold; margin-bottom: 6px; display: block;">Select User with Dean Role <span style="color: #dc3545;">*</span></label>
-        <select name="user_id" id="assign_user_id" required style="width: 100%; height: 50px; padding: 0 12px; border: 1px solid #ccc; border-radius: 12px; box-sizing: border-box; background-color: #FFFFFF;">
-          <option value="">-- Select Dean --</option>
-        </select>
-      </div>
-      <div id="currentDeanSection" style="display: none; background: #fff3cd; padding: 15px; border-radius: 8px;">
-        <strong>Current Dean:</strong> <span id="currentDeanName"></span>
-        <button type="button" onclick="window.removeDean()" style="margin-left: 10px; color: #dc3545; background: none; border: none; cursor: pointer; text-decoration: underline;">Remove</button>
-      </div>
-      <div style="display: flex; justify-content: flex-end; gap: 10px; margin-top: 10px;">
-        <button type="button" onclick="window.closeAssignDeanModal()" style="width: 125px; height: 50px; background-color: #C9C9C9; color: black; border: none; border-radius: 10px; cursor: pointer; font-size: 14px; font-weight: bold; text-transform: uppercase;">CANCEL</button>
-        <button type="submit" class="create-btn" style="width: 125px; height: 50px;">ASSIGN</button>
-      </div>
-    </form>
+    <div class="dept-details-modal__content">
+      <form id="assignDeanForm" class="dept-form">
+        <input type="hidden" name="department_id" id="assign_dept_id">
+        <div class="dept-form__group">
+          <label class="dept-form__label" for="assign_user_id">Select User with Dean Role <span class="dept-form__req">*</span></label>
+          <select name="user_id" id="assign_user_id" class="dept-form__control" required>
+            <option value="">-- Select Dean --</option>
+          </select>
+        </div>
+        <div id="currentDeanSection" class="dept-form__notice" style="display: none;">
+          <div><strong>Current Dean:</strong> <span id="currentDeanName"></span></div>
+          <button type="button" class="dept-link-danger" onclick="window.removeDean()">Remove</button>
+        </div>
+        <div class="dept-form__actions">
+          <button type="button" class="dept-btn dept-btn--secondary" onclick="window.closeAssignDeanModal()">Cancel</button>
+          <button type="submit" class="dept-btn dept-btn--primary">Assign</button>
+        </div>
+      </form>
+    </div>
   </div>
 </div>
 
 <!-- Success Modal -->
-<div id="deptSuccessModal" style="display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background-color: rgba(0, 0, 0, 0.8); z-index: 9999;">
-  <div style="max-width: 400px; text-align: center; background-color: #FFFFFF; padding: 30px; border-radius: 15px; margin: 0; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);">
-    <div style="margin-bottom: 20px;"><span style="font-size: 60px;">✓</span></div>
-    <h2 style="color: #28a745; margin-bottom: 15px;">Success!</h2>
-    <p id="deptSuccessMessage" style="font-size: 16px; margin-bottom: 25px;">Operation completed successfully!</p>
-    <button onclick="document.getElementById('deptSuccessModal').style.display='none'; location.reload();" style="min-width: 120px; height: 45px; background-color: #28a745; color: white; border: none; border-radius: 10px; cursor: pointer; font-size: 16px;">OK</button>
+<div id="deptSuccessModal" class="modal-overlay" style="display: none;">
+  <div class="modal-box dept-details-modal dept-feedback-modal" role="dialog" aria-modal="true" aria-labelledby="deptSuccessTitle">
+    <div class="dept-details-modal__header">
+      <div class="dept-details-modal__titlewrap">
+        <span class="dept-details-modal__badge">OK</span>
+        <div class="dept-details-modal__titles">
+          <h2 id="deptSuccessTitle" class="dept-details-modal__title">Success</h2>
+          <div class="dept-details-modal__subtitle">Action completed.</div>
+        </div>
+      </div>
+      <button type="button" class="dept-details-modal__close" onclick="window.closeDeptSuccessModal()" aria-label="Close modal">&times;</button>
+    </div>
+    <div class="dept-details-modal__content">
+      <div class="dept-feedback-modal__icon dept-feedback-modal__icon--success">✓</div>
+      <div id="deptSuccessMessage" class="dept-feedback-modal__message">Operation completed successfully!</div>
+      <div class="dept-form__actions" style="justify-content: center;">
+        <button type="button" class="dept-btn dept-btn--primary" onclick="window.closeDeptSuccessModal(true)">OK</button>
+      </div>
+    </div>
   </div>
 </div>
 
 <!-- Error Modal -->
-<div id="deptErrorModal" style="display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background-color: rgba(0, 0, 0, 0.8); z-index: 9999;">
-  <div style="max-width: 400px; text-align: center; background-color: #FFFFFF; padding: 30px; border-radius: 15px; margin: 0; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);">
-    <div style="margin-bottom: 20px;"><span style="font-size: 60px; color: #dc3545;">✕</span></div>
-    <h2 style="color: #dc3545; margin-bottom: 15px;">Error!</h2>
-    <p id="deptErrorMessage" style="font-size: 16px; margin-bottom: 25px;">An error occurred.</p>
-    <button onclick="document.getElementById('deptErrorModal').style.display='none';" style="min-width: 120px; height: 45px; background-color: #dc3545; color: white; border: none; border-radius: 10px; cursor: pointer; font-size: 16px;">OK</button>
+<div id="deptErrorModal" class="modal-overlay" style="display: none;">
+  <div class="modal-box dept-details-modal dept-feedback-modal" role="dialog" aria-modal="true" aria-labelledby="deptErrorTitle">
+    <div class="dept-details-modal__header">
+      <div class="dept-details-modal__titlewrap">
+        <span class="dept-details-modal__badge">ERR</span>
+        <div class="dept-details-modal__titles">
+          <h2 id="deptErrorTitle" class="dept-details-modal__title">Error</h2>
+          <div class="dept-details-modal__subtitle">Something went wrong.</div>
+        </div>
+      </div>
+      <button type="button" class="dept-details-modal__close" onclick="window.closeDeptErrorModal()" aria-label="Close modal">&times;</button>
+    </div>
+    <div class="dept-details-modal__content">
+      <div class="dept-feedback-modal__icon dept-feedback-modal__icon--error">✕</div>
+      <div id="deptErrorMessage" class="dept-feedback-modal__message">An error occurred.</div>
+      <div class="dept-form__actions" style="justify-content: center;">
+        <button type="button" class="dept-btn dept-btn--primary" onclick="window.closeDeptErrorModal()">OK</button>
+      </div>
+    </div>
   </div>
 </div>
 
 <!-- Edit Department Modal -->
-<div id="editDepartmentModal" class="modal-overlay" style="display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background-color: rgba(0, 0, 0, 0.5); z-index: 9999;">
-  <div class="modal-box" style="background-color: #EFEFEF; padding: 25px; border: 1px solid #888; border-radius: 15px; width: 90%; max-width: 500px; box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3); animation: fadeInCentered 0.3s; height: auto; max-height: 90vh; overflow-y: auto; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);">
-    <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #e5e5e5; padding-bottom: 15px; margin-bottom: 20px;">
-      <h2 style="margin: 0; font-size: 22px; font-weight: 700; color: #333;">Edit Department</h2>
-      <span onclick="window.closeEditDepartmentModal()" style="color: #aaa; font-size: 28px; font-weight: 700; cursor: pointer;">&times;</span>
-    </div>
-    <form id="editDepartmentForm" style="display: flex; flex-direction: column; gap: 15px;">
-      <input type="hidden" name="department_id" id="edit_dept_id">
-      <div>
-        <label style="font-size: 14px; font-weight: bold; margin-bottom: 6px; display: block;">Department Name <span style="color: #dc3545;">*</span></label>
-        <input type="text" name="department_name" id="edit_department_name" required placeholder="e.g., College of Computing Studies" style="width: 100%; height: 50px; padding: 0 12px; border: 1px solid #ccc; border-radius: 12px; box-sizing: border-box; background-color: #FFFFFF;">
-      </div>
-      <div>
-        <label style="font-size: 14px; font-weight: bold; margin-bottom: 6px; display: block;">Department Code <span style="color: #dc3545;">*</span></label>
-        <input type="text" name="department_code" id="edit_department_code" required placeholder="e.g., CCS" maxlength="10" style="width: 100%; height: 50px; padding: 0 12px; border: 1px solid #ccc; border-radius: 12px; box-sizing: border-box; background-color: #FFFFFF; text-transform: uppercase;">
-      </div>
-      <div>
-        <label style="font-size: 14px; font-weight: bold; margin-bottom: 6px; display: block;">Color Code</label>
-        <div style="display: flex; gap: 10px; align-items: center;">
-          <input type="color" id="edit_color_picker" value="#1976d2" style="width: 50px; height: 40px; border: none; border-radius: 8px; cursor: pointer;">
-          <input type="text" id="edit_color_hex" value="#1976d2" maxlength="7" style="flex: 1; height: 50px; padding: 0 12px; border: 1px solid #ccc; border-radius: 12px; box-sizing: border-box; background-color: #FFFFFF;">
+<div id="editDepartmentModal" class="modal-overlay" style="display: none;">
+  <div class="modal-box dept-details-modal dept-form-modal" role="dialog" aria-modal="true" aria-labelledby="editDepartmentTitle">
+    <div class="dept-details-modal__header">
+      <div class="dept-details-modal__titlewrap">
+        <span class="dept-details-modal__badge">EDIT</span>
+        <div class="dept-details-modal__titles">
+          <h2 id="editDepartmentTitle" class="dept-details-modal__title">Edit Department</h2>
+          <div class="dept-details-modal__subtitle">Update department information.</div>
         </div>
       </div>
-      <div style="display: flex; justify-content: flex-end; gap: 10px; margin-top: 10px;">
-        <button type="button" onclick="window.closeEditDepartmentModal()" style="width: 125px; height: 50px; background-color: #C9C9C9; color: black; border: none; border-radius: 10px; cursor: pointer; font-size: 14px; font-weight: bold; text-transform: uppercase;">CANCEL</button>
-        <button type="submit" class="create-btn" style="width: 125px; height: 50px;">UPDATE</button>
-      </div>
-    </form>
+      <button type="button" class="dept-details-modal__close" onclick="window.closeEditDepartmentModal()" aria-label="Close modal">&times;</button>
+    </div>
+    <div class="dept-details-modal__content">
+      <form id="editDepartmentForm" class="dept-form">
+        <input type="hidden" name="department_id" id="edit_dept_id">
+        <div class="dept-form__group">
+          <label class="dept-form__label" for="edit_department_name">Department Name <span class="dept-form__req">*</span></label>
+          <input type="text" name="department_name" id="edit_department_name" required placeholder="e.g., College of Computing Studies" class="dept-form__control">
+        </div>
+        <div class="dept-form__group">
+          <label class="dept-form__label" for="edit_department_code">Department Code <span class="dept-form__req">*</span></label>
+          <input type="text" name="department_code" id="edit_department_code" required placeholder="e.g., CCS" maxlength="10" class="dept-form__control" style="text-transform: uppercase;">
+        </div>
+        <div class="dept-form__group">
+          <label class="dept-form__label" for="edit_color_hex">Color Code</label>
+          <div class="dept-form__row">
+            <input type="color" id="edit_color_picker" value="#1976d2" class="dept-form__color">
+            <input type="text" id="edit_color_hex" value="#1976d2" maxlength="7" class="dept-form__control" style="flex: 1;">
+          </div>
+        </div>
+        <div class="dept-form__actions">
+          <button type="button" class="dept-btn dept-btn--secondary" onclick="window.closeEditDepartmentModal()">Cancel</button>
+          <button type="submit" class="dept-btn dept-btn--primary">Update</button>
+        </div>
+      </form>
+    </div>
   </div>
 </div>
 
 <!-- Add Department Modal -->
-<div id="addDepartmentModal" class="modal-overlay" style="display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background-color: rgba(0, 0, 0, 0.5); z-index: 9999;">
-  <div class="modal-box" style="background-color: #EFEFEF; padding: 25px; border: 1px solid #888; border-radius: 15px; width: 90%; max-width: 500px; box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3); animation: fadeInCentered 0.3s; height: auto; max-height: 90vh; overflow-y: auto; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);">
-    <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #e5e5e5; padding-bottom: 15px; margin-bottom: 20px;">
-      <h2 style="margin: 0; font-size: 22px; font-weight: 700; color: #333;">Add Department</h2>
-      <span onclick="window.closeAddDepartmentModal()" style="color: #aaa; font-size: 28px; font-weight: 700; cursor: pointer;">&times;</span>
-    </div>
-    <form id="addDepartmentForm" style="display: flex; flex-direction: column; gap: 15px;">
-      <div>
-        <label style="font-size: 14px; font-weight: bold; margin-bottom: 6px; display: block;">Department Name <span style="color: #dc3545;">*</span></label>
-        <input type="text" name="department_name" id="add_department_name" required placeholder="e.g., College of Computing Studies" style="width: 100%; height: 50px; padding: 0 12px; border: 1px solid #ccc; border-radius: 12px; box-sizing: border-box; background-color: #FFFFFF;">
-      </div>
-      <div>
-        <label style="font-size: 14px; font-weight: bold; margin-bottom: 6px; display: block;">Department Code <span style="color: #dc3545;">*</span></label>
-        <input type="text" name="department_code" id="add_department_code" required placeholder="e.g., CCS" maxlength="10" style="width: 100%; height: 50px; padding: 0 12px; border: 1px solid #ccc; border-radius: 12px; box-sizing: border-box; background-color: #FFFFFF; text-transform: uppercase;">
-      </div>
-      <div>
-        <label style="font-size: 14px; font-weight: bold; margin-bottom: 6px; display: block;">Color Code</label>
-        <div style="display: flex; gap: 10px; align-items: center;">
-          <input type="color" id="add_color_picker" value="#1976d2" style="width: 50px; height: 40px; border: none; border-radius: 8px; cursor: pointer;">
-          <input type="text" id="add_color_hex" value="#1976d2" maxlength="7" style="flex: 1; height: 50px; padding: 0 12px; border: 1px solid #ccc; border-radius: 12px; box-sizing: border-box; background-color: #FFFFFF;">
+<div id="addDepartmentModal" class="modal-overlay" style="display: none;">
+  <div class="modal-box dept-details-modal dept-form-modal" role="dialog" aria-modal="true" aria-labelledby="addDepartmentTitle">
+    <div class="dept-details-modal__header">
+      <div class="dept-details-modal__titlewrap">
+        <span class="dept-details-modal__badge">ADD</span>
+        <div class="dept-details-modal__titles">
+          <h2 id="addDepartmentTitle" class="dept-details-modal__title">Add Department</h2>
+          <div class="dept-details-modal__subtitle">Create a new department.</div>
         </div>
       </div>
-      <div style="display: flex; justify-content: flex-end; gap: 10px; margin-top: 10px;">
-        <button type="button" onclick="window.closeAddDepartmentModal()" style="width: 125px; height: 50px; background-color: #C9C9C9; color: black; border: none; border-radius: 10px; cursor: pointer; font-size: 14px; font-weight: bold; text-transform: uppercase;">CANCEL</button>
-        <button type="submit" class="create-btn" style="width: 125px; height: 50px;">ADD</button>
-      </div>
-    </form>
+      <button type="button" class="dept-details-modal__close" onclick="window.closeAddDepartmentModal()" aria-label="Close modal">&times;</button>
+    </div>
+    <div class="dept-details-modal__content">
+      <form id="addDepartmentForm" class="dept-form">
+        <div class="dept-form__group">
+          <label class="dept-form__label" for="add_department_name">Department Name <span class="dept-form__req">*</span></label>
+          <input type="text" name="department_name" id="add_department_name" required placeholder="e.g., College of Computing Studies" class="dept-form__control">
+        </div>
+        <div class="dept-form__group">
+          <label class="dept-form__label" for="add_department_code">Department Code <span class="dept-form__req">*</span></label>
+          <input type="text" name="department_code" id="add_department_code" required placeholder="e.g., CCS" maxlength="10" class="dept-form__control" style="text-transform: uppercase;">
+        </div>
+        <div class="dept-form__group">
+          <label class="dept-form__label" for="add_color_hex">Color Code</label>
+          <div class="dept-form__row">
+            <input type="color" id="add_color_picker" value="#1976d2" class="dept-form__color">
+            <input type="text" id="add_color_hex" value="#1976d2" maxlength="7" class="dept-form__control" style="flex: 1;">
+          </div>
+        </div>
+        <div class="dept-form__actions">
+          <button type="button" class="dept-btn dept-btn--secondary" onclick="window.closeAddDepartmentModal()">Cancel</button>
+          <button type="submit" class="dept-btn dept-btn--primary">Add</button>
+        </div>
+      </form>
+    </div>
   </div>
 </div>
 
 <!-- Department Details Modal -->
-<div id="departmentDetailsModal" class="modal-overlay" style="display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background-color: rgba(0, 0, 0, 0.5); z-index: 9999;">
-  <div class="modal-box" style="background-color: #EFEFEF; padding: 25px; border: 1px solid #888; border-radius: 15px; width: 90%; max-width: 600px; box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3); animation: fadeInCentered 0.3s; height: auto; max-height: 85vh; overflow-y: auto; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);">
-    <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #e5e5e5; padding-bottom: 15px; margin-bottom: 20px;">
-      <h2 id="detailsModalTitle" style="margin: 0; font-size: 22px; font-weight: 700; color: #333;">Department Details</h2>
-      <span onclick="window.closeDepartmentDetailsModal()" style="color: #aaa; font-size: 28px; font-weight: 700; cursor: pointer;">&times;</span>
+<div id="departmentDetailsModal" class="modal-overlay" style="display: none;">
+  <div class="modal-box dept-details-modal" role="dialog" aria-modal="true" aria-labelledby="detailsModalTitle">
+    <div class="dept-details-modal__header">
+      <div class="dept-details-modal__titlewrap">
+        <span id="deptDetailsBadge" class="dept-details-modal__badge">DEPT</span>
+        <div class="dept-details-modal__titles">
+          <h2 id="detailsModalTitle" class="dept-details-modal__title">Department Details</h2>
+          <div id="deptDetailsSubtitle" class="dept-details-modal__subtitle"></div>
+        </div>
+      </div>
+      <button type="button" class="dept-details-modal__close" onclick="window.closeDepartmentDetailsModal()" aria-label="Close modal">&times;</button>
     </div>
-    <div id="departmentDetailsContent" style="display: flex; flex-direction: column; gap: 20px;">
-      <p style="text-align: center; color: #666;">Loading...</p>
+    <div id="departmentDetailsContent" class="dept-details-modal__content" aria-live="polite">
+      <div class="dept-details-modal__loading">Loading...</div>
     </div>
   </div>
 </div>
@@ -371,6 +426,9 @@ function openDepartmentDetailsModal(deptId) {
     const modal = document.getElementById('departmentDetailsModal');
     const content = document.getElementById('departmentDetailsContent');
     const title = document.getElementById('detailsModalTitle');
+    const subtitle = document.getElementById('deptDetailsSubtitle');
+    const badge = document.getElementById('deptDetailsBadge');
+    const modalBox = modal ? modal.querySelector('.modal-box') : null;
     
     if (!modal || !content) {
         console.error('Department Details Modal not found');
@@ -378,7 +436,7 @@ function openDepartmentDetailsModal(deptId) {
         return;
     }
     
-    content.innerHTML = '<p style="text-align: center; color: #666;">Loading...</p>';
+    content.innerHTML = '<div class="dept-details-modal__loading">Loading...</div>';
     modal.style.display = 'flex';
     document.body.style.overflow = 'hidden';
     
@@ -387,79 +445,100 @@ function openDepartmentDetailsModal(deptId) {
     .then(data => {
         if (data.success) {
             const dept = data.data;
-            title.textContent = dept.department_name + ' - Details';
+            title.textContent = dept.department_name || 'Department Details';
+            if (subtitle) {
+                subtitle.textContent = dept.dean_name ? `Dean: ${dept.dean_name}` : 'No dean assigned';
+            }
+            if (badge) {
+                badge.textContent = (dept.department_code || 'DEPT').toString().toUpperCase();
+            }
+            if (modalBox) {
+                modalBox.style.setProperty('--dept-color', (dept.color_code || '#0C4B34'));
+            }
             
             let html = '';
             
             // Dean Section
-            html += '<div style="background: #fff; padding: 15px; border-radius: 10px; box-shadow: 0 1px 4px rgba(0,0,0,0.08);">';
-            html += '<h4 style="margin: 0 0 12px 0; font-size: 16px; font-weight: 600; color: #333; border-bottom: 2px solid #6f42c1; padding-bottom: 8px;">Dean</h4>';
+            html += '<section class="dept-details-modal__section">';
+            html += '<h3 class="dept-details-modal__section-title">Dean</h3>';
             if (dept.dean_name) {
-                html += '<div style="display: flex; justify-content: space-between; margin-bottom: 8px;"><span style="color: #666;">Name:</span><span style="font-weight: 500;">' + dept.dean_name + '</span></div>';
-                html += '<div style="display: flex; justify-content: space-between;"><span style="color: #666;">Employee No:</span><span>' + (dept.dean_employee_no || 'N/A') + '</span></div>';
+                html += '<div class="dept-details-modal__kv">';
+                html += '<div class="dept-details-modal__k">Name</div><div class="dept-details-modal__v">' + dept.dean_name + '</div>';
+                html += '<div class="dept-details-modal__k">Employee No</div><div class="dept-details-modal__v">' + (dept.dean_employee_no || 'N/A') + '</div>';
+                html += '</div>';
             } else {
-                html += '<p style="color: #999; font-style: italic;">No dean assigned</p>';
+                html += '<div class="dept-details-modal__empty">No dean assigned</div>';
             }
-            html += '</div>';
+            html += '</section>';
             
             // Stats Summary
-            html += '<div style="display: flex; gap: 10px; flex-wrap: wrap;">';
-            html += '<div style="flex: 1; min-width: 100px; background: #fff; padding: 15px; border-radius: 10px; text-align: center; box-shadow: 0 1px 4px rgba(0,0,0,0.08);"><div style="font-size: 24px; font-weight: 700; color: #007bff;">' + dept.program_count + '</div><div style="font-size: 12px; color: #666;">Programs</div></div>';
-            html += '<div style="flex: 1; min-width: 100px; background: #fff; padding: 15px; border-radius: 10px; text-align: center; box-shadow: 0 1px 4px rgba(0,0,0,0.08);"><div style="font-size: 24px; font-weight: 700; color: #28a745;">' + dept.course_count + '</div><div style="font-size: 12px; color: #666;">Courses</div></div>';
-            html += '<div style="flex: 1; min-width: 100px; background: #fff; padding: 15px; border-radius: 10px; text-align: center; box-shadow: 0 1px 4px rgba(0,0,0,0.08);"><div style="font-size: 24px; font-weight: 700; color: #dc3545;">' + dept.teacher_count + '</div><div style="font-size: 12px; color: #666;">Teachers</div></div>';
-            html += '</div>';
+            html += '<section class="dept-details-modal__stats">';
+            html += '<div class="dept-details-modal__stat"><div class="dept-details-modal__stat-value">' + (dept.program_count ?? 0) + '</div><div class="dept-details-modal__stat-label">Programs</div></div>';
+            html += '<div class="dept-details-modal__stat"><div class="dept-details-modal__stat-value">' + (dept.course_count ?? 0) + '</div><div class="dept-details-modal__stat-label">Courses</div></div>';
+            html += '<div class="dept-details-modal__stat"><div class="dept-details-modal__stat-value">' + (dept.teacher_count ?? 0) + '</div><div class="dept-details-modal__stat-label">Teachers</div></div>';
+            html += '</section>';
             
             // Programs (if any)
             if (dept.programs && dept.programs.length > 0) {
-                html += '<div style="background: #fff; padding: 15px; border-radius: 10px; box-shadow: 0 1px 4px rgba(0,0,0,0.08);">';
-                html += '<h4 style="margin: 0 0 12px 0; font-size: 16px; font-weight: 600; color: #333; border-bottom: 2px solid #007bff; padding-bottom: 8px;">Programs (' + dept.programs.length + ')</h4>';
-                html += '<ul style="list-style: none; padding: 0; margin: 0;">';
+                html += '<section class="dept-details-modal__section">';
+                html += '<h3 class="dept-details-modal__section-title">Programs <span class="dept-details-modal__count">(' + dept.programs.length + ')</span></h3>';
+                html += '<ul class="dept-details-modal__list">';
                 dept.programs.forEach(function(prog) {
-                    html += '<li style="padding: 8px 0; border-bottom: 1px solid #f0f0f0; font-size: 14px;"><strong>' + prog.program_code + '</strong> ' + prog.program_name + (prog.major ? ' - ' + prog.major : '') + '</li>';
+                    html += '<li class="dept-details-modal__list-item"><span class="dept-details-modal__list-code">' + prog.program_code + '</span><span class="dept-details-modal__list-text">' + prog.program_name + (prog.major ? ' — ' + prog.major : '') + '</span></li>';
                 });
-                html += '</ul>';
-                html += '</div>';
+                html += '</ul></section>';
             }
             
             // Courses (if any)
             if (dept.courses && dept.courses.length > 0) {
-                html += '<div style="background: #fff; padding: 15px; border-radius: 10px; box-shadow: 0 1px 4px rgba(0,0,0,0.08);">';
-                html += '<h4 style="margin: 0 0 12px 0; font-size: 16px; font-weight: 600; color: #333; border-bottom: 2px solid #28a745; padding-bottom: 8px;">Courses (' + dept.courses.length + ')</h4>';
-                html += '<ul style="list-style: none; padding: 0; margin: 0;">';
+                html += '<section class="dept-details-modal__section">';
+                html += '<h3 class="dept-details-modal__section-title">Courses <span class="dept-details-modal__count">(' + dept.courses.length + ')</span></h3>';
+                html += '<ul class="dept-details-modal__list">';
                 dept.courses.slice(0, 10).forEach(function(course) {
-                    html += '<li style="padding: 8px 0; border-bottom: 1px solid #f0f0f0; font-size: 14px;"><strong>' + course.course_code + '</strong> ' + course.course_title + ' <span style="color: #999; font-size: 12px;">(' + (course.units || 0) + ' units)</span></li>';
+                    html += '<li class="dept-details-modal__list-item"><span class="dept-details-modal__list-code">' + course.course_code + '</span><span class="dept-details-modal__list-text">' + course.course_title + '</span><span class="dept-details-modal__list-meta">' + (course.units || 0) + ' units</span></li>';
                 });
                 if (dept.courses.length > 10) {
-                    html += '<li style="padding: 8px 0; color: #666; font-size: 12px;">...and ' + (dept.courses.length - 10) + ' more courses</li>';
+                    html += '<li class="dept-details-modal__list-more">…and ' + (dept.courses.length - 10) + ' more courses</li>';
                 }
-                html += '</ul>';
-                html += '</div>';
+                html += '</ul></section>';
             }
             
             // Teachers (if any)
             if (dept.teachers && dept.teachers.length > 0) {
-                html += '<div style="background: #fff; padding: 15px; border-radius: 10px; box-shadow: 0 1px 4px rgba(0,0,0,0.08);">';
-                html += '<h4 style="margin: 0 0 12px 0; font-size: 16px; font-weight: 600; color: #333; border-bottom: 2px solid #dc3545; padding-bottom: 8px;">Teachers (' + dept.teachers.length + ')</h4>';
-                html += '<ul style="list-style: none; padding: 0; margin: 0;">';
+                html += '<section class="dept-details-modal__section">';
+                html += '<h3 class="dept-details-modal__section-title">Teachers <span class="dept-details-modal__count">(' + dept.teachers.length + ')</span></h3>';
+                html += '<ul class="dept-details-modal__list">';
                 dept.teachers.slice(0, 10).forEach(function(teacher) {
-                    html += '<li style="padding: 8px 0; border-bottom: 1px solid #f0f0f0; font-size: 14px;">' + teacher.first_name + ' ' + teacher.last_name + ' <span style="color: #999; font-size: 12px;">(' + teacher.employee_no + ')</span></li>';
+                    html += '<li class="dept-details-modal__list-item"><span class="dept-details-modal__list-text">' + teacher.first_name + ' ' + teacher.last_name + '</span><span class="dept-details-modal__list-meta">' + teacher.employee_no + '</span></li>';
                 });
                 if (dept.teachers.length > 10) {
-                    html += '<li style="padding: 8px 0; color: #666; font-size: 12px;">...and ' + (dept.teachers.length - 10) + ' more teachers</li>';
+                    html += '<li class="dept-details-modal__list-more">…and ' + (dept.teachers.length - 10) + ' more teachers</li>';
                 }
-                html += '</ul>';
-                html += '</div>';
+                html += '</ul></section>';
             }
             
             content.innerHTML = html;
         } else {
-            content.innerHTML = '<p style="text-align: center; color: #dc3545;">Error loading department details.</p>';
+            content.innerHTML = '<div class="dept-details-modal__error">Error loading department details.</div>';
         }
     })
     .catch(function(error) {
         console.error('Error:', error);
-        content.innerHTML = '<p style="text-align: center; color: #dc3545;">Network error. Please try again.</p>';
+        content.innerHTML = '<div class="dept-details-modal__error">Network error. Please try again.</div>';
     });
+
+    // Close on overlay click + Esc
+    modal.onclick = function(e) {
+        if (e.target === modal) {
+            window.closeDepartmentDetailsModal();
+        }
+    };
+    window.__deptDetailsEscHandler = function(e) {
+        if (e.key === 'Escape') {
+            window.closeDepartmentDetailsModal();
+        }
+    };
+    document.addEventListener('keydown', window.__deptDetailsEscHandler);
 }
 
 window.openDepartmentDetailsModal = openDepartmentDetailsModal;
@@ -468,15 +547,84 @@ function closeDepartmentDetailsModal() {
     const modal = document.getElementById('departmentDetailsModal');
     if (modal) modal.style.display = 'none';
     document.body.style.overflow = '';
+    const subtitle = document.getElementById('deptDetailsSubtitle');
+    if (subtitle) subtitle.textContent = '';
+    if (modal) modal.onclick = null;
+    if (window.__deptDetailsEscHandler) {
+        document.removeEventListener('keydown', window.__deptDetailsEscHandler);
+        window.__deptDetailsEscHandler = null;
+    }
 }
 
 window.closeDepartmentDetailsModal = closeDepartmentDetailsModal;
+
+function setupModalDismiss(modalId, onClose) {
+    const modal = document.getElementById(modalId);
+    if (!modal) return;
+
+    modal.onclick = function(e) {
+        if (e.target === modal) {
+            onClose();
+        }
+    };
+
+    const handlerKey = `__${modalId}EscHandler`;
+    window[handlerKey] = function(e) {
+        if (e.key === 'Escape') {
+            onClose();
+        }
+    };
+    document.addEventListener('keydown', window[handlerKey]);
+}
+
+function teardownModalDismiss(modalId) {
+    const modal = document.getElementById(modalId);
+    if (modal) modal.onclick = null;
+
+    const handlerKey = `__${modalId}EscHandler`;
+    if (window[handlerKey]) {
+        document.removeEventListener('keydown', window[handlerKey]);
+        window[handlerKey] = null;
+    }
+}
+
+window.closeDeptSuccessModal = function(shouldReload) {
+    const modal = document.getElementById('deptSuccessModal');
+    if (modal) modal.style.display = 'none';
+    document.body.style.overflow = '';
+    teardownModalDismiss('deptSuccessModal');
+    if (shouldReload) {
+        location.reload();
+    }
+};
+
+window.closeDeptErrorModal = function() {
+    const modal = document.getElementById('deptErrorModal');
+    if (modal) modal.style.display = 'none';
+    document.body.style.overflow = '';
+    teardownModalDismiss('deptErrorModal');
+};
+
+window.closeAddDepartmentModal = function() {
+    const modal = document.getElementById('addDepartmentModal');
+    if (modal) modal.style.display = 'none';
+    document.body.style.overflow = '';
+    teardownModalDismiss('addDepartmentModal');
+};
+
+window.closeEditDepartmentModal = function() {
+    const modal = document.getElementById('editDepartmentModal');
+    if (modal) modal.style.display = 'none';
+    document.body.style.overflow = '';
+    teardownModalDismiss('editDepartmentModal');
+};
 
 function openAddDepartmentModal() {
     const modal = document.getElementById('addDepartmentModal');
     if (modal) {
         modal.style.display = 'flex';
         document.body.style.overflow = 'hidden';
+        setupModalDismiss('addDepartmentModal', window.closeAddDepartmentModal);
     } else {
         console.error('Add Department Modal not found');
         alert('Error: Modal not loaded. Please refresh the page.');
@@ -506,6 +654,7 @@ function openEditDepartmentModal(deptId) {
             
             modal.style.display = 'flex';
             document.body.style.overflow = 'hidden';
+            setupModalDismiss('editDepartmentModal', window.closeEditDepartmentModal);
         } else {
             alert('Error: ' + (data.message || 'Failed to load department data'));
         }
@@ -577,11 +726,13 @@ window.openAssignDeanModal = function(deptId, deptCode) {
     
     document.getElementById('assignDeanModal').style.display = 'flex';
     document.body.style.overflow = 'hidden';
+    setupModalDismiss('assignDeanModal', window.closeAssignDeanModal);
 }
 
 window.closeAssignDeanModal = function() {
     document.getElementById('assignDeanModal').style.display = 'none';
     document.body.style.overflow = '';
+    teardownModalDismiss('assignDeanModal');
 }
 
 window.removeDean = function() {
@@ -597,10 +748,14 @@ window.removeDean = function() {
             if (data.success) {
                 document.getElementById('deptSuccessMessage').textContent = 'Dean removed successfully!';
                 document.getElementById('deptSuccessModal').style.display = 'flex';
+                document.body.style.overflow = 'hidden';
+                setupModalDismiss('deptSuccessModal', () => window.closeDeptSuccessModal(false));
                 window.closeAssignDeanModal();
             } else {
                 document.getElementById('deptErrorMessage').textContent = data.message;
                 document.getElementById('deptErrorModal').style.display = 'flex';
+                document.body.style.overflow = 'hidden';
+                setupModalDismiss('deptErrorModal', window.closeDeptErrorModal);
             }
         });
     }
@@ -654,15 +809,21 @@ document.addEventListener('DOMContentLoaded', function() {
                 if (data.success) {
                     document.getElementById('deptSuccessMessage').textContent = data.message || 'Department added successfully!';
                     document.getElementById('deptSuccessModal').style.display = 'flex';
+                    document.body.style.overflow = 'hidden';
+                    setupModalDismiss('deptSuccessModal', () => window.closeDeptSuccessModal(false));
                     window.closeAddDepartmentModal();
                 } else {
                     document.getElementById('deptErrorMessage').textContent = data.message;
                     document.getElementById('deptErrorModal').style.display = 'flex';
+                    document.body.style.overflow = 'hidden';
+                    setupModalDismiss('deptErrorModal', window.closeDeptErrorModal);
                 }
             })
             .catch(function(error) {
                 document.getElementById('deptErrorMessage').textContent = 'Network error. Please try again.';
                 document.getElementById('deptErrorModal').style.display = 'flex';
+                document.body.style.overflow = 'hidden';
+                setupModalDismiss('deptErrorModal', window.closeDeptErrorModal);
             });
         });
     }
@@ -685,15 +846,21 @@ document.addEventListener('DOMContentLoaded', function() {
                 if (data.success) {
                     document.getElementById('deptSuccessMessage').textContent = data.message || 'Department updated successfully!';
                     document.getElementById('deptSuccessModal').style.display = 'flex';
+                    document.body.style.overflow = 'hidden';
+                    setupModalDismiss('deptSuccessModal', () => window.closeDeptSuccessModal(false));
                     window.closeEditDepartmentModal();
                 } else {
                     document.getElementById('deptErrorMessage').textContent = data.message;
                     document.getElementById('deptErrorModal').style.display = 'flex';
+                    document.body.style.overflow = 'hidden';
+                    setupModalDismiss('deptErrorModal', window.closeDeptErrorModal);
                 }
             })
             .catch(function(error) {
                 document.getElementById('deptErrorMessage').textContent = 'Network error. Please try again.';
                 document.getElementById('deptErrorModal').style.display = 'flex';
+                document.body.style.overflow = 'hidden';
+                setupModalDismiss('deptErrorModal', window.closeDeptErrorModal);
             });
         });
     }
@@ -715,15 +882,21 @@ document.addEventListener('DOMContentLoaded', function() {
                 if (data.success) {
                     document.getElementById('deptSuccessMessage').textContent = data.message || 'Dean assigned successfully!';
                     document.getElementById('deptSuccessModal').style.display = 'flex';
+                    document.body.style.overflow = 'hidden';
+                    setupModalDismiss('deptSuccessModal', () => window.closeDeptSuccessModal(false));
                     window.closeAssignDeanModal();
                 } else {
                     document.getElementById('deptErrorMessage').textContent = data.message;
                     document.getElementById('deptErrorModal').style.display = 'flex';
+                    document.body.style.overflow = 'hidden';
+                    setupModalDismiss('deptErrorModal', window.closeDeptErrorModal);
                 }
             })
             .catch(function(error) {
                 document.getElementById('deptErrorMessage').textContent = 'Network error. Please try again.';
                 document.getElementById('deptErrorModal').style.display = 'flex';
+                document.body.style.overflow = 'hidden';
+                setupModalDismiss('deptErrorModal', window.closeDeptErrorModal);
             });
         });
     }
