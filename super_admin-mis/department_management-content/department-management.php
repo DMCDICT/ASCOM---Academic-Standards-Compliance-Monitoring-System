@@ -125,7 +125,7 @@ function ascom_on_color_for_hex($hex) {
         <div class="stat-box" style="animation-delay: 0.05s;">
             <div class="label-icon">
                 <div class="icon-container" style="background: rgba(12, 75, 52, 0.1); color: #0C4B34;">
-                    <i class="fas fa-university"></i>
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21h18"/><path d="M5 21V7l7-4 7 4v14"/><path d="M9 21v-4h6v4"/><path d="M9 9h.01"/><path d="M15 9h.01"/><path d="M9 13h.01"/><path d="M15 13h.01"/></svg>
                 </div>
                 <span>Total Depts</span>
             </div>
@@ -134,7 +134,7 @@ function ascom_on_color_for_hex($hex) {
         <div class="stat-box" style="animation-delay: 0.1s;">
             <div class="label-icon">
                 <div class="icon-container" style="background: rgba(40, 167, 69, 0.1); color: #28a745;">
-                    <i class="fas fa-check-circle"></i>
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
                 </div>
                 <span>Active</span>
             </div>
@@ -143,7 +143,7 @@ function ascom_on_color_for_hex($hex) {
         <div class="stat-box" style="animation-delay: 0.15s;">
             <div class="label-icon">
                 <div class="icon-container" style="background: rgba(21, 101, 192, 0.1); color: #1565C0;">
-                    <i class="fas fa-book"></i>
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
                 </div>
                 <span>Programs</span>
             </div>
@@ -152,7 +152,7 @@ function ascom_on_color_for_hex($hex) {
         <div class="stat-box" style="animation-delay: 0.2s;">
             <div class="label-icon">
                 <div class="icon-container" style="background: rgba(255, 152, 0, 0.1); color: #FF9800;">
-                    <i class="fas fa-graduation-cap"></i>
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 10v6M2 10l10-5 10 5-10 5z"/><path d="M6 12v5c0 2 4 3 6 3s6-1 6-3v-5"/></svg>
                 </div>
                 <span>Courses</span>
             </div>
@@ -161,7 +161,7 @@ function ascom_on_color_for_hex($hex) {
         <div class="stat-box" style="animation-delay: 0.25s;">
             <div class="label-icon">
                 <div class="icon-container" style="background: rgba(156, 39, 176, 0.1); color: #9C27B0;">
-                    <i class="fas fa-chalkboard-teacher"></i>
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
                 </div>
                 <span>Teachers</span>
             </div>
@@ -173,7 +173,7 @@ function ascom_on_color_for_hex($hex) {
     <div class="department-list">
         <?php if (empty($departments)): ?>
         <div class="empty-state">
-            <i class="fas fa-folder-open" style="font-size: 48px; margin-bottom: 20px; opacity: 0.3;"></i>
+            <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="margin-bottom: 20px; opacity: 0.3;"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/><line x1="9" y1="14" x2="15" y2="14"/></svg>
             <p>No departments found. Click "Add Department" to create one.</p>
         </div>
         <?php else: ?>
