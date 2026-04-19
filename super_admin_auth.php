@@ -53,8 +53,10 @@ try {
     session_regenerate_id(true);
     $_SESSION = [];
     $_SESSION['super_admin_logged_in'] = true;
+    $_SESSION['super_admin_session'] = true; // New verification flag
     $_SESSION['is_authenticated'] = true;
     $_SESSION['user_role'] = 'super_admin';
+    $_SESSION['super_admin_id'] = (int) $admin['id'];
     $_SESSION['user_id'] = (int) $admin['id'];
     $_SESSION['username'] = $admin['email'];
     $_SESSION['employee_no'] = 'SUPER_ADMIN';

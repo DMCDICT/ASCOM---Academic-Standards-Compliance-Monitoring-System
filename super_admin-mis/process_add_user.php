@@ -4,22 +4,9 @@
 header('Content-Type: application/json');
 $response = ['success' => false, 'message' => ''];
 
-// Get database config
-$envHost = getenv('DB_HOST') ?: 'localhost';
-$database = getenv('DB_DATABASE') ?: 'ascom_db';
-$username = getenv('DB_USERNAME') ?: 'ascom_user';
-$password = getenv('DB_PASSWORD') ?: 'ascom_password_secure_123';
+require_once dirname(__DIR__) . '/bootstrap/database.php';
 
-// Direct connection
-$conn = @new mysqli($envHost, $username, $password, $database);
-
-if ($conn->connect_error) {
-    $response['message'] = 'DB Connection failed: ' . $conn->connect_error;
-    echo json_encode($response);
-    exit;
-}
-
-$conn->set_charset('utf8mb4');
+$conn = ascom_get_mysqli();
 
     if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $employee_no = trim($_POST['employee_no'] ?? '');
@@ -83,8 +70,9 @@ $conn->set_charset('utf8mb4');
         $role_name = 'teacher';
         if ($role_id == '1') $role_name = 'super_admin';
         elseif ($role_id == '2') $role_name = 'dean';
-        elseif ($role_id == '3') $role_name = 'faculty';
-        elseif ($role_id == '4') $role_name = 'teacher';
+        elseif ($role_id == '3') $role_name = 'teacher';
+        elseif ($role_id == '4') $role_name = 'qa';
+        elseif ($role_id == '5') $role_name = 'librarian';
 
         $stmt_insert = $conn->prepare("
             INSERT INTO users 

@@ -1,3 +1,4 @@
+<?php
 // Clear any output first
 ob_start();
 

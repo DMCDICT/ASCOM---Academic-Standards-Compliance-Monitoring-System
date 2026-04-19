@@ -19,14 +19,15 @@ if ($username === '' || $password === '') {
 }
 
 try {
-    $stmt = $conn->prepare('SELECT id, employee_no, institutional_email, password, role_id, is_active, last_activity, first_name, last_name, title, department_id FROM users WHERE institutional_email = ? AND is_active = 1');
-    $stmt->bind_param('s', $username);
+    // Check both institutional_email and email columns since users may have either
+    $stmt = $conn->prepare('SELECT id, employee_no, institutional_email, email, password, role_id, is_active, last_activity, first_name, last_name, title, department_id FROM users WHERE (institutional_email = ? OR email = ?) AND is_active = 1');
+    $stmt->bind_param('ss', $username, $username);
     $stmt->execute();
     $result = $stmt->get_result();
 
     if ($result->num_rows !== 1) {
-        $stmtDisabled = $conn->prepare('SELECT id FROM users WHERE institutional_email = ? AND is_active = 0');
-        $stmtDisabled->bind_param('s', $username);
+        $stmtDisabled = $conn->prepare('SELECT id FROM users WHERE (institutional_email = ? OR email = ?) AND is_active = 0');
+        $stmtDisabled->bind_param('ss', $username, $username);
         $stmtDisabled->execute();
         $disabledResult = $stmtDisabled->get_result();
 
@@ -60,7 +61,8 @@ try {
 
     $userRoles = [];
 
-    if ((int) $user['role_id'] === 4) {
+    // If role is Dean (2) or Teacher (3), they get the Teacher role
+    if ((int) $user['role_id'] === 2 || (int) $user['role_id'] === 3) {
         $deptCode = null;
         $deptName = null;
         if (!empty($user['department_id'])) {
@@ -100,14 +102,17 @@ try {
     }
     $deanQuery->close();
 
-    $roleStmt = $conn->prepare("SELECT role_name, assigned_at FROM user_roles WHERE user_id = ? AND is_active = 1 AND role_name IN ('librarian','quality_assurance')");
+    $roleStmt = $conn->prepare("SELECT r.role_name, ur.assigned_at FROM user_roles ur JOIN roles r ON ur.role_id = r.id WHERE ur.user_id = ? AND r.role_name IN ('librarian','quality_assurance','qa')");
     $roleStmt->bind_param('i', $user['id']);
     $roleStmt->execute();
     $roleRes = $roleStmt->get_result();
     if ($roleRes && $roleRes->num_rows > 0) {
         while ($row = $roleRes->fetch_assoc()) {
+            // Normalize 'qa' to 'quality_assurance' for consistency
+            $roleType = strtolower($row['role_name']);
+            if ($roleType === 'qa') $roleType = 'quality_assurance';
             $userRoles[] = [
-                'type' => strtolower($row['role_name']),
+                'type' => $roleType,
                 'department_code' => null,
                 'department_name' => null,
                 'assigned_at' => $row['assigned_at'],
@@ -117,18 +122,27 @@ try {
     $roleStmt->close();
 
     if (count($userRoles) === 0) {
-        $legacyRoleStmt = $conn->prepare('SELECT role FROM roles WHERE id = ?');
+        // Legacy fallback: check the roles table using role_name column
+        $legacyRoleStmt = $conn->prepare('SELECT role_name FROM roles WHERE id = ?');
         $legacyRoleStmt->bind_param('i', $user['role_id']);
         $legacyRoleStmt->execute();
         $legacyRoleRes = $legacyRoleStmt->get_result();
         if ($legacyRoleRes && $legacyRoleRes->num_rows === 1) {
             $legacyRole = $legacyRoleRes->fetch_assoc();
-            $userRoles[] = [
-                'type' => strtolower($legacyRole['role']),
-                'department_code' => null,
-                'department_name' => null,
-                'assigned_at' => null,
-            ];
+            $roleType = strtolower($legacyRole['role_name']);
+            
+            // Normalize role names
+            if ($roleType === 'qa') $roleType = 'quality_assurance';
+            
+            // Reject super_admin from user portal login
+            if ($roleType !== 'super_admin') {
+                $userRoles[] = [
+                    'type' => $roleType,
+                    'department_code' => null,
+                    'department_name' => null,
+                    'assigned_at' => null,
+                ];
+            }
         }
         $legacyRoleStmt->close();
     }
@@ -163,9 +177,14 @@ try {
 
     session_regenerate_id(true);
     $_SESSION = [];
+    
+    // Explicitly ensure no super admin flags are set when logging in as a regular user
+    unset($_SESSION['super_admin_logged_in']);
+    unset($_SESSION['super_admin_session']);
+    
     $_SESSION['user_id'] = (int) $user['id'];
     $_SESSION['employee_no'] = $user['employee_no'];
-    $_SESSION['username'] = $user['institutional_email'];
+    $_SESSION['username'] = $user['institutional_email'] ?? $user['email'];
     $_SESSION['user_roles'] = $userRoles;
     $_SESSION['is_authenticated'] = true;
     $_SESSION['user_first_name'] = $user['first_name'];
