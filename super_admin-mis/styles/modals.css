@@ -4,7 +4,7 @@
  */
 
 /* Generic modal styles - exclude specific modals that have their own styles */
-.modal-overlay:not(#addUserModal):not(#addDepartmentModal):not(#userDetailsModal):not(#addTermModal):not(#addSchoolYearModal):not(#addHolidayModal):not(#addCustomEventModal):not(#scheduleMaintenanceModal):not(#successModal):not(#editUserSuccessModal):not(#editUserErrorModal):not(#editUserModal):not(#errorModal):not(#dayDetailsModal), 
+.modal-overlay:not(#addUserModal):not(#addDepartmentModal):not(#editDepartmentModal):not(#assignDeanModal):not(#departmentDetailsModal):not(#deptSuccessModal):not(#deptErrorModal):not(#userDetailsModal):not(#addTermModal):not(#addSchoolYearModal):not(#addHolidayModal):not(#addCustomEventModal):not(#scheduleMaintenanceModal):not(#successModal):not(#editUserSuccessModal):not(#editUserErrorModal):not(#editUserModal):not(#errorModal):not(#dayDetailsModal), 
 .department-modal-overlay {
     position: fixed;
     inset: 0;

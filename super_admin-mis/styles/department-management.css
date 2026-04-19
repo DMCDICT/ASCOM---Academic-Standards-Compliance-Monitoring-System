@@ -1,291 +1,400 @@
-/* department-management.css */
+/*
+ * department-management.css
+ * Premium styling for the College Department Management page.
+ * Follows DESIGN.md tokens and patterns.
+ */
 
-.department-management-page {
-    padding: 20px;
+/* -------------------------------------------------------------------------- */
+/* 1. Theme & Tokens                                                          */
+/* -------------------------------------------------------------------------- */
+
+:root {
+    --primary: #0C4B34;
+    --primary-hover: #0a3a28;
+    --primary-light: #0F7A53;
+    --primary-tint: rgba(12, 75, 52, 0.08);
+    --primary-border: rgba(12, 75, 52, 0.14);
+    --primary-shadow: rgba(12, 75, 52, 0.12);
+    --text-primary: #111827;
+    --text-muted: rgba(17, 24, 39, 0.5);
+    --text-faint: rgba(17, 24, 39, 0.4);
+    --surface: #ffffff;
+    --page-bg: #EFEFEF;
+    --accent-blue: #1565C0;
+    --accent-green: #2E7D32;
+    --danger: #b91c1c;
+    --danger-light: rgba(185, 28, 28, 0.06);
+    --success: #4CAF50;
+    --cancel-gray: #C9C9C9;
+    
+    --card-bg: #ffffff;
+    --card-border: rgba(12, 75, 52, 0.14);
+    --card-shadow: 0 4px 18px rgba(0, 0, 0, 0.04);
 }
 
+html[data-theme="dark"] {
+    --primary-tint: rgba(255, 255, 255, 0.06);
+    --text-primary: #f0f0f0;
+    --text-muted: rgba(255, 255, 255, 0.6);
+    --text-faint: rgba(255, 255, 255, 0.4);
+    --surface: #1e1e1e;
+    --page-bg: #121212;
+    --card-bg: #1e1e1e;
+    --card-border: #333;
+    --card-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+}
+
+/* -------------------------------------------------------------------------- */
+/* 2. Animations                                                              */
+/* -------------------------------------------------------------------------- */
+
+@keyframes fadeSlideUp {
+    from {
+        opacity: 0;
+        transform: translateY(18px) scale(0.985);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+@keyframes modalPop {
+    from {
+        opacity: 0;
+        transform: translateY(10px) scale(0.985);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+.fade-slide-up {
+    animation: fadeSlideUp 0.45s ease-out both;
+}
+
+/* -------------------------------------------------------------------------- */
+/* 3. Page Layout                                                             */
+/* -------------------------------------------------------------------------- */
+
+.department-management-page {
+    padding: 24px;
+    max-width: 1600px;
+    margin: 0 auto;
+}
+
+/* Header Pattern */
 .department-management-page .header-row {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 25px;
+    margin-bottom: 28px;
+    animation: fadeSlideUp 0.45s ease-out both;
 }
 
 .department-management-page .main-page-title {
-    font-size: 28px;
-    font-weight: 700;
-    color: #333;
+    font-size: 24px;
+    font-weight: 800;
+    color: var(--primary);
+    margin: 0;
+    font-family: 'TT Interphases', sans-serif;
+    letter-spacing: -0.01em;
 }
 
-/* Stats Container */
-.department-management-page .stats-container {
+html[data-theme="dark"] .department-management-page .main-page-title {
+    color: var(--text-primary);
+}
+
+/* Section Header (DESIGN.md §3.3) */
+.department-management-page .section-header {
     display: flex;
+    align-items: flex-start;
+    gap: 10px;
+}
+
+.department-management-page .label-bar {
+    width: 4px;
+    height: 20px;
+    border-radius: 2px;
+    background: linear-gradient(180deg, #0C4B34 0%, #0F7A53 100%);
+    flex-shrink: 0;
+    margin-top: 4px;
+}
+
+.department-management-page .section-header p {
+    font-size: 12px;
+    color: var(--text-muted);
+    margin: 2px 0 0 0;
+    font-weight: 600;
+}
+
+/* Icon Containers (DESIGN.md §3.2) */
+.department-management-page .icon-container {
+    width: 44px;
+    height: 44px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    font-size: 18px;
+}
+
+html[data-theme="dark"] .department-management-page .icon-container {
+    background: rgba(255, 255, 255, 0.06) !important;
+}
+
+/* -------------------------------------------------------------------------- */
+/* 4. Stats Cards                                                             */
+/* -------------------------------------------------------------------------- */
+
+.department-management-page .stats-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
     gap: 20px;
-    margin-bottom: 30px;
-    flex-wrap: wrap;
+    margin-bottom: 32px;
 }
 
 .department-management-page .stat-box {
-    flex: 1;
-    min-width: 150px;
-    background: #fff;
-    padding: 20px;
-    border-radius: 12px;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    background: var(--card-bg);
+    padding: 22px;
+    border-radius: 18px;
+    border: 1px solid var(--card-border);
+    box-shadow: var(--card-shadow);
+    transition: all 0.28s cubic-bezier(.4, 0, .2, 1);
+    animation: fadeSlideUp 0.45s ease-out both;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.department-management-page .stat-box:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 12px 36px var(--primary-shadow);
+    border-color: rgba(12, 75, 52, 0.25);
 }
 
 .department-management-page .stat-box .label-icon {
     display: flex;
     align-items: center;
-    gap: 8px;
-    margin-bottom: 10px;
+    gap: 10px;
 }
 
 .department-management-page .stat-box .label-icon span {
-    font-size: 14px;
-    color: #666;
-    font-weight: 500;
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--text-muted);
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
 }
 
 .department-management-page .stat-box .stat-amount {
     font-size: 32px;
-    font-weight: 700;
-    color: #333;
+    font-weight: 900;
+    color: var(--text-primary);
+    line-height: 1;
 }
 
-/* Department List - Compact Grid */
+/* -------------------------------------------------------------------------- */
+/* 5. Department Cards Grid                                                   */
+/* -------------------------------------------------------------------------- */
+
 .department-management-page .department-list {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
-    gap: 20px;
-    align-items: start; /* Prevents cards in a row from stretching when one is expanded */
+    grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+    gap: 24px;
 }
 
 .department-management-page .department-card {
-    background: #fff;
-    border-radius: 12px;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.05); /* Softer shadow */
+    background: var(--card-bg);
+    border-radius: 18px;
+    border: 1px solid var(--card-border);
+    box-shadow: var(--card-shadow);
     overflow: hidden;
-    transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
-    border: 1px solid #edf2f7; /* Lighter border */
+    transition: all 0.28s cubic-bezier(.4, 0, .2, 1);
+    animation: fadeSlideUp 0.45s ease-out both;
     display: flex;
     flex-direction: column;
-    height: 100%;
-    min-height: 240px; /* Force uniform squareness prior to Expansion */
+    position: relative;
 }
 
 .department-management-page .department-card:hover {
-    box-shadow: 0 10px 25px rgba(0,0,0,0.1);
     transform: translateY(-4px);
-    border-color: #cbd5e0;
+    box-shadow: 0 12px 48px rgba(0, 0, 0, 0.12);
+    border-color: rgba(12, 75, 52, 0.25);
 }
 
-/* Main Section - 3-Row Compact Layout */
-.department-management-page .dept-main {
-    display: flex;
-    flex-direction: column;
-    height: 100%;
-    cursor: pointer;
-    padding: 0;
-}
-
-/* Row 1: Top - Name and Code */
+/* Top Accent - Dynamic Color */
 .department-management-page .dept-row-top {
+    padding: 20px 24px;
+    background: linear-gradient(135deg, var(--dept-color, var(--primary)) 0%, var(--primary-light) 100%);
+    color: #ffffff;
     display: flex;
     align-items: center;
-    gap: 12px;
-    padding: 16px 20px;
-    border-bottom: 1px solid var(--dept-header-divider, rgba(0,0,0,0.08));
-    min-height: 70px; /* Ensure consistent height */
-    background: linear-gradient(0deg, rgba(0,0,0,0.10), rgba(0,0,0,0.10)), var(--dept-color, #ffffff);
-    color: var(--dept-on-color, #2d3748);
-}
-
-.department-management-page .dept-color {
-    width: 6px;
-    height: 32px;
-    border-radius: 4px;
-    flex-shrink: 0;
+    gap: 14px;
+    min-height: 80px;
 }
 
 .department-management-page .dept-name {
-    font-size: 15px;
-    font-weight: 600;
-    color: inherit;
+    font-size: 16px;
+    font-weight: 800;
+    line-height: 1.3;
     flex: 1;
     display: -webkit-box;
-    -webkit-line-clamp: 2; /* Max 2 lines */
+    -webkit-line-clamp: 2;
     -webkit-box-orient: vertical;
     overflow: hidden;
-    text-overflow: ellipsis;
-    line-height: 1.3;
 }
 
 .department-management-page .dept-code-badge {
-    font-size: 11px;
-    font-weight: 700;
-    color: inherit;
-    background: var(--dept-chip-bg, rgba(255,255,255,0.18));
-    padding: 4px 8px;
-    border-radius: 6px;
-    white-space: nowrap;
-    border: 1px solid var(--dept-chip-border, rgba(255,255,255,0.26));
-}
-
-.department-management-page .view-details-btn {
-    padding: 8px 14px;
-    background: transparent;
-    color: inherit;
-    border: 1px solid var(--dept-action-border, rgba(0,0,0,0.2));
-    border-radius: 8px;
-    cursor: pointer;
+    background: rgba(255, 255, 255, 0.2);
+    backdrop-filter: blur(8px);
+    padding: 6px 10px;
+    border-radius: 10px;
     font-size: 12px;
-    font-weight: 500;
-    transition: all 0.2s;
-    margin-left: auto;
-    backdrop-filter: blur(6px);
+    font-weight: 800;
+    letter-spacing: 0.8px;
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    text-transform: uppercase;
 }
 
-.department-management-page .view-details-btn:hover {
-    background: var(--dept-action-hover, rgba(255,255,255,0.16));
-}
-
-.department-management-page .view-details-btn:active {
-    background: var(--dept-action-active, rgba(255,255,255,0.22));
-    transform: translateY(0.5px);
-}
-
-.department-management-page .dept-row-top .view-details-btn:focus-visible {
-    outline: 2px solid var(--dept-focus-ring, rgba(17,24,39,0.45));
-    outline-offset: 2px;
-}
-
-.department-management-page .expand-icon {
-    font-size: 12px;
-    color: #a0aec0;
-    transition: transform 0.3s;
-    margin-left: auto;
-}
-
-.department-management-page .department-card.expanded .expand-icon {
-    transform: rotate(180deg);
-}
-
-/* Row 2: Middle - Stats Pills */
+/* Middle Section - Content */
 .department-management-page .dept-row-middle {
+    padding: 20px 24px;
     display: flex;
     flex-wrap: wrap;
-    gap: 8px;
-    padding: 16px 20px;
-    border-bottom: 1px solid #f0f0f0;
-    background: #f7fafc;
-    flex: 1; /* Pushes bottom row down */
-    align-content: flex-start;
+    gap: 10px;
+    border-bottom: 1px solid var(--card-border);
+    background: rgba(12, 75, 52, 0.02);
 }
 
 .department-management-page .stat-pill {
-    font-size: 12px;
-    color: #4a5568;
-    background: #fff;
+    background: var(--primary-tint);
+    border: 1px solid var(--primary-border);
+    color: var(--text-muted);
     padding: 6px 12px;
-    border-radius: 6px;
-    border: 1px solid #e2e8f0;
-    white-space: nowrap;
+    border-radius: 10px;
+    font-size: 11px;
+    font-weight: 700;
     display: flex;
     align-items: center;
     gap: 6px;
-    box-shadow: 0 1px 2px rgba(0,0,0,0.02);
 }
 
 .department-management-page .stat-pill strong {
-    color: #1a202c;
-    font-weight: 700;
+    color: var(--primary);
+    font-weight: 800;
+}
+
+html[data-theme="dark"] .department-management-page .stat-pill strong {
+    color: #81C784;
 }
 
 .department-management-page .stat-pill.dean-pill {
-    background: #ebf4ff;
-    border-color: #bee3f8;
-    color: #3182ce;
-    font-weight: 500;
-    width: 100%; /* Make dean pill take full width for better alignment */
+    width: 100%;
+    background: var(--primary-tint);
+    border-style: dashed;
     margin-top: 4px;
 }
 
-.department-management-page .stat-pill.dean-pill strong {
-    color: #2b6cb0;
-}
-
-/* Row 3: Bottom - Actions */
+/* Bottom Section - Actions */
 .department-management-page .dept-row-bottom {
+    padding: 18px 24px;
     display: flex;
     align-items: center;
     justify-content: space-between;
-    gap: 10px;
-    padding: 14px 20px;
-    background: #fff;
-    margin-top: auto; /* Stays at the bottom */
 }
 
-.department-management-page .dept-row-bottom > div {
+.department-management-page .dept-row-bottom .action-buttons {
     display: flex;
-    gap: 8px;
+    gap: 10px;
 }
 
-.department-management-page .dept-row-bottom .dean-btn {
-    padding: 8px 14px;
+/* -------------------------------------------------------------------------- */
+/* 6. Buttons & Interactive                                                   */
+/* -------------------------------------------------------------------------- */
+
+.department-management-page .create-btn {
     background: #0C4B34;
     color: white;
-    border: 1px solid #0C4B34;
-    border-radius: 6px;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 10px;
     cursor: pointer;
+    font-size: 13px;
+    font-weight: 700;
+    transition: all 0.22s cubic-bezier(.4,0,.2,1);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    letter-spacing: 0.2px;
+}
+
+.department-management-page .create-btn:hover {
+    background: #0a3a28;
+    transform: translateY(-1px);
+    box-shadow: 0 6px 18px rgba(12, 75, 52, 0.25);
+}
+
+.department-management-page .view-details-btn {
+    background: rgba(255, 255, 255, 0.15);
+    color: #ffffff;
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    padding: 8px 12px;
+    border-radius: 10px;
+    font-size: 11px;
+    font-weight: 800;
+    cursor: pointer;
+    backdrop-filter: blur(4px);
+    transition: all 0.2s;
+}
+
+.department-management-page .view-details-btn:hover {
+    background: rgba(255, 255, 255, 0.25);
+}
+
+.department-management-page .dean-btn, 
+.department-management-page .edit-btn {
+    padding: 10px 16px;
+    border-radius: 10px;
     font-size: 12px;
-    font-weight: 600;
-    transition: background 0.2s, transform 0.1s;
-    white-space: nowrap;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.2s;
 }
 
-.department-management-page .dept-row-bottom .dean-btn:hover {
-    background: #0A3F2C;
+.department-management-page .dean-btn {
+    background: var(--primary);
+    color: #ffffff;
+    border: none;
 }
 
-.department-management-page .dept-row-bottom .dean-btn:active {
-    transform: scale(0.97);
-    background: #083626;
+.department-management-page .dean-btn:hover {
+    background: var(--primary-hover);
 }
 
-.department-management-page .dept-row-bottom .dean-btn:focus-visible,
-.department-management-page .dept-row-bottom .edit-btn:focus-visible {
-    outline: 2px solid rgba(12, 75, 52, 0.55);
-    outline-offset: 2px;
-}
-
-.department-management-page .dept-row-bottom .edit-btn {
-    padding: 8px 16px;
+.department-management-page .edit-btn {
     background: transparent;
-    color: #0C4B34;
-    border: 1px solid #0C4B34;
-    border-radius: 6px;
-    cursor: pointer;
-    font-size: 12px;
-    font-weight: 600;
-    transition: background 0.2s, transform 0.1s;
+    color: var(--primary);
+    border: 1px solid var(--primary-border);
 }
 
-.department-management-page .dept-row-bottom .edit-btn:hover {
-    background: rgba(12, 75, 52, 0.10);
+html[data-theme="dark"] .department-management-page .edit-btn {
+    color: var(--text-primary);
+    border-color: #444;
 }
 
-.department-management-page .dept-row-bottom .edit-btn:active {
-    transform: scale(0.97);
-    background: rgba(12, 75, 52, 0.16);
+.department-management-page .edit-btn:hover {
+    background: var(--primary-tint);
 }
 
-/* Toggle Switch */
+/* Toggle Switch Premium */
 .department-management-page .toggle-switch {
     position: relative;
     display: inline-block;
-    width: 40px;
-    height: 22px;
+    width: 44px;
+    height: 24px;
 }
 
 .department-management-page .toggle-switch input {
@@ -297,18 +406,10 @@
 .department-management-page .toggle-switch .slider {
     position: absolute;
     cursor: pointer;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
+    inset: 0;
     background-color: #ccc;
     transition: 0.3s;
     border-radius: 24px;
-}
-
-.department-management-page .toggle-switch input:focus-visible + .slider {
-    outline: 2px solid rgba(12, 75, 52, 0.55);
-    outline-offset: 2px;
 }
 
 .department-management-page .toggle-switch .slider:before {
@@ -321,400 +422,87 @@
     background-color: white;
     transition: 0.3s;
     border-radius: 50%;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
 }
 
 .department-management-page .toggle-switch input:checked + .slider {
-    background-color: #0C4B34;
+    background-color: var(--primary-light);
 }
 
 .department-management-page .toggle-switch input:checked + .slider:before {
     transform: translateX(20px);
 }
 
-/* Details Section - Expandable */
-.department-management-page .dept-details-section {
-    max-height: 0;
-    overflow: hidden;
-    transition: max-height 0.3s ease-out;
-    background: #f8f9fa;
-}
+/* -------------------------------------------------------------------------- */
+/* 7. Modals — Overlays                                                       */
+/* -------------------------------------------------------------------------- */
 
-.department-management-page .department-card.expanded .dept-details-section {
-    max-height: 1000px;
-    border-top: 1px solid #e9ecef;
-}
-
-.department-management-page .details-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-    gap: 15px;
-    padding: 20px;
-}
-
-.department-management-page .detail-card {
-    background: #fff;
-    padding: 15px;
-    border-radius: 10px;
-    box-shadow: 0 1px 4px rgba(0,0,0,0.08);
-}
-
-.department-management-page .detail-card h4 {
-    margin: 0 0 12px 0;
-    font-size: 14px;
-    font-weight: 600;
-    color: #333;
-    border-bottom: 2px solid #007bff;
-    padding-bottom: 8px;
-}
-
-.department-management-page .detail-item {
-    display: flex;
-    justify-content: space-between;
-    margin-bottom: 8px;
-    font-size: 13px;
-}
-
-.department-management-page .detail-item .detail-label {
-    color: #666;
-}
-
-.department-management-page .detail-list {
-    list-style: none;
-    padding: 0;
-    margin: 0;
-}
-
-.department-management-page .detail-list li {
-    padding: 8px 0;
-    border-bottom: 1px solid #f0f0f0;
-    font-size: 13px;
-}
-
-.department-management-page .detail-list li:last-child {
-    border-bottom: none;
-}
-
-.department-management-page .detail-list .minor {
-    color: #666;
-    font-size: 12px;
-}
-
-.department-management-page .detail-list .units {
-    color: #999;
-    font-size: 12px;
-}
-
-.department-management-page .no-data {
-    color: #999;
-    font-style: italic;
-    text-align: center;
-    padding: 15px;
-    font-size: 13px;
-}
-
-.department-management-page .more {
-    color: #666;
-    font-size: 12px;
-    text-align: center;
-    margin-top: 8px;
-}
-
-.department-management-page .empty-state {
-    text-align: center;
-    padding: 60px 20px;
-    color: #666;
-    grid-column: 1 / -1;
-}
-
-/* Create Button */
-.create-btn {
-    background: #28a745;
-    color: white;
-    border: none;
-    border-radius: 10px;
-    cursor: pointer;
-    font-size: 14px;
-    font-weight: 600;
-    text-transform: uppercase;
-    transition: background 0.2s;
-}
-
-.create-btn:hover {
-    background: #218838;
-}
-
-/* Inactive card state */
-.department-management-page .department-card.inactive {
-    opacity: 0.6;
-}
-
-.department-management-page .department-card.inactive .dept-row-top {
-    filter: grayscale(0.25);
-}
-
-/* Responsive */
-@media (max-width: 768px) {
-    .department-management-page .dept-row-top {
-        padding: 12px 15px;
-    }
-    
-    .department-management-page .dept-row-middle {
-        padding: 10px 15px;
-    }
-    
-    .department-management-page .dept-row-bottom {
-        padding: 10px 15px;
-        flex-wrap: wrap;
-    }
-    
-    .department-management-page .stat-pill {
-        font-size: 11px;
-        padding: 4px 10px;
-    }
-    
-    .department-management-page .details-grid {
-        grid-template-columns: 1fr;
-    }
-}
-
-/* Department Details Modal (scoped to department-management) */
-#departmentDetailsModal.modal-overlay,
+/* All department management modals share this overlay */
 #addDepartmentModal.modal-overlay,
 #editDepartmentModal.modal-overlay,
 #assignDeanModal.modal-overlay,
+#departmentDetailsModal.modal-overlay,
 #deptSuccessModal.modal-overlay,
 #deptErrorModal.modal-overlay {
     position: fixed;
     inset: 0;
-    background: rgba(0, 0, 0, 0.60);
+    background: rgba(0, 0, 0, 0.65);
+    backdrop-filter: blur(4px);
     z-index: 9999;
     display: none;
     align-items: center;
     justify-content: center;
-    padding: 14px;
+    padding: 16px;
 }
 
-#departmentDetailsModal.modal-overlay {
-    background: rgba(0, 0, 0, 0.55);
-}
+/* -------------------------------------------------------------------------- */
+/* 7.1 Modal Box — Base                                                       */
+/* -------------------------------------------------------------------------- */
 
 .dept-details-modal {
-    width: min(980px, calc(100vw - 28px));
+    width: min(980px, calc(100vw - 32px));
     max-height: min(84vh, 780px);
-    background: #ffffff;
-    border: 1px solid rgba(12, 75, 52, 0.18);
+    background: var(--surface);
+    border: 1px solid var(--primary-border);
     border-radius: 18px;
     overflow: hidden;
-    box-shadow: 0 18px 48px rgba(0,0,0,0.22);
+    box-shadow: 0 24px 64px rgba(0, 0, 0, 0.22);
     display: flex;
     flex-direction: column;
-    animation: modalPop 0.18s ease-out;
+    animation: modalPop 0.22s ease-out;
     --dept-color: #0C4B34;
 }
 
+/* Smaller form modals */
 #addDepartmentModal .dept-details-modal,
 #editDepartmentModal .dept-details-modal,
 #assignDeanModal .dept-details-modal {
-    width: min(500px, calc(100vw - 28px));
-    height: fit-content;
+    width: min(520px, calc(100vw - 32px));
     max-height: none;
+    height: fit-content;
 }
 
-#addDepartmentModal .dept-details-modal__content,
-#editDepartmentModal .dept-details-modal__content,
-#assignDeanModal .dept-details-modal__content {
-    overflow: visible;
-}
-
+/* Feedback modals */
 #deptSuccessModal .dept-details-modal,
 #deptErrorModal .dept-details-modal {
-    width: min(520px, calc(100vw - 28px));
-    max-height: min(70vh, 520px);
+    width: min(440px, calc(100vw - 32px));
+    max-height: none;
+    height: fit-content;
 }
 
-.dept-form input, .dept-form select, .dept-form textarea { box-sizing: border-box; }
-
-.dept-form {
-    display: flex;
-    flex-direction: column;
-    gap: 12px;
-}
-
-.dept-form__group {
-    display: flex;
-    flex-direction: column;
-    gap: 6px;
-}
-
-.dept-form__row {
-    display: flex;
-    gap: 10px;
-    align-items: center;
-}
-
-.dept-form__label {
-    font-size: 13px;
-    font-weight: 800;
-    color: rgba(17, 24, 39, 0.82);
-}
-
-.dept-form__req {
-    color: #b91c1c;
-}
-
-.dept-form__control {
-    width: 100%;
-    height: 46px;
-    border-radius: 12px;
-    border: 1px solid rgba(12, 75, 52, 0.16);
-    background: #ffffff;
-    padding: 0 12px;
-    font-size: 14px;
-    font-weight: 600;
-    color: #111827;
-    outline: none;
-    transition: border-color 0.15s ease, box-shadow 0.15s ease;
-}
-
-.dept-form__control:focus {
-    border-color: rgba(12, 75, 52, 0.45);
-    box-shadow: 0 0 0 4px rgba(12, 75, 52, 0.10);
-}
-
-.dept-form__color {
-    width: 52px;
-    height: 40px;
-    border-radius: 12px;
-    border: 1px solid rgba(12, 75, 52, 0.16);
-    background: #ffffff;
-    padding: 0;
-    cursor: pointer;
-}
-
-.dept-form__notice {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 10px;
-    padding: 10px 12px;
-    border-radius: 12px;
-    background: rgba(12, 75, 52, 0.06);
-    border: 1px dashed rgba(12, 75, 52, 0.20);
-    color: rgba(17, 24, 39, 0.80);
-    font-weight: 700;
-    font-size: 13px;
-}
-
-.dept-link-danger {
-    background: transparent;
-    border: none;
-    color: #b91c1c;
-    font-weight: 900;
-    cursor: pointer;
-    padding: 0;
-    text-decoration: underline;
-}
-
-.dept-link-danger:focus-visible {
-    outline: 2px solid rgba(185, 28, 28, 0.35);
-    outline-offset: 2px;
-    border-radius: 6px;
-}
-
-.dept-form__actions {
-    display: flex;
-    justify-content: flex-end;
-    gap: 10px;
-    margin-top: 6px;
-    flex-wrap: wrap;
-}
-
-.dept-btn {
-    height: 46px;
-    min-width: 120px;
-    padding: 0 16px;
-    border-radius: 12px;
-    font-weight: 900;
-    font-size: 13px;
-    letter-spacing: 0.3px;
-    cursor: pointer;
-    transition: transform 0.08s ease, background 0.15s ease, border-color 0.15s ease;
-}
-
-.dept-btn--primary {
-    background: #0C4B34;
-    color: #ffffff;
-    border: 1px solid #0C4B34;
-}
-
-.dept-btn--primary:hover {
-    background: #0A3F2C;
-}
-
-.dept-btn--primary:active {
-    transform: scale(0.99);
-    background: #083626;
-}
-
-.dept-btn--secondary {
-    background: rgba(12, 75, 52, 0.06);
-    color: #0C4B34;
-    border: 1px solid rgba(12, 75, 52, 0.22);
-}
-
-.dept-btn--secondary:hover {
-    background: rgba(12, 75, 52, 0.10);
-}
-
-.dept-btn--secondary:active {
-    transform: scale(0.99);
-    background: rgba(12, 75, 52, 0.14);
-}
-
-.dept-btn:focus-visible {
-    outline: 2px solid rgba(12, 75, 52, 0.45);
-    outline-offset: 2px;
-}
-
-.dept-feedback-modal__icon {
-    width: 64px;
-    height: 64px;
-    border-radius: 18px;
-    display: grid;
-    place-items: center;
-    font-size: 34px;
-    font-weight: 900;
-    margin: 2px auto 10px auto;
-}
-
-.dept-feedback-modal__icon--success {
-    background: rgba(12, 75, 52, 0.10);
-    color: #0C4B34;
-    border: 1px solid rgba(12, 75, 52, 0.18);
-}
-
-.dept-feedback-modal__icon--error {
-    background: rgba(185, 28, 28, 0.08);
-    color: #b91c1c;
-    border: 1px solid rgba(185, 28, 28, 0.16);
-}
-
-.dept-feedback-modal__message {
-    text-align: center;
-    font-size: 14px;
-    font-weight: 800;
-    color: rgba(17, 24, 39, 0.84);
-    line-height: 1.5;
-}
+/* -------------------------------------------------------------------------- */
+/* 7.2 Modal Header                                                           */
+/* -------------------------------------------------------------------------- */
 
 .dept-details-modal__header {
     display: flex;
     align-items: center;
     justify-content: space-between;
     gap: 14px;
-    padding: 16px 18px;
-    background: linear-gradient(0deg, rgba(12, 75, 52, 0.08), rgba(12, 75, 52, 0.08)), #ffffff;
-    border-bottom: 1px solid rgba(12, 75, 52, 0.14);
+    padding: 20px 24px;
+    background: linear-gradient(180deg, var(--primary-tint) 0%, transparent 100%);
+    border-bottom: 1px solid var(--primary-border);
+    flex-shrink: 0;
 }
 
 .dept-details-modal__titlewrap {
@@ -725,16 +513,17 @@
 }
 
 .dept-details-modal__badge {
-    background: var(--dept-color, #0C4B34);
+    background: var(--dept-color, var(--primary));
     color: #ffffff;
     font-weight: 800;
-    font-size: 12px;
+    font-size: 11px;
     letter-spacing: 0.8px;
-    padding: 7px 10px;
+    padding: 7px 12px;
     border-radius: 10px;
-    box-shadow: 0 10px 26px rgba(12, 75, 52, 0.22);
+    box-shadow: 0 4px 14px var(--primary-shadow);
     flex: none;
     text-transform: uppercase;
+    font-family: 'TT Interphases', sans-serif;
 }
 
 .dept-details-modal__titles {
@@ -748,30 +537,32 @@
     margin: 0;
     font-size: 18px;
     font-weight: 800;
-    color: #111827;
+    color: var(--text-primary);
     line-height: 1.2;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
-    max-width: 100%;
+    font-family: 'TT Interphases', sans-serif;
 }
 
 .dept-details-modal__subtitle {
     font-size: 12px;
-    color: rgba(17, 24, 39, 0.72);
+    color: var(--text-muted);
+    font-weight: 600;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
 }
 
+/* Close Button — DESIGN.md §5.5 */
 .dept-details-modal__close {
     width: 40px;
     height: 40px;
     border-radius: 12px;
-    border: 1px solid rgba(12, 75, 52, 0.16);
-    background: rgba(12, 75, 52, 0.06);
-    color: #0C4B34;
-    font-size: 26px;
+    border: 1px solid var(--primary-border);
+    background: var(--primary-tint);
+    color: var(--primary);
+    font-size: 24px;
     line-height: 1;
     cursor: pointer;
     display: grid;
@@ -780,13 +571,18 @@
     flex: none;
 }
 
+html[data-theme="dark"] .dept-details-modal__close {
+    color: var(--text-primary);
+    border-color: #444;
+    background: rgba(255, 255, 255, 0.06);
+}
+
 .dept-details-modal__close:hover {
-    background: rgba(12, 75, 52, 0.10);
+    background: rgba(12, 75, 52, 0.12);
 }
 
 .dept-details-modal__close:active {
-    transform: scale(0.98);
-    background: rgba(12, 75, 52, 0.14);
+    transform: scale(0.96);
 }
 
 .dept-details-modal__close:focus-visible {
@@ -794,79 +590,325 @@
     outline-offset: 2px;
 }
 
+/* -------------------------------------------------------------------------- */
+/* 7.3 Modal Content                                                          */
+/* -------------------------------------------------------------------------- */
+
 .dept-details-modal__content {
-    padding: 16px 18px 18px 18px;
+    padding: 24px;
     overflow: auto;
     display: flex;
     flex-direction: column;
-    gap: 12px;
-    background: #ffffff;
+    gap: 16px;
+    background: var(--surface);
 }
 
 .dept-details-modal__loading {
-    padding: 28px 8px;
+    padding: 40px 16px;
     text-align: center;
-    color: rgba(17, 24, 39, 0.72);
+    color: var(--text-muted);
     font-weight: 600;
+    font-size: 14px;
 }
 
 .dept-details-modal__error {
     padding: 20px 14px;
     text-align: center;
-    color: #b91c1c;
-    background: rgba(185, 28, 28, 0.06);
+    color: var(--danger);
+    background: var(--danger-light);
     border: 1px solid rgba(185, 28, 28, 0.14);
     border-radius: 12px;
     font-weight: 700;
 }
 
+/* -------------------------------------------------------------------------- */
+/* 7.4 Forms — DESIGN.md §7                                                   */
+/* -------------------------------------------------------------------------- */
+
+.dept-form {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.dept-form input,
+.dept-form select,
+.dept-form textarea {
+    box-sizing: border-box;
+}
+
+.dept-form__group {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.dept-form__row {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+}
+
+.dept-form__label {
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.6px;
+    font-family: 'TT Interphases', sans-serif;
+}
+
+.dept-form__req {
+    color: var(--danger);
+    font-weight: 800;
+}
+
+.dept-form__control {
+    width: 100%;
+    height: 50px;
+    border-radius: 12px;
+    border: 1px solid #ccc;
+    background: var(--surface);
+    padding: 0 14px;
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--text-primary);
+    outline: none;
+    font-family: 'TT Interphases', sans-serif;
+    transition: border-color 0.2s ease, box-shadow 0.15s ease;
+}
+
+html[data-theme="dark"] .dept-form__control {
+    background: #2d2d2d;
+    border-color: #404040;
+    color: #e0e0e0;
+}
+
+.dept-form__control:focus {
+    border-color: var(--primary);
+    box-shadow: 0 0 0 4px var(--primary-tint);
+}
+
+.dept-form__control::placeholder {
+    color: var(--text-faint);
+    font-weight: 500;
+}
+
+/* Color picker */
+.dept-form__color {
+    width: 50px;
+    height: 50px;
+    border-radius: 12px;
+    border: 1px solid #ccc;
+    background: var(--surface);
+    padding: 2px;
+    cursor: pointer;
+    flex-shrink: 0;
+}
+
+/* Notice / Info bar */
+.dept-form__notice {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 12px 14px;
+    border-radius: 12px;
+    background: var(--primary-tint);
+    border: 1px dashed rgba(12, 75, 52, 0.20);
+    color: var(--text-primary);
+    font-weight: 600;
+    font-size: 13px;
+}
+
+/* Danger link (e.g., "Remove Dean") */
+.dept-link-danger {
+    background: transparent;
+    border: none;
+    color: var(--danger);
+    font-weight: 800;
+    cursor: pointer;
+    padding: 0;
+    text-decoration: underline;
+    font-size: 13px;
+}
+
+.dept-link-danger:hover {
+    opacity: 0.8;
+}
+
+/* Form actions row */
+.dept-form__actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 12px;
+    margin-top: 8px;
+    flex-wrap: wrap;
+}
+
+/* -------------------------------------------------------------------------- */
+/* 7.5 Buttons — DESIGN.md §4                                                */
+/* -------------------------------------------------------------------------- */
+
+.dept-btn {
+    height: 50px;
+    min-width: 120px;
+    padding: 0 20px;
+    border-radius: 10px;
+    font-weight: 700;
+    font-size: 14px;
+    letter-spacing: 0.2px;
+    cursor: pointer;
+    font-family: 'TT Interphases', sans-serif;
+    transition: all 0.22s cubic-bezier(.4, 0, .2, 1);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+}
+
+/* Primary = Create/Confirm (DESIGN.md §4.3) */
+.dept-btn--primary {
+    background: #0F7A53;
+    color: #ffffff;
+    border: none;
+}
+
+.dept-btn--primary:hover {
+    background: #0a5f42;
+    transform: translateY(-1px);
+    box-shadow: 0 6px 18px rgba(12, 75, 52, 0.25);
+}
+
+.dept-btn--primary:active {
+    transform: translateY(0) scale(0.98);
+}
+
+html[data-theme="dark"] .dept-btn--primary {
+    background: #0F7A53;
+}
+
+/* Secondary = Cancel (DESIGN.md §4.2) */
+.dept-btn--secondary {
+    background: #C9C9C9;
+    color: #000000;
+    border: none;
+}
+
+.dept-btn--secondary:hover {
+    background: #B9B9B9;
+}
+
+html[data-theme="dark"] .dept-btn--secondary {
+    background: #404040;
+    color: #e0e0e0;
+}
+
+.dept-btn:focus-visible {
+    outline: 2px solid rgba(12, 75, 52, 0.45);
+    outline-offset: 2px;
+}
+
+/* -------------------------------------------------------------------------- */
+/* 7.6 Feedback Modals (Success / Error)                                      */
+/* -------------------------------------------------------------------------- */
+
+.dept-feedback-modal__icon {
+    width: 72px;
+    height: 72px;
+    border-radius: 50%;
+    display: grid;
+    place-items: center;
+    font-size: 36px;
+    font-weight: 900;
+    margin: 8px auto 16px auto;
+}
+
+.dept-feedback-modal__icon--success {
+    background: rgba(76, 175, 80, 0.1);
+    color: #4CAF50;
+    border: 2px solid rgba(76, 175, 80, 0.2);
+}
+
+.dept-feedback-modal__icon--error {
+    background: rgba(185, 28, 28, 0.08);
+    color: var(--danger);
+    border: 2px solid rgba(185, 28, 28, 0.16);
+}
+
+.dept-feedback-modal__message {
+    text-align: center;
+    font-size: 15px;
+    font-weight: 700;
+    color: var(--text-primary);
+    line-height: 1.5;
+    margin-bottom: 8px;
+}
+
+/* -------------------------------------------------------------------------- */
+/* 7.7 Details Modal — Sections & Lists                                       */
+/* -------------------------------------------------------------------------- */
+
 .dept-details-modal__section {
-    background: #ffffff;
-    border: 1px solid rgba(12, 75, 52, 0.12);
+    background: var(--surface);
+    border: 1px solid var(--primary-border);
     border-radius: 14px;
-    padding: 14px 14px;
+    padding: 16px;
+}
+
+html[data-theme="dark"] .dept-details-modal__section {
+    background: #252525;
+    border-color: #444;
 }
 
 .dept-details-modal__section-title {
-    margin: 0 0 10px 0;
+    margin: 0 0 12px 0;
     font-size: 14px;
     font-weight: 800;
-    color: #0C4B34;
+    color: var(--primary);
     display: flex;
     align-items: baseline;
     gap: 8px;
 }
 
+html[data-theme="dark"] .dept-details-modal__section-title {
+    color: #81C784;
+}
+
 .dept-details-modal__count {
     font-size: 12px;
-    color: rgba(17, 24, 39, 0.60);
+    color: var(--text-muted);
     font-weight: 700;
 }
 
 .dept-details-modal__empty {
-    padding: 10px 10px;
+    padding: 12px;
     border-radius: 12px;
-    background: rgba(12, 75, 52, 0.06);
+    background: var(--primary-tint);
     border: 1px dashed rgba(12, 75, 52, 0.20);
-    color: rgba(17, 24, 39, 0.70);
+    color: var(--text-muted);
     font-style: italic;
+    font-size: 13px;
 }
 
+/* Key-value grid (Dean info) */
 .dept-details-modal__kv {
     display: grid;
     grid-template-columns: 120px 1fr;
-    gap: 8px 12px;
+    gap: 8px 14px;
     align-items: center;
 }
 
 .dept-details-modal__k {
-    color: rgba(17, 24, 39, 0.62);
+    color: var(--text-muted);
     font-weight: 700;
     font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.4px;
 }
 
 .dept-details-modal__v {
-    color: #111827;
+    color: var(--text-primary);
     font-weight: 700;
     font-size: 13px;
     overflow: hidden;
@@ -874,34 +916,42 @@
     white-space: nowrap;
 }
 
+/* Stats row inside details modal */
 .dept-details-modal__stats {
     display: grid;
     grid-template-columns: repeat(3, minmax(0, 1fr));
-    gap: 10px;
+    gap: 12px;
 }
 
 .dept-details-modal__stat {
-    background: rgba(12, 75, 52, 0.06);
-    border: 1px solid rgba(12, 75, 52, 0.12);
+    background: var(--primary-tint);
+    border: 1px solid var(--primary-border);
     border-radius: 14px;
-    padding: 14px 10px;
+    padding: 16px 12px;
     text-align: center;
 }
 
 .dept-details-modal__stat-value {
-    font-size: 22px;
+    font-size: 24px;
     font-weight: 900;
-    color: #0C4B34;
+    color: var(--primary);
     line-height: 1.1;
+}
+
+html[data-theme="dark"] .dept-details-modal__stat-value {
+    color: #81C784;
 }
 
 .dept-details-modal__stat-label {
     margin-top: 4px;
     font-size: 12px;
-    color: rgba(17, 24, 39, 0.70);
+    color: var(--text-muted);
     font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
 }
 
+/* List items (programs, courses, teachers) */
 .dept-details-modal__list {
     list-style: none;
     padding: 0;
@@ -916,29 +966,40 @@
     grid-template-columns: 96px 1fr auto;
     gap: 10px;
     align-items: center;
-    padding: 10px 10px;
+    padding: 10px 12px;
     border-radius: 12px;
-    border: 1px solid rgba(12, 75, 52, 0.10);
-    background: #ffffff;
+    border: 1px solid var(--primary-border);
+    background: var(--surface);
+    transition: background 0.15s ease;
+}
+
+.dept-details-modal__list-item:hover {
+    background: var(--primary-tint);
+}
+
+html[data-theme="dark"] .dept-details-modal__list-item {
+    background: #252525;
+    border-color: #444;
 }
 
 .dept-details-modal__list-code {
-    font-weight: 900;
-    color: rgba(17, 24, 39, 0.86);
-    font-size: 12px;
-    background: rgba(12, 75, 52, 0.08);
-    border: 1px solid rgba(12, 75, 52, 0.14);
+    font-weight: 800;
+    color: var(--text-primary);
+    font-size: 11px;
+    background: var(--primary-tint);
+    border: 1px solid var(--primary-border);
     padding: 6px 8px;
-    border-radius: 10px;
+    border-radius: 8px;
     text-align: center;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
+    letter-spacing: 0.4px;
 }
 
 .dept-details-modal__list-text {
-    color: #111827;
-    font-weight: 700;
+    color: var(--text-primary);
+    font-weight: 600;
     font-size: 13px;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -946,18 +1007,23 @@
 }
 
 .dept-details-modal__list-meta {
-    color: rgba(17, 24, 39, 0.55);
-    font-weight: 800;
+    color: var(--text-muted);
+    font-weight: 700;
     font-size: 12px;
     white-space: nowrap;
 }
 
 .dept-details-modal__list-more {
-    padding: 8px 10px;
-    color: rgba(17, 24, 39, 0.62);
+    padding: 8px 12px;
+    color: var(--text-muted);
     font-size: 12px;
-    font-weight: 700;
+    font-weight: 600;
+    font-style: italic;
 }
+
+/* -------------------------------------------------------------------------- */
+/* 7.8 Modal Responsive                                                       */
+/* -------------------------------------------------------------------------- */
 
 @media (max-width: 640px) {
     .dept-details-modal__stats {
@@ -973,4 +1039,49 @@
     .dept-details-modal__list-meta {
         justify-self: start;
     }
+    .dept-form__actions {
+        flex-direction: column;
+    }
+    .dept-btn {
+        width: 100%;
+    }
+}
+
+/* -------------------------------------------------------------------------- */
+/* 8. Empty State                                                             */
+/* -------------------------------------------------------------------------- */
+
+.department-management-page .empty-state {
+    grid-column: 1 / -1;
+    text-align: center;
+    padding: 80px 40px;
+    background: var(--card-bg);
+    border-radius: 20px;
+    border: 1px dashed var(--primary-border);
+    color: var(--text-muted);
+}
+
+.department-management-page .empty-state p {
+    font-size: 16px;
+    font-weight: 600;
+}
+
+/* Inactive department card */
+.department-management-page .department-card.inactive {
+    opacity: 0.55;
+}
+
+.department-management-page .department-card.inactive .dept-row-top {
+    filter: grayscale(0.3);
+}
+
+/* -------------------------------------------------------------------------- */
+/* 9. Responsiveness                                                          */
+/* -------------------------------------------------------------------------- */
+
+@media (max-width: 768px) {
+    .department-management-page { padding: 16px; }
+    .department-management-page .header-row { flex-direction: column; align-items: flex-start; gap: 16px; }
+    .department-management-page .create-btn { width: 100%; }
+    .department-management-page .department-list { grid-template-columns: 1fr; }
 }
