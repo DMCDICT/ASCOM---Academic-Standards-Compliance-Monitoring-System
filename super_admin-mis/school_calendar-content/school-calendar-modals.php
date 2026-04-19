@@ -6,21 +6,27 @@ if (!isset($school_years_for_dropdown) || empty($school_years_for_dropdown)) {
     $school_years_for_dropdown = [];
     $check_sy = $conn->query("SHOW TABLES LIKE 'school_years'");
     if ($check_sy->num_rows > 0) {
-        $columns_check = $conn->query("DESCRIBE school_years");
-        $columns = [];
-        while ($row = $columns_check->fetch_assoc()) {
-            $columns[] = $row['Field'];
-        }
+    $cols_raw = $conn->query("DESCRIBE school_years");
+    if ($cols_raw) {
+        $cols = [];
+        while ($r = $cols_raw->fetch_assoc()) { $cols[] = $r['Field']; }
         
-        if (in_array('school_year_label', $columns)) {
-            $sql_sy = "SELECT id, school_year_label, status, start_date, end_date FROM school_years ORDER BY school_year_label DESC";
-            $result_sy = $conn->query($sql_sy);
-            if ($result_sy && $result_sy->num_rows > 0) {
-                while($row = $result_sy->fetch_assoc()) {
-                    $school_years_for_dropdown[] = $row;
-                }
+        $has_label = in_array('school_year_label', $cols);
+        $has_status = in_array('status', $cols);
+        $has_active = in_array('is_active', $cols);
+
+        $label_field = $has_label ? "school_year_label" : "CONCAT(year_start, '-', year_end)";
+        $status_field = $has_status ? "status" : ($has_active ? "CASE WHEN is_active = 1 THEN 'Active' ELSE 'Inactive' END" : "'Active'");
+        
+        $sql_sy = "SELECT id, $label_field as school_year_label, $status_field as status, start_date, end_date FROM school_years ORDER BY $label_field DESC";
+        $result_sy = $conn->query($sql_sy);
+        if ($result_sy && $result_sy->num_rows > 0) {
+            while($row = $result_sy->fetch_assoc()) {
+                $school_years_for_dropdown[] = $row;
             }
         }
+    }
+
     }
     
     // If still empty, provide default data
@@ -39,11 +45,11 @@ if (!isset($school_years_for_dropdown) || empty($school_years_for_dropdown)) {
 ?>
 
 <!-- Add Term Modal -->
-<div id="addTermModal" class="modal-overlay">
+<div id="addTermModal" class="modal-overlay" style="display: none;">
     <div class="modal-content">
         <div class="modal-header">
             <h3>Add New Term</h3>
-            <span class="close-button">&times;</span>
+            <span class="close-button" onclick="closeAddTermModal()">&times;</span>
         </div>
         <div class="modal-body">
             <form id="addTermForm">
@@ -96,7 +102,7 @@ if (!isset($school_years_for_dropdown) || empty($school_years_for_dropdown)) {
                     </div>
                 </div>
                 <div class="form-actions">
-                    <button type="button" class="form-btn-cancel">Cancel</button>
+                    <button type="button" class="form-btn-cancel" onclick="closeAddTermModal()">Cancel</button>
                     <button type="submit" class="form-btn-save" disabled>Save Term</button>
                 </div>
             </form>
@@ -105,11 +111,11 @@ if (!isset($school_years_for_dropdown) || empty($school_years_for_dropdown)) {
 </div>
 
 <!-- Add School Year Modal -->
-<div id="addSchoolYearModal" class="modal-overlay">
+<div id="addSchoolYearModal" class="modal-overlay" style="display: none;">
     <div class="modal-content">
         <div class="modal-header">
             <h3>Add New School Year</h3>
-            <span class="close-button">&times;</span>
+            <span class="close-button" onclick="closeAddSchoolYearModal()">&times;</span>
         </div>
         <div class="modal-body">
             <form id="addSchoolYearForm">
@@ -139,7 +145,7 @@ if (!isset($school_years_for_dropdown) || empty($school_years_for_dropdown)) {
                 </div>
 
                 <div class="form-actions">
-                    <button type="button" class="form-btn-cancel">Cancel</button>
+                    <button type="button" class="form-btn-cancel" onclick="closeAddSchoolYearModal()">Cancel</button>
                     <button type="submit" class="form-btn-save" disabled>Save School Year</button>
                 </div>
             </form>
@@ -148,7 +154,7 @@ if (!isset($school_years_for_dropdown) || empty($school_years_for_dropdown)) {
 </div>
 
 <!-- Success Modal -->
-<div id="successModal" class="modal-overlay">
+<div id="successModal" class="modal-overlay" style="display: none;">
     <div class="modal-box" style="max-width: 400px; min-height: 280px; text-align: center; background-color: #FFFFFF; padding: 30px; border-radius: 15px; box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3); margin: 0; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);">
         <div class="modal-header" style="text-align: center; margin-bottom: 20px; display: block;">
             <img src="../src/assets/animated_icons/check-animated-icon.gif" alt="Success" style="width: 80px; height: 80px; margin: 0 auto 20px; display: block;">
@@ -167,8 +173,15 @@ if (!isset($school_years_for_dropdown) || empty($school_years_for_dropdown)) {
     </div>
 </div>
 
+<script>
+function closeSuccessModal() {
+    document.getElementById('successModal').style.display = 'none';
+}
+document.getElementById('successOkBtn')?.addEventListener('click', closeSuccessModal);
+</script>
+
 <!-- Error Modal -->
-<div id="errorModal" class="modal-overlay">
+<div id="errorModal" class="modal-overlay" style="display: none;">
     <div class="modal-box" style="max-width: 400px; min-height: 280px; text-align: center; background-color: #FFFFFF; padding: 30px; border-radius: 15px; box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3); margin: 0; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);">
         <div class="modal-header" style="text-align: center; margin-bottom: 20px; display: block;">
             <img src="../src/assets/animated_icons/error2-animated-icon.gif" alt="Error" style="width: 80px; height: 80px; margin: 0 auto 20px; display: block;">
@@ -190,11 +203,11 @@ if (!isset($school_years_for_dropdown) || empty($school_years_for_dropdown)) {
 
 
 <!-- Add Holiday Modal -->
-<div id="addHolidayModal" class="modal-overlay">
+<div id="addHolidayModal" class="modal-overlay" style="display: none;">
     <div class="modal-content">
         <div class="modal-header">
             <h3>Add New Holiday</h3>
-            <span class="close-button">&times;</span>
+            <span class="close-button" onclick="closeAddHolidayModal()">&times;</span>
         </div>
         <div class="modal-body">
             <form id="addHolidayForm">
@@ -226,7 +239,7 @@ if (!isset($school_years_for_dropdown) || empty($school_years_for_dropdown)) {
                     <textarea id="holidayDescription" name="holidayDescription" rows="3" placeholder="Brief description of the holiday..."></textarea>
                 </div>
                 <div class="form-actions">
-                    <button type="button" class="form-btn-cancel">Cancel</button>
+                    <button type="button" class="form-btn-cancel" onclick="closeAddHolidayModal()">Cancel</button>
                     <button type="submit" class="form-btn-save" disabled>Save Holiday</button>
                 </div>
             </form>
@@ -235,11 +248,11 @@ if (!isset($school_years_for_dropdown) || empty($school_years_for_dropdown)) {
 </div>
 
 <!-- Schedule Maintenance Modal -->
-<div id="scheduleMaintenanceModal" class="modal-overlay">
+<div id="scheduleMaintenanceModal" class="modal-overlay" style="display: none;">
     <div class="modal-content">
         <div class="modal-header">
             <h3>Schedule Maintenance</h3>
-            <span class="close-button">&times;</span>
+            <span class="close-button" onclick="closeScheduleMaintenanceModal()">&times;</span>
         </div>
         <div class="modal-body">
             <form id="scheduleMaintenanceForm">
@@ -321,7 +334,7 @@ window.addEventListener('load', function() {
 </script>
 
 <!-- Day Details Modal -->
-<div id="dayDetailsModal" class="modal-overlay">
+<div id="dayDetailsModal" class="modal-overlay" style="display: none;">
     <div class="modal-box" style="max-width: 600px; min-height: 400px; text-align: center; background-color: #FFFFFF; padding: 30px; border-radius: 15px; box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3); margin: 0; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); display: flex; flex-direction: column;">
         <div class="modal-header" style="text-align: center; margin-bottom: 20px; display: block; flex-shrink: 0;">
             <h2 id="dayDetailsTitle" style="color: #333; margin-bottom: 0; display: block; width: 100%; font-size: 24px; font-weight: bold;">Day Details</h2>
@@ -335,7 +348,7 @@ window.addEventListener('load', function() {
             </div>
         </div>
         <div class="modal-actions" style="text-align: center; flex-shrink: 0; margin-top: auto;">
-            <button type="button" id="dayDetailsCloseBtn" class="cancel-btn" style="min-width: 120px;">
+            <button type="button" id="dayDetailsCloseBtn" class="cancel-btn" style="min-width: 120px;" onclick="closeDayDetailsModal()">
                 CLOSE
             </button>
         </div>

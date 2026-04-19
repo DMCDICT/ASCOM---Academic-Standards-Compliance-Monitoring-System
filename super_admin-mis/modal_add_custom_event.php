@@ -3,7 +3,7 @@
   <div class="modal-box">
     <div class="modal-header">
       <h2>Add Custom Event</h2>
-      <button class="close-button" type="button" aria-label="Close">&times;</button>
+      <button class="close-button" type="button" aria-label="Close" onclick="closeAddCustomEventModal()">&times;</button>
     </div>
     <form id="addCustomEventForm" autocomplete="off">
       <div class="form-group">
@@ -105,7 +105,7 @@
         <textarea id="eventDescription" name="eventDescription" rows="4" placeholder="Event description..."></textarea>
       </div>
       <div class="form-actions">
-        <button type="button" class="cancel-btn form-btn-cancel">Cancel</button>
+        <button type="button" class="cancel-btn form-btn-cancel" onclick="closeAddCustomEventModal()">Cancel</button>
         <button type="submit" class="create-btn form-btn-save">Save</button>
       </div>
     </form>

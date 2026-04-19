@@ -1,843 +1,415 @@
 /*
  * school-calendar.css
- * Styles specific to the school-calendar.php content fragment.
- *
- * Path to assets: From super_admin-mis/styles/ to DataDrift/ASCOM Monitoring System/src/assets/
+ * Redesigned for ASCOM premium standards.
+ * Aligned with DESIGN.md tokens and dashboard aesthetics.
  */
 
+/* -------------------------------------- */
+/* 0. Entrance Animations                */
+/* -------------------------------------- */
+@keyframes fadeSlideUp {
+  from {
+    opacity: 0;
+    transform: translateY(18px) scale(0.985);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+/* -------------------------------------- */
+/* 1. Page Header & Greeting              */
+/* -------------------------------------- */
 .school-calendar-page-container {
-    /* This container relies on content-wrapper for main padding. */
+    padding: 0;
+}
+
+.calendar-greeting {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 28px;
+  animation: fadeSlideUp 0.4s ease-out both;
+}
+
+.calendar-greeting .greeting-text h2 {
+  font-size: 22px;
+  font-weight: 800;
+  color: #111827;
+  margin: 0 0 4px 0;
+  font-family: 'TT Interphases', sans-serif;
+  line-height: 1.25;
+}
+
+.calendar-greeting .greeting-text p {
+  font-size: 13px;
+  color: rgba(17, 24, 39, 0.55);
+  margin: 0;
+  font-weight: 600;
+  letter-spacing: 0.2px;
 }
 
 /* -------------------------------------- */
-/* 1. Page Header (reusing global styles) */
+/* 2. Section Headers                     */
 /* -------------------------------------- */
-/* .header-row, .main-page-title, .header-buttons, .activity-button are defined in global.css */
-
-
-/* -------------------------------------- */
-/* 2. Main Calendar & Management Options Row (This section is FIXED) */
-/* -------------------------------------- */
-.calendar-content-wrapper { 
-    display: flex;
-    gap: 30px; 
-    flex-wrap: wrap; 
-    margin-top: 0; /* Remove top margin to eliminate gap */
+.section-header {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  margin-bottom: 18px;
+  animation: fadeSlideUp 0.4s ease-out both;
 }
 
-/* General styling for panels that look like "boxes" (calendar, event sections, options) */
-.box-panel {
-    background-color: #FFFFFF;
-    padding: 15px; /* Reduced from 20px to make calendar more compact */
-    border-radius: 8px;
-    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+.label-bar {
+  width: 4px;
+  height: 20px;
+  border-radius: 2px;
+  background: linear-gradient(180deg, #0C4B34 0%, #0F7A53 100%);
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+.section-header h3 {
+  font-size: 16px;
+  font-weight: 800;
+  color: #0C4B34;
+  margin: 0 0 4px 0;
+  font-family: 'TT Interphases', sans-serif;
+}
+
+.section-header p {
+  font-size: 12px;
+  color: rgba(17, 24, 39, 0.5);
+  margin: 0;
+  font-weight: 600;
 }
 
 /* -------------------------------------- */
-/* 3. Calendar Section (Left Side, within calendar-content-wrapper) */
+/* 3. Main Calendar Layout                */
 /* -------------------------------------- */
-.calendar-section {
-    flex: 2; 
-    min-width: 320px; 
-    max-width: 100%; 
-    box-sizing: border-box;
-    display: flex;
-    flex-direction: column; 
+.calendar-layout-grid {
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    gap: 28px;
+    margin-bottom: 28px;
 }
 
+.premium-card {
+    background: #ffffff;
+    border-radius: 20px;
+    border: 1px solid rgba(12, 75, 52, 0.12);
+    box-shadow: 0 4px 18px rgba(0,0,0,0.04);
+    padding: 24px;
+    animation: fadeSlideUp 0.45s ease-out both;
+}
+
+.calendar-card { animation-delay: 0.1s; }
+.options-card { animation-delay: 0.2s; }
+
+/* Calendar Header */
 .calendar-header {
     display: flex;
-    justify-content: space-between; 
+    justify-content: space-between;
     align-items: center;
-    margin-bottom: 10px; /* Reduced from 15px to make calendar more compact */
-    background-color: #F8F8F8; 
-    padding: 10px;
-    border-radius: 5px;
-    box-shadow: inset 0 1px 3px rgba(0,0,0,0.05);
-}
-
-.calendar-nav-group { 
-    display: flex;
-    gap: 5px; 
-    align-items: center;
-}
-
-#currentMonthYear {
-    font-size: 24px;
-    font-weight: bold;
-    margin: 0 10px; 
-    color: #333;
-    flex-grow: 1; 
-    text-align: center;
-}
-
-.calendar-nav-btn {
-    /* FIX: Transparent background and no border */
-    background-color: transparent; 
-    color: white; /* Keep text color for 'Today' button if applicable */
-    border: none; 
-    padding: 0; /* Remove padding to let image control size */
-    border-radius: 4px;
-    cursor: pointer;
-    font-size: 0; /* Hide text content like '>' if image is used */
-    line-height: 1;
-    transition: none; /* FIX: Remove transition so image swap is instant */
-
-    /* FIX: Set explicit button size and center content */
-    width: 40px; 
-    height: 40px; 
-    display: flex; 
-    justify-content: center;
-    align-items: center;
-    flex-shrink: 0; 
-}
-.calendar-nav-btn:hover {
-    /* FIX: Remove background-color on hover. Add a subtle box-shadow for visual feedback */
-    background-color: transparent; 
-    box-shadow: 0 0 5px rgba(0, 119, 255, 0.2); 
-    border-color: transparent; 
-}
-
-.calendar-nav-year-btn { 
-    font-size: 0; 
-    background-color: transparent; 
-}
-.calendar-nav-year-btn:hover {
-    /* FIX: Remove background-color on hover. Add a subtle box-shadow for visual feedback */
-    background-color: transparent; 
-    box-shadow: 0 0 5px rgba(0, 0, 0, 0.1); 
-    border-color: transparent;
-}
-
-/* FIX: Style for the images inside the navigation buttons */
-.calendar-nav-btn img.calendar-nav-icon {
-    width: 38px; /* Set desired width of icon */
-    height: 38px; /* Set desired height of icon */
-    object-fit: contain; /* Ensure icon scales properly */
-    /* No filter needed here, as images should be pre-filtered/colored */
-}
-
-.calendar-today-btn {
-    background-color: #A99F30; 
-    font-size: 14px; 
-    padding: 6px 12px;
-    border-radius: 4px;
-    margin-left: 10px; 
-    order: 3; 
-
-    width: auto; 
-    height: auto;
-    display: inline-flex; 
-    justify-content: center;
-    align-items: center;
-}
-.calendar-today-btn:hover {
-    background-color: #8a7f29;
-}
-
-
-.calendar-days-header {
-    display: grid;
-    grid-template-columns: repeat(7, 1fr);
-    gap: 5px;
-    background-color: #E0E0E0; 
-    padding: 8px 0;
-    font-weight: bold;
-    font-size: 14px;
-    color: #555;
-    text-align: center;
-    border-radius: 5px;
-    margin-bottom: 5px;
-}
-.calendar-days-header span {
-    text-transform: uppercase;
-}
-
-.calendar-grid {
-    display: grid;
-    grid-template-columns: repeat(7, 1fr);
-    gap: 5px; 
-    flex-grow: 1; 
-}
-
-.calendar-day-cell {
-    background-color: #FDFDFD; 
-    border: 1px solid #EEE;
-    border-radius: 5px;
-    padding: 6px 4px; /* Reduced padding to make cells more compact */
-    text-align: right;
-    font-size: 14px;
-    height: 65px; /* Reduced height slightly to fit more content */
-    box-sizing: border-box;
-    display: flex;
-    flex-direction: column;
-    justify-content: flex-start;
-    align-items: flex-end;
-    overflow: hidden; 
-    position: relative; 
-    cursor: pointer; 
-    transition: background-color 0.2s ease, border-color 0.2s ease; 
-}
-
-.calendar-day-cell:hover:not(.inactive) { 
-    background-color: #E6F2FF; 
-    border-color: #0077FF; 
-}
-
-.calendar-day-number {
-    font-weight: bold;
-    color: #333;
-    margin-bottom: 5px; 
-}
-
-.calendar-day-cell.inactive {
-    background-color: #FAFAFA;
-    color: #AAA;
-    opacity: 0.6;
-    cursor: default; 
-}
-
-.calendar-day-cell.current-day {
-    background-color: #E6F2FF; 
-    border-color: #0077FF; 
-    box-shadow: 0 0 5px rgba(0, 119, 255, 0.2);
-}
-
-.calendar-day-cell.selected-day { 
-    background-color: #C0E0FF; 
-    border-color: #004080; 
-    box-shadow: 0 0 8px rgba(0, 64, 128, 0.3);
-}
-
-.calendar-event-indicator {
-    background-color: #A99F30; 
-    color: white;
-    font-size: 10px;
-    padding: 2px 5px;
-    border-radius: 3px;
-    margin-top: 2px;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    max-width: 100%;
-    cursor: pointer;
-    position: relative;
-    transition: background-color 0.2s ease;
-    box-shadow: 0 1px 3px rgba(0,0,0,0.2);
-}
-
-/* Special styling for term events to make them more prominent */
-.calendar-event-indicator[data-event-type*="term"] {
-    font-weight: bold;
-    font-size: 11px;
-    padding: 3px 6px;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.3);
-    border-radius: 4px;
-    color: white; /* White text for better contrast with #A99F30 background */
-}
-
-.calendar-event-indicator:hover {
-    background-color: #8B7D1A !important;
-    z-index: 10;
-}
-
-/* Ensure tooltips work properly */
-.calendar-event-indicator[title]:hover::after {
-    content: attr(title);
-    position: absolute;
-    bottom: 100%;
-    left: 50%;
-    transform: translateX(-50%);
-    background-color: #333;
-    color: white;
-    padding: 5px 8px;
-    border-radius: 4px;
-    font-size: 12px;
-    white-space: nowrap;
-    z-index: 1000;
-    pointer-events: none;
-    margin-bottom: 5px;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.3);
-}
-
-.calendar-event-indicator[title]:hover::before {
-    content: '';
-    position: absolute;
-    bottom: 100%;
-    left: 50%;
-    transform: translateX(-50%);
-    border: 5px solid transparent;
-    border-top-color: #333;
-    z-index: 1000;
-    pointer-events: none;
-    margin-bottom: -5px;
-}
-
-
-/* -------------------------------------- */
-/* 4. Management Options Section (Right Side, Top) */
-/* -------------------------------------- */
-.calendar-options-section {
-    flex: 1; 
-    min-width: 280px; 
-    max-width: 25%;
-    box-sizing: border-box;
-    padding-left: 20px; 
-    border-left: 1px solid #EEE; 
-    display: flex; 
-    flex-direction: column;
-    gap: 10px; 
-}
-.calendar-options-section h3 {
-    font-size: 20px;
-    color: #333;
-    margin-top: 0;
     margin-bottom: 20px;
-    font-family: 'TT Interphases', sans-serif;
-    font-weight: bold;
 }
 
-.options-list {
+.month-year-display {
+    font-size: 20px;
+    font-weight: 800;
+    color: #111827;
+    margin: 0;
+}
+
+.calendar-controls {
     display: flex;
-    flex-direction: column;
-    gap: 15px; 
+    gap: 8px;
+    align-items: center;
 }
 
-.option-button {
-    background-color: #0F7A53; 
+.nav-btn {
+    width: 36px;
+    height: 36px;
+    border-radius: 10px;
+    background: rgba(12, 75, 52, 0.05);
+    border: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.2s;
+    color: #0C4B34;
+}
+
+.nav-btn:hover {
+    background: #0C4B34;
+    color: #ffffff;
+}
+
+.today-btn {
+    background: #0C4B34;
     color: white;
     border: none;
-    padding: 12px 15px;
-    border-radius: 8px;
+    padding: 8px 16px;
+    border-radius: 10px;
+    font-size: 13px;
+    font-weight: 700;
     cursor: pointer;
-    font-size: 16px;
-    font-weight: bold;
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    transition: background-color 0.2s ease;
-    width: 100%; 
-    box-sizing: border-box;
+    transition: all 0.2s;
 }
 
-.option-button img {
-    width: 30px; 
-    height: 30px;
-    filter: sepia(0%) saturate(7500%) hue-rotate(360deg) brightness(120%) contrast(100%); 
+.today-btn:hover {
+    background: #0a3a28;
+    box-shadow: 0 4px 12px rgba(12, 75, 52, 0.2);
 }
 
-.option-button:hover {
-    background-color: #0a5f42;
-}
-
-/* -------------------------------------- */
-/* 5. School Terms Management Section (below main calendar-content-wrapper) */
-/* -------------------------------------- */
-.school-terms-section {
-    margin-top: 20px; 
-    background-color: #FFFFFF; 
-    padding: 20px; 
-    border-radius: 8px;
-    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
-}
-
-.school-terms-header { 
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 15px; 
-}
-.school-terms-header h3 { 
-    font-size: 20px;
-    color: #333;
-    margin-top: 0;
-    margin-bottom: 0;
-    font-family: 'TT Interphases', sans-serif;
-    font-weight: bold;
-}
-.school-terms-header p { 
-    font-size: 14px;
-    color: #777;
-    margin-top: 5px; 
-}
-
-.current-term-details {
-    padding: 15px; 
-    border: 1px solid #EEE; 
-    border-radius: 5px;
-    background-color: #FDFDFD;
-}
-.current-term-details h4 {
-    font-size: 16px;
-    color: #333;
-    margin-top: 0;
-    margin-bottom: 10px;
-}
-.current-term-details p {
-    font-size: 14px;
-    color: #555;
-    margin: 5px 0;
-}
-.current-term-details strong {
-    font-weight: bold;
-}
-
-/* -------------------------------------- */
-/* 6. Events Display Row (Mimics Dashboard-Bottom Layout) */
-/* -------------------------------------- */
-.calendar-events-display-row {
-    display: flex; 
-    gap: 20px; 
-    flex-wrap: wrap; 
-    margin-top: 20px; 
-}
-
-.events-selected-day-list { 
-    flex: 2; 
-    min-width: 300px; 
-}
-.events-selected-day-list h4 {
-    font-size: 16px;
-    color: #333;
-    margin-top: 0;
-    margin-bottom: 10px;
-    border-bottom: 1px solid #ddd;
-    padding-bottom: 8px;
-}
-.events-selected-day-list ul {
-    list-style: none;
-    padding: 0;
-    margin: 0;
-    font-size: 14px;
-    color: #555;
-}
-.events-selected-day-list li {
+/* Calendar Grid */
+.calendar-days-strip {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 4px;
     margin-bottom: 8px;
-    padding-left: 15px; 
-    position: relative;
-}
-.events-selected-day-list li::before { 
-    content: '•';
-    color: #0077FF; 
-    position: absolute;
-    left: 0;
-    font-size: 1.2em;
-    line-height: 1;
-}
-.events-selected-day-list li.placeholder-message {
-    font-style: italic;
-    color: #888;
-    padding-left: 0;
-}
-.events-selected-day-list li.placeholder-message::before {
-    content: ''; 
 }
 
-
-.upcoming-events-section { 
-    flex: 1; 
-    min-width: 250px; 
-}
-.upcoming-events-section h4 {
-    font-size: 16px;
-    color: #333;
-    margin-top: 0;
-    margin-bottom: 10px;
-    border-bottom: 1px solid #ddd;
-    padding-bottom: 8px;
-}
-.upcoming-events-section ul {
-    list-style: none;
-    padding: 0;
-    margin: 0;
-    font-size: 14px;
-    color: #555;
-}
-.upcoming-events-section li {
-    margin-bottom: 8px;
-    padding-left: 15px; 
-    position: relative;
-}
-.upcoming-events-section li::before { 
-    content: '•';
-    color: #A99F30; 
-    position: absolute;
-    left: 0;
-    font-size: 1.2em;
-    line-height: 1;
-}
-.upcoming-events-section li.placeholder-message {
-    font-style: italic;
-    color: #888;
-    padding-left: 0;
-}
-.upcoming-events-section li.placeholder-message::before {
-    content: ''; 
-}
-.upcoming-events-section .current-date-indicator { 
-    font-size: 14px;
-    color: #0077FF;
-    font-weight: bold;
-    display: block;
-    margin-top: 5px; 
+.day-name {
+    text-align: center;
+    font-size: 11px;
+    font-weight: 700;
+    color: rgba(17, 24, 39, 0.4);
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
 }
 
-
-/* -------------------------------------- */
-/* 7. Responsive Adjustments */
-/* -------------------------------------- */
-@media (max-width: 768px) {
-    .calendar-content-wrapper {
-        flex-direction: column; 
-        gap: 20px; 
-    }
-    .calendar-section,
-    .calendar-options-section {
-        min-width: unset; 
-        width: 100%; 
-    }
-    .calendar-options-section { 
-        border-left: none; 
-        border-top: 1px solid #EEE; 
-        padding-left: 0;
-        padding-top: 20px;
-    }
-
-    .calendar-events-display-row {
-        flex-direction: column; 
-        gap: 20px; 
-    }
-    .events-selected-day-list,
-    .upcoming-events-section {
-        min-width: unset; 
-        width: 100%; 
-    }
+.calendar-cells {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 4px;
 }
 
-@media (max-width: 500px) {
-    .calendar-header {
-        flex-wrap: wrap; 
-        justify-content: center;
-    }
-    .calendar-nav-group { 
-        gap: 10px;
-        flex-basis: 100%; 
-        justify-content: center;
-        margin-bottom: 10px; 
-    }
-    #currentMonthYear {
-        flex-basis: 100%; 
-        margin-bottom: 10px;
-    }
-    .calendar-nav-btn {
-        width: 45%; 
-        box-sizing: border-box;
-    }
-}
-
-/* -------------------------------------- */
-/* 8. Modal Styles (for pop-up forms)   */
-/* -------------------------------------- */
-/* School Calendar specific modals only */
-#addTermModal.modal-overlay,
-#addSchoolYearModal.modal-overlay,
-#addHolidayModal.modal-overlay,
-#scheduleMaintenanceModal.modal-overlay,
-#successModal.modal-overlay,
-#errorModal.modal-overlay,
-#dayDetailsModal.modal-overlay {
-    display:none;
-    position:fixed;
-    z-index:1003;
-    left:0;
-    top:0;
-    width:100%;
-    height:100%;
-    overflow:auto;
-    background-color:rgba(0,0,0,.8);
-    justify-content:center;
-    align-items:center
-}
-
-/* Additional protection for Add Holiday Modal */
-#addHolidayModal.modal-overlay {
-    display: none !important;
-    visibility: hidden !important;
-    opacity: 0 !important;
-    z-index: -1 !important;
-}
-
-/* Only show when explicitly triggered */
-#addHolidayModal.modal-overlay.show {
-    display: flex !important;
-    visibility: visible !important;
-    opacity: 1 !important;
-    z-index: 1003 !important;
-}
-
-#addTermModal .modal-content,
-#addSchoolYearModal .modal-content,
-#addHolidayModal .modal-content,
-#scheduleMaintenanceModal .modal-content {
-    background-color:#EFEFEF;
-    margin:auto;padding:25px;
-    border:1px solid #888;
-    border-radius:15px;
-    width:90%;
-    max-width:500px;
-    box-shadow:0 5px 15px rgba(0,0,0,.3);
-    animation:fadeIn .3s
-}
-
-@keyframes fadeIn {
-    from{opacity:0;
-        transform:translateY(-20px)
-    } to {opacity:1;transform:translateY(0)}
-}
-
-/* School Calendar specific modal header and close button only */
-#addTermModal .modal-header,
-#addSchoolYearModal .modal-header,
-#addHolidayModal .modal-header,
-#scheduleMaintenanceModal .modal-header {
-    display:flex;
-    justify-content:space-between;
-    align-items:center;
-    border-bottom:1px solid #e5e5e5;
-    padding-bottom:15px;
-    margin-bottom:20px
-}
-
-#addTermModal .modal-header h3,
-#addSchoolYearModal .modal-header h3,
-#addHolidayModal .modal-header h3,
-#scheduleMaintenanceModal .modal-header h3 {
-    margin:0;
-    font-size:22px;
-    font-weight:700;
-    color:#333
-}
-
-#addTermModal .close-button,
-#addSchoolYearModal .close-button,
-#addHolidayModal .close-button,
-#scheduleMaintenanceModal .close-button {
-    color:#aaa;float:right;
-    font-size:28px;
-    font-weight:700;
-    cursor:pointer;
-    transition:color .2s
-}
-
-#addTermModal .close-button:focus,
-#addTermModal .close-button:hover,
-#addSchoolYearModal .close-button:focus,
-#addSchoolYearModal .close-button:hover,
-#addHolidayModal .close-button:focus,
-#addHolidayModal .close-button:hover,
-#scheduleMaintenanceModal .close-button:focus,
-#scheduleMaintenanceModal .close-button:hover {
-    color:#000
-}
-
-/* School Calendar specific modal form groups only */
-#addTermModal .modal-body .form-group,
-#addSchoolYearModal .modal-body .form-group,
-#addHolidayModal .modal-body .form-group,
-#scheduleMaintenanceModal .modal-body .form-group {
-    margin-bottom:15px
-}
-
-/* By adding #addTermModal, these rules will ONLY apply to form-rows inside that specific modal */
-#addTermModal .form-row {
-    display: flex;
-    gap: 15px; 
-    margin-bottom: 15px;
-}
-
-#addTermModal .form-row .form-group {
-    flex: 1; 
-    margin-bottom: 0; 
-}
-
-/* Style for inputs that are not meant to be edited by the user */
-#addTermModal input[readonly],
-#addSchoolYearModal input[readonly] {
-    background-color: #f5f5f5; /* A light grey background */
-    border-color: #a0a0a0;
-    cursor: default; /* Use the default cursor, not the text input cursor */
-}
-
-/* School Calendar specific modal body styles only */
-#addTermModal .modal-body label,
-#addSchoolYearModal .modal-body label,
-#addHolidayModal .modal-body label,
-#scheduleMaintenanceModal .modal-body label {
-    display:block;
-    margin-bottom:5px;
-    font-weight:700;
-    color:#000000;
-    font-size:14px
-}
-
-/* This one rule will style all your form fields consistently - School Calendar specific only */
-#addTermModal .modal-body input[type="text"],
-#addTermModal .modal-body input[type="date"],
-#addTermModal .modal-body input[type="number"], /* For the Start/End Year fields */
-#addTermModal .modal-body select,
-#addSchoolYearModal .modal-body input[type="text"],
-#addSchoolYearModal .modal-body input[type="date"],
-#addSchoolYearModal .modal-body input[type="number"], /* For the Start/End Year fields */
-#addSchoolYearModal .modal-body select,
-#addHolidayModal .modal-body input[type="text"],
-#addHolidayModal .modal-body input[type="date"],
-#addHolidayModal .modal-body input[type="number"],
-#addHolidayModal .modal-body select,
-#addHolidayModal .modal-body textarea,
-#scheduleMaintenanceModal .modal-body input[type="text"],
-#scheduleMaintenanceModal .modal-body input[type="date"],
-#scheduleMaintenanceModal .modal-body input[type="time"],
-#scheduleMaintenanceModal .modal-body input[type="number"],
-#scheduleMaintenanceModal .modal-body select,
-#scheduleMaintenanceModal .modal-body textarea {
-    /* Hides the default arrow from the browser */
-    -webkit-appearance: none;
-    -moz-appearance: none;
-    appearance: none;
-    /* Add padding to the right to make space for our new custom arrow */
-    padding-right: 30px;
-    width: 100%;
-    padding: 10px;
-    border: 1px solid #ccc;
+.calendar-cell {
+    aspect-ratio: 1 / 0.8;
+    background: rgba(12, 75, 52, 0.015);
+    border: 1px solid rgba(12, 75, 52, 0.05);
     border-radius: 12px;
-    box-sizing: border-box;
-    font-size: 16px;
-    font-family: inherit; /* Good to add for consistent font in dropdowns */
-}
-
-/* School Calendar specific form actions only */
-#addTermModal .form-actions,
-#addSchoolYearModal .form-actions,
-#addHolidayModal .form-actions,
-#scheduleMaintenanceModal .form-actions {
-    display:flex;
-    justify-content:flex-end;
-    gap:10px;
-    margin-top:25px
-}
-
-#addTermModal .form-actions button,
-#addSchoolYearModal .form-actions button,
-#addHolidayModal .form-actions button,
-#scheduleMaintenanceModal .form-actions button {
-    padding:10px 20px;
-    border:none;
-    border-radius:5px;
-    font-size:16px;
-    font-weight:700;
-    cursor:pointer;
-    transition:background-color .2s
-}
-
-#addTermModal .form-btn-cancel,
-#addSchoolYearModal .form-btn-cancel,
-#addHolidayModal .form-btn-cancel,
-#scheduleMaintenanceModal .form-btn-cancel {
-    background-color:#C9C9C9;
-    color:#333;
-    border:1px solid #ddd
-}
-
-#addTermModal .form-btn-cancel:hover,
-#addSchoolYearModal .form-btn-cancel:hover,
-#addHolidayModal .form-btn-cancel:hover,
-#scheduleMaintenanceModal .form-btn-cancel:hover {
-    background-color:#B9B9B9
-}
-
-#addTermModal .form-btn-save,
-#addSchoolYearModal .form-btn-save,
-#addHolidayModal .form-btn-save,
-#scheduleMaintenanceModal .form-btn-save {
-    background-color:#0f7a53;
-    color:#fff
-}
-
-#addTermModal .form-btn-save:hover,
-#addSchoolYearModal .form-btn-save:hover,
-#addHolidayModal .form-btn-save:hover,
-#scheduleMaintenanceModal .form-btn-save:hover {
-    background-color:#0a5f42
-}
-
-#addTermModal .form-btn-save:disabled,
-#addSchoolYearModal .form-btn-save:disabled,
-#addHolidayModal .form-btn-save:disabled,
-#scheduleMaintenanceModal .form-btn-save:disabled {
-    background-color: #A5A5A5; /* A darker, less vibrant shade of the green */
-    color: black;
-    cursor: not-allowed; /* Show the "not allowed" cursor on hover */
-}
-
-/* This is the container we added in the HTML to help position the arrow */
-.custom-select-wrapper {
+    padding: 8px;
     position: relative;
+    cursor: pointer;
+    transition: all 0.22s;
+    display: flex;
+    flex-direction: column;
 }
 
-/* This creates the new custom arrow and positions it */
-.custom-select-wrapper::after {
-    content: ''; /* Required for pseudo-elements */
-    position: absolute;
-    top: 50%;
-    right: 15px; /* This is the space from the right edge */
-    transform: translateY(-50%);
+.calendar-cell:hover:not(.inactive) {
+    background: #ffffff;
+    border-color: #0C4B34;
+    transform: translateY(-2px);
+    box-shadow: 0 8px 16px rgba(12, 75, 52, 0.08);
+    z-index: 5;
+}
 
-    /* These border styles create a downward-pointing triangle */
-    width: 0; 
-    height: 0; 
-    border-left: 5px solid transparent;
-    border-right: 5px solid transparent;
-    border-top: 6px solid #555; /* The color of the arrow */
-    
-    pointer-events: none; /* This makes sure clicks go to the select box, not our fake arrow */
+.cell-num {
+    font-size: 13px;
+    font-weight: 700;
+    color: #111827;
+    text-align: right;
+}
+
+.calendar-cell.inactive {
+    opacity: 0.35;
+    background: transparent;
+    cursor: default;
+}
+
+.calendar-cell.today {
+    background: rgba(12, 75, 52, 0.08);
+    border-color: #0C4B34;
+}
+
+.calendar-cell.today .cell-num {
+    color: #0C4B34;
+}
+
+.event-marker {
+    background: #0C4B34;
+    height: 3px;
+    border-radius: 2px;
+    margin-top: auto;
 }
 
 /* -------------------------------------- */
-/* 9. Success/Error Modal Styles (Matching Edit User Modal Design) */
+/* 4. Management Options                  */
 /* -------------------------------------- */
-
-/* These modals now use inline styles to match the edit user modal design */
-/* The styles are defined directly in the HTML for consistency */
-
-/* =============================================
-   Layout for Side-by-Side Management Panels 
-   ============================================= */
-
-/* This creates the wrapper for our two panels */
-.management-row-wrapper {
-    display: flex;          /* This is the key: it aligns children horizontally */
-    gap: 20px;              /* This creates a 20px space between the two boxes */
-    margin-top: 20px;       /* This keeps the space from the content above */
+.options-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 12px;
 }
 
-/* This targets both panels inside the wrapper */
-.management-row-wrapper > .box-panel {
-    flex: 1; /* This makes each box grow to take up equal (50%) space */
-    margin: 0; /* Removes any extra margins from the panels themselves */
+.mgmt-btn {
+    background: rgba(12, 75, 52, 0.04);
+    border: 1px solid rgba(12, 75, 52, 0.08);
+    border-radius: 14px;
+    padding: 16px;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    cursor: pointer;
+    transition: all 0.22s;
+    text-align: left;
 }
 
-/* Space between effect for start year and end year fields */
-#addSchoolYearModal .form-row:first-of-type {
+.mgmt-btn:hover {
+    background: #ffffff;
+    border-color: #0C4B34;
+    transform: translateX(4px);
+    box-shadow: 0 6px 16px rgba(12, 75, 52, 0.1);
+}
+
+.mgmt-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 10px;
+    background: rgba(12, 75, 52, 0.08);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #0C4B34;
+    flex-shrink: 0;
+}
+
+.mgmt-btn:hover .mgmt-icon {
+    background: #0C4B34;
+    color: white;
+}
+
+.mgmt-text {
+    display: flex;
+    flex-direction: column;
+}
+
+.mgmt-label {
+    font-size: 14px;
+    font-weight: 700;
+    color: #111827;
+}
+
+.mgmt-desc {
+    font-size: 11px;
+    font-weight: 600;
+    color: rgba(17, 24, 39, 0.45);
+}
+
+/* -------------------------------------- */
+/* 5. Lower Content Sections              */
+/* -------------------------------------- */
+.lower-sections-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 28px;
+}
+
+.data-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.data-item {
+    padding: 14px 0;
+    border-bottom: 1px solid rgba(12, 75, 52, 0.06);
+    display: flex;
     justify-content: space-between;
-    gap: 20px; /* Increase gap between the fields */
+    align-items: center;
 }
 
-#addSchoolYearModal .form-row:first-of-type .form-group:first-child {
-    flex: 0 0 auto; /* Don't grow, don't shrink, auto size */
-    width: 120px; /* Fixed width for start year */
+.data-item:last-child { border-bottom: none; }
+
+.item-info { display: flex; flex-direction: column; }
+.item-title { font-size: 14px; font-weight: 700; color: #111827; }
+.item-subtitle { font-size: 11px; font-weight: 600; color: rgba(17, 24, 39, 0.4); }
+
+.status-badge {
+    padding: 4px 10px;
+    border-radius: 8px;
+    font-size: 11px;
+    font-weight: 700;
 }
 
-#addSchoolYearModal .form-row:first-of-type .form-group:last-child {
-    flex: 1; /* Take remaining space */
-    width: auto; /* Let it size naturally */
+.status-active { background: rgba(46, 125, 50, 0.1); color: #2E7D32; }
+.status-inactive { background: rgba(0,0,0,0.05); color: #757575; }
+
+/* -------------------------------------- */
+/* 6. Dark Mode Coverage                  */
+/* -------------------------------------- */
+html[data-theme="dark"] .calendar-greeting .greeting-text h2 { color: #f0f0f0 !important; }
+
+html[data-theme="dark"] .premium-card {
+    background-color: #1e1e1e !important;
+    border-color: #333 !important;
+}
+
+html[data-theme="dark"] .calendar-cell {
+    background: rgba(255,255,255,0.02) !important;
+}
+
+html[data-theme="dark"] .calendar-cell:hover:not(.inactive) {
+    background: #252525 !important;
+    border-color: #81C784 !important;
+}
+
+html[data-theme="dark"] .cell-num { color: #ccc !important; }
+html[data-theme="dark"] .month-year-display { color: #f0f0f0 !important; }
+
+html[data-theme="dark"] .mgmt-btn {
+    background: rgba(255,255,255,0.03) !important;
+    border-color: #333 !important;
+}
+
+html[data-theme="dark"] .mgmt-btn:hover {
+    background: #2a2a2a !important;
+    border-color: #81C784 !important;
+}
+
+html[data-theme="dark"] .mgmt-label { color: #f0f0f0 !important; }
+
+html[data-theme="dark"] .data-item { border-bottom-color: #333 !important; }
+html[data-theme="dark"] .item-title { color: #eee !important; }
+
+/* -------------------------------------- */
+/* 7. Responsive                          */
+/* -------------------------------------- */
+@media (max-width: 1100px) {
+    .calendar-layout-grid, .lower-sections-grid { grid-template-columns: 1fr; }
+}
+
+/* -------------------------------------- */
+/* 8. Modals & Overlays                  */
+/* -------------------------------------- */
+div.modal-overlay {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.7);
+    backdrop-filter: blur(4px);
+    z-index: 9999;
+    align-items: center;
+    justify-content: center;
+}
+
+.modal-content {
+    background: #ffffff;
+    border-radius: 20px;
+    width: 90%;
+    max-width: 500px;
+    padding: 24px;
+    animation: fadeSlideUp 0.3s ease-out;
+}
+
+html[data-theme="dark"] .modal-content {
+    background: #1e1e1e;
+    color: #f0f0f0;
 }

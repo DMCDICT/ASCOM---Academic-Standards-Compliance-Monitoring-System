@@ -1283,7 +1283,7 @@ switch ($page) {
         echo '<link rel="stylesheet" href="./styles/department-management.css?v=1.2">';
         break;
     case 'school-calendar':
-        echo '<link rel="stylesheet" href="./styles/school-calendar.css?v=1.0">';
+        echo '<link rel="stylesheet" href="./styles/school-calendar.css?v=2.0">';
         break;
     case 'settings':
         echo '<link rel="stylesheet" href="./styles/settings.css?v=2.0">';
