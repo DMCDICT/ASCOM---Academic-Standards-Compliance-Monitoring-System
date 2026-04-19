@@ -143,6 +143,179 @@ if (!isset($school_years_for_dropdown) || empty($school_years_for_dropdown)) {
     </div>
 </div>
 
+<!-- Manage Terms Modal -->
+<div id="manageTermsModal" class="modal-overlay" style="display: none;">
+    <div class="modal-content" style="max-width: 700px;">
+        <div class="modal-header">
+            <h3>Manage All Terms</h3>
+            <button type="button" class="close-button" onclick="closeManageTermsModal()">&times;</button>
+        </div>
+        <div class="modal-body" style="max-height: 60vh; overflow-y: auto;">
+            <div id="termsListContainer">
+                <p style="text-align: center; color: #666;">Loading terms...</p>
+            </div>
+        </div>
+        <div class="modal-footer" style="padding: 16px 24px; border-top: 1px solid rgba(12,75,52,0.12);">
+            <button type="button" class="form-btn-cancel" onclick="closeManageTermsModal()">Close</button>
+        </div>
+    </div>
+</div>
+
+<style>
+.modal-footer {
+    display: flex;
+    justify-content: flex-end;
+}
+.term-card {
+    background: #fff;
+    border: 1px solid rgba(12,75,52,0.12);
+    border-radius: 12px;
+    padding: 14px;
+    margin-bottom: 12px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+.term-card:hover {
+    border-color: rgba(12,75,52,0.25);
+    box-shadow: 0 4px 12px rgba(12,75,52,0.08);
+}
+.term-info {
+    flex: 1;
+}
+.term-title {
+    font-size: 15px;
+    font-weight: 700;
+    color: #111827;
+}
+.term-dates {
+    font-size: 12px;
+    color: rgba(17,24,39,0.6);
+    margin-top: 4px;
+}
+.term-school-year {
+    font-size: 11px;
+    color: rgba(17,24,39,0.5);
+    margin-top: 2px;
+}
+.term-actions {
+    display: flex;
+    gap: 8px;
+}
+.btn-edit-term {
+    background: #0C4B34;
+    color: white;
+    border: none;
+    padding: 8px 14px;
+    border-radius: 8px;
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+}
+.btn-delete-term {
+    background: #dc3545;
+    color: white;
+    border: none;
+    padding: 8px 14px;
+    border-radius: 8px;
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+}
+html[data-theme="dark"] .term-card {
+    background: #252525;
+    border-color: #333;
+}
+html[data-theme="dark"] .term-title {
+    color: #e0e0e0;
+}
+html[data-theme="dark"] .term-info {
+    color: #ccc;
+}
+</style>
+
+<script>
+function openManageTermsModal() {
+    const modal = document.getElementById('manageTermsModal');
+    if (modal) {
+        modal.style.display = 'flex';
+        loadAllTerms();
+    }
+}
+
+function closeManageTermsModal() {
+    const modal = document.getElementById('manageTermsModal');
+    if (modal) modal.style.display = 'none';
+}
+
+// Make function globally available
+window.openManageTermsModal = openManageTermsModal;
+window.closeManageTermsModal = closeManageTermsModal;
+
+async function loadAllTerms() {
+    const container = document.getElementById('termsListContainer');
+    if (!container) return;
+    
+    try {
+        const response = await fetch('./api/get_all_terms.php');
+        const data = await response.json();
+        
+        if (data.status === 'success' && data.terms && data.terms.length > 0) {
+            let html = '';
+            data.terms.forEach(term => {
+                const statusClass = term.status === 'Active' ? 'status-active' : 'status-inactive';
+                html += `
+                    <div class="term-card">
+                        <div class="term-info">
+                            <div class="term-title">${term.title}</div>
+                            <div class="term-dates">${term.start_date} to ${term.end_date}</div>
+                            <div class="term-school-year">School Year: ${term.school_year_label}</div>
+                            <span class="status-badge ${statusClass}">${term.status}</span>
+                        </div>
+                        <div class="term-actions">
+                            <button class="btn-edit-term" onclick="openEditTermModal(${term.id}, '${term.title}', '${term.start_date}', '${term.end_date}', ${term.school_year_id})">Edit</button>
+                            <button class="btn-delete-term" onclick="deleteTerm(${term.id})">Delete</button>
+                        </div>
+                    </div>
+                `;
+            });
+            container.innerHTML = html;
+        } else {
+            container.innerHTML = '<p style="text-align: center; color: #666;">No terms found. Add a school year first, then create terms.</p>';
+        }
+    } catch (error) {
+        container.innerHTML = '<p style="text-align: center; color: red;">Error loading terms: ' + error.message + '</p>';
+    }
+}
+
+async function deleteTerm(termId) {
+    if (!confirm('Are you sure you want to delete this term?')) return;
+    
+    try {
+        const response = await fetch('./api/delete_term.php', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ term_id: termId })
+        });
+        
+        const data = await response.json();
+        
+        if (data.status === 'success') {
+            alert('Term deleted successfully');
+            loadAllTerms(); // Reload the list
+        } else {
+            alert('Error: ' + data.message);
+        }
+    } catch (error) {
+        alert('Error: ' + error.message);
+    }
+}
+
+function openEditTermModal(termId, title, startDate, endDate, schoolYearId) {
+    alert('Edit term: ' + title + ' (ID: ' + termId + ') - This feature is coming soon!');
+}
+</script>
+
 <script>
 function autoFillEndYear() {
     const startYear = document.getElementById('syStartYear')?.value;

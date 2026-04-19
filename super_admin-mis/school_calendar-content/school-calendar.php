@@ -233,7 +233,7 @@ try {
                     </div>
                 </div>
             </div>
-            <button class="mgmt-btn" id="manageTermsButton" style="margin-top: 16px; width: 100%; justify-content: center; background: #0C4B34; color: white;">Manage All Terms</button>
+            <button class="mgmt-btn" id="manageTermsButton" style="margin-top: 16px; width: 100%; justify-content: center; background: #0C4B34; color: white;" onclick="openManageTermsModal()">Manage All Terms</button>
         </div>
     </div>
 

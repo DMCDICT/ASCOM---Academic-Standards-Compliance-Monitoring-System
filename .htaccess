@@ -5,7 +5,7 @@ Options -Indexes
 </FilesMatch>
 
 # Allow specific API files
-<FilesMatch "^(add_term|add_school_year|add_holiday|get_school_year_events)\.php$">
+<FilesMatch "^(add_term|add_school_year|add_holiday|get_school_year_events|get_all_terms|delete_term)\.php$">
     Require all granted
 </FilesMatch>
 
