@@ -374,6 +374,18 @@ input[type="radio"][name="customEnds"] {
     }
 }
 
+/* Fade in animation that preserves absolute centering via translate(-50%, -50%) */
+@keyframes fadeInCentered {
+    from {
+        opacity: 0;
+        transform: translate(-50%, -50%) translateY(12px);
+    }
+    to {
+        opacity: 1;
+        transform: translate(-50%, -50%) translateY(0);
+    }
+}
+
 
 .modal-overlay:not(#addUserModal):not(#addDepartmentModal):not(#userDetailsModal):not(#editUserModal) .modal-box:not(#addUserModal .modal-box):not(#addDepartmentModal .modal-box):not(#userDetailsModal .modal-box):not(#editUserModal .modal-box) {
     display: flex;
@@ -626,4 +638,3 @@ input[type="radio"][name="customEnds"] {
   border-color: #007bff;
   box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
 }
-

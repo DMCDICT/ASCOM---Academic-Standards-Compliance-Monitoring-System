@@ -3778,7 +3778,7 @@ button {
 
 .modal-content {
     background-color: #efefef !important;
-    margin: auto;
+    
     padding: 25px;
     border: 1px solid #888;
     border-radius: 15px;
