@@ -4,6 +4,12 @@ Options -Indexes
     Require all denied
 </FilesMatch>
 
-<FilesMatch "^(test_|debug_|check_|fix_|setup_|cleanup_|assign_test_|simple_user_check|database_manager|create_|add_[A-Za-z0-9_]*\.php|force_|reset_).*$">
+# Allow specific API files
+<FilesMatch "^(add_term|add_school_year|add_holiday|get_school_year_events)\.php$">
+    Require all granted
+</FilesMatch>
+
+# Block dangerous patterns
+<FilesMatch "^(test_|debug_|check_|fix_|setup_|cleanup_|assign_test_|simple_user_check|database_manager|create_|force_|reset_).*$">
     Require all denied
 </FilesMatch>

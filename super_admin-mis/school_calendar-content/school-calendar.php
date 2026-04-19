@@ -45,6 +45,7 @@ try {
         $active_where = $has_status ? "status = 'Active'" : ($has_active ? "is_active = 1" : "1=1");
         $sql_curr_sy = "SELECT $label_field as school_year_label FROM school_years WHERE $active_where ORDER BY start_date DESC LIMIT 1";
         $res_curr_sy = $conn->query($sql_curr_sy);
+        $current_school_year = null;
         if ($res_curr_sy && $res_curr_sy->num_rows > 0) {
             $current_school_year = $res_curr_sy->fetch_assoc()['school_year_label'];
             if (preg_match('/(\d{4})/', $current_school_year, $matches)) {
@@ -60,6 +61,16 @@ try {
                     }
                 }
                 $school_years_for_dropdown = $filtered;
+            }
+        }
+        
+        // If no school years after filtering, show all school years
+        if (empty($school_years_for_dropdown)) {
+            $sql_sy = "SELECT id, $label_field as school_year_label, $status_field as status, start_date, end_date FROM school_years ORDER BY $label_field DESC";
+            $res_sy = $conn->query($sql_sy);
+            if ($res_sy) {
+                $school_years_for_dropdown = [];
+                while($row = $res_sy->fetch_assoc()) { $school_years_for_dropdown[] = $row; }
             }
         }
 
