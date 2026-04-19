@@ -9,6 +9,23 @@ $admin_name = $_SESSION['full_name'] ?? 'Super Admin';
 $admin_email = $_SESSION['email'] ?? 'admin@ascom.edu.ph';
 $admin_role = $_SESSION['role_display'] ?? 'System Administrator';
 $admin_emp = $_SESSION['employee_no'] ?? 'EMP-000';
+$user_id = $_SESSION['user_id'];
+$user_role = $_SESSION['user_role'] ?? 'super_admin';
+
+// Fetch avatar from database if not in session
+if (!isset($_SESSION['profile_image'])) {
+    $table = ($user_role === 'super_admin') ? 'super_admin' : 'users';
+    $stmt = $conn->prepare("SELECT profile_image FROM $table WHERE id = ?");
+    $stmt->bind_param("i", $user_id);
+    $stmt->execute();
+    $res = $stmt->get_result();
+    if ($res && $row = $res->fetch_assoc()) {
+        $_SESSION['profile_image'] = $row['profile_image'];
+    }
+    $stmt->close();
+}
+
+$avatar_path = !empty($_SESSION['profile_image']) ? '../storage/avatars/' . $_SESSION['profile_image'] : '../src/assets/images/ASCOM_Monitoring_System.png';
 ?>
 
 <div class="settings-page-container">
@@ -17,7 +34,7 @@ $admin_emp = $_SESSION['employee_no'] ?? 'EMP-000';
         <h2 class="settings-sidebar-title">Settings</h2>
         
         <div id="accountCard" class="account-preview-card active">
-            <img src="../src/assets/images/ASCOM_Monitoring_System.png" alt="Profile" class="preview-avatar">
+            <img src="<?php echo $avatar_path; ?>" alt="Profile" class="preview-avatar" id="sidebarAvatar">
             <div class="preview-info">
                 <span class="preview-name"><?php echo htmlspecialchars($admin_name); ?></span>
                 <span class="preview-role"><?php echo htmlspecialchars($admin_role); ?></span>
@@ -51,7 +68,8 @@ $admin_emp = $_SESSION['employee_no'] ?? 'EMP-000';
         name: '<?php echo addslashes($admin_name); ?>',
         email: '<?php echo addslashes($admin_email); ?>',
         role: '<?php echo addslashes($admin_role); ?>',
-        emp: '<?php echo addslashes($admin_emp); ?>'
+        emp: '<?php echo addslashes($admin_emp); ?>',
+        avatar: '<?php echo $avatar_path; ?>'
     };
 
     function renderMyAccount() {
@@ -61,7 +79,7 @@ $admin_emp = $_SESSION['employee_no'] ?? 'EMP-000';
             
             <div class="profile-overview">
                 <div class="profile-avatar-container">
-                    <img src="../src/assets/images/ASCOM_Monitoring_System.png" alt="Profile" class="profile-avatar-large">
+                    <img src="${adminData.avatar}" alt="Profile" class="profile-avatar-large" id="profileAvatarLarge">
                     <div class="avatar-edit-overlay" onclick="document.getElementById('profileInput').click()">
                         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path><circle cx="12" cy="13" r="4"></circle></svg>
                     </div>
@@ -155,7 +173,69 @@ $admin_emp = $_SESSION['employee_no'] ?? 'EMP-000';
                 updatePasswordFeedback(e.target.value);
             }
         });
+
+        // Listen for profile image change
+        document.addEventListener('change', (e) => {
+            if (e.target.id === 'profileInput') {
+                const file = e.target.files[0];
+                if (file) {
+                    uploadAvatar(file);
+                }
+            }
+        });
     });
+
+    async function uploadAvatar(file) {
+        const formData = new FormData();
+        formData.append('avatar', file);
+
+        try {
+            // Show loading state
+            const overlay = document.querySelector('.avatar-edit-overlay');
+            const originalHTML = overlay.innerHTML;
+            overlay.innerHTML = '<div class="spinner-small"></div>';
+            overlay.style.pointerEvents = 'none';
+
+            const response = await fetch('api/upload_avatar.php', {
+                method: 'POST',
+                body: formData
+            });
+
+            const result = await response.json();
+
+            if (result.success) {
+                // Update avatars
+                const newPath = '../storage/avatars/' + result.filename;
+                
+                // Update large avatar
+                const largeAvatar = document.getElementById('profileAvatarLarge');
+                if (largeAvatar) largeAvatar.src = newPath + '?t=' + Date.now();
+                
+                // Update sidebar avatar
+                const sidebarAvatar = document.getElementById('sidebarAvatar');
+                if (sidebarAvatar) sidebarAvatar.src = newPath + '?t=' + Date.now();
+                
+                // Update adminData for re-renders
+                adminData.avatar = newPath;
+
+                if (window.showSuccessModal) {
+                    showSuccessModal('Profile picture updated successfully!');
+                } else {
+                    alert('Profile picture updated successfully!');
+                }
+            } else {
+                alert(result.message || 'Failed to upload avatar.');
+            }
+        } catch (error) {
+            console.error('Error uploading avatar:', error);
+            alert('An error occurred during upload.');
+        } finally {
+            // Restore overlay
+            const overlay = document.querySelector('.avatar-edit-overlay');
+            overlay.innerHTML = `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path><circle cx="12" cy="13" r="4"></circle></svg>`;
+            overlay.style.pointerEvents = 'all';
+        }
+    }
 
     // Toggle password visibility logic
     window.togglePassword = function(inputId, iconId) {
