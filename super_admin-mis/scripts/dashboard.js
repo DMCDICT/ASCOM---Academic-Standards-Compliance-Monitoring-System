@@ -35,7 +35,11 @@ window.addEventListener('DOMContentLoaded', () => {
                 toggleViewAll(this); // 'this' refers to the button clicked
             });
         }
-
+    }
+    
+    // Ensure Lucide icons are initialized on dashboard (run for ALL dashboard page loads)
+    if (typeof lucide !== 'undefined') {
+        lucide.createIcons();
     }
 });
 
