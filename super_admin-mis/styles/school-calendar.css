@@ -181,14 +181,15 @@
     letter-spacing: 0.8px;
 }
 
-.calendar-cells {
+#calendarGrid {
     display: grid;
     grid-template-columns: repeat(7, 1fr);
     gap: 4px;
+    min-height: 300px;
 }
 
 .calendar-cell {
-    aspect-ratio: 1 / 0.8;
+    min-height: 60px;
     background: rgba(12, 75, 52, 0.015);
     border: 1px solid rgba(12, 75, 52, 0.05);
     border-radius: 12px;
@@ -198,6 +199,74 @@
     transition: all 0.22s;
     display: flex;
     flex-direction: column;
+}
+
+.calendar-cell.inactive {
+    background: transparent;
+    border: none;
+    cursor: default;
+}
+
+.calendar-cell.today {
+    background: rgba(12, 75, 52, 0.1);
+    border-color: #0C4B34;
+}
+
+.calendar-cell .cell-num {
+    font-size: 14px;
+    font-weight: 600;
+    color: #111827;
+}
+
+.calendar-cell.inactive .cell-num {
+    color: rgba(17, 24, 39, 0.2);
+}
+
+/* Event indicators on calendar cells */
+.calendar-cell.has-events {
+    background: rgba(12, 75, 52, 0.06);
+    border-color: rgba(12, 75, 52, 0.2);
+}
+
+.calendar-cell.has-events:hover {
+    background: rgba(12, 75, 52, 0.12);
+    border-color: #0C4B34;
+}
+
+.calendar-cell .event-dots {
+    display: flex;
+    gap: 3px;
+    margin-top: auto;
+    justify-content: center;
+}
+
+.calendar-cell .event-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: #ccc;
+}
+
+.calendar-cell .event-dot.term_start,
+.calendar-cell .event-dot.term_end {
+    background: #0C4B34;
+}
+
+.calendar-cell .event-dot.holiday {
+    background: #dc3545;
+}
+
+.calendar-cell .event-dot.school_year {
+    background: #1565C0;
+}
+
+html[data-theme="dark"] .calendar-cell.has-events {
+    background: rgba(255, 255, 255, 0.06);
+    border-color: #444;
+}
+
+html[data-theme="dark"] .calendar-cell .event-dot {
+    background: #81C784;
 }
 
 .calendar-cell:hover:not(.inactive) {
