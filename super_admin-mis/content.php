@@ -1274,7 +1274,7 @@ window.closeDeanSuccessModal = function() {
 $page = isset($_GET['page']) ? $_GET['page'] : 'dashboard';
 switch ($page) {
     case 'dashboard':
-        echo '<link rel="stylesheet" href="./styles/dashboard.css?v=1.0">';
+        echo '<link rel="stylesheet" href="./styles/dashboard.css?v=2.0">';
         break;
     case 'user-account-management':
         echo '<link rel="stylesheet" href="./styles/user-account-management.css?v=1.0">';
@@ -1289,7 +1289,7 @@ switch ($page) {
         echo '<link rel="stylesheet" href="./styles/settings.css?v=1.0">';
         break;
     default:
-        echo '<link rel="stylesheet" href="./styles/dashboard.css?v=1.0">';
+        echo '<link rel="stylesheet" href="./styles/dashboard.css?v=2.0">';
         break;
 }
 ?>

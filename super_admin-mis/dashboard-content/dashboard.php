@@ -5,16 +5,6 @@
 
 global $conn; // $conn is provided globally by content.php
 
-// --- REMOVE DUMMY DATA ---
-// Dummy values for overview boxes
-// $totalDepartments = 1;
-// $totalUsersCount = 3;
-// $activeUsersCount = 1;
-// Dummy departments array
-// $departments = [ ... ];
-// Dummy recent activities
-// $recentActivities = [ ... ];
-
 // --- ACTIVATE REAL DATABASE CODE ---
 // Initialize default values
 $totalDepartments = 0;
@@ -125,21 +115,94 @@ if (isset($conn) && !$conn->connect_error) {
 } else {
     // Default values are already set above, so no need to set them again
 }
+
+// Greeting logic
+$hour = (int) date('G');
+if ($hour < 12) {
+    $greeting = 'Good Morning';
+} elseif ($hour < 17) {
+    $greeting = 'Good Afternoon';
+} else {
+    $greeting = 'Good Evening';
+}
+$todayDate = date('l, F j, Y');
 ?>
 
-<h2 class="main-page-title" style="padding-left: 0px;">Overview</h2> 
-<div class="dashboard-container">
-    <div class="box">
-        <h2>Departments</h2>
-        <div class="amount"><?php echo $totalDepartments; ?></div>
+<!-- Greeting Banner -->
+<div class="dashboard-greeting">
+    <div class="greeting-text">
+        <h2><?php echo $greeting; ?>, Admin</h2>
+        <p>Here's what's happening across your institution today.</p>
     </div>
-    <div class="box"><h2>Total Users</h2><div class="amount"><?php echo $totalUsersCount; ?></div></div> 
-    <div class="box"><h2>System Status</h2><div class="amount" style="color: green;">Development</div></div>
+    <div class="greeting-date">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
+        <?php echo $todayDate; ?>
+    </div>
+</div>
+
+<!-- Overview Section -->
+<div class="section-label">
+    <div class="label-bar"></div>
+    <h3>Overview</h3>
+</div>
+
+<div class="dashboard-container">
+    <!-- Departments Card -->
+    <div class="box" id="overview-departments">
+        <div class="box-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+                <polyline points="9 22 9 12 15 12 15 22"></polyline>
+            </svg>
+        </div>
+        <div class="box-content">
+            <span class="box-label">Departments</span>
+            <div class="amount"><?php echo $totalDepartments; ?></div>
+            <span class="box-sub">Active departments</span>
+        </div>
+    </div>
+
+    <!-- Total Users Card -->
+    <div class="box" id="overview-users">
+        <div class="box-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                <circle cx="9" cy="7" r="4"></circle>
+                <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+                <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+            </svg>
+        </div>
+        <div class="box-content">
+            <span class="box-label">Total Users</span>
+            <div class="amount"><?php echo $totalUsersCount; ?></div>
+            <span class="box-sub">Registered accounts</span>
+        </div>
+    </div>
+
+    <!-- System Status Card -->
+    <div class="box" id="overview-status">
+        <div class="box-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline>
+            </svg>
+        </div>
+        <div class="box-content">
+            <span class="box-label">System Status</span>
+            <div class="amount">
+                <span class="status-indicator">
+                    <span class="status-dot"></span>
+                    Development
+                </span>
+            </div>
+            <span class="box-sub">System health</span>
+        </div>
+    </div>
 </div>
 
 <!-- Account Access Management Section -->
 <div class="account-access-section">
     <div class="account-access-header">
+        <div class="label-bar"></div>
         <div>
             <h3>Account Access Management</h3>
             <p>Assign special access roles to users</p>
@@ -187,13 +250,20 @@ if (isset($conn) && !$conn->connect_error) {
     </div>
 </div>
 
+<!-- Department Management Section -->
 <div class="departments-section">
     <div class="departments-header">
-        <div>
-            <h3>Department Management</h3>
-            <p>Manage college departments and their color codes</p>
+        <div class="departments-header-left">
+            <div class="label-bar"></div>
+            <div>
+                <h3>Department Management</h3>
+                <p>Manage college departments and their color codes</p>
+            </div>
         </div>
-        <button class="add-dept-btn" id="addDepartmentButton" onclick="if(typeof openAddDepartmentModal === 'function') { openAddDepartmentModal(); } else { console.error('openAddDepartmentModal not available'); }">Add Department</button>
+        <button class="add-dept-btn" id="addDepartmentButton" onclick="if(typeof openAddDepartmentModal === 'function') { openAddDepartmentModal(); } else { console.error('openAddDepartmentModal not available'); }">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+            Add Department
+        </button>
     </div>
 
     <div class="departments-container" id="departmentContainer">
@@ -201,16 +271,19 @@ if (isset($conn) && !$conn->connect_error) {
         if (!empty($departments)) {
             $index = 0;
             foreach ($departments as $dept) {
-                $hidden = ($index >= 6) ? "hidden" : "";
-                echo "<div class='department-card " . htmlspecialchars($hidden) . "'>";
-                echo "<span class='dept-code' style='background-color: " . htmlspecialchars($dept['color_code']) . "'>" . htmlspecialchars($dept['department_code']) . "</span>";
-                echo "<h3>" . htmlspecialchars($dept['department_name']) . "</h3>";
-                echo "<p class='dean-indicator'><strong>Dean:</strong> " . htmlspecialchars($dept['dean_name']) . "</p>";
-                echo "<div class='dept-indicator-row'><span><strong>Programs:</strong> 0</span></div>";
-                echo "<div class='dept-indicator-row staff-row-only'><span><strong>Staff:</strong> " . htmlspecialchars($dept['staff_count']) . "</span></div>";
-                // Place button at the bottom
-
-                echo "<button class='view-details-btn' onclick='event.stopPropagation(); openDepartmentDetailsModal($index);'>View Details</button>";
+                $hidden = ($index >= 8) ? "hidden" : "";
+                echo "<div class='department-card compact-dept-card " . htmlspecialchars($hidden) . "' onclick='openDepartmentDetailsModal($index);' tabindex='0' aria-label='View " . htmlspecialchars($dept['department_name']) . " Details'>";
+                echo "  <div class='dept-card-header'>";
+                echo "    <div class='dept-card-title-wrap'>";
+                echo "      <h3 class='dept-name' title='" . htmlspecialchars($dept['department_name']) . "'>" . htmlspecialchars($dept['department_name']) . "</h3>";
+                echo "      <p class='dean-indicator'>Dean: <strong>" . htmlspecialchars($dept['dean_name']) . "</strong></p>";
+                echo "    </div>";
+                echo "    <span class='dept-code' style='background-color: " . htmlspecialchars($dept['color_code']) . "; box-shadow: 0 4px 12px " . htmlspecialchars($dept['color_code']) . "40;'>" . htmlspecialchars($dept['department_code']) . "</span>";
+                echo "  </div>";
+                echo "  <div class='dept-card-stats'>";
+                echo "    <div class='stat-pill'>Programs: <strong>0</strong></div>";
+                echo "    <div class='stat-pill'>Staff: <strong>" . htmlspecialchars($dept['staff_count']) . "</strong></div>";
+                echo "  </div>";
                 echo "</div>";
                 $index++;
             }
@@ -221,12 +294,16 @@ if (isset($conn) && !$conn->connect_error) {
     </div>
 
     <button class="view-all-btn" id="viewAllDepartmentsButton" 
-            style="display: <?php echo (count($departments) > 6) ? 'block' : 'none'; ?>">View All</button>
+            style="display: <?php echo (count($departments) > 6) ? 'block' : 'none'; ?>">View All →</button>
 </div>
 
+<!-- Recent Activities Section -->
 <div class="dashboard-bottom">
     <div class="recent-activities">
-        <h3>Recent Activities</h3>
+        <div class="recent-activities-header">
+            <div class="label-bar"></div>
+            <h3>Recent Activities</h3>
+        </div>
         <table>
             <thead><tr><th>User</th><th>Activity</th><th>Date & Time</th></tr></thead> 
             <tbody id="recentActivitiesTableBody">
@@ -239,7 +316,12 @@ if (isset($conn) && !$conn->connect_error) {
                     </tr>
                     <?php endforeach; ?>
                 <?php else: ?>
-                    <tr><td colspan="3" style="text-align: center;">No recent activities found.</td></tr>
+                    <tr><td colspan="3">
+                        <div class="empty-state">
+                            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>
+                            No recent activities found.
+                        </div>
+                    </td></tr>
                 <?php endif; ?>
             </tbody>
         </table>
@@ -346,163 +428,39 @@ if (isset($conn) && !$conn->connect_error) {
     </div>
 </div>
 
-<!-- BACK TO TOP FUNCTIONALITY - Direct Implementation -->
+<!-- BACK TO TOP FUNCTIONALITY -->
 <script>
-
-// Wait for DOM to be ready
 document.addEventListener('DOMContentLoaded', function() {
+    // Create back to top button
+    const backToTopButton = document.createElement('button');
+    backToTopButton.className = 'back-to-top';
+    backToTopButton.setAttribute('aria-label', 'Back to top');
     
-    try {
-        // Create back to top button with icon and text
-        const backToTopButton = document.createElement('button');
-        backToTopButton.className = 'back-to-top';
-        backToTopButton.setAttribute('aria-label', 'Back to top');
-        
-        // Create icon element
-        const icon = document.createElement('img');
-        icon.src = '../src/assets/icons/go-back-icon.png';
-        icon.alt = 'Back to Top';
-        icon.className = 'arrow';
-        
-        // Create text element
-        const text = document.createElement('span');
-        text.className = 'text';
-        text.textContent = 'Back to Top';
-        
-        // Append icon and text to button
-        backToTopButton.appendChild(icon);
-        backToTopButton.appendChild(text);
-        
-        // Append button to body
-        document.body.appendChild(backToTopButton);
+    const icon = document.createElement('img');
+    icon.src = '../src/assets/icons/go-back-icon.png';
+    icon.alt = 'Back to Top';
+    icon.className = 'arrow';
+    
+    const text = document.createElement('span');
+    text.className = 'text';
+    text.textContent = 'Back to Top';
+    
+    backToTopButton.appendChild(icon);
+    backToTopButton.appendChild(text);
+    document.body.appendChild(backToTopButton);
 
-        // Show/hide button based on scroll position
-        window.addEventListener('scroll', function() {
-            if (window.pageYOffset > 300) {
-                backToTopButton.classList.add('show');
-            } else {
-                backToTopButton.classList.remove('show');
-            }
-        });
-
-        // Scroll to top when clicked
-        backToTopButton.addEventListener('click', function() {
-            window.scrollTo({
-                top: 0,
-                behavior: 'smooth'
-            });
-        });
-        
-        // Test button removed - back-to-top functionality is working
-        
-        // Don't force show button - let it show naturally when scrolling
-        
-    } catch (error) {
-        console.error('❌ DASHBOARD.PHP: Error in back-to-top functionality:', error);
-        // Fallback: Create a simple back-to-top button
-        const fallbackButton = document.createElement('button');
-        fallbackButton.textContent = 'BACK TO TOP (DASHBOARD.PHP FALLBACK)';
-        fallbackButton.style.position = 'fixed';
-        fallbackButton.style.bottom = '30px';
-        fallbackButton.style.right = '30px';
-        fallbackButton.style.background = 'orange';
-        fallbackButton.style.color = 'white';
-        fallbackButton.style.padding = '10px';
-        fallbackButton.style.zIndex = '9999';
-        fallbackButton.onclick = () => window.scrollTo({ top: 0, behavior: 'smooth' });
-        document.body.appendChild(fallbackButton);
-    }
-});
-
-// TOOLTIP SYSTEM REMOVED - No tooltips needed
-
-function createEmergencyTooltips() {
-    return; // No tooltips
-    
-    const navButtons = document.querySelectorAll('.nav-button');
-    
-    if (navButtons.length === 0) {
-        return;
-    }
-    
-    let emergencyTooltip = null;
-    
-    navButtons.forEach(function(button, index) {
-        const tooltipText = button.querySelector('span:not(.nav-icon-wrapper)')?.textContent?.trim() || 'Unknown';
-        
-        button.addEventListener('mouseenter', function() {
-            const sidebar = document.getElementById('sidebar');
-            const isCollapsed = sidebar ? sidebar.classList.contains('collapsed') : false;
-            
-            
-            if (isCollapsed) {
-                if (emergencyTooltip) {
-                    emergencyTooltip.remove();
-                }
-                
-                const buttonRect = button.getBoundingClientRect();
-                
-                emergencyTooltip = document.createElement('div');
-                emergencyTooltip.innerHTML = `
-                    <div style="
-                        position: absolute;
-                        left: -8px;
-                        top: 50%;
-                        transform: translateY(-50%);
-                        width: 0;
-                        height: 0;
-                        border-top: 8px solid transparent;
-                        border-bottom: 8px solid transparent;
-                        border-right: 8px solid #f8f9fa;
-                        filter: drop-shadow(-2px 0 4px rgba(0,0,0,0.2));
-                    "></div>
-                    ${tooltipText}
-                `;
-                
-                emergencyTooltip.style.cssText = `
-                    position: fixed !important;
-                    left: ${buttonRect.right + 20}px !important;
-                    top: ${buttonRect.top + buttonRect.height / 2}px !important;
-                    transform: translateY(-50%) !important;
-                    background: #f8f9fa !important;
-                    color: #000000 !important;
-                    padding: 12px 20px !important;
-                    border-radius: 12px !important;
-                    font-size: 14px !important;
-                    font-weight: 600 !important;
-                    white-space: nowrap !important;
-                    opacity: 1 !important;
-                    visibility: visible !important;
-                    display: block !important;
-                    pointer-events: none !important;
-                    z-index: 999999 !important;
-                    box-shadow: 0 2px 8px rgba(0,0,0,0.1) !important;
-                    border: 1px solid #e0e0e0 !important;
-                    font-family: 'TT Interphases', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important;
-                    letter-spacing: 0.5px !important;
-                    text-shadow: none !important;
-                `;
-                
-                document.body.appendChild(emergencyTooltip);
-            }
-        });
-        
-        button.addEventListener('mouseleave', function() {
-            if (emergencyTooltip) {
-                emergencyTooltip.remove();
-                emergencyTooltip = null;
-            }
-        });
+    // Show/hide button based on scroll position
+    window.addEventListener('scroll', function() {
+        if (window.pageYOffset > 300) {
+            backToTopButton.classList.add('show');
+        } else {
+            backToTopButton.classList.remove('show');
+        }
     });
-    
-}
 
-// Create emergency tooltips multiple times
-setTimeout(createEmergencyTooltips, 1000);
-setTimeout(createEmergencyTooltips, 3000);
-setTimeout(createEmergencyTooltips, 5000);
-
-// Make it available globally
-window.createEmergencyTooltips = createEmergencyTooltips;
-
+    // Scroll to top when clicked
+    backToTopButton.addEventListener('click', function() {
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    });
+});
 </script>
