@@ -14,12 +14,22 @@ function openAddUserModal() {
             form.reset();
         }
         
+        // Reset department field label to default state
+        const departmentLabel = document.getElementById('add_department_label');
+        const departmentSelect = document.getElementById('add_department_id');
+        if (departmentLabel) {
+            departmentLabel.innerHTML = 'Department';
+        }
+        if (departmentSelect) {
+            departmentSelect.removeAttribute('required');
+        }
+        
         // Clear validation message
         hideAddUserValidation();
         
-        // Focus on first input
+        // Focus on first input (Role is now first field)
         setTimeout(() => {
-            document.getElementById('add_employee_no')?.focus();
+            document.getElementById('add_role_id')?.focus();
         }, 100);
     } else {
         // Modal not found - function will be called by button but modal not loaded
@@ -67,9 +77,10 @@ function validateAddUserForm() {
     const password = document.getElementById('add_password');
     const confirmPassword = document.getElementById('add_confirm_password');
     const roleId = document.getElementById('add_role_id');
+    const departmentId = document.getElementById('add_department_id');
     
     // Clear previous styles
-    [employeeNo, firstName, lastName, email, password, confirmPassword, roleId].forEach(el => {
+    [employeeNo, firstName, lastName, email, password, confirmPassword, roleId, departmentId].forEach(el => {
         if (el) el.style.borderColor = '';
     });
     
@@ -118,6 +129,18 @@ function validateAddUserForm() {
     if (!roleId?.value) {
         errors.push('Role is required');
         roleId.style.borderColor = '#dc3545';
+    }
+    
+    // Validate department based on role
+    // Role IDs: 1=super_admin, 2=dean, 3=teacher, 4=qa, 5=librarian
+    // Department required for: 2 (dean), 3 (teacher)
+    // Department optional for: 4 (qa), 5 (librarian)
+    if (roleId?.value) {
+        const departmentRequiredRoles = ['2', '3'];
+        if (departmentRequiredRoles.includes(roleId.value) && (!departmentId?.value || departmentId.value === '')) {
+            errors.push('Department is required for Dean and Teacher roles');
+            departmentId.style.borderColor = '#dc3545';
+        }
     }
     
     if (errors.length > 0) {
