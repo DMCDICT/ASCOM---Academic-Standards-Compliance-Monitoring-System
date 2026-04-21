@@ -27,6 +27,14 @@ $conn = ascom_get_mysqli();
     }
 
     // Validation
+    // Role-based department requirement validation
+    // Role IDs: 1=super_admin, 2=dean, 3=teacher, 4=qa, 5=librarian
+    // Department required for: 2 (dean), 3 (teacher)
+    // Department optional for: 4 (qa), 5 (librarian)
+    $departmentRequiredRoles = [2, 3];
+    $departmentOptionalRoles = [4, 5];
+    $roleIdInt = (int)$role_id;
+    
     if (empty($employee_no)) {
         $response['message'] = 'Employee No. is required.';
     } elseif (empty($first_name)) {
@@ -45,6 +53,8 @@ $conn = ascom_get_mysqli();
         $response['message'] = 'Passwords do not match.';
     } elseif (empty($role_id)) {
         $response['message'] = 'Role is required.';
+    } elseif (in_array($roleIdInt, $departmentRequiredRoles) && (empty($department_id) || $department_id === null)) {
+        $response['message'] = 'Department is required for Dean and Teacher roles.';
     }
 
     // Check duplicates

@@ -4,7 +4,7 @@ Options -Indexes
     Require all denied
 </FilesMatch>
 
-# Allow specific API files
+# Allow specific API files (both super_admin and department-dean)
 <FilesMatch "^(add_term|add_school_year|add_holiday|get_school_year_events|get_all_terms|delete_term)\.php$">
     Require all granted
 </FilesMatch>

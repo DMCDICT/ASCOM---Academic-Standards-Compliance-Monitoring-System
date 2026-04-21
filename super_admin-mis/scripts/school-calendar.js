@@ -60,14 +60,29 @@ function goToToday() {
 // Calendar data storage
 let calendarEvents = {};
 
+// Detect if we're in super_admin or department-dean context
+function getApiPath() {
+    // Check if we can access super_admin-mis API
+    return './api/get_school_year_events.php';
+}
+
 // Load events from API
 async function loadCalendarEvents() {
     try {
-        const response = await fetch('./api/get_school_year_events.php');
-        const data = await response.json();
+        const response = await fetch(getApiPath());
+        if (!response.ok) {
+            throw new Error('HTTP ' + response.status);
+        }
+        const text = await response.text();
+        if (!text.trim()) {
+            calendarEvents = {};
+            updateUpcomingEvents();
+            return;
+        }
+        const data = JSON.parse(text);
         
-        // API returns events in 'data' key
-        const events = data.data || [];
+        // Handle both API formats: {status, data} or {status, data: {events}}
+        const events = data.data?.events || data.data || [];
         
         calendarEvents = {};
         events.forEach(event => {
@@ -80,10 +95,10 @@ async function loadCalendarEvents() {
         
         console.log('Loaded calendar events:', Object.keys(calendarEvents).length, 'days with events');
         
-        // Update upcoming events
         updateUpcomingEvents();
     } catch (error) {
-        console.error('Error loading calendar events:', error);
+        console.error('Error loading calendar events:', error.message);
+        calendarEvents = {};
     }
 }
 

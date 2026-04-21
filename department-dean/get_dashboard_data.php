@@ -54,54 +54,65 @@ try {
         'selectedTerm' => null
     ];
     
+    // Get current academic year safely
+    $currentAcademicYear = ['school_year_label' => 'Current Year'];
+    try {
+        $currentYearStmt = $pdo->prepare("SELECT school_year_label FROM school_years WHERE status = 'Active' ORDER BY start_date DESC LIMIT 1");
+        $currentYearStmt->execute();
+        $currentAcademicYear = $currentYearStmt->fetch(PDO::FETCH_ASSOC) ?: $currentAcademicYear;
+    } catch (Exception $e) {
+        error_log("Get academic year error: " . $e->getMessage());
+    }
+    
     // Get selected term information
-    if ($showAllTerms) {
-        $response['selectedTerm'] = [
-            'id' => 'all',
-            'term_name' => 'All Terms',
-            'school_year_id' => null,
-            'school_year_label' => $currentAcademicYear['school_year_label'] ?? 'Current Year',
-            'display_name' => 'All Terms (Current Academic Year)'
-        ];
-    } elseif ($termId && is_numeric($termId)) {
-        $termQuery = "
-            SELECT t.id, t.name as term_name, t.school_year_id, sy.school_year_label,
-                   CONCAT(t.name, ' ', sy.school_year_label) as display_name
-            FROM terms t
-            INNER JOIN school_years sy ON t.school_year_id = sy.id
-            WHERE t.id = ?
-        ";
-        $termStmt = $pdo->prepare($termQuery);
-        $termStmt->execute([$termId]);
-        $response['selectedTerm'] = $termStmt->fetch(PDO::FETCH_ASSOC);
+    $response['selectedTerm'] = null;
+    try {
+        if ($showAllTerms) {
+            $response['selectedTerm'] = [
+                'id' => 'all',
+                'term_name' => 'All Terms',
+                'school_year_id' => null,
+                'school_year_label' => $currentAcademicYear['school_year_label'] ?? 'Current Year',
+                'display_name' => 'All Terms (Current Academic Year)'
+            ];
+        } elseif ($termId && is_numeric($termId)) {
+            $termStmt = $pdo->prepare("SELECT id, name as term_name, school_year_id, school_year_label, CONCAT(name, ' ', school_year_label) as display_name FROM terms WHERE id = ?");
+            $termStmt->execute([$termId]);
+            $response['selectedTerm'] = $termStmt->fetch(PDO::FETCH_ASSOC);
+        }
+    } catch (Exception $e) {
+        error_log("Term select error: " . $e->getMessage());
     }
     
-    // Get current academic year
-    $currentYearQuery = "
-        SELECT id, start_date, end_date, school_year_label
-        FROM school_years 
-        WHERE status = 'Active' 
-        ORDER BY start_date DESC 
-        LIMIT 1
-    ";
-    $currentYearStmt = $pdo->prepare($currentYearQuery);
-    $currentYearStmt->execute();
-    $currentAcademicYear = $currentYearStmt->fetch(PDO::FETCH_ASSOC);
-    
-    // Get the term name for filtering
-    $termName = null;
-    if ($showAllTerms) {
-        // Don't filter by term - show all courses for the current academic year
-        $termName = null;
-    } elseif ($termId && is_numeric($termId)) {
-        $termQuery = "SELECT name FROM terms WHERE id = ?";
-        $termStmt = $pdo->prepare($termQuery);
-        $termStmt->execute([$termId]);
-        $termResult = $termStmt->fetch(PDO::FETCH_ASSOC);
-        $termName = $termResult ? $termResult['name'] : null;
+    // Fetch programs - safely wrapped
+    try {
+        $programsQuery = "SELECT p.id, p.program_code, p.program_name, p.department_id, COUNT(DISTINCT c.id) as course_count
+                         FROM programs p
+                         LEFT JOIN courses c ON c.program_id = p.id
+                         WHERE p.department_id = ?
+                         GROUP BY p.id
+                         ORDER BY p.program_name";
+        
+        $programsStmt = $pdo->prepare($programsQuery);
+        $programsStmt->execute([$deanDepartmentCode]);
+        $programs = $programsStmt->fetchAll(PDO::FETCH_ASSOC);
+        
+        $response['stats']['totalPrograms'] = count($programs);
+        $response['programs'] = $programs;
+    } catch (Exception $e) {
+        error_log("Programs fetch error: " . $e->getMessage());
     }
     
-    // Fetch programs with course counts filtered by selected term
+    // Return success
+    echo json_encode($response);
+    
+} catch (Exception $e) {
+    error_log("get_dashboard_data.php error: " . $e->getMessage());
+    echo json_encode([
+        'success' => false,
+        'message' => 'Database error occurred: ' . $e->getMessage()
+    ]);
+}
     // Always show all programs, but calculate course counts based on selected term
     if ($showAllTerms) {
         // Show all courses for the current academic year (no term filtering)
@@ -212,9 +223,11 @@ try {
     echo json_encode($response);
     
 } catch (Exception $e) {
+    // Log the actual error for debugging
+    error_log("get_dashboard_data.php error: " . $e->getMessage());
     echo json_encode([
         'success' => false,
-        'message' => 'Database error occurred'
+        'message' => 'Database error occurred: ' . $e->getMessage()
     ]);
 }
 ?>

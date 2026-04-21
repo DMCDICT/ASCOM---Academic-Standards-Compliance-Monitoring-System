@@ -57,7 +57,6 @@ ascom_require_role('dean', '../user_login.php');
 <?php include './modals/add_faculty_modal.php'; ?>
 <?php include './modals/add_course_modal.php'; ?>
 <?php include './modals/add_program_modal.php'; ?>
-<?php include './modals/switch_role_modal.php'; ?>
 
 <!-- Course Selection Modal -->
 <div id="courseSelectionModal" class="modal" style="display: none; z-index: 10003;">
@@ -877,28 +876,41 @@ document.addEventListener('DOMContentLoaded', function() {
   <div class="nav-buttons">
     <a href="#" class="nav-button new-account-button" id="newCourseBtn" onclick="checkProgramsAndOpenCourseModal(); return false;">
       <span class="nav-icon-wrapper">
-        <i data-lucide="plus" class="nav-icon" aria-hidden="true"></i>
+        <i data-lucide="plus-circle" class="nav-icon" aria-hidden="true"></i>
       </span>
-      <span>Add Course</span>
+      <span>Add New</span>
     </a>
 
     <?php $currentPage = isset($_GET['page']) ? $_GET['page'] : 'dashboard'; ?>
 
-    <a href="content.php?page=dashboard" class="nav-button hoverable <?php if ($currentPage == 'dashboard' || $currentPage == 'all-courses' || $currentPage == 'course-details' || $currentPage == 'program-courses' || $currentPage == 'reference-requests' || $currentPage == 'course-proposals') echo 'active'; ?>">
+    <a href="content.php?page=dashboard" class="nav-button hoverable <?php if ($currentPage == 'dashboard' || $currentPage == 'all-courses' || $currentPage == 'course-details' || $currentPage == 'program-courses') echo 'active'; ?>">
       <span class="nav-icon-wrapper">
         <i data-lucide="layout-dashboard" class="nav-icon" aria-hidden="true"></i>
       </span>
       <span>Dashboard</span>
     </a>
 
+    <!-- Combined Teacher/Dean Courses Section -->
+    <a href="content.php?page=reference-requests" class="nav-button hoverable <?php if ($currentPage == 'reference-requests' || $currentPage == 'course-proposals') echo 'active'; ?>">
+      <span class="nav-icon-wrapper">
+        <i data-lucide="book-open" class="nav-icon" aria-hidden="true"></i>
+      </span>
+      <span style="line-height: 1.2;">Reference<br />Requests</span>
+    </a>
 
+    <a href="content.php?page=program-management" class="nav-button hoverable <?php if ($currentPage == 'program-management') echo 'active'; ?>">
+      <span class="nav-icon-wrapper">
+        <i data-lucide="folder-cog" class="nav-icon" aria-hidden="true"></i>
+      </span>
+      <span style="line-height: 1.2;">Program<br />Management</span>
+    </a>
 
     <a href="content.php?page=faculty-management" class="nav-button hoverable <?php if ($currentPage == 'academic-management' || $currentPage == 'faculty-management' || $currentPage == 'faculty-details') echo 'active'; ?>" style="height: 76px;">
       <span class="nav-icon-wrapper">
         <i data-lucide="users" class="nav-icon" aria-hidden="true"></i>
       </span>
       <span style="line-height: 1.2;">
-        Faculty<br />Management
+        Faculty &<br />Teachers
       </span>
     </a>
 
@@ -906,7 +918,7 @@ document.addEventListener('DOMContentLoaded', function() {
       <span class="nav-icon-wrapper">
         <i data-lucide="calendar" class="nav-icon" aria-hidden="true"></i>
       </span>
-      <span>School Calendar</span>
+      <span>Calendar</span>
     </a>
 
     <a href="content.php?page=settings" class="nav-button hoverable <?php if ($currentPage == 'settings') echo 'active'; ?>">
@@ -918,13 +930,6 @@ document.addEventListener('DOMContentLoaded', function() {
   </div>
 
   <div class="bottom-nav-buttons">
-    <a href="#" class="nav-button switch-role-button" onclick="openSwitchRoleModal(); return false;">
-      <span class="nav-icon-wrapper">
-        <i data-lucide="repeat-2" class="nav-icon" aria-hidden="true"></i>
-      </span>
-      <span>Switch Role</span>
-    </a>
-
     <a href="./logout.php" class="nav-button logout-button">
       <span class="nav-icon-wrapper">
         <i data-lucide="log-out" class="nav-icon" aria-hidden="true"></i>

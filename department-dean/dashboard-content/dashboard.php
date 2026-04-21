@@ -1263,65 +1263,78 @@ html[data-theme="dark"] .nav-btn:hover:not(:disabled) { border-color: #81C784; c
 
 <script>
     // This variable will be accessed by scripts/program-management.js
-    const programs = <?php echo json_encode($programs); ?>;
-    const recentActivities = <?php echo json_encode($recentActivities); ?>;
+    const programs = <?php 
+        try { echo json_encode($programs ?? []); } 
+        catch (Exception $e) { echo '[]'; }
+    ?>;
+    const recentActivities = <?php 
+        try { echo json_encode($recentActivities ?? []); } 
+        catch (Exception $e) { echo '[]'; }
+    ?>;
     
     // Set hasPrograms variable for the global checkProgramsAndOpenCourseModal function
     // Always allow course creation regardless of filtered program count
     const hasPrograms = true;
     
     // Academic terms data
-    const academicTerms = <?php echo json_encode($academicTerms); ?>;
-    const currentAcademicTerm = <?php echo json_encode($currentAcademicTerm); ?>;
+    const academicTerms = <?php 
+        try { echo json_encode($academicTerms ?? []); } 
+        catch (Exception $e) { echo '[]'; }
+    ?>;
+    const currentAcademicTerm = <?php 
+        try { echo json_encode($currentAcademicTerm ?? null); } 
+        catch (Exception $e) { echo 'null'; }
+    ?>;
     
     // Selected term ID (stored in session storage for persistence)
     // Default to current term if no session storage exists
     let selectedTermId = sessionStorage.getItem('selectedTermId') || (currentAcademicTerm ? String(currentAcademicTerm.id) : null);
     
-    // Handle term selection change
+    // Handle term selection change - with loop prevention
     async function handleTermChange(termId) {
-        if (!termId) {
-            sessionStorage.removeItem('selectedTermId');
-            selectedTermId = null;
-            updateCurrentTermButtonState();
+        // Prevent multiple concurrent term changes
+        if (window.__termChangeInProgress) {
             return;
         }
+        window.__termChangeInProgress = true;
         
-        selectedTermId = termId;
-        sessionStorage.setItem('selectedTermId', termId);
-        
-        // Update server-side session and wait for completion
-        const sessionUpdated = await updateServerSession(termId);
-        if (!sessionUpdated) {
-            console.error('Failed to update server session');
-            return;
-        }
-        
-        // Handle "All Terms" option
-        if (termId === 'all') {
-            
-            // Show notification
-            showTermChangeNotification('All Terms (Current Academic Year)');
-            
-            // Refresh dashboard data for all terms
-            refreshDashboardData(termId);
-        } else {
-            // Find the selected term
-            const selectedTerm = academicTerms.find(t => t.id == termId);
-            if (selectedTerm) {
-                
-                // Show notification
-                showTermChangeNotification(selectedTerm.display_name);
-                
-                // Refresh dashboard data for the selected term
+        try {
+            if (!termId) {
+                sessionStorage.removeItem('selectedTermId');
+                selectedTermId = null;
+                updateCurrentTermButtonState();
+                return;
+            }
+
+            selectedTermId = termId;
+            sessionStorage.setItem('selectedTermId', termId);
+
+            // Update server-side session and wait for completion
+            const sessionUpdated = await updateServerSession(termId);
+            if (!sessionUpdated) {
+                console.error('Failed to update server session');
+                return;
+            }
+
+            // Handle "All Terms" option
+            if (termId === 'all') {
+                showTermChangeNotification('All Terms (Current Academic Year)');
                 refreshDashboardData(termId);
             } else {
-                console.error('Term not found:', termId);
+                const selectedTerm = academicTerms.find(t => t.id == termId);
+                if (selectedTerm) {
+                    showTermChangeNotification(selectedTerm.display_name);
+                    refreshDashboardData(termId);
+                } else {
+                    console.error('Term not found:', termId);
+                }
             }
+
+            updateSelectedTermDisplay();
+            updateCurrentTermButtonState();
+        } finally {
+            window.__termChangeInProgress = false;
         }
-        
-        updateSelectedTermDisplay();
-        updateCurrentTermButtonState();
     }
     
     // New function to handle term change from dropdown
@@ -1367,7 +1380,13 @@ html[data-theme="dark"] .nav-btn:hover:not(:disabled) { border-color: #81C784; c
     }
     
     // Function to refresh dashboard data based on selected term
-    function refreshDashboardData(termId) {
+    function refreshDashboardData(termId, isFromServer = false) {
+        
+        // If already loading, skip
+        if (window.__dashboardRefreshing) {
+            return;
+        }
+        window.__dashboardRefreshing = true;
         
         // Show loading indicator
         showLoadingIndicator();
@@ -1380,9 +1399,7 @@ html[data-theme="dark"] .nav-btn:hover:not(:disabled) { border-color: #81C784; c
             },
             body: 'term_id=' + encodeURIComponent(termId)
         })
-        .then(response => {
-            return response.json();
-        })
+        .then(response => response.json())
         .then(data => {
             if (data.success) {
                 // Update dashboard statistics
@@ -1391,7 +1408,6 @@ html[data-theme="dark"] .nav-btn:hover:not(:disabled) { border-color: #81C784; c
                 // Update Program & Courses Management section
                 if (data.programs) {
                     updateProgramsSection(data.programs);
-                } else {
                 }
                 
                 // Update course material requests
@@ -1399,20 +1415,16 @@ html[data-theme="dark"] .nav-btn:hover:not(:disabled) { border-color: #81C784; c
                 
                 // Update selected term display
                 updateSelectedTermDisplay();
-                
             } else {
                 console.error('Error refreshing dashboard data:', data.message);
-                // Fallback: reload the page
-                window.location.reload();
             }
         })
         .catch(error => {
             console.error('Error refreshing dashboard data:', error);
-            // Fallback: reload the page
-            window.location.reload();
         })
         .finally(() => {
             hideLoadingIndicator();
+            window.__dashboardRefreshing = false;
         });
     }
     
@@ -1837,15 +1849,15 @@ function toggleSection() {
         
         // Add change event listener for term selector
         termSelect.addEventListener('change', function() {
-            handleTermChangeFromDropdown();
+            if (!window.__termChangeInProgress) {
+                handleTermChangeFromDropdown();
+            }
         });
         
-        // Load data for the selected term on page load
-        if (selectedTermId) {
-            // Update server session first, then refresh data
-            updateServerSession(selectedTermId).then(() => {
-                refreshDashboardData(selectedTermId);
-            });
+        // Load data for the selected term on page load - only if not already loaded by PHP
+        if (selectedTermId && !window.__dashboardInitialized) {
+            window.__dashboardInitialized = true;
+            // Data is already loaded via PHP, no need to reload
         }
     }
         
