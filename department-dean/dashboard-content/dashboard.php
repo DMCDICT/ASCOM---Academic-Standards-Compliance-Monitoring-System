@@ -823,6 +823,12 @@ html[data-theme="dark"] .view-all-btn:hover {
     justify-content: center;
 }
 
+/* Refresh button spinning animation */
+@keyframes spin {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+}
+
 /* Course nav button icons */
 .course-nav-btn {
     background: #0C4B34;
@@ -1606,12 +1612,6 @@ html[data-theme="dark"] .collapse-btn:hover {
         </div>
         <div class="header-actions">
             <a href="content.php?page=reference-requests" class="view-all-btn">View All</a>
-            <button class="nav-btn prev-btn" id="prevBtn" onclick="showPreviousRequests()">
-                <i data-lucide="chevron-left" aria-label="Previous"></i>
-            </button>
-            <button class="nav-btn next-btn" id="nextBtn" onclick="showNextRequests()">
-                <i data-lucide="chevron-right" aria-label="Next"></i>
-            </button>
         </div>
     </div>
                             
@@ -2453,34 +2453,33 @@ html[data-theme="dark"] .collapse-btn:hover {
     }
 
 function toggleSection() {
-    
-    const section = document.querySelector('.dashboard-section');
-    const container = section.querySelector('.reference-requests-container');
-    const footer = section.querySelector('.section-footer');
-    const collapseBtn = section.querySelector('.collapse-btn');
-    const headerActions = section.querySelector('.header-actions');
-    
-    
-    // Check if container is currently hidden
-    const isCurrentlyHidden = container.style.display === 'none';
-    
-    
-    if (isCurrentlyHidden) {
-        // Expand - show normal layout
-        container.style.display = 'block';
-        footer.style.display = 'flex';
+        const section = document.querySelector('.dashboard-section');
+        const container = section.querySelector('.reference-requests-container');
+        const footer = section.querySelector('.section-footer');
+        const collapseBtn = section.querySelector('.collapse-btn');
+        const headerActions = section.querySelector('.header-actions');
         
-        // Remove the collapsed controls if they exist
-        const existingCollapsedControls = section.querySelector('.collapsed-controls');
-        if (existingCollapsedControls) {
-            existingCollapsedControls.remove();
-        }
         
-        // Restore the navigation buttons
-        headerActions.style.display = 'flex';
+        // Check if container is currently hidden
+        const isCurrentlyHidden = container.style.display === 'none';
         
-        // Display the current page of requests
-        displayCurrentPage();
+        
+        if (isCurrentlyHidden) {
+            // Expand - show normal layout
+            container.style.display = 'block';
+            footer.style.display = 'flex';
+            
+            // Remove the collapsed controls if they exist
+            const existingCollapsedControls = section.querySelector('.collapsed-controls');
+            if (existingCollapsedControls) {
+                existingCollapsedControls.remove();
+            }
+            
+            // Restore the navigation buttons
+            headerActions.style.display = 'flex';
+            
+            // Display the current page of requests
+            displayCurrentPage();
         
     } else {
         // Collapse - just replace navigation buttons with red badge + expand button
@@ -2575,7 +2574,7 @@ function toggleSection() {
         initializeCourseProposals();
     });
     
-    // Initialize Course Proposals & Revisions section
+// Initialize Course Proposals & Revisions section
     async function initializeCourseProposals() {
         const proposalsGrid = document.getElementById('courseProposalsGrid');
         const emptyState = document.getElementById('courseProposalsEmptyState');
@@ -2606,64 +2605,30 @@ function toggleSection() {
             
             const proposals = data.proposals || [];
             
-            if (data.debug) {
-            }
-            
             // Store data globally for access by viewCourseProposalDetails
             window.courseProposalsData = proposals;
-        
-        // Clear existing content
+            
+            // Clear existing content
             proposalsGrid.innerHTML = '';
             
             if (proposals.length === 0) {
-                
                 // Show empty state
                 emptyState.style.display = 'block';
                 proposalsGrid.style.minHeight = '230px';
-                
-                // If debug info shows drafts exist, show a message
-                if (data.debug && data.debug.total_drafts_in_db > 0) {
-                    console.error('ISSUE DETECTED: Drafts exist in DB but not returned!');
-                    console.error('Debug info:', data.debug);
-                    proposalsGrid.innerHTML = '<div style="text-align: center; padding: 20px; color: #f44336;"><p>Drafts exist in database but could not be loaded.</p></div>';
-                }
             } else {
                 // Hide empty state
                 emptyState.style.display = 'none';
-        
+                
                 // Create and append cards
                 proposals.forEach(function(cardData, index) {
                     try {
                         var card = createCourseProposalCard(cardData);
                         if (card) {
                             proposalsGrid.appendChild(card);
-                        } else {
-                            console.error('Card ' + (index + 1) + ' creation returned null/undefined');
                         }
                     } catch (error) {
                         console.error('Error creating card ' + (index + 1) + ':', error, cardData);
                     }
-                });
-        
-                // Ensure grid is set up to match other cards
-                proposalsGrid.style.flexWrap = 'wrap';
-                proposalsGrid.style.justifyContent = 'flex-start';
-                proposalsGrid.style.gap = '20px';
-                proposalsGrid.style.width = '100%';
-                proposalsGrid.style.maxWidth = '100%';
-            
-                // Adjust card widths to match other reference request cards (fixed 250px)
-                var cards = proposalsGrid.querySelectorAll('.reference-request-card');
-                cards.forEach(function(card) {
-                    // Force fixed width - override any CSS that might make it grow
-                    card.style.minWidth = '250px';
-                    card.style.maxWidth = '250px';
-                    card.style.width = '250px';
-                    card.style.flex = '0 0 250px';
-                    card.style.flexGrow = '0';
-                    card.style.flexShrink = '0';
-                    card.style.flexBasis = '250px';
-                    card.style.boxSizing = 'border-box';
                 });
             }
         } catch (error) {
@@ -3736,42 +3701,6 @@ function toggleSection() {
             grid.appendChild(card);
         });
         if (typeof window.ascomRefreshIcons === 'function') window.ascomRefreshIcons();
-
-        // Update navigation buttons
-        const prevBtn = document.getElementById('prevBtn');
-        const nextBtn = document.getElementById('nextBtn');
-        const totalRequests = allRequests.length;
-        const totalPages = Math.ceil(totalRequests / requestsPerPage);
-
-        // Hide prev button on first page
-        if (currentPage === 0) {
-            prevBtn.style.display = 'none';
-        } else {
-            prevBtn.style.display = 'inline-flex';
-        }
-
-        // Hide next button on last page
-        if (currentPage >= totalPages - 1) {
-            nextBtn.style.display = 'none';
-        } else {
-            nextBtn.style.display = 'inline-flex';
-        }
-
-        // Hide both buttons if there's only one page or no requests
-        if (totalRequests <= requestsPerPage) {
-            prevBtn.style.display = 'none';
-            nextBtn.style.display = 'none';
-        }
-    }
-
-    function showNextRequests() {
-            currentPage++;
-            displayCurrentPage();
-    }
-
-    function showPreviousRequests() {
-            currentPage--;
-            displayCurrentPage();
     }
 
     function createRequestCard(request) {
@@ -3791,15 +3720,47 @@ function toggleSection() {
         // Get department code
         const departmentCode = '<?php echo $_SESSION["selected_role"]["department_code"] ?? "CCS"; ?>';
         
+        // Create card element
         const card = document.createElement('div');
         card.className = 'reference-request-card';
         card.setAttribute('data-request-id', request.id);
         
+        // Set status badge class and text
+        const statusClass = request.status ? `status-${request.status.toLowerCase()}` : 'status-pending';
+        const statusText = request.status || 'PENDING';
+        
+        // Set priority badge
+        const priorityBadge = request.priority ? `<span style="font-size: 10px; font-weight: 700; padding: 3px 6px; border-radius: 4px; background: ${request.priority === 'HIGH' ? '#fee2e2' : request.priority === 'MEDIUM' ? '#fef3c7' : '#e0e7ff'}; color: ${request.priority === 'HIGH' ? '#991b1b' : request.priority === 'MEDIUM' ? '#92400e' : '#4338ca'};">${request.priority}</span>` : '';
+        
+        // Action buttons based on status
+        let actionButtons = '';
+        if (request.status === 'PENDING') {
+            actionButtons = `
+                <div class="action-buttons" style="margin-top: auto; display: flex; gap: 8px; width: 100%;">
+                    <button class="view-all-btn" onclick="approveRequest(${request.id})" style="flex: 1; height: 36px; padding: 0; background: #0C4B34; color: white;">Approve</button>
+                    <button class="view-all-btn" onclick="rejectRequest(${request.id})" style="flex: 1; height: 36px; padding: 0; background: #fee2e2; color: #991b1b; border-color: #fecaca;">Reject</button>
+                </div>
+            `;
+        } else if (request.status === 'APPROVED') {
+            actionButtons = `
+                <div class="action-buttons" style="margin-top: auto; display: flex; gap: 8px; width: 100%;">
+                    <button class="view-all-btn" onclick="rejectRequest(${request.id})" style="flex: 1; height: 36px; padding: 0; background: #fee2e2; color: #991b1b; border-color: #fecaca;">Reject</button>
+                </div>
+            `;
+        } else if (request.status === 'REJECTED') {
+            actionButtons = `
+                <div class="action-buttons" style="margin-top: auto; display: flex; gap: 8px; width: 100%;">
+                    <button class="view-all-btn" onclick="approveRequest(${request.id})" style="flex: 1; height: 36px; padding: 0; background: #0C4B34; color: white;">Approve</button>
+                </div>
+            `;
+        }
+        
         card.innerHTML = `
-            <div class="status-badge status-pending">PENDING</div>
+            <div class="status-badge ${statusClass}">${statusText}</div>
             
-            <div style="margin-top: 16px; margin-bottom: 12px; height: 40px; display: flex; align-items: center;">
+            <div style="margin-top: 16px; margin-bottom: 12px; height: 40px; display: flex; align-items: center; gap: 8px;">
                 <span style="font-size: 11px; font-weight: 800; color: #0C4B34; background: rgba(12, 75, 52, 0.08); padding: 4px 8px; border-radius: 6px; letter-spacing: 0.5px;">${request.course_code}</span>
+                ${priorityBadge}
                 <span style="margin-left: auto; font-size: 11px; font-weight: 700; color: #6b7280; text-transform: uppercase;">${departmentCode} FACULTY</span>
             </div>
             
@@ -3811,10 +3772,7 @@ function toggleSection() {
                 ${apaCitation}
             </h3>
             
-            <div class="action-buttons" style="margin-top: auto; display: flex; gap: 8px; width: 100%;">
-                <button class="view-all-btn" onclick="approveRequest(${request.id})" style="flex: 1; height: 36px; padding: 0; background: #0C4B34; color: white;">Approve</button>
-                <button class="view-all-btn" onclick="rejectRequest(${request.id})" style="flex: 1; height: 36px; padding: 0; background: #fee2e2; color: #991b1b; border-color: #fecaca;">Reject</button>
-            </div>
+            ${actionButtons}
             
             <div style="margin-top: 12px; font-size: 11px; color: #9ca3af; font-weight: 600; text-align: center;">
                 Requested on: ${new Date().toLocaleDateString()}
