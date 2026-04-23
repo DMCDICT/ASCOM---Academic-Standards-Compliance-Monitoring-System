@@ -271,30 +271,65 @@ try {
     50% { opacity: 0.55; }
 }
 
+@keyframes modalPop {
+    from {
+        opacity: 0;
+        transform: translateY(10px) scale(0.985);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+@keyframes shimmer {
+    0% { background-position: -200% 0; }
+    100% { background-position: 200% 0; }
+}
+
 /* 2. Page Container & Layout Overrides */
 .content-wrapper {
     margin-top: 102px !important;
     padding-top: 0 !important;
+    padding-bottom: 40px !important;
     transition: all 0.3s ease;
+    height: auto !important;
+    min-height: unset !important;
+    overflow: visible !important;
 }
 
-/* 3. Personalized Greeting Banner */
+/* Ensure children don't cause overflow */
+.content-wrapper > * {
+    overflow: visible;
+}
+
+/* 3. Personalized Greeting Banner - DESIGN.md premium */
 .dashboard-greeting {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    margin-bottom: 24px;
+    margin-bottom: 28px;
     margin-top: 0;
+    padding-bottom: 24px;
+    border-bottom: 1px solid rgba(12, 75, 52, 0.1);
     animation: fadeSlideUp 0.4s ease-out both;
+    gap: 16px;
+    flex-wrap: wrap;
+}
+
+.greeting-text {
+    flex: 1;
+    min-width: 250px;
 }
 
 .greeting-text h2 {
-    font-size: 24px;
+    font-size: 26px;
     font-weight: 800;
-    color: #053423;
-    margin: 0 0 4px 0;
+    color: #0C4B34;
+    margin: 0 0 6px 0;
     font-family: 'TT Interphases', sans-serif;
     line-height: 1.25;
+    letter-spacing: -0.3px;
 }
 
 .greeting-text p {
@@ -308,18 +343,36 @@ try {
 .dept-badge-container {
     display: flex;
     align-items: center;
+    gap: 12px;
 }
 
+.greeting-meta {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    flex-wrap: wrap;
+}
+
+/* Department badge - DESIGN.md section 3.4 pattern */
 .dept-badge {
-    background: #0C4B34;
+    background: linear-gradient(135deg, #0C4B34 0%, #0F7A53 100%);
     color: #ffffff;
     font-weight: 800;
     border-radius: 12px;
-    padding: 10px 20px;
+    padding: 12px 20px;
     font-size: 14px;
     letter-spacing: 1px;
-    box-shadow: 0 4px 12px rgba(12, 75, 52, 0.2);
+    box-shadow: 0 6px 20px rgba(12, 75, 52, 0.25);
     text-transform: uppercase;
+}
+
+.dept-badge:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 24px rgba(12, 75, 52, 0.35);
+}
+
+html[data-theme="dark"] .greeting-text h2 {
+    color: #f0f0f0;
 }
 
 /* 4. Overview Section & Stats */
@@ -353,6 +406,63 @@ try {
     border-radius: 2px;
     background: linear-gradient(180deg, #0C4B34 0%, #0F7A53 100%);
     flex-shrink: 0;
+    margin-top: 2px;
+}
+
+/* Section Header pattern - DESIGN.md section 3.3 */
+/* Section Header - DESIGN.md section 3.3 pattern */
+.dashboard-section .section-header {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    margin-bottom: 16px;
+    flex-wrap: wrap;
+}
+
+.dashboard-section .section-header .label-bar {
+    width: 4px;
+    height: 22px;
+    border-radius: 2px;
+    background: linear-gradient(180deg, #0C4B34 0%, #0F7A53 100%);
+    flex-shrink: 0;
+    margin-top: 2px;
+}
+
+.dashboard-section .header-left {
+    flex: 1;
+    min-width: 200px;
+}
+
+.dashboard-section .header-left h3 {
+    font-size: 18px;
+    font-weight: 800;
+    color: #0C4B34;
+    margin: 0 0 6px 0;
+    font-family: 'TT Interphases', sans-serif;
+    letter-spacing: -0.3px;
+}
+
+.dashboard-section .header-left .section-description {
+    font-size: 13px;
+    color: rgba(17, 24, 39, 0.5);
+    margin: 0;
+    font-weight: 600;
+    line-height: 1.5;
+}
+
+html[data-theme="dark"] .dashboard-section .header-left h3 {
+    color: #e0e0e0;
+}
+
+html[data-theme="dark"] .dashboard-section .header-left .section-description {
+    color: rgba(255,255,255,0.5);
+}
+
+.dashboard-section .header-left .section-description {
+    font-size: 12px;
+    color: rgba(17, 24, 39, 0.5);
+    margin: 0;
+    font-weight: 600;
 }
 
 /* 5. Overview Cards System */
@@ -362,6 +472,40 @@ try {
     gap: 18px; 
     padding: 0;
     margin-bottom: 28px;
+    height: auto;
+}
+
+/* Quick Actions grid */
+.quick-actions { 
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 12px;
+    margin: 8px 0 4px 0;
+    height: auto;
+}
+
+/* Today's date display */
+.greeting-date {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: rgba(12, 75, 52, 0.06);
+    border: 1px solid rgba(12, 75, 52, 0.12);
+    border-radius: 12px;
+    padding: 10px 16px;
+    font-size: 13px;
+    font-weight: 700;
+    color: #0C4B34;
+}
+
+.greeting-date svg {
+    flex-shrink: 0;
+}
+
+html[data-theme="dark"] .greeting-date {
+    background: rgba(255,255,255,0.06);
+    border-color: rgba(255,255,255,0.1);
+    color: #81C784;
 }
 
 .box {
@@ -400,14 +544,13 @@ try {
     border-color: rgba(12, 75, 52, 0.25);
 }
 
+/* Remove green top border accent from box elements */
 .box::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 3px;
-    background: linear-gradient(90deg, #0C4B34 0%, #0F7A53 100%);
+    display: none !important;
+}
+
+.box {
+    padding: 18px;
 }
 
 .box-icon {
@@ -417,9 +560,46 @@ try {
     display: flex;
     align-items: center;
     justify-content: center;
+    flex-shrink: 0;
+    font-size: 22px;
+    transition: all 0.28s cubic-bezier(.4,0,.2,1);
+}
+
+/* Programs card - Primary brand color */
+.box:nth-child(1) .box-icon {
     background: rgba(12, 75, 52, 0.08);
     color: #0C4B34;
-    font-size: 22px;
+}
+
+/* Active Courses card - Accent Blue */
+.box:nth-child(2) .box-icon {
+    background: rgba(21, 101, 192, 0.08);
+    color: #1565C0;
+}
+
+/* Faculty card - Accent Green */
+.box:nth-child(3) .box-icon {
+    background: rgba(46, 125, 50, 0.08);
+    color: #2E7D32;
+}
+
+.box:hover .box-icon {
+    transform: scale(1.05);
+}
+
+html[data-theme="dark"] .box-icon {
+    background: rgba(129, 199, 132, 0.10);
+    color: #81C784;
+}
+
+html[data-theme="dark"] .box:nth-child(2) .box-icon {
+    background: rgba(100, 181, 246, 0.10);
+    color: #64B5F6;
+}
+
+html[data-theme="dark"] .box:nth-child(3) .box-icon {
+    background: rgba(129, 199, 132, 0.10);
+    color: #81C784;
 }
 
 .box-icon svg,
@@ -470,24 +650,71 @@ try {
 }
 
 .amount {
-    font-size: 28px;
+    font-size: 32px;
     font-weight: 800;
     color: #111827;
     line-height: 1;
     margin: 0;
+    font-family: 'TT Interphases', sans-serif;
+    letter-spacing: -0.5px;
 }
 
-/* 6. Dashboard Sections Components */
+.box-content .amount {
+    font-size: 32px;
+    font-weight: 800;
+    color: #111827;
+    line-height: 1.1;
+    margin: 0;
+}
+
+.box-content .amount-sub {
+    font-size: 12px;
+    font-weight: 600;
+    color: rgba(17, 24, 39, 0.4);
+    margin-top: 4px;
+}
+
+html[data-theme="dark"] .box-content .amount {
+    color: #f0f0f0;
+}
+
+html[data-theme="dark"] .box-content .amount-sub {
+    color: rgba(255,255,255,0.4);
+}
+
+/* 6. Dashboard Sections Components - DESIGN.md section 3.1 */
 .dashboard-section {
-    margin-top: 32px;
+    position: relative;
     background: #ffffff;
-    border-radius: 20px;
-    padding: 26px;
-    border: 1px solid rgba(12, 75, 52, 0.12);
-    box-shadow: 0 4px 20px rgba(0,0,0,0.03);
-    width: 100%;
-    box-sizing: border-box;
-    animation: fadeSlideUp 0.5s ease-out 0.4s both;
+    border-radius: 18px;
+    border: 1px solid rgba(12, 75, 52, 0.14);
+    box-shadow: 0 4px 18px rgba(0, 0, 0, 0.04);
+    padding: 18px;
+    margin-top: 28px;
+    transition: all 0.28s cubic-bezier(.4,0,.2,1);
+}
+
+/* Remove green top border accent from dashboard-section elements */
+.dashboard-section::before {
+    display: none !important;
+}
+
+.dashboard-section {
+    padding: 18px;
+}
+
+.dashboard-section:hover {
+    box-shadow: 0 12px 36px rgba(12, 75, 52, 0.1);
+    border-color: rgba(12, 75, 52, 0.25);
+}
+
+/* Section Footer */
+.dashboard-section .section-footer {
+    display: flex;
+    justify-content: center;
+    padding-top: 16px;
+    margin-top: 16px;
+    border-top: 1px solid rgba(12, 75, 52, 0.08);
 }
 
 .section-header {
@@ -510,32 +737,65 @@ try {
     font-weight: 600;
 }
 
-/* 7. Action Buttons & Controls */
+/* 7. Action Buttons & Controls - DESIGN.md section 4 */
 .view-all-btn {
     display: inline-flex;
     align-items: center;
     justify-content: center;
     background: rgba(12, 75, 52, 0.06);
     color: #0C4B34;
-    border: 1px solid rgba(12, 75, 52, 0.12);
-    padding: 10px 20px;
+    border: 1px solid rgba(12, 75, 52, 0.14);
+    padding: 10px 18px;
     border-radius: 10px;
     font-size: 13px;
     font-weight: 700;
     text-decoration: none;
-    transition: all 0.2s ease;
+    transition: all 0.22s cubic-bezier(.4,0,.2,1);
+    letter-spacing: 0.1px;
 }
 
 .view-all-btn:focus-visible {
-    outline: 3px solid rgba(12, 75, 52, 0.28);
-    outline-offset: 3px;
+    outline: 2px solid rgba(12, 75, 52, 0.45);
+    outline-offset: 2px;
 }
 
 .view-all-btn:hover {
     background: #0C4B34;
     color: #ffffff;
     transform: translateY(-1px);
-    box-shadow: 0 4px 12px rgba(12, 75, 52, 0.2);
+    box-shadow: 0 6px 18px rgba(12, 75, 52, 0.2);
+}
+
+.view-all-btn:active {
+    transform: translateY(0) scale(0.98);
+}
+
+.header-actions {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-left: auto;
+}
+
+/* Icons inside header-actions */
+.header-actions i[data-lucide],
+.header-actions svg {
+    width: 16px;
+    height: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+html[data-theme="dark"] .view-all-btn {
+    background: rgba(255,255,255,0.05);
+    color: #81C784;
+    border-color: #333;
+}
+
+html[data-theme="dark"] .view-all-btn:hover {
+    background: #81C784;
+    color: #1a1a1a;
 }
 
 .nav-btn {
@@ -551,6 +811,54 @@ try {
     transition: all 0.2s ease;
 }
 
+/* Lucide icon rendering in navigation buttons */
+.nav-btn i[data-lucide],
+.nav-btn svg,
+.nav-btn .lucide {
+    width: 18px;
+    height: 18px;
+    opacity: 0.7;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Course nav button icons */
+.course-nav-btn {
+    background: #0C4B34;
+    color: white;
+    border: none;
+    border-radius: 10px;
+    padding: 10px 18px;
+    font-size: 12px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.22s cubic-bezier(.4,0,.2,1);
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-family: 'TT Interphases', sans-serif;
+}
+
+.course-nav-btn:hover {
+    background: #0a3a28;
+    color: white;
+    transform: translateY(-1px);
+    box-shadow: 0 6px 18px rgba(12, 75, 52, 0.25);
+}
+
+/* Lucide icon rendering in course nav buttons */
+.course-nav-btn i[data-lucide],
+.course-nav-btn svg,
+.course-nav-btn .lucide {
+    width: 16px;
+    height: 16px;
+    opacity: 0.9;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
 .nav-btn:hover:not(:disabled) {
     border-color: #0C4B34;
     color: #0C4B34;
@@ -562,15 +870,16 @@ try {
     cursor: not-allowed;
 }
 
-/* Term Selector */
+/* Term Selector - DESIGN.md section 7 */
 .term-selector-wrapper {
     display: inline-flex;
     align-items: center;
-    gap: 10px;
-    padding: 10px 12px;
+    gap: 12px;
+    padding: 10px 16px;
     border-radius: 12px;
-    background: rgba(12, 75, 52, 0.04);
-    border: 1px solid rgba(12, 75, 52, 0.12);
+    background: #ffffff;
+    border: 1px solid rgba(12, 75, 52, 0.14);
+    box-shadow: 0 4px 18px rgba(0,0,0,0.04);
 }
 
 .term-label {
@@ -639,6 +948,7 @@ try {
     animation: fadeSlideUp 0.45s ease-out 0.12s both;
 }
 
+/* Quick Actions - DESIGN.md section 4 pattern */
 .quick-action {
     display: flex;
     align-items: center;
@@ -647,7 +957,7 @@ try {
     background: #ffffff;
     border: 1px solid rgba(12, 75, 52, 0.14);
     border-radius: 14px;
-    padding: 12px 14px;
+    padding: 14px 18px;
     color: #0C4B34;
     font-weight: 800;
     font-size: 13px;
@@ -655,12 +965,29 @@ try {
     cursor: pointer;
     transition: all 0.28s cubic-bezier(.4,0,.2,1);
     box-shadow: 0 4px 18px rgba(0,0,0,0.03);
+    animation: fadeSlideUp 0.45s ease-out both;
 }
+
+.quick-action:nth-child(1) { animation-delay: 0.08s; }
+.quick-action:nth-child(2) { animation-delay: 0.12s; }
+.quick-action:nth-child(3) { animation-delay: 0.16s; }
+.quick-action:nth-child(4) { animation-delay: 0.20s; }
 
 .quick-action:hover {
     transform: translateY(-2px);
     box-shadow: 0 12px 28px rgba(12, 75, 52, 0.10);
     border-color: rgba(12, 75, 52, 0.25);
+    background: #0C4B34;
+    color: #ffffff;
+}
+
+.quick-action:active {
+    transform: translateY(0) scale(0.98);
+}
+
+.quick-action:focus-visible {
+    outline: 2px solid rgba(12, 75, 52, 0.45);
+    outline-offset: 2px;
 }
 
 .quick-action:focus-visible {
@@ -668,52 +995,114 @@ try {
     outline-offset: 3px;
 }
 
+/* Quick Action Icon - DESIGN.md section 3.2 pattern */
 .quick-action .qa-icon {
-    width: 28px;
-    height: 28px;
+    width: 32px;
+    height: 32px;
     border-radius: 10px;
     background: rgba(12, 75, 52, 0.08);
     display: flex;
     align-items: center;
     justify-content: center;
     color: #0C4B34;
+    transition: all 0.28s cubic-bezier(.4,0,.2,1);
+}
+
+.quick-action:hover .qa-icon {
+    background: rgba(255, 255, 255, 0.15);
+    color: #ffffff;
+    transform: scale(1.1);
+}
+
+html[data-theme="dark"] .quick-action .qa-icon {
+    background: rgba(255,255,255,0.06);
+    color: #81C784;
+}
+
+html[data-theme="dark"] .quick-action:hover .qa-icon {
+    background: rgba(129, 199, 132, 0.2);
 }
 
 /* 8. Card Grid Systems */
+.reference-requests-container {
+    overflow-x: auto;
+    overflow-y: visible;
+    min-height: unset;
+    height: auto;
+}
+
 .reference-requests-grid {
     display: grid;
     grid-template-columns: repeat(4, 1fr);
     gap: 18px;
+    min-height: unset;
+    height: auto;
+    overflow: visible;
 }
 
+/* Reference Request Cards - DESIGN.md section 3.1 pattern */
 .reference-request-card {
     background: #ffffff;
     border-radius: 16px;
-    border: 1px solid rgba(12, 75, 52, 0.1);
-    padding: 20px;
-    transition: all 0.3s ease;
+    border: 1px solid rgba(12, 75, 52, 0.12);
+    padding: 18px 20px;
+    transition: all 0.28s cubic-bezier(.4,0,.2,1);
     display: flex;
     flex-direction: column;
     position: relative;
-    overflow: hidden;
-    height: 100%;
+    overflow: visible;
+    min-height: unset;
+    box-shadow: 0 4px 18px rgba(0,0,0,0.04);
+    animation: fadeSlideUp 0.45s ease-out both;
 }
+
+.reference-request-card:nth-child(1) { animation-delay: 0.08s; }
+.reference-request-card:nth-child(2) { animation-delay: 0.12s; }
+.reference-request-card:nth-child(3) { animation-delay: 0.16s; }
+.reference-request-card:nth-child(4) { animation-delay: 0.20s; }
 
 .reference-request-card:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 12px 30px rgba(0,0,0,0.08);
-    border-color: rgba(12, 75, 52, 0.2);
+    transform: translateY(-3px);
+    box-shadow: 0 12px 36px rgba(12, 75, 52, 0.12);
+    border-color: rgba(12, 75, 52, 0.25);
 }
 
+/* Remove green top border accent from reference-request-card elements */
 .reference-request-card::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 4px;
-    background: #0C4B34;
-    opacity: 0.8;
+    display: none !important;
+}
+
+.reference-request-card {
+    padding: 18px;
+}
+
+/* Status-based accent colors */
+.reference-request-card[data-status="APPROVED"]::before {
+    background: linear-gradient(90deg, #2E7D32 0%, #66BB6A 100%);
+}
+
+.reference-request-card[data-status="PENDING"]::before {
+    background: linear-gradient(90deg, #F59E0B 0%, #FBBF24 100%);
+}
+
+.reference-request-card[data-status="REJECTED"]::before {
+    background: linear-gradient(90deg, #b91c1c 0%, #ef4444 100%);
+}
+
+.reference-request-card[data-status="DRAFT"]::before {
+    background: linear-gradient(90deg, #6b7280 0%, #9ca3af 100%);
+}
+
+/* Dark mode */
+html[data-theme="dark"] .reference-request-card {
+    background: #1e1e1e !important;
+    border-color: #333 !important;
+    box-shadow: 0 4px 18px rgba(0,0,0,0.25) !important;
+}
+
+html[data-theme="dark"] .reference-request-card:hover {
+    border-color: #444 !important;
+    box-shadow: 0 12px 36px rgba(0,0,0,0.4) !important;
 }
 
 /* 9. Specialized Badges & Indicators */
@@ -750,6 +1139,68 @@ try {
 
 .reference-requests-container::-webkit-scrollbar-thumb:hover {
     background: #999;
+}
+
+/* Empty States - DESIGN.md section 8 */
+.empty-state {
+    padding: 40px 24px;
+    text-align: center;
+    color: rgba(17, 24, 39, 0.4);
+    font-weight: 600;
+    font-size: 14px;
+    background: #ffffff;
+    border-radius: 16px;
+    border: 1px dashed rgba(12, 75, 52, 0.2);
+}
+
+.empty-state svg {
+    display: block;
+    margin: 0 auto 16px;
+    opacity: 0.25;
+    color: #0C4B34;
+}
+
+.empty-state h4 {
+    font-size: 16px;
+    font-weight: 800;
+    color: #0C4B34;
+    margin: 0 0 8px 0;
+    font-family: 'TT Interphases', sans-serif;
+}
+
+.empty-state p {
+    font-size: 13px;
+    color: rgba(17, 24, 39, 0.5);
+    margin: 0;
+    font-weight: 500;
+    line-height: 1.5;
+}
+
+.empty-dashed {
+    padding: 16px;
+    border-radius: 12px;
+    background: rgba(12, 75, 52, 0.04);
+    border: 1px dashed rgba(12, 75, 52, 0.18);
+    color: rgba(17, 24, 39, 0.6);
+    font-style: normal;
+    font-weight: 600;
+    font-size: 13px;
+}
+
+html[data-theme="dark"] .empty-state { 
+    color: rgba(255,255,255,0.4);
+    background: #1e1e1e !important;
+    border-color: #333;
+}
+
+html[data-theme="dark"] .empty-state svg { 
+    color: #81C784;
+}
+
+html[data-theme="dark"] .empty-dashed { 
+    background: rgba(255,255,255,0.04); 
+    border-color: rgba(255,255,255,0.15); 
+    color: rgba(255,255,255,0.6); 
 }
 
 /* 12. Floating Back to Top Modernization */
@@ -796,37 +1247,262 @@ try {
     color: #ffffff !important;
 }
 
-/* Dark Mode Integration */
+/* Dark Mode Integration - DESIGN.md all elements */
+html[data-theme="dark"] .dashboard-greeting { 
+    flex-wrap: wrap; 
+    gap: 12px; 
+    border-bottom-color: #333;
+}
 html[data-theme="dark"] .dashboard-greeting h2 { color: #f0f0f0; }
-html[data-theme="dark"] .box { background: #1e1e1e; border-color: #333; }
+html[data-theme="dark"] .greeting-text p { color: rgba(255,255,255,0.5); }
+html[data-theme="dark"] .greeting-meta { flex-wrap: wrap; gap: 10px; }
+html[data-theme="dark"] .label-left h2 { color: #e0e0e0; }
+html[data-theme="dark"] .box { 
+    background: #1e1e1e !important; 
+    border-color: #333 !important; 
+    box-shadow: 0 4px 18px rgba(0,0,0,0.25) !important; 
+}
+html[data-theme="dark"] .box:hover { 
+    border-color: #444 !important; 
+    box-shadow: 0 12px 36px rgba(0,0,0,0.4) !important; 
+}
 html[data-theme="dark"] .amount { color: #f0f0f0; }
-html[data-theme="dark"] .dashboard-section { background: #1e1e1e; border-color: #333; }
-html[data-theme="dark"] .header-left h3 { color: #f0f0f0; }
-html[data-theme="dark"] .reference-request-card { background: #1a1a1a; border-color: #333; }
-html[data-theme="dark"] .view-all-btn { background: rgba(255,255,255,0.05); color: #81C784; }
-html[data-theme="dark"] .term-selector-wrapper { background: rgba(255,255,255,0.05); border-color: #333; }
-html[data-theme="dark"] .term-dropdown { color: #81C784; }
-html[data-theme="dark"] .quick-action { background: #1e1e1e; border-color: #333; color: #81C784; }
-html[data-theme="dark"] .quick-action .qa-icon { background: rgba(255,255,255,0.06); }
-html[data-theme="dark"] .qa-icon { color: #81C784; }
+html[data-theme="dark"] .box-label { color: rgba(255,255,255,0.5); }
 html[data-theme="dark"] .box-icon { color: #81C784; background: rgba(129, 199, 132, 0.10); }
-html[data-theme="dark"] .nav-btn { border-color: #333; background: rgba(255,255,255,0.02); }
-html[data-theme="dark"] .nav-btn:hover:not(:disabled) { border-color: #81C784; color: #81C784; background: rgba(255,255,255,0.04); }
+html[data-theme="dark"] .dashboard-section { 
+    background: #1e1e1e !important; 
+    border-color: #333 !important; 
+    box-shadow: 0 4px 18px rgba(0,0,0,0.25) !important;
+}
+html[data-theme="dark"] .dashboard-section:hover {
+    box-shadow: 0 12px 36px rgba(0,0,0,0.35) !important;
+    border-color: #444 !important;
+}
+html[data-theme="dark"] .section-header { border-bottom-color: #333; }
+html[data-theme="dark"] .header-left h3 { color: #f0f0f0; }
+html[data-theme="dark"] .section-description { color: rgba(255,255,255,0.5); }
+html[data-theme="dark"] .reference-request-card { 
+    background: #1a1a1a !important; 
+    border-color: #333 !important;
+    box-shadow: 0 4px 18px rgba(0,0,0,0.2) !important;
+}
+html[data-theme="dark"] .reference-request-card:hover { border-color: #444 !important; }
+html[data-theme="dark"] .view-all-btn { 
+    background: rgba(255,255,255,0.05); 
+    color: #81C784; 
+    border-color: #333; 
+}
+html[data-theme="dark"] .view-all-btn:hover { 
+    background: #81C784; 
+    color: #1a1a1a; 
+}
+html[data-theme="dark"] .term-selector-wrapper { 
+    background: #1e1e1e; 
+    border-color: #333; 
+    box-shadow: 0 4px 18px rgba(0,0,0,0.2);
+}
+html[data-theme="dark"] .term-label { color: rgba(255,255,255,0.6); }
+html[data-theme="dark"] .term-dropdown { 
+    color: #81C784; 
+    background: transparent; 
+}
+html[data-theme="dark"] .current-term-btn { 
+    background: #81C784; 
+    color: #1a1a1a; 
+}
+html[data-theme="dark"] .current-term-btn:hover { 
+    background: #66BB6A; 
+}
+html[data-theme="dark"] .quick-action { 
+    background: #1e1e1e !important; 
+    border-color: #333 !important; 
+    color: #81C784; 
+    box-shadow: none; 
+}
+html[data-theme="dark"] .quick-action:hover { 
+    border-color: #444 !important; 
+    box-shadow: 0 12px 28px rgba(0,0,0,0.3);
+    background: #81C784 !important;
+    color: #1a1a1a;
+}
+html[data-theme="dark"] .quick-action .qa-icon { 
+    background: rgba(255,255,255,0.06); 
+    color: #81C784;
+}
+html[data-theme="dark"] .qa-icon { color: #81C784; }
+html[data-theme="dark"] .nav-btn { 
+    border-color: #333; 
+    background: rgba(255,255,255,0.02); 
+    color: #b0b0b0; 
+}
+html[data-theme="dark"] .nav-btn:hover:not(:disabled) { 
+    border-color: #81C784; 
+    color: #81C784; 
+    background: rgba(255,255,255,0.04); 
+}
+html[data-theme="dark"] .dept-badge { 
+    background: linear-gradient(135deg, #81C784 0%, #66BB6A 100%) !important; 
+    color: #1a1a1a; 
+}
+html[data-theme="dark"] .status-badge { 
+    background: rgba(255,255,255,0.08) !important; 
+    border-color: #333 !important; 
+}
+html[data-theme="dark"] .section-footer { 
+    border-top-color: #333; 
+}
+html[data-theme="dark"] .collapse-btn { 
+    background: rgba(255,255,255,0.05); 
+    border-color: #333; 
+    color: #b0b0b0; 
+}
+html[data-theme="dark"] .collapse-btn:hover { 
+    background: rgba(255,255,255,0.08); 
+    color: #81C784; 
+}
+html[data-theme="dark"] .term-dropdown { 
+    color: #e0e0e0;
+}
+html[data-theme="dark"] .term-dropdown option {
+    background: #1e1e1e;
+    color: #e0e0e0;
+}
+html[data-theme="dark"] .request-count-badge {
+    background: #ef4444;
+}
 
-/* Responsive */
-@media (max-width: 1200px) {
+/* Collapse/Expand button */
+.collapse-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    background: #0C4B34;
+    color: white;
+    border: none;
+    padding: 10px 18px;
+    border-radius: 10px;
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.2px;
+    cursor: pointer;
+    transition: all 0.22s cubic-bezier(.4,0,.2,1);
+    font-family: 'TT Interphases', sans-serif;
+}
+
+.collapse-btn:hover {
+    background: #0a3a28;
+    color: white;
+    transform: translateY(-1px);
+    box-shadow: 0 6px 18px rgba(12, 75, 52, 0.25);
+}
+
+.collapse-btn:active {
+    transform: translateY(0) scale(0.98);
+}
+
+/* Lucide icon in collapse button */
+.collapse-btn i[data-lucide],
+.collapse-btn svg,
+.collapse-btn .collapse-icon {
+    width: 16px;
+    height: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: transform 0.22s cubic-bezier(.4,0,.2,1);
+}
+
+html[data-theme="dark"] .collapse-btn {
+    background: rgba(255,255,255,0.05);
+    border-color: #333;
+    color: #81C784;
+}
+
+html[data-theme="dark"] .collapse-btn:hover {
+    background: #81C784;
+    color: #1a1a1a;
+}
+
+/* Collapsed controls container - DESIGN.md section header pattern */
+.collapsed-controls {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-left: auto;
+    padding: 8px 0;
+}
+
+/* Collapsed state badge - DESIGN.md stat pill style */
+.request-count-badge {
+    background: #b91c1c;
+    color: #ffffff;
+    font-size: 11px;
+    font-weight: 800;
+    padding: 6px 10px;
+    border-radius: 8px;
+    letter-spacing: 0.5px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 28px;
+}
+
+/* Expand button for collapsed state - DESIGN.md button style */
+.expand-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    background: #0C4B34;
+    color: white;
+    border: none;
+    padding: 10px 18px;
+    border-radius: 10px;
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.2px;
+    cursor: pointer;
+    transition: all 0.22s cubic-bezier(.4,0,.2,1);
+    font-family: 'TT Interphases', sans-serif;
+}
+
+.expand-btn:hover {
+    background: #0a3a28;
+    transform: translateY(-1px);
+    box-shadow: 0 6px 18px rgba(12, 75, 52, 0.25);
+}
+
+.expand-btn:active {
+    transform: translateY(0) scale(0.98);
+}
+
+/* Responsive - DESIGN.md breakpoints */
+@media (max-width: 1100px) {
     .dashboard-stats-grid { grid-template-columns: repeat(2, 1fr); }
     .reference-requests-grid { grid-template-columns: repeat(2, 1fr); }
     .quick-actions { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 }
 
-@media (max-width: 760px) {
+@media (max-width: 768px) {
     .dashboard-greeting { flex-direction: column; align-items: flex-start; gap: 12px; }
+    .greeting-meta { flex-wrap: wrap; gap: 10px; }
     .section-label { flex-direction: column; align-items: flex-start; }
     .term-selector-wrapper { width: 100%; justify-content: space-between; flex-wrap: wrap; }
     .dashboard-stats-grid { grid-template-columns: 1fr; }
     .reference-requests-grid { grid-template-columns: 1fr; }
     .header-actions { display: flex; gap: 10px; flex-wrap: wrap; justify-content: flex-start; }
+    .dashboard-section .section-header { flex-direction: column; gap: 12px; }
+    .dashboard-section .header-actions { width: 100%; justify-content: flex-start; }
+}
+
+@media (max-width: 640px) {
+    .quick-actions { grid-template-columns: 1fr; }
+    .section-label { flex-direction: column; align-items: flex-start; }
+    .term-selector-wrapper { flex-direction: column; align-items: flex-start; }
+    .box { padding: 18px; }
+    .box-icon { width: 40px; height: 40px; }
+    .amount { font-size: 24px; }
 }
 
 </style>
@@ -836,8 +1512,12 @@ html[data-theme="dark"] .nav-btn:hover:not(:disabled) { border-color: #81C784; c
         <h2>Welcome back, <?php echo htmlspecialchars($deanName); ?></h2>
         <p>Department Dean • <?php echo htmlspecialchars($departmentName); ?></p>
     </div>
-    <div class="dept-badge-container">
+    <div class="greeting-meta">
         <span class="dept-badge" style="background: <?php echo htmlspecialchars($departmentColor); ?>;"><?php echo htmlspecialchars($departmentCode); ?></span>
+        <div class="greeting-date">
+            <i data-lucide="calendar"></i>
+            <span><?php echo date('F j, Y'); ?></span>
+        </div>
     </div>
 </div>
 
@@ -871,25 +1551,28 @@ html[data-theme="dark"] .nav-btn:hover:not(:disabled) { border-color: #81C784; c
 </div>
 
 <div class="dashboard-stats-grid">
-  <button type="button" class="box box-link" onclick="window.location.href='content.php?page=academic-management'">
+  <button type="button" class="box box-link" onclick="window.location.href='content.php?page=academic-management'" aria-label="View total programs">
     <div class="box-icon"><i data-lucide="folder-kanban"></i></div>
     <div class="box-content">
         <span class="box-label">Total Programs</span>
         <span class="amount"><?php echo $totalPrograms; ?></span>
+        <span class="amount-sub">Active programs</span>
     </div>
   </button>
-  <button type="button" class="box box-link" onclick="navigateToAllCourses()">
+  <button type="button" class="box box-link" onclick="navigateToAllCourses()" aria-label="View active courses">
     <div class="box-icon"><i data-lucide="book-open"></i></div>
     <div class="box-content">
         <span class="box-label">Active Courses</span>
         <span class="amount"><?php echo $totalCourses; ?></span>
+        <span class="amount-sub">This term</span>
     </div>
   </button>
-  <button type="button" class="box box-link" onclick="window.location.href='content.php?page=faculty-management'">
+  <button type="button" class="box box-link" onclick="window.location.href='content.php?page=faculty-management'" aria-label="View faculty members">
     <div class="box-icon"><i data-lucide="users"></i></div>
     <div class="box-content">
         <span class="box-label">Faculty Members</span>
         <span class="amount"><?php echo $totalFaculty; ?></span>
+        <span class="amount-sub">Enrolled teachers</span>
     </div>
   </button>
 </div>
@@ -916,6 +1599,7 @@ html[data-theme="dark"] .nav-btn:hover:not(:disabled) { border-color: #81C784; c
 <!-- Review Course Material Requests Section -->
 <div class="dashboard-section">
     <div class="section-header">
+        <div class="label-bar"></div>
         <div class="header-left">
             <h3>Review Course Material Requests</h3>
             <div class="section-description">Review and manage all course material requests from faculty.</div>
@@ -1182,6 +1866,7 @@ html[data-theme="dark"] .nav-btn:hover:not(:disabled) { border-color: #81C784; c
 <!-- Course Proposals & Revisions Section -->
 <div class="dashboard-section">
     <div class="section-header">
+        <div class="label-bar"></div>
         <div class="header-left">
             <h3>Course Proposals & Revisions</h3>
             <div class="section-description">Review and manage new course proposals and course revision requests from faculty.</div>
@@ -1212,6 +1897,7 @@ html[data-theme="dark"] .nav-btn:hover:not(:disabled) { border-color: #81C784; c
 <!-- Program & Courses Management Section -->
 <div class="dashboard-section">
     <div class="section-header">
+        <div class="label-bar"></div>
         <div class="header-left">
             <h3>Program & Courses Management</h3>
             <div class="section-description">Manage academic programs and their configurations</div>

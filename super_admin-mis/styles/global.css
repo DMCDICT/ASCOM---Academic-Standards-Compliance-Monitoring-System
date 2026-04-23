@@ -685,6 +685,13 @@ html[data-theme="dark"] .content-card {
     opacity: 0.9 !important;
 }
 
+/* Remove green top border accent from 6th, 7th, and 8th children of content-wrapper */
+body > div.content-wrapper > div:nth-child(6)::before,
+body > div.content-wrapper > div:nth-child(7)::before,
+body > div.content-wrapper > div:nth-child(8)::before {
+    display: none !important;
+}
+
 /* .content { -- This class was in the original HTML but is removed/redundant as content-wrapper provides padding. */
 
 .stats-container { /* Common stats container for overview boxes */
