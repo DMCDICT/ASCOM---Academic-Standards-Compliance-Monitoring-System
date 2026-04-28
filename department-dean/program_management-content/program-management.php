@@ -79,6 +79,21 @@ try {
 // Store department ID for JavaScript
 $deanDepartmentId = $_SESSION['selected_role']['department_id'] ?? null;
 
+// If department_id is not in session, look it up using department_code
+if (!$deanDepartmentId && !empty($deanDepartmentCode)) {
+    try {
+        require_once dirname(__FILE__) . '/../includes/db_connection.php';
+        $deptStmt = $pdo->prepare("SELECT id FROM departments WHERE department_code = ?");
+        $deptStmt->execute([$deanDepartmentCode]);
+        $deptRow = $deptStmt->fetch(PDO::FETCH_ASSOC);
+        if ($deptRow) {
+            $deanDepartmentId = (int) $deptRow['id'];
+        }
+    } catch (Exception $e) {
+        // Keep deanDepartmentId as null
+    }
+}
+
 // Show all programs without pagination
 
 $totalPrograms = count($programs);
@@ -202,42 +217,8 @@ $recentActivities = [];
                         </button>
                     </div>
                 <?php endif; ?>
-            </div>
+</div>
         </section>
-
-        <aside class="pc-panel card pc-side">
-            <div class="section-header pc-section-header">
-                <div class="label-bar"></div>
-                <div>
-                    <h3>Focused workspace</h3>
-                    <p>This page is intentionally different from the dashboard.</p>
-                </div>
-            </div>
-
-            <div class="pc-side-card">
-                <div class="pc-side-row">
-                    <div class="icon-container" aria-hidden="true"><i data-lucide="list-check"></i></div>
-                    <div>
-                        <div class="pc-side-title">Programs list</div>
-                        <div class="pc-side-text">Everything you need to manage programs lives on the left.</div>
-                    </div>
-                </div>
-                <div class="pc-side-row">
-                    <div class="icon-container" aria-hidden="true"><i data-lucide="graduation-cap"></i></div>
-                    <div>
-                        <div class="pc-side-title">Courses per program</div>
-                        <div class="pc-side-text">Use “Manage Courses” to view/add/edit courses for a specific program.</div>
-                    </div>
-                </div>
-                <div class="pc-side-row">
-                    <div class="icon-container" aria-hidden="true"><i data-lucide="user-check"></i></div>
-                    <div>
-                        <div class="pc-side-title">Program head</div>
-                        <div class="pc-side-text">Assign or change the program head to keep ownership clear.</div>
-                    </div>
-                </div>
-            </div>
-        </aside>
     </div>
 </div>
 
