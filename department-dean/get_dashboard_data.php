@@ -223,7 +223,7 @@ try {
     echo json_encode($response);
     
 } catch (Exception $e) {
-    // Log the actual error for debugging
+    // Log the error
     error_log("get_dashboard_data.php error: " . $e->getMessage());
     echo json_encode([
         'success' => false,

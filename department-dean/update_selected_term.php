@@ -21,8 +21,6 @@ try {
     // Update the session with the selected term ID
     $_SESSION['selectedTermId'] = $termId;
     
-    // Log the update for debugging
-    
     // Return success response
     echo json_encode([
         'success' => true,

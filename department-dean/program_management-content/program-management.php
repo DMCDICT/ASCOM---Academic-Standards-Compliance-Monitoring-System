@@ -5,9 +5,6 @@
 
 global $conn; // $conn is provided globally by content.php
 
-// Include the modal
-include './modal_add_program.php';
-
 // Initialize programs array
 $programs = [];
 $programHeads = [];
@@ -91,301 +88,156 @@ $recentActivities = [];
 
 ?>
 
-<style>
-.program-management-container {
-    margin-top: 0 !important;
-    padding-top: 0 !important;
-}
-.main-page-title {
-    margin-top: 0 !important;
-    padding-top: 0 !important;
-}
-.content-wrapper {
-    margin-top: 102px !important;
-    padding-top: 0 !important;
-}
-
-/* Floating Back to Top Button Styles */
-.back-to-top-btn {
-    position: fixed;
-    bottom: 30px;
-    right: 30px;
-    width: 50px;
-    height: 50px;
-    background: #1976d2;
-    color: white;
-    border: none;
-    border-radius: 25px;
-    font-size: 20px;
-    font-weight: bold;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    box-shadow: 0 4px 12px rgba(25, 118, 210, 0.3);
-    z-index: 1000;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    opacity: 0;
-    visibility: hidden;
-    transform: translateY(20px);
-    overflow: hidden;
-    white-space: nowrap;
-}
-
-.back-to-top-btn:hover {
-    background: #1565c0;
-    transform: translateY(-5px);
-    box-shadow: 0 6px 16px rgba(25, 118, 210, 0.4);
-    width: 140px;
-    border-radius: 25px;
-}
-
-.back-to-top-btn:active {
-    transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(25, 118, 210, 0.3);
-}
-
-.back-to-top-btn.show {
-    opacity: 1;
-    visibility: visible;
-    transform: translateY(0);
-}
-
-.back-to-top-btn .arrow {
-    width: 20px;
-    height: 20px;
-    transition: all 0.3s ease;
-    position: absolute;
-    left: 50%;
-    transform: translateX(-50%) rotate(90deg);
-    filter: brightness(0) invert(1);
-}
-
-.back-to-top-btn .text {
-    position: absolute;
-    left: 50%;
-    transform: translateX(-50%) translateX(-10px);
-    font-size: 14px;
-    font-weight: 500;
-    font-family: 'TT Interphases', sans-serif;
-    opacity: 0;
-    transition: all 0.3s ease;
-    white-space: nowrap;
-}
-
-.back-to-top-btn:hover .arrow {
-    left: 20px;
-    transform: translateX(0) rotate(90deg);
-    margin-right: 8px;
-}
-
-.back-to-top-btn:hover .text {
-    opacity: 1;
-    left: 43px;
-    transform: translateX(0);
-}
-
-/* Responsive floating back to top button */
-@media (max-width: 768px) {
-    .back-to-top-btn {
-        bottom: 20px;
-        right: 20px;
-        width: 45px;
-        height: 45px;
-        font-size: 18px;
-    }
-    
-    .back-to-top-btn:hover {
-        width: 120px;
-    }
-    
-    .back-to-top-btn .arrow {
-        width: 18px;
-        height: 18px;
-    }
-    
-    .back-to-top-btn .text {
-        font-size: 13px;
-    }
-}
-
-/* Program Head Assignment Styles */
-.program-head-section {
-    margin-top: 12px;
-    padding-top: 12px;
-    border-top: 1px solid #eee;
-}
-
-.assign-program-head-btn {
-    background: #0C4B34;
-    color: white;
-    border: none;
-    padding: 6px 12px;
-    border-radius: 4px;
-    font-size: 11px;
-    cursor: pointer;
-    width: 100%;
-    transition: all 0.2s ease;
-}
-
-.assign-program-head-btn:hover {
-    background: #0a3420;
-}
-
-/* View Details Button Styling */
-.view-details-btn {
-    background: #1976d2;
-    color: white;
-    border: none;
-    padding: 6px 18px;
-    border-radius: 6px;
-    font-size: 1rem;
-    font-weight: bold;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    font-family: 'TT Interphases', sans-serif;
-    margin-top: auto;
-    align-self: flex-end;
-    width: auto;
-    box-shadow: 0 1px 4px rgba(0,0,0,0.07);
-}
-
-.view-details-btn:hover {
-    background: #1565c0;
-    transform: translateY(-1px);
-    box-shadow: 0 2px 8px rgba(25, 118, 210, 0.3);
-}
-
-/* Empty Program Card Styling */
-.empty-program-card {
-    background: #e3f2fd;
-    border: 2px dashed #90caf9;
-    cursor: default;
-    transition: all 0.3s ease;
-}
-
-.empty-program-card:hover {
-    transform: translateY(-3px);
-    box-shadow: 0 8px 20px rgba(33, 150, 243, 0.2);
-    border-color: #64b5f6;
-}
-
-.empty-program-card h3 {
-    color: #1976d2;
-}
-
-.empty-program-card p {
-    color: #64b5f6;
-    margin-bottom: 15px;
-}
-</style>
-
-<h2 class="main-page-title" style="padding-left: 0px; margin-top: 20px;">Program Management</h2>
-
-<div class="dashboard-container">
-    <div class="box">
-        <h2>Programs</h2>
-        <div class="amount"><?php echo $totalPrograms; ?></div>
-    </div>
-    <div class="box">
-        <h2>Total Courses</h2>
-        <div class="amount"><?php echo $totalCourses; ?></div>
-    </div>
-    <div class="box">
-        <h2>Faculty Members</h2>
-        <div class="amount"><?php echo $totalFaculty; ?></div>
-    </div>
-    <div class="box">
-        <h2>System Status</h2>
-        <div class="amount" style="color: green;">Active</div>
-    </div>
-</div>
-
-<div class="departments-section">
-    <div class="departments-header">
-        <div>
-            <h3>Program Management</h3>
-            <p>Manage academic programs and their configurations</p>
+<div class="pc-page">
+    <div class="pc-hero card">
+        <div class="pc-hero-main">
+            <div class="pc-hero-icon" aria-hidden="true">
+                <i data-lucide="folder-cog"></i>
+            </div>
+            <div>
+                <h2 class="pc-title">Programs &amp; Courses</h2>
+                <p class="pc-subtitle">Manage programs, assign program heads, and manage course offerings.</p>
+            </div>
         </div>
-        <button class="add-dept-btn" id="addProgramButton" style="display: <?php echo (count($programs) > 0) ? 'block' : 'none'; ?>">Add Program</button>
+        <div class="pc-hero-actions">
+            <button type="button" class="btn-primary" id="addProgramButton">
+                <i data-lucide="plus"></i>
+                <span>Add Program</span>
+            </button>
+        </div>
     </div>
 
-    <div class="departments-container" id="programContainer">
-        <?php
-        if (!empty($programs)) {
-             foreach ($programs as $program) {
-                 $programId = $program['id'];
-                 $head = $programHeads[$programId] ?? null;
-                 $headName = $head ? trim(($head['title'] ?? '') . ' ' . $head['first_name'] . ' ' . $head['last_name']) : null;
-                 
-                 echo "<div class='department-card' data-program-id='" . htmlspecialchars($programId) . "'>";
-                 echo "<div class='dept-code' style='background-color: " . htmlspecialchars($program['color_code']) . "'>" . htmlspecialchars($program['program_code']) . "</div>";
-                 echo "<h3>" . htmlspecialchars($program['program_name']) . "</h3>";
-                 if (!empty($program['major'])) {
-                     echo "<p style='margin: 4px 0; font-size: 12px; color: #666;'>Major in: <strong>" . htmlspecialchars($program['major']) . "</strong></p>";
-                 }
-                 echo "<p><strong>Description:</strong> " . htmlspecialchars($program['description']) . "</p>";
-                 echo "<p><strong>Courses:</strong> " . htmlspecialchars($program['course_count']) . "</p>";
-                 echo "<p><strong>Faculty:</strong> " . htmlspecialchars($program['faculty_count']) . "</p>";
-                 
-                 // Program Head Section
-                 echo "<div class='program-head-section'>";
-                 echo "<p style='margin: 0 0 8px 0; font-size: 12px; color: #666;'><strong>Program Head:</strong> ";
-                 if ($headName) {
-                     echo "<span style='color: #0C4B34; font-weight: 600;'>" . htmlspecialchars($headName) . "</span>";
-                     echo " <button onclick='removeProgramHead(" . $programId . ")' style='background: none; border: none; color: #dc3545; cursor: pointer; font-size: 11px; margin-left: 5px; text-decoration: underline;'>Remove</button>";
-                 } else {
-                     echo "<span style='color: #999; font-style: italic;'>Not assigned</span>";
-                 }
-                 echo "</p>";
-                 echo "<button class='assign-program-head-btn' onclick='openAssignProgramHeadModal(" . $programId . ", " . json_encode(htmlspecialchars($program['program_name'])) . ")'>" . ($headName ? 'Change Program Head' : 'Assign Program Head') . "</button>";
-                 echo "</div>";
-                 
-                 echo "<button class='view-details-btn' onclick=\"window.location.href='content.php?page=program-courses&program=" . urlencode($program['program_code']) . "'\">View Details</button>";
-                 echo "</div>";
-             }
-        } else {
-            // No programs found - show empty state card
-            echo "<div class='department-card empty-program-card'>";
-            echo "<div style='display: flex; justify-content: space-between; align-items: center;'><div class='dept-code' style='background-color: #1976d2; color: white; font-weight: bold;'>NEW</div><span style='font-size: 1.5rem;'>📁</span></div>";
-            echo "<h3>No Programs Yet</h3>";
-            echo "<p style='font-weight: bold; color: #333;'>Start building your programs</p>";
-            echo "<button class='view-details-btn' onclick='openAddProgramModal()'>Create First Program</button>";
-            echo "</div>";
-        }
-        ?>
-    </div>
+    <div class="pc-grid">
+        <section class="pc-panel card">
+            <div class="section-header pc-section-header">
+                <div class="label-bar"></div>
+                <div>
+                    <h3>Programs</h3>
+                    <p>Search programs and jump into course management.</p>
+                </div>
+            </div>
 
-    <!-- Floating Back to Top Button -->
-    <button id="backToTopBtn" class="back-to-top-btn" onclick="scrollToTop()">
-        <img src="../src/assets/icons/go-back-icon.png" alt="Back to Top" class="arrow">
-        <span class="text">Back to Top</span>
-    </button>
-</div>
+            <div class="pc-search-row">
+                <div class="pc-search">
+                    <i data-lucide="search" aria-hidden="true"></i>
+                    <input id="pcProgramSearch" type="text" placeholder="Search by code, name, or major…" autocomplete="off" />
+                </div>
+                <div class="pc-count stat-pill" aria-label="Total programs">
+                    <strong><?php echo (int) $totalPrograms; ?></strong> programs
+                </div>
+            </div>
 
-<div class="dashboard-bottom">
-    <div class="recent-activities">
-        <h3>Recent Activities</h3>
-        <table>
-            <thead><tr><th>User</th><th>Activity</th><th>Date & Time</th></tr></thead> 
-            <tbody id="recentActivitiesTableBody">
-                <?php if (!empty($recentActivities)): ?>
-                    <?php foreach ($recentActivities as $activity): ?>
-                    <tr>
-                        <td><?php echo htmlspecialchars($activity['username']); ?></td>
-                        <td><?php echo htmlspecialchars($activity['description']); ?></td>
-                        <td><?php echo htmlspecialchars($activity['activity_timestamp']); ?></td>
-                    </tr>
+            <div class="pc-programs" id="programContainer">
+                <?php if (!empty($programs)) : ?>
+                    <?php 
+                    $index = 0;
+                    foreach ($programs as $program) :
+                        $programId = (int) $program['id'];
+                        $head = $programHeads[$programId] ?? null;
+                        $headName = $head ? trim(($head['title'] ?? '') . ' ' . $head['first_name'] . ' ' . $head['last_name']) : null;
+                        $programCode = (string) $program['program_code'];
+                        $programNameSafe = (string) ($program['program_name'] ?? '');
+                        $programMajorSafe = (string) ($program['major'] ?? '');
+                        $programColorSafe = (string) ($program['color_code'] ?? '#0C4B34');
+                        $programDescriptionSafe = (string) ($program['description'] ?? '');
+                        $courseCount = (int) ($program['course_count'] ?? 0);
+                        $facultyCount = (int) ($program['faculty_count'] ?? 0);
+                        $searchBlob = strtolower(trim($programCode . ' ' . $programNameSafe . ' ' . $programMajorSafe));
+                        $delay = 0.16 + ($index * 0.08);
+                        $index++;
+                    ?>
+                        <article class="pc-program" data-program-search="<?php echo htmlspecialchars($searchBlob); ?>" style="animation-delay: <?php echo $delay; ?>s">
+                            <div class="pc-program-top">
+                                <div class="pc-program-code code-badge" style="background-color: <?php echo htmlspecialchars($programColorSafe); ?>">
+                                    <?php echo htmlspecialchars($programCode); ?>
+                                </div>
+                                <div class="pc-program-meta">
+                                    <div class="pc-program-name"><?php echo htmlspecialchars($programNameSafe); ?></div>
+                                    <?php if ($programMajorSafe !== '') : ?>
+                                        <div class="pc-program-major">Major in <strong><?php echo htmlspecialchars($programMajorSafe); ?></strong></div>
+                                    <?php endif; ?>
+                                </div>
+                            </div>
+
+                            <?php if ($programDescriptionSafe !== '') : ?>
+                                <div class="pc-program-desc"><?php echo htmlspecialchars($programDescriptionSafe); ?></div>
+                            <?php endif; ?>
+
+                            <div class="pc-program-stats">
+                                <div class="stat-pill"><strong><?php echo $courseCount; ?></strong> courses</div>
+                                <div class="stat-pill"><strong><?php echo $facultyCount; ?></strong> faculty</div>
+                            </div>
+
+                            <div class="pc-program-head">
+                                <div class="pc-program-head-label">Program Head</div>
+                                <div class="pc-program-head-value">
+                                    <?php if ($headName) : ?>
+                                        <span class="pc-head-name"><?php echo htmlspecialchars($headName); ?></span>
+                                        <button type="button" class="pc-head-remove" onclick="removeProgramHead(<?php echo $programId; ?>)">Remove</button>
+                                    <?php else : ?>
+                                        <span class="pc-head-empty">Not assigned</span>
+                                    <?php endif; ?>
+                                </div>
+                                <button type="button" class="pc-head-assign" onclick='openAssignProgramHeadModal(<?php echo $programId; ?>, <?php echo json_encode($programNameSafe); ?>)' style="margin-top: 8px;">
+                                    <?php echo $headName ? 'Change Program Head' : 'Assign Program Head'; ?>
+                                </button>
+                            </div>
+
+                            <div class="pc-program-actions">
+                                <a class="pc-link btn-primary" href="content.php?page=program-courses&amp;program=<?php echo urlencode($programCode); ?>">
+                                    <i data-lucide="list"></i>
+                                    <span>Manage Courses</span>
+                                </a>
+                            </div>
+                        </article>
                     <?php endforeach; ?>
-                <?php else: ?>
-                    <tr><td colspan="3" style="text-align: center;">No recent activities found.</td></tr>
+                <?php else : ?>
+                    <div class="pc-empty">
+                        <div class="pc-empty-icon icon-container" aria-hidden="true"><i data-lucide="folder-plus"></i></div>
+                        <div class="pc-empty-title">No programs yet</div>
+                        <div class="pc-empty-subtitle">Create your first program to start organizing courses.</div>
+                        <button type="button" class="btn-primary" onclick="openAddProgramModal()">
+                            <i data-lucide="plus"></i>
+                            <span>Create First Program</span>
+                        </button>
+                    </div>
                 <?php endif; ?>
-            </tbody>
-        </table>
-    </div>
-    <div class="active-users">
-        <h3>Active Users</h3>
-        <div class="user">No users currently active.</div> 
+            </div>
+        </section>
+
+        <aside class="pc-panel card pc-side">
+            <div class="section-header pc-section-header">
+                <div class="label-bar"></div>
+                <div>
+                    <h3>Focused workspace</h3>
+                    <p>This page is intentionally different from the dashboard.</p>
+                </div>
+            </div>
+
+            <div class="pc-side-card">
+                <div class="pc-side-row">
+                    <div class="icon-container" aria-hidden="true"><i data-lucide="list-check"></i></div>
+                    <div>
+                        <div class="pc-side-title">Programs list</div>
+                        <div class="pc-side-text">Everything you need to manage programs lives on the left.</div>
+                    </div>
+                </div>
+                <div class="pc-side-row">
+                    <div class="icon-container" aria-hidden="true"><i data-lucide="graduation-cap"></i></div>
+                    <div>
+                        <div class="pc-side-title">Courses per program</div>
+                        <div class="pc-side-text">Use “Manage Courses” to view/add/edit courses for a specific program.</div>
+                    </div>
+                </div>
+                <div class="pc-side-row">
+                    <div class="icon-container" aria-hidden="true"><i data-lucide="user-check"></i></div>
+                    <div>
+                        <div class="pc-side-title">Program head</div>
+                        <div class="pc-side-text">Assign or change the program head to keep ownership clear.</div>
+                    </div>
+                </div>
+            </div>
+        </aside>
     </div>
 </div>
 
@@ -393,24 +245,21 @@ $recentActivities = [];
     const programs = <?php echo json_encode($programs); ?>;
     const recentActivities = <?php echo json_encode($recentActivities); ?>;
     const deanDepartmentId = <?php echo json_encode($deanDepartmentId); ?>;
-    
-    // Back to top functionality
-    function scrollToTop() {
-        window.scrollTo({
-            top: 0,
-            behavior: 'smooth'
+
+    (function initProgramsCoursesPage() {
+        const searchInput = document.getElementById('pcProgramSearch');
+        if (!searchInput) return;
+
+        const cards = Array.from(document.querySelectorAll('#programContainer .pc-program'));
+        searchInput.addEventListener('input', function() {
+            const query = (searchInput.value || '').trim().toLowerCase();
+            cards.forEach(card => {
+                const haystack = card.getAttribute('data-program-search') || '';
+                const match = query === '' ? true : haystack.includes(query);
+                card.style.display = match ? '' : 'none';
+            });
         });
-    }
-    
-    // Show/hide back to top button based on scroll position
-    window.addEventListener('scroll', function() {
-        const backToTopBtn = document.getElementById('backToTopBtn');
-        if (window.pageYOffset > 300) {
-            backToTopBtn.classList.add('show');
-        } else {
-            backToTopBtn.classList.remove('show');
-        }
-    });
+    })();
     
     // Program Head Assignment Functions
     function openAssignProgramHeadModal(programId, programName) {

@@ -108,65 +108,169 @@ if ($deanDepartmentCode && $programCode) {
 ?>
 
 <style>
+/* DESIGN.md Animations */
+@keyframes fadeSlideUp {
+    from {
+        opacity: 0;
+        transform: translateY(18px) scale(0.985);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+/* DESIGN.md Component Patterns */
+.btn-primary {
+    background: #0C4B34;
+    color: white;
+    border: none;
+    padding: 12px 22px;
+    border-radius: 10px;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 700;
+    letter-spacing: 0.2px;
+    transition: all 0.22s cubic-bezier(.4, 0, .2, 1);
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-family: 'TT Interphases', sans-serif;
+}
+
+.btn-primary:hover {
+    background: #0a3a28;
+    transform: translateY(-1px);
+    box-shadow: 0 6px 18px rgba(12, 75, 52, 0.25);
+}
+
+.btn-primary:active {
+    transform: translateY(0) scale(0.98);
+}
+
+.section-header {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    margin-bottom: 16px;
+}
+
+.label-bar {
+    width: 4px;
+    height: 22px;
+    border-radius: 2px;
+    background: linear-gradient(180deg, #0C4B34 0%, #0F7A53 100%);
+    flex-shrink: 0;
+    margin-top: 2px;
+}
+
 .program-courses-container {
     margin-top: 0 !important;
     padding: 0 !important;
+    font-family: 'TT Interphases', sans-serif;
 }
 
+/* Hero Card with gradient top stripe */
 .program-header {
-    background: linear-gradient(135deg, <?php echo $programColor; ?>, <?php echo $programColor; ?>dd);
-    color: white;
-    padding: 30px;
-    border-radius: 12px;
-    margin-bottom: 30px;
-    box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+    background: #ffffff;
+    border-radius: 18px;
+    border: 1px solid rgba(12, 75, 52, 0.14);
+    box-shadow: 0 4px 18px rgba(0, 0, 0, 0.04);
+    padding: 28px 30px;
+    margin-bottom: 24px;
+    position: relative;
+    overflow: hidden;
+    animation: fadeSlideUp 0.45s ease-out both;
+}
+
+.program-header::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 3px;
+    background: linear-gradient(90deg, <?php echo $programColor; ?> 0%, <?php echo $programColor; ?>cc 100%);
 }
 
 .program-title {
-    font-size: 28px;
-    font-weight: 700;
-    margin: 0 0 8px 0;
+    font-size: 26px;
+    font-weight: 800;
+    margin: 0 0 6px 0;
+    color: #111827;
     font-family: 'TT Interphases', sans-serif;
 }
 
 .program-subtitle {
-    font-size: 16px;
-    opacity: 0.9;
-    margin: 0;
+    font-size: 15px;
+    color: rgba(17, 24, 39, 0.6);
+    margin: 0 0 16px 0;
     font-family: 'TT Interphases', sans-serif;
+    font-weight: 500;
+}
+
+.program-header-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    flex-wrap: wrap;
+}
+
+.course-count-badge {
+    background: rgba(12, 75, 52, 0.08);
+    color: #0C4B34;
+    padding: 8px 16px;
+    border-radius: 10px;
+    font-size: 14px;
+    font-weight: 700;
 }
 
 .back-button {
-    background: rgba(255,255,255,0.2);
+    background: #0C4B34;
     color: white;
-    border: 2px solid rgba(255,255,255,0.3);
-    padding: 12px 24px;
-    border-radius: 8px;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 10px;
     text-decoration: none;
-    font-weight: 600;
+    font-weight: 700;
     font-family: 'TT Interphases', sans-serif;
-    transition: all 0.3s ease;
-    display: inline-block;
-    margin-top: 20px;
+    transition: all 0.22s cubic-bezier(.4, 0, .2, 1);
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 14px;
+    letter-spacing: 0.2px;
 }
 
 .back-button:hover {
-    background: rgba(255,255,255,0.3);
-    border-color: rgba(255,255,255,0.5);
+    background: #0a3a28;
     color: white;
+    transform: translateY(-1px);
+    box-shadow: 0 6px 18px rgba(12, 75, 52, 0.25);
     text-decoration: none;
 }
 
+/* Courses Table Container - DESIGN.md pattern */
 .courses-table-container {
-    background: white;
-    border-radius: 12px;
-    box-shadow: 0 4px 20px rgba(0,0,0,0.08);
-    overflow: hidden;
+    background: #ffffff;
+    border-radius: 18px;
+    border: 1px solid rgba(12, 75, 52, 0.12);
+    box-shadow: 0 4px 18px rgba(0, 0, 0, 0.04);
+    overflow-x: auto;
+    transition: all 0.28s cubic-bezier(.4, 0, .2, 1);
+    animation: fadeSlideUp 0.45s ease-out both;
+    animation-delay: 0.08s;
+}
+
+.courses-table-container:hover {
+    box-shadow: 0 12px 36px rgba(12, 75, 52, 0.1);
 }
 
 .courses-table {
     width: 100%;
-    border-collapse: collapse;
+    border-collapse: separate;
+    border-spacing: 0;
     font-family: 'TT Interphases', sans-serif;
     table-layout: fixed;
 }
@@ -181,101 +285,129 @@ if ($deanDepartmentCode && $programCode) {
 }
 
 .courses-table th {
-    background: #f8f9fa;
-    color: #495057;
-    font-weight: 600;
-    padding: 20px 16px;
+    background: rgba(12, 75, 52, 0.03);
+    color: rgba(17, 24, 39, 0.5);
+    font-weight: 700;
+    padding: 14px 16px;
     text-align: left;
-    border-bottom: 2px solid #e9ecef;
-    font-size: 14px;
+    border-bottom: 1px solid rgba(12, 75, 52, 0.08);
+    font-size: 11px;
     text-transform: uppercase;
-    letter-spacing: 0.5px;
+    letter-spacing: 0.6px;
 }
 
 .courses-table td {
-    padding: 16px;
-    border-bottom: 1px solid #e9ecef;
+    padding: 14px 16px;
+    font-size: 13px;
+    color: #333;
+    font-weight: 500;
+    border-bottom: 1px solid rgba(12, 75, 52, 0.05);
     vertical-align: middle;
 }
 
-.courses-table tr:hover {
-    background: #f8f9fa;
+.courses-table td:first-child {
+    font-weight: 700;
+    color: #111827;
+}
+
+.courses-table tbody tr {
+    transition: background-color 0.15s ease;
+}
+
+.courses-table tbody tr:hover {
+    background-color: rgba(12, 75, 52, 0.03);
+}
+
+.courses-table tbody tr:nth-child(even) {
+    background-color: rgba(12, 75, 52, 0.015);
+}
+
+.courses-table tbody tr:last-child td {
+    border-bottom: none;
 }
 
 .course-code {
-    font-weight: 600;
-    color: #495057;
+    font-weight: 700;
+    color: #111827;
     font-size: 14px;
 }
 
 .course-title {
-    color: #6c757d;
+    color: rgba(17, 24, 39, 0.8);
     font-size: 14px;
     line-height: 1.4;
 }
 
 .units-badge {
-    background: #e3f2fd;
-    color: #1976d2;
-    padding: 4px 12px;
-    border-radius: 20px;
+    background: rgba(12, 75, 52, 0.06);
+    color: #0C4B34;
+    padding: 5px 12px;
+    border-radius: 8px;
     font-size: 12px;
-    font-weight: 600;
+    font-weight: 700;
     font-family: 'TT Interphases', sans-serif;
 }
 
 .faculty-name {
-    color: #495057;
-    font-size: 14px;
+    color: rgba(17, 24, 39, 0.7);
+    font-size: 13px;
     font-weight: 500;
 }
 
+/* Status Badges - DESIGN.md pattern */
 .status-badge {
-    padding: 6px 12px;
-    border-radius: 20px;
-    font-size: 12px;
-    font-weight: 600;
+    padding: 5px 10px;
+    border-radius: 8px;
+    font-size: 11px;
+    font-weight: 700;
     text-transform: uppercase;
-    letter-spacing: 0.5px;
+    letter-spacing: 0.6px;
     font-family: 'TT Interphases', sans-serif;
 }
 
 .status-active {
-    background: #d4edda;
-    color: #155724;
+    background: rgba(46, 125, 50, 0.1);
+    color: #2E7D32;
 }
 
 .status-pending {
-    background: #fff3cd;
-    color: #856404;
+    background: rgba(255, 183, 0, 0.15);
+    color: #b8860b;
 }
 
 .status-rejected {
-    background: #f8d7da;
-    color: #721c24;
+    background: rgba(185, 28, 28, 0.08);
+    color: #b91c1c;
 }
 
 .status-inactive {
-    background: #f8d7da;
-    color: #721c24;
+    background: rgba(185, 28, 28, 0.08);
+    color: #b91c1c;
 }
 
+/* Empty State - DESIGN.md pattern */
 .no-courses {
     text-align: center;
     padding: 60px 20px;
-    color: #6c757d;
+    background: #ffffff;
+    border-radius: 18px;
+    border: 1px dashed rgba(12, 75, 52, 0.2);
     font-family: 'TT Interphases', sans-serif;
 }
 
 .no-courses h3 {
-    font-size: 24px;
-    margin-bottom: 12px;
-    color: #495057;
+    font-size: 20px;
+    margin-bottom: 8px;
+    color: #111827;
+    font-weight: 800;
 }
 
 .no-courses p {
-    font-size: 16px;
+    font-size: 14px;
     margin: 0;
+    color: rgba(17, 24, 39, 0.5);
+    font-weight: 500;
+}
 }
 
 /* Action Menu Styles */
@@ -304,13 +436,13 @@ if ($deanDepartmentCode && $programCode) {
 }
 
 .action-menu-btn:hover {
-    background-color: #f0f0f0;
+    background-color: rgba(12, 75, 52, 0.08);
 }
 
 .three-dots {
     font-size: 18px;
     font-weight: bold;
-    color: #666;
+    color: #0C4B34;
     line-height: 1;
     display: inline-block;
     user-select: none;
@@ -323,27 +455,29 @@ if ($deanDepartmentCode && $programCode) {
     right: 0;
     margin-top: 4px;
     background: white;
-    border: 1px solid #e0e0e0;
-    border-radius: 6px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    border: 1px solid rgba(12, 75, 52, 0.14);
+    border-radius: 10px;
+    box-shadow: 0 8px 24px rgba(12, 75, 52, 0.15);
     z-index: 99999;
-    min-width: 140px;
-    padding: 4px 0;
+    min-width: 160px;
+    padding: 6px 0;
+    animation: fadeSlideUp 0.2s ease-out;
 }
 
 .action-menu-item {
     display: flex;
     align-items: center;
-    gap: 8px;
-    padding: 8px 12px;
+    gap: 10px;
+    padding: 10px 14px;
     cursor: pointer;
-    transition: background-color 0.2s ease;
-    font-size: 14px;
+    transition: background-color 0.15s ease;
+    font-size: 13px;
     color: #333;
+    font-weight: 500;
 }
 
 .action-menu-item:hover {
-    background-color: #f5f5f5;
+    background-color: rgba(12, 75, 52, 0.06);
 }
 
 .action-menu-item.disabled {
@@ -583,18 +717,9 @@ if ($deanDepartmentCode && $programCode) {
         font-size: 24px;
     }
     
-    .edit-program-modal-content {
-        width: 95%;
-        margin: 10% auto;
-    }
-    
-    .edit-program-modal-body {
-        padding: 20px;
-    }
-    
-    .form-row {
+    .program-header-row {
         flex-direction: column;
-        gap: 15px;
+        align-items: flex-start;
     }
     
     .courses-table-container {
@@ -604,34 +729,126 @@ if ($deanDepartmentCode && $programCode) {
     .courses-table {
         min-width: 600px;
     }
+    
+    .section-header {
+        flex-direction: column;
+    }
+    
+    .label-bar {
+        display: none;
+    }
+}
+
+/* Dark Mode - DESIGN.md pattern */
+html[data-theme="dark"] .program-header {
+    background-color: #1e1e1e !important;
+    border-color: #333 !important;
+    box-shadow: 0 4px 18px rgba(0, 0, 0, 0.25) !important;
+}
+
+html[data-theme="dark"] .program-title {
+    color: #e0e0e0 !important;
+}
+
+html[data-theme="dark"] .program-subtitle {
+    color: rgba(224, 224, 224, 0.65) !important;
+}
+
+html[data-theme="dark"] .course-count-badge {
+    background: rgba(255, 255, 255, 0.08) !important;
+    color: #81C784 !important;
+}
+
+html[data-theme="dark"] .back-button {
+    background: #0F7A53 !important;
+}
+
+html[data-theme="dark"] .courses-table-container {
+    background-color: #1e1e1e !important;
+    border-color: #333 !important;
+}
+
+html[data-theme="dark"] .courses-table th {
+    background: rgba(255, 255, 255, 0.04) !important;
+    color: rgba(224, 224, 224, 0.5) !important;
+}
+
+html[data-theme="dark"] .courses-table td {
+    color: #b0b0b0 !important;
+    border-bottom-color: rgba(255, 255, 255, 0.05) !important;
+}
+
+html[data-theme="dark"] .courses-table td:first-child {
+    color: #e0e0e0 !important;
+}
+
+html[data-theme="dark"] .courses-table tbody tr:hover {
+    background-color: rgba(255, 255, 255, 0.03) !important;
+}
+
+html[data-theme="dark"] .course-code {
+    color: #e0e0e0 !important;
+}
+
+html[data-theme="dark"] .status-active {
+    background: rgba(46, 125, 50, 0.2) !important;
+    color: #81C784 !important;
+}
+
+html[data-theme="dark"] .status-pending {
+    background: rgba(255, 183, 0, 0.2) !important;
+    color: #FFD54F !important;
+}
+
+html[data-theme="dark"] .status-rejected,
+html[data-theme="dark"] .status-inactive {
+    background: rgba(185, 28, 28, 0.2) !important;
+    color: #EF5350 !important;
+}
+
+html[data-theme="dark"] .section-header h3 {
+    color: #e0e0e0 !important;
 }
 </style>
 
 <div class="program-courses-container">
-    <!-- Program Header -->
-<div class="program-header">
-        <h1 class="program-title"><?php echo htmlspecialchars($programName); ?></h1>
-        <p class="program-subtitle">
-            <?php echo htmlspecialchars($programCode); ?>
-            <?php if (!empty($programMajor)): ?>
-                • <?php echo htmlspecialchars($programMajor); ?>
-                            <?php endif; ?>
-        </p>
-        <div class="course-count">
-            <?php echo count($courses); ?> Course<?php echo count($courses) !== 1 ? 's' : ''; ?>
-</div>
-        <a href="content.php?page=dashboard" class="back-button">
-            ← Back to Dashboard
-        </a>
-</div>
+    <!-- Program Header - DESIGN.md Card pattern -->
+    <div class="program-header">
+        <div class="program-header-row">
+            <div>
+                <h1 class="program-title"><?php echo htmlspecialchars($programName); ?></h1>
+                <p class="program-subtitle">
+                    <?php echo htmlspecialchars($programCode); ?>
+                    <?php if (!empty($programMajor)): ?>
+                        • <?php echo htmlspecialchars($programMajor); ?>
+                    <?php endif; ?>
+                </p>
+            </div>
+            <div style="display: flex; align-items: center; gap: 16px;">
+                <span class="course-count-badge">
+                    <?php echo count($courses); ?> Course<?php echo count($courses) !== 1 ? 's' : ''; ?>
+                </span>
+                <a href="content.php?page=program-management" class="back-button">
+                    <i data-lucide="arrow-left"></i>
+                    <span>Back</span>
+                </a>
+            </div>
+        </div>
+    </div>
 
     <!-- Courses Table Header with Actions -->
-    <div class="courses-table-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
-        <div style="flex: 1;">
-            <!-- Search can go here if needed in future -->
+    <div class="section-header" style="margin-bottom: 16px;">
+        <div class="label-bar"></div>
+        <div>
+            <h3 style="font-size: 16px; font-weight: 800; color: #0C4B34; margin: 0 0 4px 0;">Courses</h3>
+            <p style="font-size: 12px; color: rgba(17, 24, 39, 0.5); margin: 0; font-weight: 600;">Manage courses for this program</p>
         </div>
-        <button class="add-course-btn" onclick="openAddCourseModalFromProgram('<?php echo htmlspecialchars($programCode); ?>')" style="background: <?php echo $programColor; ?>; color: white; border: none; padding: 12px 24px; border-radius: 8px; font-weight: 600; cursor: pointer; font-family: 'TT Interphases', sans-serif; transition: all 0.2s;" onmouseover="this.style.background='<?php echo $programColor; ?>dd'; this.style.transform='translateY(-1px)';" onmouseout="this.style.background='<?php echo $programColor; ?>'; this.style.transform='translateY(0)';">
-            + Add New Course
+    </div>
+    
+    <div style="display: flex; justify-content: flex-end; margin-bottom: 16px;">
+        <button class="btn-primary" onclick="openAddCourseModalFromProgram('<?php echo htmlspecialchars($programCode); ?>')">
+            <i data-lucide="plus"></i>
+            <span>Add New Course</span>
         </button>
     </div>
 

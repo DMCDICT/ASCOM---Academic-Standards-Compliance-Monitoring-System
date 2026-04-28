@@ -6,7 +6,6 @@ set_error_handler(function($severity, $message, $file, $line) {
 });
 
 try {
-    // Log the incoming POST data for debugging
     
     // Include session configuration
     $sessionConfigPath = dirname(dirname(__FILE__)) . '/../session_config.php';

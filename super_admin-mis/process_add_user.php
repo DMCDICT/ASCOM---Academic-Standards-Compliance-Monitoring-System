@@ -1,5 +1,5 @@
 <?php
-// process_add_user.php - Direct database connection to debug
+// process_add_user.php
 
 header('Content-Type: application/json');
 $response = ['success' => false, 'message' => ''];

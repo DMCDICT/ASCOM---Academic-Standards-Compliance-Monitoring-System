@@ -82,7 +82,7 @@ if ($input === null && json_last_error() !== JSON_ERROR_NONE) {
     echo json_encode([
         'success' => false, 
         'message' => 'Invalid JSON input: ' . json_last_error_msg(),
-        'raw_input_preview' => substr($rawInput, 0, 200) // First 200 chars for debugging
+        'raw_input_preview' => substr($rawInput, 0, 200) // First 200 chars
     ]);
     exit;
 }

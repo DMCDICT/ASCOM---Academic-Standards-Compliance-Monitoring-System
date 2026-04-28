@@ -383,11 +383,6 @@ if (!$showProgramCourses && $courseDetails) {
                     
                 }
             }
-            
-            // Final debug
-            if (!empty($bookReferences)) {
-            }
-        } else {
         }
     } catch (Exception $e) {
     }

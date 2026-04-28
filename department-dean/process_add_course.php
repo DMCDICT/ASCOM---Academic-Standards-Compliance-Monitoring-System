@@ -6,7 +6,6 @@ set_error_handler(function($severity, $message, $file, $line) {
 });
 
 try {
-    // Log the incoming POST data for debugging
     
     // Include session configuration
     $sessionConfigPath = dirname(__FILE__) . '/../session_config.php';
@@ -230,7 +229,7 @@ try {
     ob_end_clean();
     http_response_code(500);
     
-    // Return detailed error for debugging
+    // Return detailed error
     $errorResponse = [
         'success' => false,
         'message' => $e->getMessage(),

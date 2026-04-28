@@ -1228,7 +1228,6 @@ function submitImportedBooks() {
         try {
             data = JSON.parse(responseText);
         } catch (e) {
-            // If not valid JSON, show the raw response for debugging
             console.error('Invalid JSON response:', responseText);
             throw new Error('Server returned invalid response. Check console for details.');
         }
@@ -1575,12 +1574,6 @@ function showCourseBooksModal(courseIndex) {
         alert('Error: No book data found. Please upload the Excel file again.');
         return;
     }
-    
-    // Store data globally for debugging
-    window.debugImportedBooksData = importedBooksData;
-    window.debugOriginalParsedBooksData = originalParsedBooksData;
-    window.debugCourse = course;
-    window.debugCourseIndex = courseIndex;
     
     // Set modal title
     document.getElementById('courseBooksModalTitle').textContent = `Book References - ${courseCode}`;
