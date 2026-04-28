@@ -148,56 +148,25 @@ try {
                                 $draft['program_code'] = $program['program_code'];
                                 $draft['program_name'] = $program['program_name'];
                             }
-                        } catch (Exception $e) {
-                        }
-                    }
+} catch (Exception $e) {
+    }
+    
+    // Return response
+    $response = [
+        'success' => true,
+        'proposals' => $proposals,
+        'count' => count($proposals)
+    ];
+    
+    echo json_encode($response);
+}
                 }
                 unset($draft); // Break reference
-                
-                if (count($drafts) > 0) {
-                }
             }
-            
-            
-            // If no drafts found for this user, try to find ANY draft (for debugging and temporary fix)
-            if (count($drafts) === 0) {
-                $allDraftsCheck = $pdo->query("SELECT id, user_id FROM course_drafts LIMIT 5");
-                $allDrafts = $allDraftsCheck->fetchAll(PDO::FETCH_ASSOC);
-                
-                // TEMPORARY FIX: If there's only 1 draft total, use it regardless of user_id
-                // This helps debug the user_id mismatch issue
-                $totalDraftsCheck = $pdo->query("SELECT COUNT(*) as total FROM course_drafts");
-                $totalDrafts = $totalDraftsCheck->fetch(PDO::FETCH_ASSOC);
-                
-                if ($totalDrafts['total'] == 1) {
-                    $anyDraftQuery = $pdo->query("
-                        SELECT 
-                            cd.id,
-                            cd.user_id,
-                            cd.program_id,
-                            cd.term,
-                            cd.academic_year,
-                            cd.year_level,
-                            cd.courses_data,
-                            cd.created_at,
-                            cd.updated_at,
-                            p.program_code,
-                            p.program_name
-                        FROM course_drafts cd
-                        LEFT JOIN programs p ON cd.program_id = p.id
-                        ORDER BY cd.updated_at DESC
-                        LIMIT 1
-                    ");
-                    $anyDraft = $anyDraftQuery->fetch(PDO::FETCH_ASSOC);
-                    if ($anyDraft) {
-                        $drafts = [$anyDraft]; // Use this draft even though user_id doesn't match
-                    }
-                }
-            }
-            
-            if (count($drafts) > 0) {
-            }
-        } else {
+        }
+        
+        
+        // If no drafts found for this user, try to find ANY draft
             $drafts = [];
         }
     } catch (Exception $e) {
@@ -212,20 +181,8 @@ try {
         
         $coursesData = json_decode($rawData, true);
         
-        // Log for debugging
+        // Handle JSON parsing errors
         if (json_last_error() !== JSON_ERROR_NONE) {
-            
-            // Try to fix common JSON issues
-            $cleanedData = trim($rawData);
-            if (substr($cleanedData, 0, 1) !== '[' && substr($cleanedData, 0, 1) !== '{') {
-                $coursesData = json_decode($cleanedData, true);
-                if (json_last_error() !== JSON_ERROR_NONE) {
-                    continue;
-                }
-            } else {
-                continue;
-            }
-        }
         
         
         if (!is_array($coursesData)) {
@@ -511,91 +468,17 @@ try {
                     }
                 }
             }
-        } catch (Exception $e) {
-        }
+} catch (Exception $e) {
     }
     
-    // If we found drafts but didn't process any, there's a problem
-    if (count($drafts) > 0 && count($proposals) === 0) {
-    }
-    
-    // Return response with debug info
+    // Return response
     $response = [
         'success' => true,
         'proposals' => $proposals,
         'count' => count($proposals)
     ];
     
-        // Always add debug info
-        if (true || isset($_GET['debug']) || count($proposals) === 0) {
-        // Get total drafts count for debugging
-        $totalDraftsInDb = 0;
-        $totalDraftsForUser = 0;
-        try {
-            if (isset($checkDraftsTable) && $checkDraftsTable && $checkDraftsTable->rowCount() > 0) {
-                $totalCheck = $pdo->query("SELECT COUNT(*) as total FROM course_drafts");
-                $totalResult = $totalCheck->fetch(PDO::FETCH_ASSOC);
-                $totalDraftsInDb = $totalResult['total'];
-                
-                $userCheck = $pdo->prepare("SELECT COUNT(*) as total FROM course_drafts WHERE user_id = ?");
-                $userCheck->execute([$userId]);
-                $userResult = $userCheck->fetch(PDO::FETCH_ASSOC);
-                $totalDraftsForUser = $userResult['total'];
-            }
-        } catch (Exception $e) {
-            // Ignore
-        }
-        
-        $response['debug'] = [
-            'user_id' => $userId,
-            'drafts_found' => count($drafts ?? []),
-            'proposals_found' => count($submittedProposals ?? []),
-            'drafts_table_exists' => isset($checkDraftsTable) && $checkDraftsTable && $checkDraftsTable->rowCount() > 0,
-            'proposals_table_exists' => isset($checkProposalsTable) && $checkProposalsTable && $checkProposalsTable->rowCount() > 0,
-            'total_drafts_in_db' => $totalDraftsInDb,
-            'total_drafts_for_user' => $totalDraftsForUser
-        ];
-        
-        // If drafts were found but not processed, add more debug info
-        if (isset($drafts) && count($drafts) > 0 && count($proposals) === 0) {
-            $response['debug']['draft_samples'] = [];
-            $response['debug']['processing_errors'] = [];
-            
-            foreach (array_slice($drafts, 0, 3) as $draft) {
-                $sample = [
-                    'id' => $draft['id'],
-                    'courses_data_length' => strlen($draft['courses_data'] ?? ''),
-                    'courses_data_preview' => substr($draft['courses_data'] ?? '', 0, 150)
-                ];
-                
-                // Try to decode
-                $testDecode = json_decode($draft['courses_data'] ?? '', true);
-                if (json_last_error() !== JSON_ERROR_NONE) {
-                    $sample['json_error'] = json_last_error_msg();
-                    $response['debug']['processing_errors'][] = "Draft {$draft['id']}: JSON decode error - " . json_last_error_msg();
-                } else {
-                    $sample['json_valid'] = true;
-                    $sample['is_array'] = is_array($testDecode);
-                    $sample['array_count'] = is_array($testDecode) ? count($testDecode) : 0;
-                    if (is_array($testDecode) && count($testDecode) === 0) {
-                        $response['debug']['processing_errors'][] = "Draft {$draft['id']}: Empty array after decode";
-                    }
-                }
-                
-                $response['debug']['draft_samples'][] = $sample;
-            }
-        }
-    }
-    
-    echo json_encode($response);
-    
-} catch (Exception $e) {
-    http_response_code(500);
-    echo json_encode([
-        'success' => false,
-        'message' => 'Failed to fetch course proposals',
-        'error' => $e->getMessage()
-    ]);
+echo json_encode($response);
 }
 ?>
 

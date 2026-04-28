@@ -898,11 +898,11 @@ document.addEventListener('DOMContentLoaded', function() {
       <span style="line-height: 1.2;">Reference<br />Requests</span>
     </a>
 
-    <a href="content.php?page=program-management" class="nav-button hoverable <?php if ($currentPage == 'program-management') echo 'active'; ?>">
+    <a href="content.php?page=program-management" class="nav-button hoverable <?php if ($currentPage == 'program-management' || $currentPage == 'program-courses') echo 'active'; ?>">
       <span class="nav-icon-wrapper">
         <i data-lucide="folder-cog" class="nav-icon" aria-hidden="true"></i>
       </span>
-      <span style="line-height: 1.2;">Program<br />Management</span>
+      <span style="line-height: 1.2;">Programs &<br />Courses</span>
     </a>
 
     <a href="content.php?page=faculty-management" class="nav-button hoverable <?php if ($currentPage == 'academic-management' || $currentPage == 'faculty-management' || $currentPage == 'faculty-details') echo 'active'; ?>" style="height: 76px;">
@@ -919,6 +919,13 @@ document.addEventListener('DOMContentLoaded', function() {
         <i data-lucide="calendar" class="nav-icon" aria-hidden="true"></i>
       </span>
       <span>Calendar</span>
+    </a>
+
+    <a href="content.php?page=syllabus-management" class="nav-button hoverable <?php if ($currentPage == 'syllabus-management') echo 'active'; ?>">
+      <span class="nav-icon-wrapper">
+        <i data-lucide="file-check" class="nav-icon" aria-hidden="true"></i>
+      </span>
+      <span>Syllabus<br />Management</span>
     </a>
 
     <a href="content.php?page=settings" class="nav-button hoverable <?php if ($currentPage == 'settings') echo 'active'; ?>">
@@ -944,6 +951,9 @@ document.addEventListener('DOMContentLoaded', function() {
     $page = isset($_GET['page']) ? $_GET['page'] : 'dashboard';
     
     switch ($page) {
+      case 'program-management':
+        include './program_management-content/program-management.php';
+        break;
       case 'faculty-management':
       case 'academic-management':
         include './academic_management-content/academic-management.php';
@@ -977,6 +987,9 @@ document.addEventListener('DOMContentLoaded', function() {
         break;
       case 'course-proposals':
         include './course-proposals-content/course-proposals.php';
+        break;
+      case 'syllabus-management':
+        include './syllabus-management-content/syllabus-management.php';
         break;
       case 'dashboard':
       default:

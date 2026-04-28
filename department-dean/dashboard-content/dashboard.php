@@ -174,7 +174,8 @@ try {
         $totalPrograms = count($programs);
         
         // Count unique courses for this department (not just sum of program counts)
-        if ($selectedTermId === 'all') {
+        $termName = $currentAcademicTerm['term_name'] ?? null;
+        if ($selectedTermId === 'all' || $selectedTermId === null) {
             $uniqueCoursesQuery = "
                 SELECT COUNT(DISTINCT c.course_code) as unique_course_count
                 FROM courses c

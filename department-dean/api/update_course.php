@@ -1,5 +1,5 @@
 <?php
-// Enable error reporting for debugging
+// Enable error reporting
 
 header('Content-Type: application/json');
 header('Access-Control-Allow-Origin: *');
@@ -194,8 +194,6 @@ try {
     if (isset($pdo) && $pdo->inTransaction()) {
         $pdo->rollBack();
     }
-    
-    // Log the error for debugging
     
     echo json_encode([
         'success' => false,

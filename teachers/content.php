@@ -88,8 +88,29 @@ if (isset($_SESSION['user_id']) && isset($pdo)) {
 }
 
 include './modals/switch_role_modal.php';
-include './modals/request_book_modal.php'; 
-?>
+include './modals/request_book_modal.php';
+include './modals/syllabus_modal.php';
+
+// Check if teacher is also a program head
+$isProgramHead = false;
+$programHeadProgram = null;
+if (isset($pdo) && isset($_SESSION['user_id'])) {
+    $phCheckStmt = $pdo->prepare("
+        SELECT ph.id, ph.program_id, p.program_name, p.program_code
+        FROM program_heads ph
+        JOIN programs p ON ph.program_id = p.id
+        JOIN users u ON ph.teacher_id = u.id
+        WHERE ph.teacher_id = ? AND ph.is_active = TRUE
+    ");
+    $phCheckStmt->execute([$_SESSION['user_id']]);
+    $phData = $phCheckStmt->fetch(PDO::FETCH_ASSOC);
+    $isProgramHead = !empty($phData);
+    if ($isProgramHead) {
+        $programHeadProgram = $phData;
+        $_SESSION['is_program_head'] = true;
+        $_SESSION['program_head_program'] = $phData;
+    }
+}
 
 <div class="top-navbar">
   <div class="top-navbar-content">
@@ -127,6 +148,24 @@ include './modals/request_book_modal.php';
     </a>
 
     <?php $currentPage = isset($_GET['page']) ? $_GET['page'] : 'dashboard'; ?>
+
+    <!-- Course Syllabus button -->
+    <a href="content.php?page=course-syllabus" class="nav-button hoverable <?php if ($currentPage == 'course-syllabus') echo 'active'; ?>">
+      <span class="nav-icon-wrapper">
+        <img src="../src/assets/icons/file-icon.png" alt="Syllabus Icon" class="nav-icon" />
+      </span>
+      <span>Course Syllabus</span>
+    </a>
+
+    <?php if ($isProgramHead): ?>
+    <!-- Program Head Dashboard (for teachers who are also program heads) -->
+    <a href="content.php?page=program-head-dashboard" class="nav-button hoverable <?php if ($currentPage == 'program-head-dashboard') echo 'active'; ?>">
+      <span class="nav-icon-wrapper">
+        <img src="../src/assets/icons/users-icon.png" alt="Program Head Icon" class="nav-icon" />
+      </span>
+      <span>Program Head</span>
+    </a>
+    <?php endif; ?>
 
     <a href="content.php?page=dashboard" class="nav-button hoverable <?php if ($currentPage == 'dashboard' || $currentPage == 'book-requests') echo 'active'; ?>">
       <span class="nav-icon-wrapper">
@@ -176,6 +215,12 @@ include './modals/request_book_modal.php';
     switch ($page) {
       case 'book-requests':
         include './content/book-requests.php';
+        break;
+      case 'course-syllabus':
+        include './content/course-syllabus.php';
+        break;
+      case 'program-head-dashboard':
+        include './content/program-head-dashboard.php';
         break;
       case 'grade-management':
         $_GET['page'] = 'grade-management';

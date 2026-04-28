@@ -2098,9 +2098,7 @@ function populateAcademicYearSelect(select, data) {
     
     // Check if data has the expected structure
     
-    // Only log full data if debugging is needed (can be large)
-    if (!data.success || !data.school_years || data.school_years.length === 0) {
-    }
+    // Only log full data if needed (can be large)
     
     // Validate and populate
     if (data.success && data.school_years && Array.isArray(data.school_years) && data.school_years.length > 0) {
@@ -2510,12 +2508,6 @@ window.handleFiles = function(files) {
     });
     
     
-    // Update debug info
-    const debugText = document.getElementById('attachmentDebugText');
-    if (debugText) {
-        debugText.textContent = `Files: ${window.attachmentFiles.length} (Added: ${addedCount}, Skipped: ${skippedCount})`;
-    }
-    
     // Update the file input first
     if (typeof window.updateFileInput === 'function') {
         window.updateFileInput();
@@ -2583,7 +2575,7 @@ window.initializeFileDropZone = window.initializeFileDropZone || function initia
     const dropZone = document.getElementById('fileDropZone');
     const fileInput = document.getElementById('courseAttachments');
     const attachmentList = document.getElementById('attachmentList');
-    
+    console.log({
         dropZone: !!dropZone,
         fileInput: !!fileInput,
         attachmentList: !!attachmentList,
@@ -2700,22 +2692,6 @@ window.initializeFileDropZone = window.initializeFileDropZone || function initia
         parentDisplay: parentStyle ? parentStyle.display : 'N/A',
         zIndex: fileInputStyle.zIndex
     });
-    
-    // Also attach a direct click handler to the file input for debugging
-    fileInput.addEventListener('click', function(e) {
-            target: e.target,
-            currentTarget: e.currentTarget,
-            bubbles: e.bubbles
-        });
-    });
-    
-    // Update debug info
-    const debugInfo = document.getElementById('attachmentDebugInfo');
-    const debugText = document.getElementById('attachmentDebugText');
-    if (debugInfo && debugText) {
-        debugInfo.style.display = 'block';
-        debugText.textContent = `File input ready. Current files: ${window.attachmentFiles ? window.attachmentFiles.length : 0}`;
-    }
     
 };
 
@@ -3260,11 +3236,6 @@ window.populateReviewData = window.populateReviewData || function populateReview
                             
                             <!-- File List -->
                             <div id="attachmentList" class="attachment-list"></div>
-                            
-                            <!-- Debug info (remove in production) -->
-                            <div id="attachmentDebugInfo" style="margin-top: 10px; padding: 10px; background: #f5f5f5; border-radius: 4px; font-size: 12px; color: #666; display: none;">
-                                <strong>Debug:</strong> <span id="attachmentDebugText">No files selected</span>
-                            </div>
                             
                             <small class="form-hint">You can upload multiple files. Click on a file to view or remove it.</small>
                         </div>
@@ -5554,7 +5525,6 @@ function initializeLearningMaterials() {
             // Setup autocomplete for the new call number input
             setTimeout(() => setupCallNumberAutocomplete(materialCount), 100);
         });
-        */
     }
 }
 

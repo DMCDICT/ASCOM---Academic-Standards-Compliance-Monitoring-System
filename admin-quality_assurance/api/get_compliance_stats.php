@@ -10,7 +10,7 @@ try {
     // Get term parameter (can be "all", term ID, or term name)
     $termFilter = $_GET['term'] ?? 'all';
     
-    // First, get all courses that match the filter (for debugging)
+    // Get all courses that match the filter
     $baseQuery = "
         SELECT DISTINCT
             c.id,
@@ -145,15 +145,7 @@ try {
         }
     }
     
-    // Log for debugging
-    
-    // Verify the SQL query result matches (for debugging)
-    $sqlTotal = (int)($result['total_courses'] ?? 0);
-    $sqlCompliant = (int)($result['compliant_courses'] ?? 0);
-    $sqlNonCompliant = (int)($result['non_compliant_courses'] ?? 0);
-    
-    if ($sqlTotal != $totalCourses || $sqlCompliant != $compliantCourses || $sqlNonCompliant != $nonCompliantCourses) {
-    }
+    // Verify the SQL query results
     
     // Calculate compliance percentage
     $compliancePercentage = 0;
@@ -419,7 +411,7 @@ try {
         }
     }
     
-    // Include debug courses in response for troubleshooting
+    // Include courses in response for troubleshooting
     $response = [
         'success' => true,
         'data' => [
@@ -432,16 +424,6 @@ try {
             'date_range' => $dateRange,
             'start_date' => $startDate,
             'end_date' => $endDate
-        ],
-        'debug' => [
-            'calculated_total' => $compliantCourses + $nonCompliantCourses,
-            'actual_total' => $totalCourses,
-            'courses_found' => $debugCourses ?? [],
-            'term_filter' => $termFilter,
-            'query_used' => $query,
-            'params_used' => $params,
-            'total_courses_in_db' => count($allCourses ?? []),
-            'all_courses_details' => $allCourses ?? []
         ]
     ];
     
