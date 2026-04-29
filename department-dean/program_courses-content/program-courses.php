@@ -42,67 +42,66 @@ $programName = 'Unknown Program';
 $programColor = '#1976d2';
 $programMajor = '';
 
-        // Fetch courses for the specific program
+// Fetch courses for the specific program
 if ($deanDepartmentCode && $programCode) {
-    try {
-        $currentYear = date('Y');
-        $query = "
-            SELECT 
-                c.id as course_id,
-                c.course_code,
-                c.course_title,
-                c.units,
-                d.color_code as program_color,
-                CONCAT(u.first_name, ' ', u.last_name) AS faculty_name,
-                c.status,
-                c.term,
-                c.academic_year,
-                c.year_level,
-                COUNT(CASE WHEN br.id IS NOT NULL AND br.copyright_year > 0 AND (? - br.copyright_year) < 5 THEN 1 END) as book_references_count
-            FROM 
-                courses c
-            JOIN 
-                programs p ON c.program_id = p.id
-            JOIN
-                departments d ON p.department_id = d.id
-            LEFT JOIN 
-                users u ON c.faculty_id = u.id AND u.is_active = TRUE
-            LEFT JOIN 
-                user_roles ur ON u.id = ur.user_id AND ur.role_name = 'teacher' AND ur.is_active = 1
-            LEFT JOIN
-                book_references br ON c.id = br.course_id
-            WHERE 
-                d.department_code = ? AND p.program_code = ?
-            GROUP BY c.id, c.course_code, c.course_title, c.units, d.color_code, faculty_name, c.status, c.term, c.academic_year, c.year_level
-            ORDER BY 
-                c.course_code ASC;
-        ";
-        
-        $stmt = $pdo->prepare($query);
-        $stmt->execute([$currentYear, $deanDepartmentCode, $programCode]);
-        $result = $stmt->fetchAll(PDO::FETCH_ASSOC);
-
-        if (count($result) > 0) {
-            $courses = $result;
-        }
-
-        // Get program name, major, and department color from database
-        $programQuery = "SELECT p.program_name, p.major, d.color_code as department_color 
-                        FROM programs p 
-                        JOIN departments d ON p.department_id = d.id 
-                        WHERE p.program_code = ? AND d.department_code = ?";
-        $stmt = $pdo->prepare($programQuery);
-        $stmt->execute([$programCode, $deanDepartmentCode]);
-        $programResult = $stmt->fetchAll(PDO::FETCH_ASSOC);
-        
-        if (count($programResult) > 0) {
-            $row = $programResult[0];
-            $programName = $row['program_name'];
-            $programColor = $row['department_color'];
-            $programMajor = $row['major'] ?? '';
-        }
-    } catch (Exception $e) {
+    // Direct lookup of program - bypass complex query
+    $directProgramQuery = "SELECT p.program_name, p.major, d.color_code 
+                      FROM programs p 
+                      INNER JOIN departments d ON p.department_id = d.id 
+                      WHERE p.program_code = :prog_code AND d.department_code = :dept_code";
+    $directStmt = $pdo->prepare($directProgramQuery);
+    $directStmt->execute([':prog_code' => $programCode, ':dept_code' => $deanDepartmentCode]);
+    $directResult = $directStmt->fetch(PDO::FETCH_ASSOC);
+    
+    // Directly set if found
+    if ($directResult) {
+        $programName = $directResult['program_name'];
+        $programColor = $directResult['color_code'] ?? '#1976d2';
+        $programMajor = $directResult['major'] ?? '';
     }
+    
+// Now get courses
+    $coursesQuery = "
+        SELECT 
+            c.id as course_id,
+            c.course_code,
+            c.course_title,
+            c.units,
+            d.color_code as program_color,
+            CONCAT(u.first_name, ' ', u.last_name) AS faculty_name,
+            c.status,
+            c.term,
+            c.academic_year,
+            c.year_level,
+            COUNT(br.id) as book_references_count
+        FROM 
+            courses c
+        JOIN 
+            programs p ON c.program_id = p.id
+        JOIN
+            departments d ON p.department_id = d.id
+        LEFT JOIN 
+            users u ON c.faculty_id = u.id
+                AND u.is_active = TRUE
+                AND EXISTS (
+                    SELECT 1
+                    FROM user_roles ur
+                    WHERE ur.user_id = u.id
+                      AND " . ascom_user_roles_role_predicate($pdo, 'ur', 'teacher') . "
+                      AND " . ascom_user_roles_active_predicate($pdo, 'ur') . "
+                )
+        LEFT JOIN
+            book_references br ON c.id = br.course_id
+        WHERE 
+            d.department_code = :dept_code AND p.program_code = :prog_code
+        GROUP BY c.id, c.course_code, c.course_title, c.units, d.color_code, faculty_name, c.status, c.term, c.academic_year, c.year_level
+        ORDER BY 
+            c.course_code ASC;
+    ";
+    
+    $coursesStmt = $pdo->prepare($coursesQuery);
+    $coursesStmt->execute([':dept_code' => $deanDepartmentCode, ':prog_code' => $programCode]);
+    $courses = $coursesStmt->fetchAll(PDO::FETCH_ASSOC);
 }
 
 ?>
@@ -462,6 +461,15 @@ if ($deanDepartmentCode && $programCode) {
     min-width: 160px;
     padding: 6px 0;
     animation: fadeSlideUp 0.2s ease-out;
+}
+
+/* When action menu is portaled to <body> to avoid clipping by scroll containers */
+.action-menu-dropdown.action-menu-portal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: auto;
+    margin-top: 0;
 }
 
 .action-menu-item {
@@ -1271,8 +1279,52 @@ function toggleActionMenu(event, courseCode, courseId, courseStatus, isAssigned)
     
     // Toggle current menu
     const menu = document.getElementById('actionMenu-' + courseCode);
+    if (!menu) return;
+
+    const trigger = event.currentTarget;
+    if (trigger && !trigger.id) {
+        trigger.id = `actionMenuTrigger-${courseCode}`;
+    }
+
     if (menu.style.display === 'none' || menu.style.display === '') {
+        // Portal to body so it isn't clipped by `.courses-table-container` overflow.
+        if (!menu.classList.contains('action-menu-portal')) {
+            menu.classList.add('action-menu-portal');
+            document.body.appendChild(menu);
+        }
+        if (trigger && trigger.id) {
+            menu.dataset.triggerId = trigger.id;
+        }
+
+        // Show first so we can measure.
+        menu.style.visibility = 'hidden';
         menu.style.display = 'block';
+
+        const triggerRect = trigger.getBoundingClientRect();
+        const menuWidth = menu.offsetWidth;
+        const menuHeight = menu.offsetHeight;
+
+        // Default placement: below + right-aligned to trigger
+        let top = triggerRect.bottom + 6;
+        let left = triggerRect.right - menuWidth;
+
+        // Keep within viewport
+        const padding = 8;
+        const vw = window.innerWidth;
+        const vh = window.innerHeight;
+
+        if (left < padding) left = padding;
+        if (left + menuWidth > vw - padding) left = Math.max(padding, vw - padding - menuWidth);
+
+        // If it would overflow bottom, flip above
+        if (top + menuHeight > vh - padding) {
+            top = triggerRect.top - 6 - menuHeight;
+        }
+        if (top < padding) top = padding;
+
+        menu.style.left = `${left}px`;
+        menu.style.top = `${top}px`;
+        menu.style.visibility = 'visible';
     } else {
         menu.style.display = 'none';
     }
@@ -1287,6 +1339,40 @@ document.addEventListener('click', function(event) {
         });
     }
 });
+
+// Reposition any open portaled menu on resize/scroll
+function ascomRepositionOpenActionMenus() {
+    const openMenus = document.querySelectorAll('.action-menu-dropdown.action-menu-portal');
+    openMenus.forEach(menu => {
+        if (menu.style.display !== 'block') return;
+
+        const triggerId = menu.dataset.triggerId;
+        const trigger = triggerId ? document.getElementById(triggerId) : null;
+        if (!trigger) return;
+
+        const triggerRect = trigger.getBoundingClientRect();
+        const menuWidth = menu.offsetWidth;
+        const menuHeight = menu.offsetHeight;
+
+        let top = triggerRect.bottom + 6;
+        let left = triggerRect.right - menuWidth;
+
+        const padding = 8;
+        const vw = window.innerWidth;
+        const vh = window.innerHeight;
+
+        if (left < padding) left = padding;
+        if (left + menuWidth > vw - padding) left = Math.max(padding, vw - padding - menuWidth);
+        if (top + menuHeight > vh - padding) top = triggerRect.top - 6 - menuHeight;
+        if (top < padding) top = padding;
+
+        menu.style.left = `${left}px`;
+        menu.style.top = `${top}px`;
+    });
+}
+
+window.addEventListener('resize', ascomRepositionOpenActionMenus);
+window.addEventListener('scroll', ascomRepositionOpenActionMenus, true);
 
 // Edit course from program courses page
 async function editCourseFromProgram(courseCode, courseId) {

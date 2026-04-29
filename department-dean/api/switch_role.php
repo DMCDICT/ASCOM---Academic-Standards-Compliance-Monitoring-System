@@ -59,20 +59,31 @@ try {
                 'department_color' => $user['color_code']
             ];
         }
-    } else {
-        // Check for librarian or quality_assurance roles (stored in user_roles table)
-        $stmt = $pdo->prepare("
-            SELECT u.id, u.password, u.first_name, u.last_name, u.middle_name, u.title,
-                   ur.role_name
-            FROM users u
-            JOIN user_roles ur ON u.id = ur.user_id
-            WHERE u.id = ? AND ur.role_name = ? AND ur.is_active = 1 AND u.is_active = 1
-        ");
-        $stmt->execute([$userId, $targetRole]);
-        $user = $stmt->fetch(PDO::FETCH_ASSOC);
-        
-        if ($user) {
-            $roleInfo = [
+	    } else {
+	        // Check for librarian or quality_assurance roles (stored in user_roles table)
+	        $roleSelect = ascom_table_has_column($pdo, 'user_roles', 'role_name') ? 'ur.role_name' : 'r.role_name';
+	        $roleJoin = ascom_table_has_column($pdo, 'user_roles', 'role_name')
+	            ? ''
+	            : 'JOIN roles r ON ur.role_id = r.id';
+
+	        $sql = "
+	            SELECT u.id, u.password, u.first_name, u.last_name, u.middle_name, u.title,
+	                   {$roleSelect} AS role_name
+	            FROM users u
+	            JOIN user_roles ur ON u.id = ur.user_id
+	            {$roleJoin}
+	            WHERE u.id = ?
+	              AND " . ascom_user_roles_role_predicate($pdo, 'ur', $targetRole) . "
+	              AND " . ascom_user_roles_active_predicate($pdo, 'ur') . "
+	              AND u.is_active = 1
+	        ";
+
+	        $stmt = $pdo->prepare($sql);
+	        $stmt->execute([$userId]);
+	        $user = $stmt->fetch(PDO::FETCH_ASSOC);
+	        
+	        if ($user) {
+	            $roleInfo = [
                 'type' => $targetRole,
                 'department_code' => 'QA',
                 'department_name' => $targetRole === 'quality_assurance' ? 'Quality Assurance' : 'Librarian',
