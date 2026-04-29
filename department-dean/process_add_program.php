@@ -89,11 +89,9 @@ if (!$deanDepartmentId && isset($_SESSION['selected_role']['department_code'])) 
         $deptStmt = $pdo->prepare($deptQuery);
         $deptStmt->execute([$deptCode]);
         $deptResult = $deptStmt->fetch(PDO::FETCH_ASSOC);
-if ($deptResult) {
+        if ($deptResult) {
             $deanDepartmentId = $deptResult['id'];
         }
-    }
-}
     } catch (Exception $e) {
         // Log error but continue
     }
@@ -296,18 +294,23 @@ if ($insertStmt->execute([$programCode, $programName, $major, $departmentColorCo
             $qaNotification['recipient_id']
         ]);
         
-        // Get all teachers/faculty in the same department
-        $teachersQuery = "
-            SELECT u.id, u.first_name, u.last_name, u.employee_no
-            FROM users u
-            INNER JOIN user_roles ur ON u.id = ur.user_id
-            WHERE ur.role_name = 'teacher' 
-            AND ur.is_active = 1
-            AND u.department_id = ?
-        ";
-        $teachersStmt = $pdo->prepare($teachersQuery);
-        $teachersStmt->execute([$deanDepartmentId]);
-        $teachers = $teachersStmt->fetchAll(PDO::FETCH_ASSOC);
+	        // Get all teachers/faculty in the same department
+	        $teachersQuery = "
+	            SELECT u.id, u.first_name, u.last_name, u.employee_no
+	            FROM users u
+	            WHERE EXISTS (
+	                SELECT 1
+	                FROM user_roles ur
+	                WHERE ur.user_id = u.id
+	                  AND " . ascom_user_roles_role_predicate($pdo, 'ur', 'teacher') . "
+	                  AND " . ascom_user_roles_active_predicate($pdo, 'ur') . "
+	            )
+	            AND u.department_id = ?
+	            AND u.is_active = 1
+	        ";
+	        $teachersStmt = $pdo->prepare($teachersQuery);
+	        $teachersStmt->execute([$deanDepartmentId]);
+	        $teachers = $teachersStmt->fetchAll(PDO::FETCH_ASSOC);
         
         // Send notification to each teacher
         foreach ($teachers as $teacher) {

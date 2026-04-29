@@ -199,22 +199,26 @@ try {
             $totalCourses = $uniqueCoursesStmt->fetchColumn();
         }
         
-        // Fetch total faculty count for this department (not filtered by academic term)
-        // Faculty members remain the same across all academic terms
-        try {
-            $facultyQuery = "
-                SELECT COUNT(DISTINCT u.id) AS total_faculty 
-                FROM users u 
-                JOIN user_roles ur ON u.id = ur.user_id 
-                JOIN departments d ON u.department_id = d.id 
-                WHERE ur.role_name = 'teacher' 
-                AND d.department_code = ? 
-                AND ur.is_active = 1 
-                AND u.is_active = 1
-            ";
-            $stmt = $pdo->prepare($facultyQuery);
-            $stmt->execute([$deanDepartmentCode]);
-            $facultyResult = $stmt->fetch(PDO::FETCH_ASSOC);
+	        // Fetch total faculty count for this department (not filtered by academic term)
+	        // Faculty members remain the same across all academic terms
+	        try {
+	            $facultyQuery = "
+	                SELECT COUNT(DISTINCT u.id) AS total_faculty 
+	                FROM users u 
+	                JOIN departments d ON u.department_id = d.id 
+	                WHERE EXISTS (
+	                    SELECT 1
+	                    FROM user_roles ur
+	                    WHERE ur.user_id = u.id
+	                      AND " . ascom_user_roles_role_predicate($pdo, 'ur', 'teacher') . "
+	                      AND " . ascom_user_roles_active_predicate($pdo, 'ur') . "
+	                )
+	                AND d.department_code = ? 
+	                AND u.is_active = 1
+	            ";
+	            $stmt = $pdo->prepare($facultyQuery);
+	            $stmt->execute([$deanDepartmentCode]);
+	            $facultyResult = $stmt->fetch(PDO::FETCH_ASSOC);
             $totalFaculty = $facultyResult['total_faculty'];
         } catch (Exception $e) {
             $totalFaculty = 0;

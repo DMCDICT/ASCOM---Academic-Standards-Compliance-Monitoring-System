@@ -88,3 +88,61 @@ function ascom_get_pdo(): PDO
 
     return $pdo;
 }
+
+function ascom_table_has_column(PDO $pdo, string $tableName, string $columnName): bool
+{
+    static $cache = [];
+
+    $cacheKey = strtolower($tableName . '.' . $columnName);
+    if (array_key_exists($cacheKey, $cache)) {
+        return $cache[$cacheKey];
+    }
+
+    $sql = "
+        SELECT 1
+        FROM information_schema.COLUMNS
+        WHERE TABLE_SCHEMA = DATABASE()
+          AND TABLE_NAME = :table_name
+          AND COLUMN_NAME = :column_name
+        LIMIT 1
+    ";
+
+    try {
+        $stmt = $pdo->prepare($sql);
+        $stmt->execute([
+            ':table_name' => $tableName,
+            ':column_name' => $columnName,
+        ]);
+        $cache[$cacheKey] = (bool) $stmt->fetchColumn();
+    } catch (Throwable $e) {
+        // If information_schema is unavailable for any reason, assume "no" to keep queries conservative.
+        $cache[$cacheKey] = false;
+    }
+
+    return $cache[$cacheKey];
+}
+
+function ascom_user_roles_role_predicate(PDO $pdo, string $userRolesAlias, string $roleName): string
+{
+    // Supports both schemas:
+    // - user_roles.role_name (legacy)
+    // - user_roles.role_id referencing roles.id (normalized)
+    if (ascom_table_has_column($pdo, 'user_roles', 'role_name')) {
+        return "{$userRolesAlias}.role_name = " . $pdo->quote($roleName);
+    }
+
+    if (ascom_table_has_column($pdo, 'user_roles', 'role_id') && ascom_table_has_column($pdo, 'roles', 'role_name')) {
+        return "{$userRolesAlias}.role_id = (SELECT id FROM roles WHERE role_name = " . $pdo->quote($roleName) . " LIMIT 1)";
+    }
+
+    // Fallback: can't reliably filter by role.
+    return '1=1';
+}
+
+function ascom_user_roles_active_predicate(PDO $pdo, string $userRolesAlias): string
+{
+    if (ascom_table_has_column($pdo, 'user_roles', 'is_active')) {
+        return "{$userRolesAlias}.is_active = 1";
+    }
+    return '1=1';
+}

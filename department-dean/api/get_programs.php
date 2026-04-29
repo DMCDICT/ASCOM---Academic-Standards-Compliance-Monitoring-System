@@ -28,21 +28,26 @@ try {
     
     if (!$deanDepartmentCode) {
         // Try alternative ways to get department code
-        $deanDepartmentCode = $_SESSION['dean_department_code'] ?? null;
-        if (!$deanDepartmentCode && isset($_SESSION['user_id'])) {
-            // Try to get from user_roles table
-            $userRoleQuery = "
-                SELECT d.department_code 
-                FROM user_roles ur 
-                JOIN departments d ON ur.department_id = d.id 
-                WHERE ur.user_id = ? AND ur.role_name = 'dean' AND ur.is_active = 1
-            ";
-            $userRoleStmt = $pdo->prepare($userRoleQuery);
-            $userRoleStmt->execute([$_SESSION['user_id']]);
-            $roleResult = $userRoleStmt->fetch(PDO::FETCH_ASSOC);
-            $deanDepartmentCode = $roleResult['department_code'] ?? null;
-        }
-    }
+	        $deanDepartmentCode = $_SESSION['dean_department_code'] ?? null;
+	        if (!$deanDepartmentCode && isset($_SESSION['user_id'])) {
+	            // Try to get from user_roles table (only if it supports department scoping)
+	            if (ascom_table_has_column($pdo, 'user_roles', 'department_id')) {
+	                $userRoleQuery = "
+	                    SELECT d.department_code
+	                    FROM user_roles ur
+	                    JOIN departments d ON ur.department_id = d.id
+	                    WHERE ur.user_id = ?
+	                      AND " . ascom_user_roles_role_predicate($pdo, 'ur', 'dean') . "
+	                      AND " . ascom_user_roles_active_predicate($pdo, 'ur') . "
+	                    LIMIT 1
+	                ";
+	                $userRoleStmt = $pdo->prepare($userRoleQuery);
+	                $userRoleStmt->execute([$_SESSION['user_id']]);
+	                $roleResult = $userRoleStmt->fetch(PDO::FETCH_ASSOC);
+	                $deanDepartmentCode = $roleResult['department_code'] ?? null;
+	            }
+	        }
+	    }
     
     if ($deanDepartmentCode) {
         // Query programs by joining with departments table using department_code
@@ -71,15 +76,16 @@ try {
                     ORDER BY p.program_name ASC
                 ");
                 $stmt->execute([$deanDepartmentCode]);
-            } else {
-                // Still no department found
-                    'selected_role' => $_SESSION['selected_role'] ?? 'NOT_SET',
-                    'user_id' => $_SESSION['user_id'] ?? 'NOT_SET'
-                ]));
-                echo json_encode([
-                    'success' => false,
-                    'message' => 'No department assigned',
-                    'programs' => []
+	            } else {
+	                // Still no department found
+	                error_log('No department assigned: ' . print_r([
+	                    'selected_role' => $_SESSION['selected_role'] ?? 'NOT_SET',
+	                    'user_id' => $_SESSION['user_id'] ?? 'NOT_SET',
+	                ], true));
+	                echo json_encode([
+	                    'success' => false,
+	                    'message' => 'No department assigned',
+	                    'programs' => []
                 ]);
                 exit;
             }
@@ -108,4 +114,3 @@ try {
     ]);
 }
 ?>
-
