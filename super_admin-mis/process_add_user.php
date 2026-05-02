@@ -57,6 +57,26 @@ $conn = ascom_get_mysqli();
         $response['message'] = 'Department is required for Dean and Teacher roles.';
     }
 
+    $resolvedRoleName = '';
+    if ($response['message'] == '') {
+        $roleLookup = $conn->prepare("SELECT role_name FROM roles WHERE id = ? LIMIT 1");
+        if ($roleLookup) {
+            $roleLookup->bind_param("i", $roleIdInt);
+            $roleLookup->execute();
+            $roleResult = $roleLookup->get_result();
+            $resolvedRoleName = strtolower(trim($roleResult->fetch_assoc()['role_name'] ?? ''));
+            $roleLookup->close();
+
+            if ($resolvedRoleName === '') {
+                $response['message'] = 'Invalid role selected.';
+            } elseif (in_array($resolvedRoleName, ['program_head', 'program-head'], true)) {
+                $response['message'] = 'Program head must be assigned from the department dean portal.';
+            }
+        } else {
+            $response['message'] = 'Database error: ' . $conn->error;
+        }
+    }
+
     // Check duplicates
     if ($response['message'] == '') {
         $stmt_check = $conn->prepare("SELECT id FROM users WHERE employee_no = ? OR email = ?");
@@ -78,11 +98,15 @@ $conn = ascom_get_mysqli();
         $username = explode('@', $institutional_email)[0];
         
         $role_name = 'teacher';
-        if ($role_id == '1') $role_name = 'super_admin';
-        elseif ($role_id == '2') $role_name = 'dean';
-        elseif ($role_id == '3') $role_name = 'teacher';
-        elseif ($role_id == '4') $role_name = 'qa';
-        elseif ($role_id == '5') $role_name = 'librarian';
+        if ($resolvedRoleName !== '') {
+            $role_name = $resolvedRoleName;
+        } else {
+            if ($role_id == '1') $role_name = 'super_admin';
+            elseif ($role_id == '2') $role_name = 'dean';
+            elseif ($role_id == '3') $role_name = 'teacher';
+            elseif ($role_id == '4') $role_name = 'qa';
+            elseif ($role_id == '5') $role_name = 'librarian';
+        }
 
         $stmt_insert = $conn->prepare("
             INSERT INTO users 

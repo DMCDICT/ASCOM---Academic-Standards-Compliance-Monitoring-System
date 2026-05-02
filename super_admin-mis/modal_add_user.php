@@ -12,6 +12,14 @@ if (!isset($conn) || $conn->connect_error) {
 global $conn;
 $departments = $departments ?? [];
 $roles = [];
+$roleLabels = [
+    'super_admin' => 'Super Admin',
+    'dean' => 'Department Dean',
+    'teacher' => 'Teacher',
+    'qa' => 'Quality Assurance',
+    'quality_assurance' => 'Quality Assurance',
+    'librarian' => 'Librarian',
+];
 if (isset($conn) && $conn instanceof mysqli && !$conn->connect_error) {
     // Fetch departments
     $departmentsQuery = "SELECT id, department_code FROM departments ORDER BY department_code ASC";
@@ -24,7 +32,7 @@ if (isset($conn) && $conn instanceof mysqli && !$conn->connect_error) {
     } else {
     }
     // Fetch roles
-    $rolesQuery = "SELECT id, role_name as role FROM roles ORDER BY id ASC";
+    $rolesQuery = "SELECT id, role_name as role FROM roles WHERE LOWER(role_name) NOT IN ('program_head', 'program-head') ORDER BY FIELD(role_name, 'super_admin', 'dean', 'teacher', 'qa', 'quality_assurance', 'librarian'), role_name ASC";
     $rolesResult = $conn->query($rolesQuery);
     if ($rolesResult) {
         while ($row = $rolesResult->fetch_assoc()) {
@@ -37,66 +45,79 @@ if (isset($conn) && $conn instanceof mysqli && !$conn->connect_error) {
 ?>
 
 <!-- Add User Modal -->
-<div id="addUserModal" class="modal-overlay" style="display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background-color: rgba(0, 0, 0, 0.5); z-index: 9999;" data-modal-state="hidden">
-  <div class="modal-box" style="background-color: #EFEFEF; padding: 25px; border: 1px solid #888; border-radius: 15px; width: 90%; max-width: 650px; box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3); animation: fadeIn 0.3s; max-height: 98vh; overflow-y: auto; margin: 20px auto;">
-    <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #e5e5e5; padding-bottom: 15px; margin-bottom: 20px;">
-      <h2 style="margin: 0; font-size: 22px; font-weight: 700; color: #333;">Add New User</h2>
-      <span onclick="closeAddUserModal()" style="color: #aaa; font-size: 28px; font-weight: 700; cursor: pointer; transition: color 0.2s;">&times;</span>
+<div id="addUserModal" class="modal-overlay" style="display: none;" data-modal-state="hidden">
+  <div class="modal-box add-user-modal-shell">
+    <!-- Modal Header -->
+    <div class="add-user-modal-hero">
+      <div class="add-user-modal-hero-left">
+        <div class="add-user-modal-icon" aria-hidden="true">
+          <i data-lucide="user-plus"></i>
+        </div>
+        <div>
+          <h2 class="add-user-modal-title">Add New User</h2>
+          <p class="add-user-modal-subtitle">Create an account and assign the correct access level.</p>
+        </div>
+      </div>
+      <button type="button" class="add-user-close" onclick="closeAddUserModal()" aria-label="Close modal">
+        <i data-lucide="x"></i>
+      </button>
     </div>
-    
-    <form id="addUserForm" style="display: flex; flex-direction: column; gap: 15px;">
-      <!-- Row 1: Role (FIRST!) & Employee No. -->
-      <div style="display: flex; gap: 20px;">
-        <div style="flex: 1;">
-          <label style="font-size: 14px; font-weight: bold; margin-bottom: 6px; display: block;">Role <span style="color: #dc3545;">*</span></label>
-          <select name="role_id" id="add_role_id" required onchange="handleRoleChange()" style="width: 100%; height: 50px; padding: 0 12px; border: 1px solid #ccc; border-radius: 12px; box-sizing: border-box; background-color: #FFFFFF;">
-            <option value="">-- Select Role --</option>
+
+    <!-- Info Note -->
+    <div class="add-user-modal-note">
+      <i data-lucide="info" aria-hidden="true"></i>
+      Program head assignments are managed by department deans.
+    </div>
+
+    <!-- Form -->
+    <form id="addUserForm" class="add-user-form">
+      <!-- Section 1: Account Details -->
+      <div class="section-header">
+        <div class="label-bar"></div>
+        <div>
+          <h3>Account Details</h3>
+          <p>Select role and enter employee information.</p>
+        </div>
+      </div>
+      <div class="add-user-grid">
+        <div class="form-group">
+          <label for="add_role_id">Role <span class="required">*</span></label>
+          <select name="role_id" id="add_role_id" required onchange="handleRoleChange()">
+            <option value="">Select a role</option>
             <?php foreach ($roles as $id => $role): ?>
-              <option value="<?php echo htmlspecialchars($id); ?>"><?php echo htmlspecialchars(ucfirst($role)); ?></option>
+              <option value="<?php echo htmlspecialchars($id); ?>"><?php echo htmlspecialchars($roleLabels[$role] ?? ucwords(str_replace('_', ' ', $role))); ?></option>
             <?php endforeach; ?>
           </select>
         </div>
-        <div style="flex: 1;">
-          <label style="font-size: 14px; font-weight: bold; margin-bottom: 6px; display: block;">Employee No. <span style="color: #dc3545;">*</span></label>
-          <input type="text" name="employee_no" id="add_employee_no" required maxlength="6" placeholder="6-digit number" autocomplete="off" inputmode="numeric" onkeypress="return event.charCode >= 48 && event.charCode <= 57" oninput="this.value = this.value.replace(/[^0-9]/g, '').slice(0, 6)" style="width: 100%; height: 50px; padding: 0 12px; border: 1px solid #ccc; border-radius: 12px; box-sizing: border-box; background-color: #FFFFFF;">
+        <div class="form-group">
+          <label for="add_employee_no">Employee No. <span class="required">*</span></label>
+          <input type="text" name="employee_no" id="add_employee_no" required maxlength="6" placeholder="6-digit number" autocomplete="off" inputmode="numeric" onkeypress="return event.charCode >= 48 && event.charCode <= 57" oninput="this.value = this.value.replace(/[^0-9]/g, '').slice(0, 6)">
         </div>
       </div>
-      
-      <!-- Row 2: Department & First Name -->
-      <div style="display: flex; gap: 20px;">
-        <div style="flex: 1;">
-          <label id="add_department_label" style="font-size: 14px; font-weight: bold; margin-bottom: 6px; display: block;">Department</label>
-          <select name="department_id" id="add_department_id" style="width: 100%; height: 50px; padding: 0 12px; border: 1px solid #ccc; border-radius: 12px; box-sizing: border-box; background-color: #FFFFFF;">
-            <option value="">-- Select Department --</option>
+
+      <!-- Section 2: Personal Information -->
+      <div class="section-header">
+        <div class="label-bar"></div>
+        <div>
+          <h3>Personal Information</h3>
+          <p>Enter the user's name and department.</p>
+        </div>
+      </div>
+      <div class="add-user-grid add-user-grid-wide">
+        <div class="form-group">
+          <label id="add_department_label" for="add_department_id">Department</label>
+          <select name="department_id" id="add_department_id">
+            <option value="">Select department</option>
             <?php foreach ($departments as $id => $code): ?>
               <option value="<?php echo htmlspecialchars($id); ?>"><?php echo htmlspecialchars($code); ?></option>
             <?php endforeach; ?>
           </select>
+          <div id="add_department_help" class="field-help">Required for dean and teacher roles.</div>
         </div>
-        <div style="flex: 2.5;">
-          <label style="font-size: 14px; font-weight: bold; margin-bottom: 6px; display: block;">First Name <span style="color: #dc3545;">*</span></label>
-          <input type="text" name="first_name" id="add_first_name" required style="width: 100%; height: 50px; padding: 0 12px; border: 1px solid #ccc; border-radius: 12px; box-sizing: border-box; background-color: #FFFFFF;">
-        </div>
-      </div>
-      
-      <!-- Row 3: Middle Name & Last Name -->
-      <div style="display: flex; gap: 20px;">
-        <div style="flex: 1.2;">
-          <label style="font-size: 14px; font-weight: bold; margin-bottom: 6px; display: block;">Middle Name</label>
-          <input type="text" name="middle_name" id="add_middle_name" style="width: 100%; height: 50px; padding: 0 12px; border: 1px solid #ccc; border-radius: 12px; box-sizing: border-box; background-color: #FFFFFF;">
-        </div>
-        <div style="flex: 2.5;">
-          <label style="font-size: 14px; font-weight: bold; margin-bottom: 6px; display: block;">Last Name <span style="color: #dc3545;">*</span></label>
-          <input type="text" name="last_name" id="add_last_name" required style="width: 100%; height: 50px; padding: 0 12px; border: 1px solid #ccc; border-radius: 12px; box-sizing: border-box; background-color: #FFFFFF;">
-        </div>
-      </div>
-      
-      <!-- Row 4: Title & Institutional Email -->
-      <div style="display: flex; gap: 20px;">
-        <div style="flex: 1.2;">
-          <label style="font-size: 14px; font-weight: bold; margin-bottom: 6px; display: block;">Title</label>
-          <select name="title" id="add_title" style="width: 100%; height: 50px; padding: 0 12px; border: 1px solid #ccc; border-radius: 12px; box-sizing: border-box; background-color: #FFFFFF;">
-            <option value="">--</option>
+        <div class="form-group">
+          <label for="add_title">Title</label>
+          <select name="title" id="add_title">
+            <option value="">No title</option>
             <option>Mr.</option>
             <option>Mrs.</option>
             <option>Ms.</option>
@@ -104,66 +125,81 @@ if (isset($conn) && $conn instanceof mysqli && !$conn->connect_error) {
             <option>Prof.</option>
           </select>
         </div>
-        <div style="flex: 2.5;">
-          <label style="font-size: 14px; font-weight: bold; margin-bottom: 6px; display: block;">
-            Institutional Email <span style="color: #dc3545;">*</span>
-            <span style="color: #666; font-size: 12px;">@sccpag.edu.ph</span>
-          </label>
-          <div style="position: relative;">
-            <input type="email" name="institutional_email" id="add_institutional_email" required placeholder="username@sccpag.edu.ph" style="width: 100%; height: 50px; padding: 0 12px; border: 1px solid #ccc; border-radius: 12px; box-sizing: border-box; background-color: #FFFFFF;">
-            <button type="button" id="clear_add_email_btn" title="Clear field" style="position: absolute; right: 10px; top: 50%; transform: translateY(-50%); background: none; border: none; cursor: pointer; color: #999;">✕</button>
+        <div class="form-group">
+          <label for="add_first_name">First Name <span class="required">*</span></label>
+          <input type="text" name="first_name" id="add_first_name" required placeholder="e.g. Juan" autocomplete="off">
+        </div>
+        <div class="form-group">
+          <label for="add_middle_name">Middle Name</label>
+          <input type="text" name="middle_name" id="add_middle_name" placeholder="e.g. Santos" autocomplete="off">
+        </div>
+        <div class="form-group">
+          <label for="add_last_name">Last Name <span class="required">*</span></label>
+          <input type="text" name="last_name" id="add_last_name" required placeholder="e.g. Dela Cruz" autocomplete="off">
+        </div>
+      </div>
+
+      <!-- Section 3: Contact Details -->
+      <div class="section-header">
+        <div class="label-bar"></div>
+        <div>
+          <h3>Contact Details</h3>
+          <p>Institutional email and mobile number.</p>
+        </div>
+      </div>
+      <div class="add-user-grid add-user-grid-wide">
+        <div class="form-group add-user-email-group">
+          <label for="add_institutional_email">Institutional Email <span class="required">*</span></label>
+          <div class="input-with-clear">
+            <input type="email" name="institutional_email" id="add_institutional_email" required placeholder="username@sccpag.edu.ph">
+            <button type="button" id="clear_add_email_btn" class="clear-btn" title="Clear field" aria-label="Clear email">
+              <i data-lucide="x"></i>
+            </button>
+          </div>
+          <div class="field-help">@sccpag.edu.ph will be used for this account.</div>
+        </div>
+        <div class="form-group">
+          <label for="add_mobile_no">Mobile Number</label>
+          <input type="text" name="mobile_no" id="add_mobile_no" maxlength="11" placeholder="e.g. 09123456789">
+        </div>
+      </div>
+
+      <!-- Section 4: Account Security -->
+      <div class="section-header">
+        <div class="label-bar"></div>
+        <div>
+          <h3>Account Security</h3>
+          <p>Set password for this account.</p>
+        </div>
+      </div>
+      <div class="add-user-grid password-row">
+        <div class="form-group password-group">
+          <label for="add_password">Password <span class="required">*</span></label>
+          <div class="input-with-toggle">
+            <input type="password" name="password" id="add_password" autocomplete="new-password" minlength="8" required placeholder="Minimum 8 characters">
+            <button type="button" class="toggle-password" data-target="add_password" aria-label="Show or hide password">
+              <i data-lucide="eye"></i>
+            </button>
+          </div>
+        </div>
+        <div class="form-group password-group">
+          <label for="add_confirm_password">Confirm Password <span class="required">*</span></label>
+          <div class="input-with-toggle">
+            <input type="password" name="confirm_password" id="add_confirm_password" autocomplete="new-password" required placeholder="Re-enter password">
+            <button type="button" class="toggle-password" data-target="add_confirm_password" aria-label="Show or hide password">
+              <i data-lucide="eye"></i>
+            </button>
           </div>
         </div>
       </div>
-      
-      <!-- Row 5: Mobile Number & Password -->
-      <div style="display: flex; gap: 20px;">
-        <div style="flex: 1;">
-          <label style="font-size: 14px; font-weight: bold; margin-bottom: 6px; display: block;">Mobile Number</label>
-          <input type="text" name="mobile_no" id="add_mobile_no" maxlength="11" placeholder="e.g., 09123456789" style="width: 100%; height: 50px; padding: 0 12px; border: 1px solid #ccc; border-radius: 12px; box-sizing: border-box; background-color: #FFFFFF;">
-        </div>
-        <div style="flex: 1;">
-          <label style="font-size: 14px; font-weight: bold; margin-bottom: 6px; display: block;">Password <span style="color: #dc3545;">*</span> <span style="color: #666; font-size: 11px;">(min 8 chars)</span></label>
-          <div style="position: relative;">
-            <input type="password" name="password" id="add_password" autocomplete="new-password" minlength="8" required style="width: 100%; height: 50px; padding: 0 12px; border: 1px solid #ccc; border-radius: 12px; box-sizing: border-box; background-color: #FFFFFF;">
-            <img src="../src/assets/icons/show_password.png" class="toggle-password" data-target="add_password" alt="Show/Hide Password" style="position: absolute; right: 12px; top: 25px; transform: translateY(-50%); cursor: pointer; width: 24px; height: 24px; filter: invert(0%) sepia(0%) saturate(0%) hue-rotate(0deg) brightness(0%) contrast(100%) !important;">
-          </div>
-        </div>
-      </div>
-      
-      <!-- Row 6: Confirm Password -->
-      <div>
-        <label style="font-size: 14px; font-weight: bold; margin-bottom: 6px; display: block;">Confirm Password <span style="color: #dc3545;">*</span></label>
-        <div style="position: relative;">
-          <input type="password" name="confirm_password" id="add_confirm_password" autocomplete="new-password" required style="width: 100%; height: 50px; padding: 0 12px; border: 1px solid #ccc; border-radius: 12px; box-sizing: border-box; background-color: #FFFFFF;">
-          <img src="../src/assets/icons/show_password.png" class="toggle-password" data-target="add_confirm_password" alt="Show/Hide Password" style="position: absolute; right: 12px; top: 25px; transform: translateY(-50%); cursor: pointer; width: 24px; height: 24px; filter: invert(0%) sepia(0%) saturate(0%) hue-rotate(0deg) brightness(0%) contrast(100%) !important;">
-        </div>
-      </div>
-      
-      <!-- Row 6: Password & Confirm Password -->
-      <div style="display: flex; gap: 20px;">
-        <div style="flex: 1;">
-          <label style="font-size: 14px; font-weight: bold; margin-bottom: 6px; display: block;">Password <span style="color: #dc3545;">*</span> <span style="color: #666; font-size: 11px;">(min 8 chars)</span></label>
-          <div style="position: relative;">
-            <input type="password" name="password" id="add_password" autocomplete="new-password" minlength="8" required style="width: 100%; height: 50px; padding: 0 12px; border: 1px solid #ccc; border-radius: 12px; box-sizing: border-box; background-color: #FFFFFF;">
-            <img src="../src/assets/icons/show_password.png" class="toggle-password" data-target="add_password" alt="Show/Hide Password" style="position: absolute; right: 12px; top: 25px; transform: translateY(-50%); cursor: pointer; width: 24px; height: 24px; filter: invert(0%) sepia(0%) saturate(0%) hue-rotate(0deg) brightness(0%) contrast(100%) !important;">
-          </div>
-        </div>
-        <div style="flex: 1;">
-          <label style="font-size: 14px; font-weight: bold; margin-bottom: 6px; display: block;">Confirm Password <span style="color: #dc3545;">*</span></label>
-          <div style="position: relative;">
-            <input type="password" name="confirm_password" id="add_confirm_password" autocomplete="new-password" required style="width: 100%; height: 50px; padding: 0 12px; border: 1px solid #ccc; border-radius: 12px; box-sizing: border-box; background-color: #FFFFFF;">
-            <img src="../src/assets/icons/show_password.png" class="toggle-password" data-target="add_confirm_password" alt="Show/Hide Password" style="position: absolute; right: 12px; top: 25px; transform: translateY(-50%); cursor: pointer; width: 24px; height: 24px; filter: invert(0%) sepia(0%) saturate(0%) hue-rotate(0deg) brightness(0%) contrast(100%) !important;">
-          </div>
-        </div>
-      </div>
-      
-      <!-- Validation Messages -->
-      <div id="addUserValidationMsg" style="display: none; padding: 10px; border-radius: 8px; font-size: 14px;"></div>
-      
-      <div style="display: flex; justify-content: flex-end; gap: 10px; margin-top: 10px;">
-        <button type="button" onclick="closeAddUserModal()" style="width: 125px; height: 50px; background-color: #C9C9C9; color: black; border: none; border-radius: 10px; cursor: pointer; font-size: 14px; font-weight: bold; text-transform: uppercase;">CANCEL</button>
-        <button type="submit" id="add_create_btn" style="width: 125px; height: 50px; background-color: #28a745; color: white; border: none; border-radius: 10px; cursor: pointer; font-size: 14px; font-weight: bold; text-transform: uppercase;">CREATE</button>
+
+      <!-- Validation Message -->
+      <div id="addUserValidationMsg" class="validation-msg" style="display: none;"></div>
+
+      <!-- Actions -->
+      <div class="add-user-actions">
+        <button type="button" class="cancel-btn" onclick="closeAddUserModal()">Cancel</button>
+        <button type="submit" id="add_create_btn" class="create-btn" disabled>Create</button>
       </div>
     </form>
   </div>
@@ -250,6 +286,7 @@ function handleRoleChange() {
     const roleSelect = document.getElementById('add_role_id');
     const departmentSelect = document.getElementById('add_department_id');
     const departmentLabel = document.getElementById('add_department_label');
+    const departmentHelp = document.getElementById('add_department_help');
     
     const selectedRole = roleSelect.value;
     
@@ -263,14 +300,23 @@ function handleRoleChange() {
         // Department is required for Dean and Teacher
         departmentLabel.innerHTML = 'Department <span style="color: #dc3545;">*</span>';
         departmentSelect.setAttribute('required', 'required');
+        if (departmentHelp) {
+            departmentHelp.textContent = 'Required for dean and teacher roles.';
+        }
     } else if (departmentOptionalRoles.includes(selectedRole)) {
         // Department is optional for Librarian and QA
         departmentLabel.innerHTML = 'Department <span style="color: #666; font-size: 12px;">(optional)</span>';
         departmentSelect.removeAttribute('required');
+        if (departmentHelp) {
+            departmentHelp.textContent = 'Optional for QA and librarian roles.';
+        }
     } else {
         // No role selected yet
         departmentLabel.innerHTML = 'Department';
         departmentSelect.removeAttribute('required');
+        if (departmentHelp) {
+            departmentHelp.textContent = 'Required for dean and teacher roles.';
+        }
     }
 }
 
@@ -293,4 +339,3 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 });
 </script>
-
