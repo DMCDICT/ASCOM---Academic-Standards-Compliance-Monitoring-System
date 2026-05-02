@@ -51,13 +51,22 @@
                     </svg>
                     <input type="text" id="teacherSearchInput" placeholder="Search by name, employee number, or title..." 
                            style="border: none; outline: none; flex: 1; font-size: 14px; background: transparent; padding: 0 10px; font-family: 'TT Interphases', sans-serif;"
-                           oninput="filterTeachers(this.value)">
+                           oninput="onTeacherSearchInput(this.value)">
                     <button type="button" onclick="clearTeacherSearch()" style="background: none; border: none; color: rgba(17, 24, 39, 0.4); cursor: pointer; padding: 4px; display: none;" id="clearSearchBtn">
                         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                             <line x1="18" y1="6" x2="6" y2="18"></line>
                             <line x1="6" y1="6" x2="18" y2="18"></line>
                         </svg>
                     </button>
+                </div>
+            </div>
+
+            <!-- Toolbar -->
+            <div class="teacher-toolbar" aria-live="polite">
+                <div class="teacher-count" id="teacherCount">—</div>
+                <div class="teacher-filters" role="tablist" aria-label="Faculty filters">
+                    <button type="button" class="filter-chip active" data-filter="all" onclick="setTeacherFilter('all')" role="tab" aria-selected="true">All</button>
+                    <button type="button" class="filter-chip" data-filter="program_head" onclick="setTeacherFilter('program_head')" role="tab" aria-selected="false">Program Heads</button>
                 </div>
             </div>
 
@@ -90,7 +99,7 @@
                         <circle cx="11" cy="11" r="8"></circle>
                         <path d="m21 21-4.35-4.35"></path>
                     </svg>
-                    <p style="margin: 0;">No teachers match your search</p>
+                    <p style="margin: 0;" id="teachersNoResultsMessage">No teachers match your search</p>
                 </div>
 
                 <!-- Teachers List -->
@@ -221,6 +230,65 @@
         margin: 0;
         font-weight: 600;
         font-family: 'TT Interphases', sans-serif;
+    }
+
+    .teacher-toolbar {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        margin-bottom: 12px;
+        padding: 8px 10px;
+        background: rgba(12, 75, 52, 0.04);
+        border: 1px solid rgba(12, 75, 52, 0.1);
+        border-radius: 12px;
+    }
+
+    .teacher-count {
+        font-size: 12px;
+        font-weight: 800;
+        color: rgba(17, 24, 39, 0.6);
+        letter-spacing: 0.2px;
+        font-family: 'TT Interphases', sans-serif;
+        white-space: nowrap;
+    }
+
+    .teacher-filters {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        flex-wrap: wrap;
+        justify-content: flex-end;
+    }
+
+    .filter-chip {
+        border: 1px solid rgba(12, 75, 52, 0.16);
+        background: rgba(12, 75, 52, 0.06);
+        color: #0C4B34;
+        padding: 8px 10px;
+        border-radius: 999px;
+        font-size: 12px;
+        font-weight: 800;
+        letter-spacing: 0.2px;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        font-family: 'TT Interphases', sans-serif;
+    }
+
+    .filter-chip:hover {
+        background: rgba(12, 75, 52, 0.1);
+        transform: translateY(-1px);
+    }
+
+    .filter-chip.active {
+        background: linear-gradient(135deg, rgba(12, 75, 52, 0.14) 0%, rgba(15, 122, 83, 0.14) 100%);
+        border-color: rgba(12, 75, 52, 0.28);
+        box-shadow: 0 10px 22px rgba(12, 75, 52, 0.12);
+    }
+
+    .filter-chip:focus-visible {
+        outline: 2px solid rgba(12, 75, 52, 0.45);
+        outline-offset: 2px;
     }
 
     .btn-cancel {
@@ -492,6 +560,27 @@
         border-color: #333;
     }
 
+    html[data-theme="dark"] .teacher-toolbar {
+        background: rgba(129, 199, 132, 0.08);
+        border-color: #333;
+    }
+
+    html[data-theme="dark"] .teacher-count {
+        color: rgba(224, 224, 224, 0.75);
+    }
+
+    html[data-theme="dark"] .filter-chip {
+        background: rgba(129, 199, 132, 0.12);
+        border-color: #333;
+        color: #81C784;
+    }
+
+    html[data-theme="dark"] .filter-chip.active {
+        background: rgba(129, 199, 132, 0.18);
+        border-color: rgba(129, 199, 132, 0.35);
+        box-shadow: 0 10px 22px rgba(0, 0, 0, 0.35);
+    }
+
     /* Scrollbar Styles */
     #teachersList::-webkit-scrollbar {
         width: 6px;
@@ -533,6 +622,9 @@
     let departmentTeachers = [];
     let selectedTeacherId = null;
     let currentAssignedTeacher = null;
+    let currentTeacherFilter = 'all';
+    let teacherSearchDebounce = null;
+    let assignFacultyKeyHandler = null;
 
     // Open the assign faculty modal
     function assignFaculty(courseCode, courseId, courseTitle, courseInfo) {
@@ -553,6 +645,7 @@
         // Reset search
         document.getElementById('teacherSearchInput').value = '';
         document.getElementById('clearSearchBtn').style.display = 'none';
+        setTeacherFilter('all', { silent: true });
 
         // Reset selection
         updateAssignButtonState();
@@ -561,6 +654,14 @@
         const modal = document.getElementById('assignFacultyModal');
         modal.style.display = 'flex';
         document.body.style.overflow = 'hidden';
+
+        // Focus search for faster assignment flow
+        setTimeout(() => {
+            const input = document.getElementById('teacherSearchInput');
+            if (input) input.focus();
+        }, 50);
+
+        attachAssignFacultyModalKeybinds();
 
         // Load teachers
         loadTeachersForAssignment();
@@ -579,6 +680,8 @@
         currentCourseInfo = null;
         selectedTeacherId = null;
         currentAssignedTeacher = null;
+        currentTeacherFilter = 'all';
+        detachAssignFacultyModalKeybinds();
     }
 
     // Load teachers for assignment
@@ -609,6 +712,7 @@
                     departmentTeachers = data.teachers || [];
                     
                     if (departmentTeachers.length === 0) {
+                        updateTeacherCount(0, 0);
                         document.getElementById('teachersEmptyState').style.display = 'block';
                     } else {
                         // Check if course already has an assigned teacher
@@ -635,7 +739,7 @@
     // Check current assignment for this course
     function checkCurrentAssignment() {
         if (!currentCourseId) {
-            renderTeachersList(departmentTeachers);
+            applyTeacherFiltersAndRender();
             return;
         }
 
@@ -675,21 +779,90 @@
                 }
                 
                 // Render teachers list (excluding already assigned)
-                renderTeachersList(departmentTeachers);
+                applyTeacherFiltersAndRender();
             })
             .catch(error => {
                 console.error('Error checking assignment:', error);
-                renderTeachersList(departmentTeachers);
+                applyTeacherFiltersAndRender();
             });
+    }
+
+    function updateTeacherCount(visibleCount, totalCount) {
+        const el = document.getElementById('teacherCount');
+        if (!el) return;
+
+        if (totalCount === 0) {
+            el.textContent = '0 faculty';
+            return;
+        }
+        if (visibleCount === totalCount) {
+            el.textContent = `${totalCount} faculty`;
+            return;
+        }
+        el.textContent = `${visibleCount} of ${totalCount} faculty`;
+    }
+
+    function setTeacherFilter(filterValue, opts = {}) {
+        currentTeacherFilter = filterValue || 'all';
+
+        const chips = document.querySelectorAll('.filter-chip');
+        chips.forEach(chip => {
+            const isActive = chip.dataset.filter === currentTeacherFilter;
+            chip.classList.toggle('active', isActive);
+            chip.setAttribute('aria-selected', isActive ? 'true' : 'false');
+        });
+
+        if (!opts.silent) {
+            applyTeacherFiltersAndRender();
+        }
+    }
+
+    function getFilteredTeachers() {
+        const searchValue = document.getElementById('teacherSearchInput')?.value ?? '';
+        const search = searchValue.trim().toLowerCase();
+
+        return departmentTeachers.filter(teacher => {
+            if (currentTeacherFilter === 'program_head' && !teacher.is_program_head) {
+                return false;
+            }
+
+            if (!search) return true;
+
+            return (
+                (teacher.first_name && teacher.first_name.toLowerCase().includes(search)) ||
+                (teacher.last_name && teacher.last_name.toLowerCase().includes(search)) ||
+                (teacher.employee_no && teacher.employee_no.toLowerCase().includes(search)) ||
+                (teacher.title && teacher.title.toLowerCase().includes(search))
+            );
+        });
+    }
+
+    function applyTeacherFiltersAndRender() {
+        const visibleTeachers = getFilteredTeachers();
+        updateTeacherCount(visibleTeachers.length, departmentTeachers.length);
+        renderTeachersList(visibleTeachers);
     }
 
     // Render teachers list
     function renderTeachersList(teachers) {
         const container = document.getElementById('teachersList');
+        document.getElementById('teachersEmptyState').style.display = 'none';
+        document.getElementById('teachersNoResultsState').style.display = 'none';
+        document.getElementById('teachersList').style.display = 'none';
         
         if (teachers.length === 0) {
             const searchValue = document.getElementById('teacherSearchInput').value;
-            if (searchValue.trim()) {
+            const hasSearch = !!searchValue.trim();
+            const hasFilter = currentTeacherFilter !== 'all';
+            const isDepartmentEmpty = departmentTeachers.length === 0;
+
+            if (!isDepartmentEmpty && (hasSearch || hasFilter)) {
+                const msg = document.getElementById('teachersNoResultsMessage');
+                if (msg) {
+                    if (hasSearch && hasFilter) msg.textContent = 'No faculty match your search and filter';
+                    else if (hasFilter) msg.textContent = 'No faculty match this filter';
+                    else msg.textContent = 'No teachers match your search';
+                }
                 document.getElementById('teachersNoResultsState').style.display = 'block';
             } else {
                 document.getElementById('teachersEmptyState').style.display = 'block';
@@ -706,6 +879,7 @@
             
             const item = document.createElement('div');
             item.className = `teacher-item ${isAssigned ? 'disabled' : ''} ${selectedTeacherId === teacher.id ? 'selected' : ''}`;
+            item.dataset.teacherId = String(teacher.id);
             item.style.animationDelay = `${index * 0.05}s`;
             item.onclick = () => {
                 if (!isAssigned) {
@@ -757,21 +931,8 @@
         selectedTeacherId = teacherId;
         
         // Update UI
-        const items = document.querySelectorAll('.teacher-item');
-        items.forEach(item => {
-            item.classList.remove('selected');
-        });
-        
-        // Find and select the clicked item
-        const teacher = departmentTeachers.find(t => t.id === teacherId);
-        if (teacher) {
-            const items = document.querySelectorAll('.teacher-item');
-            items.forEach((item, index) => {
-                if (departmentTeachers[index].id === teacherId) {
-                    item.classList.add('selected');
-                }
-            });
-        }
+        const items = document.querySelectorAll('.teacher-item[data-teacher-id]');
+        items.forEach(item => item.classList.toggle('selected', item.dataset.teacherId === String(teacherId)));
         
         updateAssignButtonState();
     }
@@ -783,34 +944,71 @@
         btn.style.opacity = selectedTeacherId ? '1' : '0.5';
     }
 
-    // Filter teachers by search
-    function filterTeachers(searchValue) {
+    // Search input handler (debounced)
+    function onTeacherSearchInput(searchValue) {
         const clearBtn = document.getElementById('clearSearchBtn');
         clearBtn.style.display = searchValue.trim() ? 'block' : 'none';
-        
-        if (!searchValue.trim()) {
-            renderTeachersList(departmentTeachers);
-            return;
+        if (teacherSearchDebounce) {
+            clearTimeout(teacherSearchDebounce);
         }
-
-        const search = searchValue.toLowerCase();
-        const filtered = departmentTeachers.filter(teacher => {
-            return (
-                (teacher.first_name && teacher.first_name.toLowerCase().includes(search)) ||
-                (teacher.last_name && teacher.last_name.toLowerCase().includes(search)) ||
-                (teacher.employee_no && teacher.employee_no.toLowerCase().includes(search)) ||
-                (teacher.title && teacher.title.toLowerCase().includes(search))
-            );
-        });
-
-        renderTeachersList(filtered);
+        teacherSearchDebounce = setTimeout(() => {
+            applyTeacherFiltersAndRender();
+        }, 120);
     }
 
     // Clear teacher search
     function clearTeacherSearch() {
         document.getElementById('teacherSearchInput').value = '';
         document.getElementById('clearSearchBtn').style.display = 'none';
-        renderTeachersList(departmentTeachers);
+        applyTeacherFiltersAndRender();
+    }
+
+    function attachAssignFacultyModalKeybinds() {
+        if (assignFacultyKeyHandler) return;
+        assignFacultyKeyHandler = (e) => {
+            const modal = document.getElementById('assignFacultyModal');
+            if (!modal || modal.style.display !== 'flex') return;
+
+            if (e.key === 'Escape') {
+                e.preventDefault();
+                closeAssignFacultyModal();
+                return;
+            }
+
+            const activeEl = document.activeElement;
+            const isTyping = activeEl && activeEl.id === 'teacherSearchInput';
+
+            if (!isTyping && (e.key === 'ArrowDown' || e.key === 'ArrowUp')) {
+                const items = Array.from(document.querySelectorAll('.teacher-item:not(.disabled)[data-teacher-id]'));
+                if (items.length === 0) return;
+
+                e.preventDefault();
+                const currentIndex = items.findIndex(it => it.dataset.teacherId === String(selectedTeacherId));
+                const nextIndex = e.key === 'ArrowDown'
+                    ? Math.min(currentIndex + 1, items.length - 1)
+                    : Math.max(currentIndex - 1, 0);
+                const nextItem = items[nextIndex] || items[0];
+                const nextId = parseInt(nextItem.dataset.teacherId, 10);
+                if (!Number.isNaN(nextId)) {
+                    selectTeacher(nextId);
+                    nextItem.scrollIntoView({ block: 'nearest' });
+                }
+                return;
+            }
+
+            if (!isTyping && e.key === 'Enter' && selectedTeacherId) {
+                e.preventDefault();
+                assignSelectedTeacher();
+            }
+        };
+
+        document.addEventListener('keydown', assignFacultyKeyHandler);
+    }
+
+    function detachAssignFacultyModalKeybinds() {
+        if (!assignFacultyKeyHandler) return;
+        document.removeEventListener('keydown', assignFacultyKeyHandler);
+        assignFacultyKeyHandler = null;
     }
 
     // Assign selected teacher
