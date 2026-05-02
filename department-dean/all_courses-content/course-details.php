@@ -2346,8 +2346,8 @@ if (!$showProgramCourses && $courseDetails) {
                                                 <span class="action-icon">✏️</span>
                                                 <span>Edit</span>
                                             </div>
-                                            <div class="action-menu-item <?php echo !empty($course['faculty_name']) ? 'disabled' : ''; ?>" 
-                                                 onclick="<?php echo !empty($course['faculty_name']) ? 'return false;' : 'assignFaculty(\'' . htmlspecialchars($course['course_code']) . '\');'; ?>">
+                                            <div class="action-menu-item" 
+                                                 onclick="assignFaculty('<?php echo htmlspecialchars($course['course_code']); ?>', <?php echo intval($course['id']); ?>, '<?php echo htmlspecialchars($course['course_title']); ?>', '<?php echo htmlspecialchars(($course['program_code'] ?? 'N/A') . ' | ' . ($course['term'] ?? 'N/A') . ' | ' . ($course['year_level'] ?? 'N/A') . ' Year | ' . ($course['academic_year'] ?? 'N/A')); ?>');">
                                                 <span class="action-icon">👤</span>
                                                 <span>Assign</span>
                                             </div>
@@ -2373,7 +2373,7 @@ if (!$showProgramCourses && $courseDetails) {
                     <button class="edit-course-btn" onclick="editCourse('<?php echo htmlspecialchars($courseDetails['course_code']); ?>')">
                         Edit Course
                     </button>
-                    <button class="assign-course-btn" onclick="assignFaculty('<?php echo htmlspecialchars($courseDetails['course_code']); ?>')">
+                    <button class="assign-course-btn" onclick="assignFaculty('<?php echo htmlspecialchars($courseDetails['course_code']); ?>', <?php echo intval($courseDetails['id']); ?>, '<?php echo htmlspecialchars($courseDetails['course_title']); ?>', '<?php echo htmlspecialchars(($courseDetails['program_code'] ?? 'N/A') . ' | ' . ($courseDetails['term'] ?? 'N/A') . ' | ' . ($courseDetails['year_level'] ?? 'N/A') . ' Year | ' . ($courseDetails['academic_year'] ?? 'N/A')); ?>');">
                         Assign
                     </button>
                 </div>
@@ -3839,5 +3839,10 @@ if (!$showProgramCourses && $courseDetails) {
         }
         
     </script>
+
+<?php 
+// Include the Assign Faculty Modal
+include_once __DIR__ . '/../modals/assign_faculty_modal.php';
+?>
 </body>
 </html>

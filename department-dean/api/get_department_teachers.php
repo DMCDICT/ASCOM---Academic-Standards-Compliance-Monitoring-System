@@ -16,10 +16,14 @@ if (!$department_id) {
 try {
     // Get all teachers from this department
     $stmt = $pdo->prepare("
-        SELECT id, employee_no, first_name, last_name, title, email
-        FROM users 
-        WHERE department_id = ? AND is_active = 1
-        ORDER BY first_name ASC
+        SELECT u.id, u.employee_no, u.first_name, u.last_name, u.title, u.email
+        FROM users u
+        JOIN user_roles ur ON u.id = ur.user_id
+        WHERE u.department_id = ? 
+          AND u.is_active = 1 
+          AND ur.role_name = 'teacher'
+          AND ur.is_active = 1
+        ORDER BY u.first_name ASC
     ");
     $stmt->execute([$department_id]);
     $teachers = $stmt->fetchAll(PDO::FETCH_ASSOC);

@@ -17,12 +17,25 @@ if (!$course_id || !$teacher_id) {
 }
 
 try {
+    // Start transaction
+    $pdo->beginTransaction();
+    
+    // Deactivate the assignment
     $deactivate = $pdo->prepare("
         UPDATE course_assignments 
         SET is_active = FALSE 
         WHERE course_id = ? AND teacher_id = ?
     ");
     $deactivate->execute([$course_id, $teacher_id]);
+    
+    // Also clear the faculty_id in the courses table if this was the active teacher
+    $updateCourse = $pdo->prepare("
+        UPDATE courses SET faculty_id = NULL WHERE id = ? AND faculty_id = ?
+    ");
+    $updateCourse->execute([$course_id, $teacher_id]);
+    
+    // Commit transaction
+    $pdo->commit();
     
     echo json_encode(['success' => true, 'message' => 'Teacher removed from course successfully']);
     
