@@ -408,165 +408,353 @@ if (!$showProgramCourses && $courseDetails) {
     <link rel="stylesheet" href="../super_admin-mis/styles/dashboard.css">
     <link rel="stylesheet" href="../super_admin-mis/styles/user-account-management.css">
     <style>
+        /* ====== DESIGN.md COMPLIANT STYLES ====== */
         body {
-            background: #f8f9fa;
+            background: #EFEFEF;
             font-family: 'TT Interphases', sans-serif;
         }
         
-        .course-details-container {
-            max-width: 100%;
-            margin: 20px 0;
-            padding: 0;
+        .content-wrapper {
+            padding: 0 !important;
         }
         
+        .content-wrapper .content-wrapper {
+            margin: 0 auto !important;
+            padding: 20px 24px !important;
+            max-width: 1200px !important;
+            width: 100% !important;
+        }
+        
+        div.course-details-container {
+            width: 90% !important;
+            max-width: 90% !important;
+            margin: 0 auto !important;
+            padding: 0 !important;
+            animation: fadeSlideUp 0.45s ease-out both;
+            display: block !important;
+            position: relative !important;
+            left: 0 !important;
+            right: 0 !important;
+        }
+        
+        /* Back Button - DESIGN.md btn-ghost pattern */
         .back-button {
             display: inline-flex;
             align-items: center;
-            background: #1976d2;
+            background: transparent;
             border: none;
-            color: white;
-            font-size: 16px;
-            font-weight: 600;
+            color: #0C4B34;
+            font-size: 13px;
+            font-weight: 700;
             cursor: pointer;
-            padding: 10px 16px;
-            border-radius: 8px;
+            padding: 0;
+            border-radius: 0;
             text-decoration: none;
-            transition: background-color 0.2s;
+            transition: all 0.2s ease;
             font-family: 'TT Interphases', sans-serif;
-            margin-bottom: 20px;
+            margin-bottom: 16px;
+            gap: 4px;
         }
         
         .back-button:hover {
-            background-color: #1565c0;
-            color: white;
+            color: #0a3a28;
+            transform: translateX(-4px);
             text-decoration: none;
         }
         
         .back-button img {
-            width: 20px;
-            height: 20px;
-            margin-right: 8px;
+            width: 18px;
+            height: 18px;
+            margin-right: 6px;
         }
         
+        /* Course Header - DESIGN.md Card with top accent and hover */
         .course-header {
-            background: white;
-            border-radius: 12px;
-            padding: 16px 24px;
+            background: #ffffff;
+            border-radius: 16px 18px;
+            border: 1px solid rgba(12, 75, 52, 0.14);
+            box-shadow: 0 4px 18px rgba(0, 0, 0, 0.04);
+            padding: 22px 24px;
             margin-bottom: 20px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            transition: all 0.28s cubic-bezier(.4,0,.2,1);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .course-header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 3px;
+            background: linear-gradient(90deg, #0C4B34 0%, #0F7A53 100%);
+            border-radius: 18px 18px 0 0;
+        }
+        
+        .course-header:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 12px 36px rgba(12, 75, 52, 0.12);
+            border-color: rgba(12, 75, 52, 0.25);
         }
         
         .course-title-section {
             display: flex;
             align-items: center;
             justify-content: space-between;
-            margin-bottom: 8px;
+            margin-bottom: 12px;
+            gap: 16px;
         }
         
         .course-title {
-            font-size: 24px;
-            font-weight: 700;
-            color: #212529;
+            font-size: 28px;
+            font-weight: 800;
+            color: #111827;
             margin: 0;
             font-family: 'TT Interphases', sans-serif;
+            letter-spacing: -0.5px;
         }
         
         .course-subtitle {
-            font-size: 16px;
-            color: #6c757d;
+            font-size: 15px;
+            color: rgba(17, 24, 39, 0.6);
             margin: 0 0 20px 0;
             font-weight: 500;
         }
         
+        /* Course Actions - DESIGN.md buttons */
+        .course-actions {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex-shrink: 0;
+        }
+        
+        .edit-course-btn, .assign-course-btn {
+            background: #0C4B34;
+            color: white;
+            border: none;
+            padding: 10px 18px;
+            border-radius: 10px;
+            font-size: 13px;
+            font-weight: 700;
+            letter-spacing: 0.2px;
+            cursor: pointer;
+            transition: all 0.22s cubic-bezier(.4,0,.2,1);
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-family: 'TT Interphases', sans-serif;
+        }
+        
+        .edit-course-btn:hover, .assign-course-btn:hover {
+            background: #0a3a28;
+            transform: translateY(-1px);
+            box-shadow: 0 6px 18px rgba(12, 75, 52, 0.25);
+        }
+        
+        .edit-course-btn:active, .assign-course-btn:active {
+            transform: translateY(0) scale(0.98);
+        }
+        
+        .assign-course-btn {
+            background: #0F7A53;
+        }
+        
+        .assign-course-btn:hover {
+            background: #0a5f42;
+        }
+        
+        /* Course Info Grid - DESIGN.md responsive */
         .course-info-grid {
             display: grid;
             grid-template-columns: repeat(5, 1fr);
-            gap: 12px;
+            gap: 16px;
             margin-bottom: 20px;
+            margin-top: 20px;
         }
         
         .info-item {
             display: flex;
             flex-direction: column;
-            gap: 3px;
+            gap: 6px;
             min-width: 0;
         }
         
         .info-label {
-            font-size: 10px;
-            font-weight: 600;
-            color: #6c757d;
+            font-size: 11px;
+            font-weight: 700;
+            color: rgba(17, 24, 39, 0.5);
             text-transform: uppercase;
-            letter-spacing: 0.5px;
+            letter-spacing: 0.6px;
             white-space: nowrap;
         }
         
         .info-value {
             font-size: 13px;
-            font-weight: 500;
-            color: #212529;
+            font-weight: 600;
+            color: #111827;
             word-wrap: break-word;
             overflow-wrap: break-word;
         }
         
+        /* Stat Pill for info items */
+        .info-item .info-value {
+            background: rgba(12, 75, 52, 0.04);
+            border: 1px solid rgba(12, 75, 52, 0.08);
+            color: rgba(17, 24, 39, 0.6);
+            padding: 8px 12px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+        }
+        
+        .info-item .info-value strong {
+            color: #0C4B34;
+            font-weight: 800;
+            font-size: 14px;
+            margin-right: 4px;
+        }
+        
+        /* Program Badge - DESIGN.md code badge */
         .program-badge {
             display: inline-block;
-            background: #1976d2;
+            background: #0C4B34;
             color: white;
-            padding: 4px 8px;
-            border-radius: 12px;
-            font-size: 10px;
-            font-weight: 600;
+            padding: 5px 9px;
+            border-radius: 8px;
+            font-size: 11px;
+            font-weight: 800;
+            letter-spacing: 0.6px;
             text-transform: uppercase;
-            letter-spacing: 0.3px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
         }
         
+        /* Book References Section - DESIGN.md card */
         .book-references-section {
-            background: white;
-            border-radius: 12px;
-            padding: 24px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            background: #ffffff;
+            border-radius: 16px 18px;
+            border: 1px solid rgba(12, 75, 52, 0.14);
+            box-shadow: 0 4px 18px rgba(0, 0, 0, 0.04);
+            padding: 22px 24px;
+            position: relative;
+            overflow: hidden;
+            animation: fadeSlideUp 0.45s ease-out both;
         }
         
+        .book-references-section::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 3px;
+            background: linear-gradient(90deg, #0C4B34 0%, #0F7A53 100%);
+            border-radius: 18px 18px 0 0;
+        }
+        
+        /* Departments Header */
         .departments-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
             margin-bottom: 20px;
+            gap: 16px;
+            flex-wrap: wrap;
         }
         
         .departments-header h3 {
             font-size: 18px;
-            font-weight: 600;
-            color: #212529;
+            font-weight: 800;
+            color: #0C4B34;
             margin: 0 0 4px 0;
             font-family: 'TT Interphases', sans-serif;
         }
         
         .departments-header p {
-            font-size: 14px;
-            color: #6c757d;
+            font-size: 12px;
+            color: rgba(17, 24, 39, 0.5);
             margin: 0;
+            font-weight: 600;
             font-family: 'TT Interphases', sans-serif;
         }
         
         .add-dept-btn {
-            background: #1976d2;
+            background: #0F7A53;
             color: white;
             border: none;
-            padding: 8px 16px;
-            border-radius: 6px;
-            font-size: 14px;
-            font-weight: 500;
+            padding: 10px 18px;
+            border-radius: 10px;
+            font-size: 13px;
+            font-weight: 700;
+            letter-spacing: 0.2px;
             cursor: pointer;
-            transition: all 0.3s ease;
+            transition: all 0.22s cubic-bezier(.4,0,.2,1);
             font-family: 'TT Interphases', sans-serif;
+            flex-shrink: 0;
         }
         
         .add-dept-btn:hover {
-            background: #1565c0;
+            background: #0a5f42;
             transform: translateY(-1px);
-            box-shadow: 0 2px 8px rgba(25, 118, 210, 0.3);
+            box-shadow: 0 6px 18px rgba(15, 122, 83, 0.25);
+        }
+        
+        /* Tabs - DESIGN.md section header pattern */
+        .book-tabs {
+            display: flex;
+            margin-bottom: 20px;
+            border-bottom: 2px solid rgba(12, 75, 52, 0.08);
+            gap: 4px;
+        }
+        
+        .tab-button {
+            background: transparent;
+            border: none;
+            padding: 12px 20px;
+            font-size: 13px;
+            font-weight: 700;
+            color: rgba(17, 24, 39, 0.5);
+            cursor: pointer;
+            border-bottom: 3px solid transparent;
+            transition: all 0.15s ease;
+            font-family: 'TT Interphases', sans-serif;
+            flex-shrink: 0;
+            white-space: nowrap;
+        }
+        
+        .tab-button:hover {
+            color: #0C4B34;
+            background-color: rgba(12, 75, 52, 0.04);
+        }
+        
+        .tab-button.active {
+            color: #0F7A53;
+            border-bottom-color: #0F7A53;
+            background-color: rgba(12, 75, 52, 0.06);
+        }
+        
+        .tab-content {
+            display: none;
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+        
+        /* Book Reference Item - DESIGN.md card */
+        .book-reference-item {
+            border: 1px solid rgba(12, 75, 52, 0.12);
+            border-radius: 12px;
+            padding: 16px;
+            background: #ffffff;
+            transition: all 0.28s cubic-bezier(.4,0,.2,1);
+        }
+        
+        .book-reference-item:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 24px rgba(12, 75, 52, 0.1);
+            border-color: rgba(12, 75, 52, 0.2);
         }
         
         .book-references-list {
@@ -575,24 +763,32 @@ if (!$showProgramCourses && $courseDetails) {
             gap: 12px;
         }
         
-        .book-reference-item {
-            border: 1px solid #e9ecef;
-            border-radius: 8px;
-            padding: 16px;
-            background: #f8f9fa;
+        .book-card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 10px;
+            gap: 12px;
+        }
+        
+        .book-card-header .book-title {
+            margin-bottom: 0;
+            font-size: 15px;
+            font-weight: 700;
+            color: #111827;
         }
         
         .book-title {
             font-size: 15px;
-            font-weight: 600;
-            color: #212529;
+            font-weight: 700;
+            color: #111827;
             margin-bottom: 8px;
         }
         
         .book-author-publisher-row {
             display: flex;
             align-items: center;
-            gap: 8px;
+            gap: 12px;
             margin-bottom: 10px;
             flex-wrap: wrap;
         }
@@ -606,192 +802,432 @@ if (!$showProgramCourses && $courseDetails) {
         
         .book-detail-item {
             font-size: 11px;
-            color: #495057;
-            background: white;
-            padding: 3px 6px;
-            border-radius: 3px;
-            border: 1px solid #dee2e6;
+            font-weight: 600;
+            color: rgba(17, 24, 39, 0.6);
+            background: rgba(12, 75, 52, 0.04);
+            padding: 4px 8px;
+            border-radius: 6px;
+            border: 1px solid rgba(12, 75, 52, 0.08);
             flex: 0 0 auto;
         }
         
         .book-created-by, .book-requested-by {
             font-size: 11px;
-            color: #6c757d;
+            color: rgba(17, 24, 39, 0.4);
             margin-top: 6px;
-        }
-        
-        .book-location {
-            font-size: 11px;
-            color: #6c757d;
-            margin-top: 6px;
-        }
-        
-        .book-call-number {
-            font-size: 10px;
-            color: #adb5bd;
-            margin-top: 3px;
-        }
-        
-        /* Tab Styles */
-        .book-tabs {
-            display: flex;
-            margin-bottom: 20px;
-            border-bottom: 2px solid #e9ecef;
-        }
-        
-        .tab-button {
-            background: none;
-            border: none;
-            padding: 12px 24px;
-            font-size: 14px;
             font-weight: 600;
-            color: #6c757d;
-            cursor: pointer;
-            border-bottom: 3px solid transparent;
-            transition: all 0.3s ease;
-            font-family: 'TT Interphases', sans-serif;
-            flex-shrink: 0;
-            flex-grow: 0;
-            white-space: nowrap;
-            width: auto;
-        }
-        
-        .tab-button:hover {
-            color: #0f7a53;
-            background-color: #f8f9fa;
-        }
-        
-        .tab-button.active {
-            color: #0f7a53;
-            border-bottom-color: #0f7a53;
-            background-color: #f8f9fa;
-        }
-        
-        .tab-content {
-            display: none;
-        }
-        
-        .tab-content.active {
-            display: block;
-        }
-        
-        .book-card-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: flex-start;
-            margin-bottom: 8px;
-        }
-        
-        .book-card-header .book-title {
-            margin-bottom: 0;
         }
         
         .warning-indicator {
-            background: #fff3cd;
+            background: #FFF3CD;
             color: #856404;
             padding: 4px 8px;
-            border-radius: 4px;
-            font-size: 16px;
-            border: 1px solid #ffeaa7;
+            border-radius: 6px;
+            font-size: 14px;
+            border: 1px solid #FFEAA7;
             cursor: help;
             flex-shrink: 0;
         }
         
-        .book-header-right {
-            display: flex;
-            flex-direction: column;
-            align-items: flex-end;
-            gap: 6px;
-        }
-        
-        .book-reference-item.archived {
-            opacity: 0.8;
-            background: #f8f9fa;
-        }
-        
-        .book-reference-item.archived .book-title {
-            color: #6c757d;
-        }
-        
         .processing-status-badge {
-            display: inline-block;
-            padding: 4px 8px;
-            border-radius: 12px;
+            display: inline-flex;
+            align-items: center;
+            padding: 5px 10px;
+            border-radius: 8px;
             font-size: 10px;
-            font-weight: 600;
+            font-weight: 700;
             text-transform: uppercase;
             letter-spacing: 0.5px;
         }
         
+        .processing-status-processing {
+            background: #FFF3E0;
+            color: #E65100;
+        }
+        
+        .processing-status-completed {
+            background: #E8F5E9;
+            color: #2E7D32;
+        }
+        
+        .processing-status-drafted {
+            background: #FFEBEE;
+            color: #C62828;
+        }
+        
+        .book-actions {
+            display: flex;
+            gap: 8px;
+            margin-top: 12px;
+        }
+        
+        .book-action-btn {
+            padding: 6px 12px;
+            border: none;
+            border-radius: 6px;
+            font-size: 11px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.15s ease;
+            font-family: 'TT Interphases', sans-serif;
+        }
+        
+        .view-book-btn {
+            background: rgba(12, 75, 52, 0.08);
+            color: #0C4B34;
+        }
+        
+        .view-book-btn:hover {
+            background: rgba(12, 75, 52, 0.15);
+        }
+        
+        .request-book-btn {
+            background: #0F7A53;
+            color: white;
+        }
+        
+        .request-book-btn:hover {
+            background: #0a5f42;
+        }
+        
+        .no-references {
+            text-align: center;
+            color: rgba(17, 24, 39, 0.4);
+            font-weight: 600;
+            font-size: 13px;
+            padding: 32px 20px;
+            background: rgba(12, 75, 52, 0.04);
+            border: 1px dashed rgba(12, 75, 52, 0.2);
+            border-radius: 12px;
+        }
+        
+        /* Responsive Breakpoints - DESIGN.md Section 10 */
+        @media (max-width: 1100px) {
+            .course-info-grid {
+                grid-template-columns: repeat(3, 1fr);
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .course-info-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            .course-title-section {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 12px;
+            }
+            .course-actions {
+                width: 100%;
+            }
+            .departments-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 12px;
+            }
+            .add-dept-btn {
+                width: 100%;
+                justify-content: center;
+            }
+        }
+        
+        @media (max-width: 640px) {
+            .course-info-grid {
+                grid-template-columns: 1fr;
+            }
+            .course-title {
+                font-size: 22px;
+            }
+            .book-author-publisher-row,
+            .book-details-row {
+                flex-direction: column;
+            }
+        }
+        
+        /* Dark Mode - DESIGN.md Section 1.2 */
+        html[data-theme="dark"] body {
+            background: #1a1a1a;
+        }
+        
+        html[data-theme="dark"] .course-header {
+            background-color: #1e1e1e !important;
+            border-color: #333 !important;
+            box-shadow: 0 4px 18px rgba(0, 0, 0, 0.25) !important;
+        }
+        
+        html[data-theme="dark"] .course-header:hover {
+            border-color: #444 !important;
+            box-shadow: 0 12px 36px rgba(0, 0, 0, 0.4) !important;
+        }
+        
+        html[data-theme="dark"] .course-title {
+            color: #f0f0f0;
+        }
+        
+        html[data-theme="dark"] .course-subtitle {
+            color: #b0b0b0;
+        }
+        
+        html[data-theme="dark"] .back-button {
+            color: #81C784;
+        }
+        
+        html[data-theme="dark"] .back-button:hover {
+            color: #a5d6a7;
+        }
+        
+        html[data-theme="dark"] .info-label {
+            color: #b0b0b0;
+        }
+        
+        html[data-theme="dark"] .info-item .info-value {
+            background: rgba(255, 255, 255, 0.06);
+            border-color: rgba(255, 255, 255, 0.1);
+            color: #e0e0e0;
+        }
+        
+        html[data-theme="dark"] .info-item .info-value strong {
+            color: #81C784;
+        }
+        
+        html[data-theme="dark"] .book-references-section {
+            background-color: #1e1e1e !important;
+            border-color: #333 !important;
+            box-shadow: 0 4px 18px rgba(0, 0, 0, 0.25) !important;
+        }
+        
+        html[data-theme="dark"] .departments-header h3 {
+            color: #e0e0e0;
+        }
+        
+        html[data-theme="dark"] .departments-header p {
+            color: #b0b0b0;
+        }
+        
+        html[data-theme="dark"] .tab-button {
+            color: #b0b0b0;
+        }
+        
+        html[data-theme="dark"] .tab-button:hover {
+            color: #81C784;
+            background-color: rgba(255, 255, 255, 0.06);
+        }
+        
+        html[data-theme="dark"] .tab-button.active {
+            color: #81C784;
+            background-color: rgba(129, 199, 132, 0.1);
+        }
+        
+        html[data-theme="dark"] .book-tabs {
+            border-bottom-color: #404040;
+        }
+        
+        html[data-theme="dark"] .book-reference-item {
+            background: #252525;
+            border-color: #333;
+        }
+        
+        html[data-theme="dark"] .book-reference-item:hover {
+            border-color: #444;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+        }
+        
+        html[data-theme="dark"] .book-title {
+            color: #f0f0f0;
+        }
+        
+        html[data-theme="dark"] .book-detail-item {
+            background: rgba(255, 255, 255, 0.06);
+            border-color: #404040;
+            color: #b0b0b0;
+        }
+        
+        html[data-theme="dark"] .book-created-by,
+        html[data-theme="dark"] .book-requested-by {
+            color: #808080;
+        }
+        
+        html[data-theme="dark"] .no-references {
+            background: rgba(255, 255, 255, 0.04);
+            border-color: #404040;
+            color: #808080;
+        }
+        
+        html[data-theme="dark"] .warning-indicator {
+            background: #4A3000;
+            color: #FFD54F;
+            border-color: #5C4000;
+        }
+        
+        html[data-theme="dark"] .view-book-btn {
+            background: rgba(255, 255, 255, 0.08);
+            color: #81C784;
+        }
+        
+        html[data-theme="dark"] .view-book-btn:hover {
+            background: rgba(255, 255, 255, 0.15);
+        }
+        
+        /* Table Styles for Program Courses - DESIGN.md compliant */
+        .courses-table-container {
+            background: #ffffff;
+            border-radius: 16px 18px;
+            overflow: hidden;
+            box-shadow: 0 4px 18px rgba(0, 0, 0, 0.04);
+            border: 1px solid rgba(12, 75, 52, 0.12);
+            margin-top: 20px;
+            transition: all 0.28s cubic-bezier(.4,0,.2,1);
+        }
+        
+        .courses-table-container:hover {
+            box-shadow: 0 12px 36px rgba(12, 75, 52, 0.1);
+        }
+        
+        .courses-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-family: 'TT Interphases', sans-serif;
+            table-layout: fixed;
+        }
+        
+        .courses-table th {
+            background-color: rgba(12, 75, 52, 0.04);
+            padding: 14px 12px;
+            text-align: left;
+            font-weight: 700;
+            color: rgba(17, 24, 39, 0.5);
+            border-bottom: 1px solid rgba(12, 75, 52, 0.08);
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 0.6px;
+        }
+        
+        .courses-table td {
+            padding: 14px 12px;
+            border-bottom: 1px solid rgba(12, 75, 52, 0.05);
+            font-size: 13px;
+            color: #333;
+            font-weight: 500;
+        }
+        
+        .courses-table tbody tr {
+            transition: background-color 0.15s ease;
+        }
+        
+        .courses-table tbody tr:hover {
+            background-color: rgba(12, 75, 52, 0.03);
+        }
+        
+        .courses-table tbody tr:nth-child(even) {
+            background-color: rgba(12, 75, 52, 0.015);
+        }
+        
+        /* Dark Mode - Table */
+        html[data-theme="dark"] .courses-table-container {
+            background-color: #1e1e1e !important;
+            border-color: #333 !important;
+            box-shadow: 0 4px 18px rgba(0, 0, 0, 0.25) !important;
+        }
+        
+        html[data-theme="dark"] .courses-table th {
+            background-color: rgba(255, 255, 255, 0.04);
+            color: #b0b0b0;
+            border-bottom-color: #404040;
+        }
+        
+        html[data-theme="dark"] .courses-table td {
+            color: #e0e0e0;
+            border-bottom-color: #333;
+        }
+        
+        html[data-theme="dark"] .courses-table tbody tr:hover {
+            background-color: rgba(255, 255, 255, 0.04);
+        }
+        
+        html[data-theme="dark"] .courses-table tbody tr:nth-child(even) {
+            background-color: rgba(255, 255, 255, 0.02);
+        }
+        
+        /* Responsive Table Breakpoints */
+        @media (max-width: 1100px) {
+            .courses-table-container {
+                overflow-x: auto;
+            }
+            .courses-table {
+                min-width: 800px;
+            }
+        }
+        
+        /* Archived book items */
+        .book-reference-item.archived {
+            opacity: 0.7;
+            background: rgba(12, 75, 52, 0.03);
+        }
+        
+        .book-reference-item.archived .book-title {
+            color: rgba(17, 24, 39, 0.4);
+        }
+        
         .status-reason-info {
-            font-size: 16px;
-            color: #666;
+            font-size: 14px;
+            color: rgba(17, 24, 39, 0.6);
             padding: 4px 8px;
-            background: #f8f9fa;
+            background: rgba(12, 75, 52, 0.04);
             border-radius: 50%;
-            border: 1px solid #dee2e6;
-            width: 28px;
-            height: 28px;
+            border: 1px solid rgba(12, 75, 52, 0.12);
+            width: 26px;
+            height: 26px;
             display: flex;
             align-items: center;
             justify-content: center;
             cursor: help;
         }
         
-        .processing-status-processing {
-            background: #fff3e0;
-            color: #ff9800;
-        }
-        
-        .processing-status-completed {
-            background: #e8f5e9;
-            color: #4CAF50;
-        }
-        
-        .processing-status-drafted {
-            background: #ffebee;
-            color: #f44336;
-        }
-        
+        /* Book actions */
         .book-actions {
             display: flex;
-            gap: 6px;
-            margin-top: 10px;
+            gap: 8px;
+            margin-top: 12px;
         }
         
         .book-action-btn {
-            padding: 4px 8px;
+            padding: 6px 12px;
             border: none;
-            border-radius: 3px;
+            border-radius: 6px;
             font-size: 11px;
-            font-weight: 500;
+            font-weight: 700;
             cursor: pointer;
-            transition: all 0.2s ease;
+            transition: all 0.15s ease;
+            font-family: 'TT Interphases', sans-serif;
         }
         
         .view-book-btn {
-            background: #007bff;
-            color: white;
+            background: rgba(12, 75, 52, 0.08);
+            color: #0C4B34;
         }
         
         .view-book-btn:hover {
-            background: #0056b3;
+            background: rgba(12, 75, 52, 0.15);
         }
         
         .request-book-btn {
-            background: #28a745;
+            background: #0F7A53;
             color: white;
         }
         
         .request-book-btn:hover {
-            background: #1e7e34;
+            background: #0a5f42;
         }
         
         .no-references {
             text-align: center;
-            color: #6c757d;
-            font-style: italic;
-            padding: 30px 20px;
+            color: rgba(17, 24, 39, 0.4);
+            font-weight: 600;
+            font-size: 13px;
+            padding: 32px 20px;
+            background: rgba(12, 75, 52, 0.04);
+            border: 1px dashed rgba(12, 75, 52, 0.2);
+            border-radius: 12px;
         }
         
         .action-buttons {
@@ -800,83 +1236,12 @@ if (!$showProgramCourses && $courseDetails) {
             margin-top: 16px;
         }
         
-        .edit-course-btn {
-            background: #007bff;
-            color: white;
-            border: none;
-            padding: 8px 16px;
-            border-radius: 6px;
-            font-size: 13px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: background-color 0.2s;
-        }
-        
-        .edit-course-btn:hover {
-            background: #0056b3;
-        }
-        
-        .assign-course-btn {
-            background: #28a745;
-            color: white;
-            border: none;
-            padding: 8px 16px;
-            border-radius: 6px;
-            font-size: 14px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: background-color 0.2s;
-            margin-left: 8px;
-        }
-        
-        .assign-course-btn:hover {
-            background: #218838;
-        }
-        
-        /* Table Styles for Program Courses */
-        .courses-table-container {
-            background: white;
-            border-radius: 12px;
-            overflow: hidden;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-            margin-top: 20px;
-        }
-        
-        .courses-table-container {
-            background: white;
-            border-radius: 12px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-            overflow: hidden;
-            margin-top: 20px;
-        }
-        .courses-table {
-            width: 100%;
-            border-collapse: collapse;
-            font-family: 'TT Interphases', sans-serif;
-            table-layout: fixed;
-        }
-        .courses-table th {
-            background-color: #f8f9fa;
-            padding: 16px 12px;
-            text-align: left;
-            font-weight: 600;
-            color: #333;
-            border-bottom: 2px solid #e9ecef;
-            font-size: 14px;
-        }
-        .courses-table td {
-            padding: 16px 12px;
-            border-bottom: 1px solid #e9ecef;
-            font-size: 14px;
-            color: #555;
-        }
-
-        /* Column width specifications - UPDATED FOR 8 COLUMNS (NO PROGRAM) */
+/* Column width specifications - 8 COLUMNS (NO PROGRAM) */
         .courses-table th:nth-child(1),
         .courses-table td:nth-child(1) { /* Course Code */
             width: 10%;
             min-width: 90px;
-            padding: 12px 8px 12px 24px; /* Left padding matches section header padding */
+            padding: 12px 8px 12px 24px;
         }
 
         .courses-table th:nth-child(2),
@@ -934,22 +1299,103 @@ if (!$showProgramCourses && $courseDetails) {
             padding: 12px 8px;
             text-align: right;
         }
-        .courses-table tr:hover {
-            background-color: #e3f2fd;
+        
+        /* Search Container - DESIGN.md */
+        .search-container {
+            background: #ffffff;
+            border-radius: 16px 18px;
+            border: 1px solid rgba(12, 75, 52, 0.14);
+            box-shadow: 0 4px 18px rgba(0, 0, 0, 0.04);
+            padding: 18px 24px;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 16px;
+            flex-wrap: wrap;
+            animation: fadeSlideUp 0.45s ease-out both;
         }
-
-        /* Section Headers */
+        
+        .user-search-bar {
+            display: flex;
+            align-items: center;
+            background-color: #FFFFFF;
+            height: 42px;
+            padding: 0 14px;
+            border-radius: 10px;
+            border: 1px solid rgba(12, 75, 52, 0.14);
+            flex: 1;
+            max-width: 450px;
+            min-width: 200px;
+            transition: border-color 0.2s ease, box-shadow 0.2s ease;
+        }
+        
+        .user-search-bar:focus-within {
+            border-color: #0C4B34;
+            box-shadow: 0 0 0 3px rgba(12, 75, 52, 0.1);
+        }
+        
+        .user-search-bar input {
+            border: none;
+            outline: none;
+            flex: 1;
+            font-size: 14px;
+            background: transparent;
+            font-family: 'TT Interphases', sans-serif;
+        }
+        
+        .user-search-bar .magnifier-icon {
+            width: 18px;
+            height: 18px;
+            margin-right: 10px;
+            opacity: 0.4;
+        }
+        
+        .clear-search-btn {
+            background: none;
+            border: none;
+            font-size: 18px;
+            color: #666;
+            cursor: pointer;
+            padding: 0 4px;
+            line-height: 1;
+        }
+        
+        .clear-search-btn:hover {
+            color: #333;
+        }
+        
+        .search-button {
+            background: #0C4B34;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 10px;
+            font-size: 13px;
+            font-weight: 700;
+            letter-spacing: 0.2px;
+            cursor: pointer;
+            transition: all 0.22s cubic-bezier(.4,0,.2,1);
+            font-family: 'TT Interphases', sans-serif;
+        }
+        
+        .search-button:hover {
+            background: #0a3a28;
+            transform: translateY(-1px);
+            box-shadow: 0 6px 18px rgba(12, 75, 52, 0.25);
+        }
+        
+        /* Section Headers - DESIGN.md */
         .course-section-header {
-            background: linear-gradient(135deg, #FFD700 0%, #FFA500 100%);
-            color: #000;
+            background: #ffffff;
+            border-radius: 12px 12px 0 0;
             padding: 16px 24px;
             margin: 20px 0 0 0;
-            border-radius: 8px 8px 0 0;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            box-shadow: 0 2px 8px rgba(255, 215, 0, 0.3);
-            border: 1px solid #FFD700;
+            border: 1px solid rgba(12, 75, 52, 0.12);
+            border-bottom: none;
         }
 
         .course-section-header:first-child {
@@ -958,20 +1404,20 @@ if (!$showProgramCourses && $courseDetails) {
 
         .course-section-header h3 {
             margin: 0;
-            font-size: 18px;
-            font-weight: 600;
+            font-size: 16px;
+            font-weight: 800;
             font-family: 'TT Interphases', sans-serif;
-            color: #000;
+            color: #0C4B34;
         }
 
         .course-section-header .course-count {
-            background: rgba(0, 0, 0, 0.1);
-            color: #000;
-            padding: 4px 12px;
+            background: rgba(12, 75, 52, 0.08);
+            color: #0C4B34;
+            padding: 6px 12px;
             border-radius: 20px;
-            font-size: 14px;
-            font-weight: 600;
-            border: 1px solid rgba(0, 0, 0, 0.2);
+            font-size: 13px;
+            font-weight: 700;
+            border: 1px solid rgba(12, 75, 52, 0.12);
         }
 
         /* Section Dropdown Styles */
@@ -983,7 +1429,22 @@ if (!$showProgramCourses && $courseDetails) {
 
         .section-dropdown {
             padding: 8px 12px;
-            border: 2px solid #1976d2;
+            border: 1px solid rgba(12, 75, 52, 0.14);
+            border-radius: 8px;
+            font-size: 13px;
+            font-weight: 600;
+            font-family: 'TT Interphases', sans-serif;
+            background: white;
+            color: #111827;
+            cursor: pointer;
+            min-width: 200px;
+            transition: border-color 0.2s ease;
+        }
+
+        .section-dropdown:focus {
+            border-color: #0C4B34;
+            outline: none;
+        }
             border-radius: 6px;
             background: white;
             color: #333;
@@ -994,103 +1455,34 @@ if (!$showProgramCourses && $courseDetails) {
             transition: all 0.2s ease;
         }
 
-        .section-dropdown:focus {
-            outline: none;
-            border-color: #1565c0;
-            box-shadow: 0 0 0 3px rgba(25, 118, 210, 0.1);
+        /* Responsive Section Dropdown */
+        @media (max-width: 768px) {
+            .search-container {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            .user-search-bar {
+                max-width: 100%;
+            }
+            .section-dropdown {
+                min-width: 100%;
+            }
         }
-
-        .section-dropdown:hover {
-            border-color: #1565c0;
-        }
-
+        
+        /* Course Row - DESIGN.md Table Row */
         .course-row {
             cursor: pointer;
-            transition: all 0.2s ease;
+            transition: all 0.15s ease;
         }
 
         .course-row:hover {
-            background-color: #e3f2fd !important;
-        }
-
-        /* Override specific columns to be centered */
-        .courses-table th:nth-child(3),  /* Units */
-        .courses-table th:nth-child(6),  /* Year Level */
-        .courses-table th:nth-child(8) { /* References */
-            text-align: center !important;
-        }
-
-        /* Override specific columns to be left-aligned */
-        .courses-table th:nth-child(7),  /* Faculty */
-        .courses-table th:nth-child(9) { /* Actions */
-            text-align: left !important;
-        }
-
-        /* Override specific data cells to be centered */
-        .courses-table td:nth-child(3) { /* Units */
-            text-align: center !important;
-        }
-
-        .courses-table td:nth-child(5) { /* Year Level */
-            text-align: center !important;
-        }
-
-        .courses-table td:nth-child(7) { /* References */
-            text-align: center !important;
-        }
-
-        /* Override specific data cells to be left-aligned */
-        .courses-table td:nth-child(6) { /* Faculty */
-            text-align: left !important;
-        }
-
-        .courses-table td:nth-child(8) { /* Actions */
-            text-align: left !important;
-        }
-
-        /* Course Code Column Alignment - FIXED */
-        .courses-table th:nth-child(1) { /* Course Code Header */
-            text-align: left !important;
-            padding: 12px 8px 12px 24px !important;
-        }
-        
-        .courses-table td:nth-child(1) { /* Course Code Data */
-            text-align: left !important;
-            padding: 8px 8px 8px 24px !important;
-            font-weight: 600;
-            color: #333;
-        }
-        
-        
-        .courses-table th {
-            background: #f8f9fa;
-            color: #333;
-            font-weight: 600;
-            border-bottom: 2px solid #e9ecef;
-            font-size: 14px;
-            padding: 12px 12px;
-        }
-        
-        .courses-table td {
-            padding: 8px 6px;
-            border-bottom: 1px solid #e9ecef;
-            font-size: 14px;
-            color: #555;
-        }
-        
-        .course-row {
-            transition: all 0.2s ease;
-        }
-        
-        .course-row:hover {
-            background-color: #e3f2fd !important;
+            background-color: rgba(12, 75, 52, 0.04) !important;
             transform: translateY(-1px);
-            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
         }
         
         .course-code {
-            font-weight: 600;
-            color: #333;
+            font-weight: 700;
+            color: #111827;
         }
 
         .term-year {
@@ -1099,46 +1491,30 @@ if (!$showProgramCourses && $courseDetails) {
         }
         
         .units-count {
-            font-weight: 600;
-            color: #333;
+            font-weight: 700;
+            color: #0C4B34;
         }
         
         .term-year {
-            font-size: 14px;
+            font-size: 13px;
+            color: rgba(17, 24, 39, 0.6);
         }
         
         .actions-cell {
             padding: 8px 12px;
         }
         
-        /* All headers should be left-aligned */
-        .courses-table th {
+        /* Course Code - Left aligned */
+        .courses-table th:nth-child(1) {
             text-align: left !important;
-        }
-
-        /* All data cells should be left-aligned by default */
-        .courses-table td {
-            text-align: left !important;
+            padding: 12px 8px 12px 24px !important;
         }
         
-        /* Course Code - Left aligned - REMOVED CONFLICTING RULE */
-        
-        /* Course Title - Left aligned */
-        .courses-table td:nth-child(2) {
+        .courses-table td:nth-child(1) {
             text-align: left !important;
-            padding: 8px 6px !important;
-        }
-        
-        /* Units - Center aligned */
-        .courses-table td:nth-child(3) {
-            text-align: center !important;
-            padding: 8px 6px !important;
-        }
-        
-        /* Term & Academic Year - Left aligned */
-        .courses-table td:nth-child(4) {
-            text-align: left !important;
-            padding: 6px 4px !important;
+            padding: 8px 8px 8px 24px !important;
+            font-weight: 700;
+            color: #111827;
         }
         
         /* Year Level - Center aligned */
@@ -1175,33 +1551,33 @@ if (!$showProgramCourses && $courseDetails) {
         .action-btn {
             padding: 6px 12px;
             border: none;
-            border-radius: 4px;
+            border-radius: 6px;
             font-size: 12px;
-            font-weight: 600;
+            font-weight: 700;
             cursor: pointer;
-            transition: all 0.2s ease;
+            transition: all 0.15s ease;
             font-family: 'TT Interphases', sans-serif;
         }
         
         .edit-btn {
-            background-color: #1976d2;
-            color: white;
+            background-color: rgba(12, 75, 52, 0.1);
+            color: #0C4B34;
         }
         
         .edit-btn:hover {
-            background-color: #1565c0;
+            background-color: rgba(12, 75, 52, 0.2);
         }
         
         .assign-btn {
-            background-color: #28a745;
+            background-color: #0F7A53;
             color: white;
         }
         
         .assign-btn:hover:not(.disabled) {
-            background-color: #218838;
+            background-color: #0a5f42;
         }
-
-        /* Action Menu Styles */
+        
+        /* Action Menu Styles - DESIGN.md Button Patterns */
         .action-menu-container {
             position: relative;
             width: 100%;
@@ -1215,25 +1591,25 @@ if (!$showProgramCourses && $courseDetails) {
         .action-menu-btn {
             background: none;
             border: none;
-            padding: 10px;
+            padding: 8px;
             cursor: pointer;
-            border-radius: 6px;
-            transition: background-color 0.2s ease;
+            border-radius: 8px;
+            transition: all 0.15s ease;
             display: flex;
             align-items: center;
             justify-content: center;
-            width: 36px;
-            height: 36px;
+            width: 32px;
+            height: 32px;
         }
 
         .action-menu-btn:hover {
-            background-color: #f0f0f0;
+            background-color: rgba(12, 75, 52, 0.08);
         }
 
         .three-dots {
-            font-size: 18px;
+            font-size: 16px;
             font-weight: bold;
-            color: #666;
+            color: #0C4B34;
             line-height: 1;
             display: inline-block;
             user-select: none;
@@ -1295,98 +1671,26 @@ if (!$showProgramCourses && $courseDetails) {
             color: #666;
         }
         
-        /* Search Container Styles */
-        .search-container {
-            margin: 0;
+        /* REFERENCES - Already styled above with DESIGN.md */
+        .references-count {
+            font-weight: 700;
+            color: #111827;
         }
         
-        .user-search-bar {
-            display: flex;
-            align-items: center;
-            background-color: #FFFFFF;
-            height: 38px;
-            width: 450px;
-            border-radius: 6px;
-            padding: 0 10px;
-            border: 1px solid #e0e0e0;
-        }
-        
-        .user-search-bar:focus-within {
-            border-color: #1976d2;
-            box-shadow: 0 0 0 2px rgba(25, 118, 210, 0.1);
-        }
-        
-        .magnifier-icon {
-            width: 16px;
-            height: 16px;
-            margin-right: 8px;
-            opacity: 0.6;
-        }
-        
-        .user-search-bar input {
-            flex: 1;
-            border: none;
-            background: none;
-            outline: none;
-            font-size: 14px;
-            color: #333;
-            font-family: 'TT Interphases', sans-serif;
-        }
-        
-        .user-search-bar input::placeholder {
-            color: #999;
-        }
-        
-        .clear-search-btn {
-            background: none;
-            border: none;
-            color: #999;
-            cursor: pointer;
-            font-size: 18px;
-            padding: 0;
-            margin-left: 8px;
-            width: 20px;
-            height: 20px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-        
-        .clear-search-btn:hover {
-            color: #666;
-        }
-        
-        .search-button {
-            background-color: #1976d2;
-            color: white;
-            border: none;
-            border-radius: 6px;
-            padding: 8px 16px;
-            font-size: 14px;
-            font-weight: 500;
-            cursor: pointer;
-            height: 38px;
-            font-family: 'TT Interphases', sans-serif;
-        }
-        
-        .search-button:hover {
-            background-color: #1565c0;
-        }
-        
-        /* Info icon styling for edit program modal */
+        /* Info icon styling for edit program modal - DESIGN.md */
         .info-icon {
             position: absolute;
             right: 8px;
             top: 50%;
             transform: translateY(-50%);
-            color: #6c757d;
+            color: rgba(17, 24, 39, 0.4);
             font-size: 14px;
             cursor: help;
             z-index: 1;
         }
         
         .info-icon:hover {
-            color: #495057;
+            color: #0C4B34;
         }
         
         /* Edit Program Modal - Exact match to Add Program Modal */
@@ -1705,7 +2009,8 @@ if (!$showProgramCourses && $courseDetails) {
     </style>
 </head>
 <body>
-    <div class="course-details-container">
+    <!-- Nested wrappers removed to fix offset bugs and structure -->
+    <div class="course-details-container" style="margin: 0 auto !important; max-width: 90% !important; width: 90% !important;">
         <!-- Back Navigation -->
         <a href="content.php?page=<?php 
             if ($showProgramCourses) {
