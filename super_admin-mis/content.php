@@ -1300,7 +1300,7 @@ switch ($page) {
 ?>
 
 <!-- Modal CSS files (load last for higher priority) -->
-<link rel="stylesheet" href="./styles/modal-add-user.css?v=1.0">
+<link rel="stylesheet" href="./styles/modal-add-user.css?v=2.0">
 <link rel="stylesheet" href="./styles/modal-add-department.css?v=1.0">
 <link rel="stylesheet" href="./styles/modals.css?v=1.0">
 <link rel="stylesheet" href="./styles/notifications.css?v=1.0">

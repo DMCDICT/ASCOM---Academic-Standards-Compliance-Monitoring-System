@@ -1,6 +1,12 @@
 // modal-add-user.js
 // Add User modal functionality
 
+function initAddUserLucide() {
+    if (window.lucide && typeof window.lucide.createIcons === 'function') {
+        window.lucide.createIcons();
+    }
+}
+
 // Open Add User Modal
 function openAddUserModal() {
     const modal = document.getElementById('addUserModal');
@@ -23,9 +29,17 @@ function openAddUserModal() {
         if (departmentSelect) {
             departmentSelect.removeAttribute('required');
         }
+        const departmentHelp = document.getElementById('add_department_help');
+        if (departmentHelp) {
+            departmentHelp.textContent = 'Required for dean and teacher roles.';
+        }
+        if (typeof window.handleRoleChange === 'function') {
+            window.handleRoleChange();
+        }
         
         // Clear validation message
         hideAddUserValidation();
+        initAddUserLucide();
         
         // Focus on first input (Role is now first field)
         setTimeout(() => {
@@ -49,11 +63,12 @@ function closeAddUserModal() {
 function showAddUserValidation(message, isError = true) {
     const msgDiv = document.getElementById('addUserValidationMsg');
     if (msgDiv) {
+        msgDiv.className = 'validation-msg';
         msgDiv.textContent = message;
         msgDiv.style.display = 'block';
-        msgDiv.style.backgroundColor = isError ? '#f8d7da' : '#d4edda';
-        msgDiv.style.color = isError ? '#721c24' : '#155724';
-        msgDiv.style.border = '1px solid ' + (isError ? '#f5c6cb' : '#c3e6cb');
+        msgDiv.style.backgroundColor = isError ? 'rgba(185, 28, 28, 0.06)' : 'rgba(12, 75, 52, 0.06)';
+        msgDiv.style.color = isError ? '#b91c1c' : '#0C4B34';
+        msgDiv.style.borderColor = isError ? 'rgba(185, 28, 28, 0.14)' : 'rgba(12, 75, 52, 0.14)';
     }
 }
 
@@ -159,7 +174,7 @@ function submitAddUserForm(formData) {
     if (submitBtn) {
         submitBtn.disabled = true;
         submitBtn.textContent = 'Creating...';
-        submitBtn.style.backgroundColor = '#6c757d';
+        submitBtn.style.backgroundColor = '#A5A5A5';
     }
     
     fetch('./process_add_user.php', {
@@ -203,7 +218,7 @@ function submitAddUserForm(formData) {
         if (submitBtn) {
             submitBtn.disabled = false;
             submitBtn.textContent = 'CREATE';
-            submitBtn.style.backgroundColor = '#28a745';
+            submitBtn.style.backgroundColor = '#0F7A53';
         }
     });
 }
@@ -259,8 +274,11 @@ window.closeAddUserErrorModal = closeAddUserErrorModal;
 
 // Initialize on DOM ready
 document.addEventListener('DOMContentLoaded', function() {
+    initAddUserLucide();
+
     const addUserForm = document.getElementById('addUserForm');
     const clearEmailBtn = document.getElementById('clear_add_email_btn');
+    const addUserModal = document.getElementById('addUserModal');
     
     // Clear email button
     if (clearEmailBtn) {
@@ -290,14 +308,20 @@ document.addEventListener('DOMContentLoaded', function() {
         toggle.addEventListener('click', function() {
             const targetId = this.getAttribute('data-target');
             const targetInput = document.getElementById(targetId);
+            const icon = this.querySelector('i[data-lucide]');
             if (targetInput) {
                 if (targetInput.type === 'password') {
                     targetInput.type = 'text';
-                    this.style.filter = 'invert(0.4)';
+                    if (icon) {
+                        icon.setAttribute('data-lucide', 'eye-off');
+                    }
                 } else {
                     targetInput.type = 'password';
-                    this.style.filter = 'invert(0%)';
+                    if (icon) {
+                        icon.setAttribute('data-lucide', 'eye');
+                    }
                 }
+                initAddUserLucide();
             }
         });
     });
@@ -347,4 +371,18 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         });
     }
+
+    if (addUserModal) {
+        addUserModal.addEventListener('click', function(e) {
+            if (e.target === addUserModal) {
+                closeAddUserModal();
+            }
+        });
+    }
+
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape' && addUserModal && addUserModal.style.display === 'flex') {
+            closeAddUserModal();
+        }
+    });
 });
