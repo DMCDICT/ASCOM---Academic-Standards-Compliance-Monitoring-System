@@ -1434,25 +1434,130 @@ function assignFacultyFromProgram(courseCode) {
 function openAddCourseModalFromProgram(programCode) {
     // Store the program code for use in the modal
     window.currentProgramCode = programCode;
+    
+    // Set context to bypass course type selection and go directly to add course modal
+    window.courseSelectionContext = {
+        programCode: programCode,
+        skipCourseTypeSelection: true
+    };
+    
     // Open the add course modal
-    if (typeof checkProgramsAndOpenCourseModal === 'function') {
-        checkProgramsAndOpenCourseModal();
-        // After modal opens, pre-select the current program
-        setTimeout(() => {
-            if (window.currentProgramCode && typeof preSelectProgram === 'function') {
-                preSelectProgram(window.currentProgramCode);
-            }
-        }, 500);
-    } else if (typeof openAddCourseModal === 'function') {
+    if (typeof openAddCourseModal === 'function') {
         openAddCourseModal();
-        setTimeout(() => {
-            if (window.currentProgramCode && typeof preSelectProgram === 'function') {
-                preSelectProgram(window.currentProgramCode);
-            }
-        }, 500);
     } else {
-        console.error('Add course modal function not found');
-        alert('Add course functionality is not available. Please refresh the page.');
+        // Try using the modal element directly
+        const addCourseModal = document.getElementById('addCourseModal');
+        if (addCourseModal) {
+            addCourseModal.style.display = 'flex';
+            addCourseModal.style.zIndex = '10000';
+            document.body.style.overflow = 'hidden';
+        } else {
+            console.error('Add course modal not found');
+            alert('Add course functionality is not available. Please refresh the page.');
+        }
+    }
+    
+    // Try to pre-select the program after modal opens
+    setTimeout(() => {
+        if (typeof preSelectProgram === 'function' && window.currentProgramCode) {
+            preSelectProgram(window.currentProgramCode);
+        }
+    }, 800);
+}
+
+// Pre-select the program in the add course modal
+function preSelectProgram(programCodeOrId) {
+    if (!programCodeOrId) return;
+    
+    // First ensure programs are loaded
+    const ensureProgramsLoaded = async () => {
+        if (!window.courseSelectionPrograms || window.courseSelectionPrograms.length === 0) {
+            try {
+                const response = await fetch('../../department-dean/api/get_programs.php');
+                const data = await response.json();
+                if (data.success && data.programs) {
+                    window.courseSelectionPrograms = data.programs;
+                }
+            } catch (error) {
+                console.error('Error loading programs:', error);
+            }
+        }
+    };
+    
+    // Then try to set the program
+    const tryPreSelect = () => {
+        const selectedProgramsInput = document.getElementById('selectedPrograms');
+        const programSelectText = document.getElementById('programSelectText');
+        const programSelectBtn = document.getElementById('programSelectBtn');
+        
+        if (!selectedProgramsInput || !window.courseSelectionPrograms) return false;
+        
+        const programs = window.courseSelectionPrograms;
+        
+        // Find by program code first
+        let program = programs.find(p => p.program_code === programCodeOrId);
+        
+        // If not found, try by ID
+        if (!program) {
+            program = programs.find(p => p.id == programCodeOrId);
+        }
+        
+        if (program) {
+            selectedProgramsInput.value = program.id;
+            selectedProgramsInput.setAttribute('value', program.id);
+            
+            if (programSelectText) {
+                programSelectText.textContent = program.program_name;
+            }
+            
+            if (programSelectBtn) {
+                programSelectBtn.setAttribute('data-selected-programs', program.id);
+                programSelectBtn.setAttribute('data-selected-names', program.program_name);
+            }
+            
+            // Also update window.selectedProgramsData
+            window.selectedProgramsData = {
+                ids: [String(program.id)],
+                names: [program.program_name]
+            };
+            
+            console.log('Pre-selected program:', program.program_name);
+            return true;
+        }
+        
+        return false;
+    };
+    
+    // Execute
+    ensureProgramsLoaded().then(() => {
+        if (!tryPreSelect()) {
+            // Retry a few times
+            let retries = 0;
+            const checkInterval = setInterval(() => {
+                if (tryPreSelect() || retries >= 5) {
+                    clearInterval(checkInterval);
+                }
+                retries++;
+            }, 200);
+        }
+    });
+}
+
+// Fallback openAddCourseModal function
+function openAddCourseModal() {
+    const addCourseModal = document.getElementById('addCourseModal');
+    if (addCourseModal) {
+        addCourseModal.style.display = 'flex';
+        addCourseModal.style.zIndex = '10000';
+        document.body.style.overflow = 'hidden';
+        
+        // Initialize form if needed
+        if (typeof initializeCourseForm === 'function') {
+            initializeCourseForm();
+        }
+    } else {
+        console.error('Add course modal (addCourseModal) not found in DOM');
+        alert('Unable to open the add course form. Please refresh the page and try again.');
     }
 }
 
