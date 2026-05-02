@@ -946,7 +946,7 @@ html[data-theme="dark"] .section-header h3 {
                                                 <span>Edit</span>
                                             </div>
                                             <div class="action-menu-item <?php echo (!empty($course['faculty_name']) && $course['faculty_name'] !== 'Unassigned') ? 'disabled' : ''; ?>" 
-                                                 onclick="<?php echo (!empty($course['faculty_name']) && $course['faculty_name'] !== 'Unassigned') ? 'return false;' : 'assignFacultyFromProgram(\'' . htmlspecialchars($course['course_code']) . '\');'; ?>">
+                                                 onclick="<?php echo (!empty($course['faculty_name']) && $course['faculty_name'] !== 'Unassigned') ? 'return false;' : 'assignFacultyFromProgram(\'' . htmlspecialchars($course['course_code']) . '\', ' . intval($course['course_id']) . ', \'' . htmlspecialchars($course['course_code']) . '\', \'Program: ' . htmlspecialchars($programCode ?? 'N/A') . "\');"; ?>">
                                                 <span class="action-icon">👤</span>
                                                 <span>Assign</span>
                                             </div>
@@ -1420,14 +1420,18 @@ async function editCourseFromProgram(courseCode, courseId) {
 }
 
 // Assign faculty from program courses page
-function assignFacultyFromProgram(courseCode) {
+function assignFacultyFromProgram(courseCode, courseId, courseTitle, courseInfo) {
     // Close the action menu
     const menu = document.getElementById('actionMenu-' + courseCode);
     if (menu) {
         menu.style.display = 'none';
     }
-    // TODO: Implement assign faculty functionality
-    alert('Assign faculty to course: ' + courseCode + '\n\nThis functionality will be implemented soon.');
+    // Call the global assignFaculty function
+    if (typeof assignFaculty === 'function') {
+        assignFaculty(courseCode, courseId, courseTitle, courseInfo);
+    } else {
+        alert('Assign faculty functionality not available. Please refresh the page.');
+    }
 }
 
 // Open add course modal from program courses page
@@ -1562,3 +1566,8 @@ function openAddCourseModal() {
 }
 
 </script>
+
+<?php 
+// Include the Assign Faculty Modal
+include_once __DIR__ . '/../modals/assign_faculty_modal.php';
+?>

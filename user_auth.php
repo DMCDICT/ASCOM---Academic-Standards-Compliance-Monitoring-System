@@ -65,8 +65,9 @@ try {
     if ((int) $user['role_id'] === 2 || (int) $user['role_id'] === 3) {
         $deptCode = null;
         $deptName = null;
+        $deptId = null;
         if (!empty($user['department_id'])) {
-            $deptQuery = $conn->prepare('SELECT department_code, department_name FROM departments WHERE id = ?');
+            $deptQuery = $conn->prepare('SELECT id as department_id, department_code, department_name FROM departments WHERE id = ?');
             $deptQuery->bind_param('i', $user['department_id']);
             $deptQuery->execute();
             $deptRes = $deptQuery->get_result();
@@ -74,19 +75,21 @@ try {
                 $deptRow = $deptRes->fetch_assoc();
                 $deptCode = $deptRow['department_code'];
                 $deptName = $deptRow['department_name'];
+                $deptId = $deptRow['department_id'];
             }
             $deptQuery->close();
         }
 
         $userRoles[] = [
             'type' => 'teacher',
+            'department_id' => $deptId,
             'department_code' => $deptCode,
             'department_name' => $deptName,
             'assigned_at' => null,
         ];
     }
 
-    $deanQuery = $conn->prepare('SELECT department_code, department_name FROM departments WHERE dean_user_id = ?');
+    $deanQuery = $conn->prepare('SELECT id as department_id, department_code, department_name FROM departments WHERE dean_user_id = ?');
     $deanQuery->bind_param('i', $user['id']);
     $deanQuery->execute();
     $deanRes = $deanQuery->get_result();
@@ -94,6 +97,7 @@ try {
         while ($row = $deanRes->fetch_assoc()) {
             $userRoles[] = [
                 'type' => 'dean',
+                'department_id' => $row['department_id'],
                 'department_code' => $row['department_code'],
                 'department_name' => $row['department_name'],
                 'assigned_at' => null,

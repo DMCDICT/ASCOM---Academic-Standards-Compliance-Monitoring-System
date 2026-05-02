@@ -1475,11 +1475,11 @@ if (isset($pdo)) {
                                          <span class="action-icon">✏️</span>
                                          <span>Edit</span>
                                      </div>
-                                     <div class="action-menu-item <?php echo !empty($course['faculty']) ? 'disabled' : ''; ?>" 
-                                          onclick="<?php echo !empty($course['faculty']) ? 'return false;' : 'assignFaculty(\'' . htmlspecialchars($course['course_code']) . '\');'; ?>">
-                                         <span class="action-icon">👤</span>
-                                         <span>Assign</span>
-                                     </div>
+<div class="action-menu-item" 
+                                           onclick="assignFaculty('<?php echo htmlspecialchars($course['course_code']); ?>', <?php echo intval($course['id']); ?>, '<?php echo htmlspecialchars($course['course_title']); ?>', '<?php echo htmlspecialchars(($course['program_code'] ?? 'N/A') . ' | ' . ($course['term'] ?? 'N/A') . ' | ' . ($course['year_level'] ?? 'N/A') . ' Year | ' . ($course['academic_year'] ?? 'N/A')); ?>');">
+                                          <span class="action-icon">👤</span>
+                                          <span>Assign</span>
+                                      </div>
                                  </div>
                              </div>
                          </td>
@@ -3064,6 +3064,11 @@ $deanDepartmentIdJS = $_SESSION['selected_role']['department_id'] ?? 'null';
              });
      }
      
-     // Load teachers when course details are shown
-     window.loadCourseTeachersList = loadCourseTeachersList;
-  </script>
+// Load teachers when course details are shown
+      window.loadCourseTeachersList = loadCourseTeachersList;
+   </script>
+
+<?php 
+// Include the Assign Faculty Modal
+include_once __DIR__ . '/../modals/assign_faculty_modal.php';
+?>

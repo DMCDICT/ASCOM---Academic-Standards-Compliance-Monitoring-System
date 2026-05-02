@@ -14,13 +14,54 @@ if (!$department_id) {
 }
 
 try {
-    // Get all teachers from this department
-    $stmt = $pdo->prepare("
-        SELECT id, employee_no, first_name, last_name, title, email
-        FROM users 
-        WHERE department_id = ? AND is_active = 1
-        ORDER BY first_name ASC
-    ");
+    // Get all faculty/teachers from this department.
+    // Role data differs across deployments:
+    // - users.role_id (primary role via roles table)
+    // - users.role (legacy string role)
+    // - user_roles table (additional roles; sometimes used for teacher/faculty too)
+    //
+    // Treat "teacher" and "faculty" as synonyms for assignment UIs.
+    $joins = [];
+    $roleConditions = [];
+
+    if (ascom_table_has_column($pdo, 'users', 'role')) {
+        $roleConditions[] = "u.role IN ('teacher', 'faculty')";
+    }
+
+    if (ascom_table_has_column($pdo, 'users', 'role_id') && ascom_table_has_column($pdo, 'roles', 'role_name')) {
+        $joins[] = "LEFT JOIN roles br ON u.role_id = br.id";
+        $roleConditions[] = "br.role_name IN ('teacher', 'faculty')";
+    }
+
+    if (ascom_table_has_column($pdo, 'user_roles', 'user_id')) {
+        $activePredicate = ascom_user_roles_active_predicate($pdo, 'ur');
+        $teacherRolePredicate = ascom_user_roles_role_predicate($pdo, 'ur', 'teacher');
+        $facultyRolePredicate = ascom_user_roles_role_predicate($pdo, 'ur', 'faculty');
+
+        $joins[] = "
+            LEFT JOIN user_roles ur
+              ON u.id = ur.user_id
+             AND {$activePredicate}
+        ";
+        $roleConditions[] = "({$teacherRolePredicate} OR {$facultyRolePredicate})";
+    }
+
+    if (count($roleConditions) === 0) {
+        // Last resort: do not filter by role if we can't determine role columns.
+        $roleConditions[] = '1=1';
+    }
+
+    $query = "
+        SELECT DISTINCT u.id, u.employee_no, u.first_name, u.last_name, u.title, u.email
+        FROM users u
+        " . implode("\n", $joins) . "
+        WHERE u.department_id = ?
+          AND u.is_active = 1
+          AND (" . implode(' OR ', $roleConditions) . ")
+        ORDER BY u.first_name ASC
+    ";
+    
+    $stmt = $pdo->prepare($query);
     $stmt->execute([$department_id]);
     $teachers = $stmt->fetchAll(PDO::FETCH_ASSOC);
     
@@ -48,6 +89,8 @@ try {
     ]);
     
 } catch (PDOException $e) {
+    echo json_encode(['success' => false, 'message' => 'Error: ' . $e->getMessage()]);
+} catch (Exception $e) {
     echo json_encode(['success' => false, 'message' => 'Error: ' . $e->getMessage()]);
 }
 ?>
