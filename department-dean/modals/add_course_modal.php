@@ -6202,7 +6202,7 @@ window.openAddCourseModal = function() {
         }
         
         // Check if we're resuming a draft - if not, clear any draft-related flags
-        const isResumingDraft = window.courseSelectionContext && window.courseSelectionContext.isResumingDraft === true;
+        let isResumingDraft = window.courseSelectionContext && window.courseSelectionContext.isResumingDraft === true;
         
         // Always clear draft resume data unless we're explicitly resuming
         if (!isResumingDraft) {
@@ -6318,7 +6318,7 @@ window.openAddCourseModal = function() {
             void modal.offsetHeight;
   
   // Reset form (but skip if resuming draft)
-        const isResumingDraft = window.courseSelectionContext && window.courseSelectionContext.isResumingDraft;
+        isResumingDraft = window.courseSelectionContext && window.courseSelectionContext.isResumingDraft;
         
         if (!isResumingDraft) {
             window._courseFormStep = 1;
@@ -6407,7 +6407,7 @@ window.openAddCourseModal = function() {
         // Reset form fields MANUALLY (excluding program selection) instead of using form.reset()
         // This gives us complete control and ensures program selection is NEVER touched
         // BUT skip reset if we're resuming a draft (draft data will be loaded instead)
-        const isResumingDraft = window.courseSelectionContext && window.courseSelectionContext.isResumingDraft;
+        isResumingDraft = window.courseSelectionContext && window.courseSelectionContext.isResumingDraft;
         
         if (!isResumingDraft) {
             const form = document.getElementById('addCourseForm');

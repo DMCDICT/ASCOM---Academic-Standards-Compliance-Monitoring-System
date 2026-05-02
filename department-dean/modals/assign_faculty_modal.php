@@ -592,7 +592,7 @@
         document.getElementById('currentAssignmentSection').style.display = 'none';
 
         // Get department ID from session
-        const departmentId = <?php echo isset($_SESSION['selected_role']['department_id']) ? $_SESSION['selected_role']['department_id'] : 'null'; ?>;
+        const departmentId = <?php echo json_encode($_SESSION['selected_role']['department_id'] ?? null); ?>;
 
         if (!departmentId) {
             showTeachersError('Department not found. Please refresh and try again.');

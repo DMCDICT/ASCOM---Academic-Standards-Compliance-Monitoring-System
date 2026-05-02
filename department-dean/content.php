@@ -55,7 +55,7 @@ ascom_require_role('dean', '../user_login.php');
 <body>
 
 <?php include './modals/add_faculty_modal.php'; ?>
-<?php include './modals/add_course_modal.php'; ?>
+<?php include_once './modals/add_course_modal.php'; ?>
 <?php include './modals/add_program_modal.php'; ?>
 
 <!-- Course Selection Modal -->
@@ -845,7 +845,7 @@ document.addEventListener('DOMContentLoaded', function() {
     }, 200);
 });
 </script>
-<?php include './modals/add_book_reference_modal.php'; ?>
+<?php include_once './modals/add_book_reference_modal.php'; ?>
 
 <div class="top-navbar">
   <div class="top-navbar-content">
@@ -973,14 +973,13 @@ document.addEventListener('DOMContentLoaded', function() {
         break;
       case 'course-details':
         include './all_courses-content/course-details.php';
-        include './modals/edit_course_modal.php';
-        include './modals/add_book_reference_modal.php';
+        include_once './modals/edit_course_modal.php';
+        // add_book_reference_modal.php is already included at the top level (line 848)
         break;
       case 'program-courses':
         include './program_courses-content/program-courses.php';
-        include './modals/edit_course_modal.php';
-        // add_course_modal.php is already included at the top level (line 82)
-        include './modals/add_book_reference_modal.php';
+        include_once './modals/edit_course_modal.php';
+        // add_book_reference_modal.php is already included at the top level (line 848)
         break;
       case 'reference-requests':
         include './reference-requests-content/reference-requests.php';
