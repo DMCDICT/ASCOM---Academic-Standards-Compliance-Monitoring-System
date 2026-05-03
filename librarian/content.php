@@ -22,6 +22,9 @@ ascom_require_role('librarian', '../user_login.php');
 <link rel="stylesheet" href="./styles/modal-add-book.css">
 <link rel="stylesheet" href="../super_admin-mis/styles/notifications.css">
 
+<!-- Lucide Icons (CDN) -->
+<script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+
 </head>
 <body>
 
@@ -110,12 +113,12 @@ if ($hasOtherRoles) {
       </div>
       <img src="../src/assets/images/ASCOM_Monitoring_System.png" alt="Logo" class="logo-img" />
       <div class="search-bar">
-        <img src="../src/assets/icons/search-icon.png" alt="Search Icon" />
+        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="display: inline-block; vertical-align: middle; margin-right: 10px; opacity: 0.85; flex-shrink: 0;"><circle cx="11" cy="11" r="8"></circle><path d="m21 21-4.3-4.3"></path></svg>
         <input type="text" placeholder="Search Here..." />
       </div>
     </div>
-    <div class="notification-icon">
-      <img src="../src/assets/icons/notifications-icon.png" alt="Notifications" />
+    <div class="notification-icon" id="notificationIconBtn">
+      <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display: inline-block; vertical-align: middle;"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"></path><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"></path></svg>
       <div class="notification-count">0</div>
       <div class="notification-dropdown" id="notificationDropdown">
         <h3>Notifications</h3>
@@ -391,6 +394,22 @@ document.addEventListener('click', function(e) {
         }
     }
 });
+
+// Initialize Lucide icons
+(function() {
+    function initLucide() {
+        if (typeof lucide !== 'undefined') {
+            lucide.createIcons();
+        } else {
+            setTimeout(initLucide, 100);
+        }
+    }
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', initLucide);
+    } else {
+        initLucide();
+    }
+})();
 
 </script>
 </body>
