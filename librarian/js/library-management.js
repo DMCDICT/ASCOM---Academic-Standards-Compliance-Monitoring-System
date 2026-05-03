@@ -457,7 +457,7 @@
     edition: els.edition.value.trim(),
     call: els.callNumber.value.trim(),
     class: els.classification.value,
-    loc: els.location.value.trim(),
+    loc: Array.from(document.querySelectorAll('input[name="lmLocation[]"]:checked')).map(cb => cb.value).join(', '),
     copies: els.noOfCopies.value,
     avail: els.availableCopies.value,
     status: els.status.value,
@@ -502,7 +502,8 @@
     els.edition.value = "";
     els.callNumber.value = "";
     els.classification.value = "";
-    els.location.value = "";
+    // Clear location checkboxes
+    document.querySelectorAll('input[name="lmLocation[]"]').forEach(cb => cb.checked = false);
     els.noOfCopies.value = "1";
     els.availableCopies.value = "1";
     els.status.value = "available";
@@ -545,7 +546,12 @@
       els.edition.value = b.edition || "";
       els.callNumber.value = b.call_number || "";
       els.classification.value = b.classification_id ? String(b.classification_id) : "";
-      els.location.value = b.location || "";
+      // Parse location string and check appropriate checkboxes
+      const locationStr = b.location || "";
+      const locations = locationStr.split(',').map(l => l.trim());
+      document.querySelectorAll('input[name="lmLocation[]"]').forEach(cb => {
+        cb.checked = locations.includes(cb.value);
+      });
       els.noOfCopies.value = String(b.no_of_copies ?? 0);
       els.availableCopies.value = String(b.available_copies ?? 0);
       els.status.value = b.status || "available";
@@ -590,7 +596,8 @@
       classification_id: els.classification.value ? Number(els.classification.value) : null,
       no_of_copies: noOfCopies,
       available_copies: availableCopies,
-      location: els.location.value.trim(),
+      // Get location from checkboxes
+      location: Array.from(document.querySelectorAll('input[name="lmLocation[]"]:checked')).map(cb => cb.value).join(', '),
       description: els.description.value.trim(),
       status: els.status.value,
       department_ids: deptMulti.getSelectedIds(),
@@ -769,13 +776,18 @@
   const cancelUXTick = debounce(updateCancelButtonUX, 120);
   [
     els.bookTitle, els.author, els.isbn, els.publisher, els.publicationYear, els.edition,
-    els.callNumber, els.classification, els.location, els.noOfCopies, els.availableCopies,
+    els.callNumber, els.classification, els.noOfCopies, els.availableCopies,
     els.status, els.description,
     els.deptMulti.input, els.catMulti.input, els.tagsMulti.input,
   ].forEach((el) => {
     if (!el) return;
     el.addEventListener("input", cancelUXTick);
     el.addEventListener("change", cancelUXTick);
+  });
+  
+  // Add event listeners for location checkboxes
+  document.querySelectorAll('input[name="lmLocation[]"]').forEach(cb => {
+    cb.addEventListener("change", cancelUXTick);
   });
 
   els.search.addEventListener("input", debounce(() => {
