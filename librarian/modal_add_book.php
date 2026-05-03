@@ -618,16 +618,6 @@ function validateAddBookButton() {
     const publisher = document.getElementById('publisher');
     const location = document.getElementById('location');
     
-        courseSearch: courseSearch,
-        courseId: courseId,
-        callNo: callNo,
-        bookTitle: bookTitle,
-        copyright: copyright,
-        authors: authors,
-        publisher: publisher,
-        location: location
-    });
-    
     const courseSearchValue = courseSearch?.value?.trim() || '';
     const courseIdValue = courseId?.value?.trim() || '';
     const callNoValue = callNo?.value?.trim() || '';
@@ -636,16 +626,6 @@ function validateAddBookButton() {
     const authorsValue = authors?.value?.trim() || '';
     const publisherValue = publisher?.value?.trim() || '';
     const locationValue = location?.value?.trim() || '';
-    
-        courseSearch: courseSearchValue,
-        courseId: courseIdValue,
-        callNo: callNoValue,
-        bookTitle: bookTitleValue,
-        copyright: copyrightValue,
-        authors: authorsValue,
-        publisher: publisherValue,
-        location: locationValue
-    });
     
     // Find the button using ID
     const button = document.getElementById('addBookBtn');
@@ -660,17 +640,6 @@ function validateAddBookButton() {
     // Check if all required fields are filled (authors and publisher are now optional)
     const noOfCopiesValue = document.getElementById('no_of_copies')?.value?.trim() || '';
     const allFilled = courseSearchValue && courseIdValue && callNoValue && bookTitleValue && copyrightValue && noOfCopiesValue && locationValue;
-    
-        courseSearch: !!courseSearchValue,
-        courseId: !!courseIdValue,
-        callNo: !!callNoValue,
-        bookTitle: !!bookTitleValue,
-        copyright: !!copyrightValue,
-        noOfCopies: !!noOfCopiesValue,
-        location: !!locationValue,
-        authors: !!authorsValue, // Optional
-        publisher: !!publisherValue // Optional
-    });
     
     if (button) {
         if (allFilled) {

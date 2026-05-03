@@ -7,11 +7,6 @@ class NotificationSystem {
         this.notifications = [];
         this.unreadCount = 0;
         
-            icon: !!this.notificationIcon,
-            dropdown: !!this.notificationDropdown,
-            count: !!this.notificationCount
-        });
-        
         this.init();
     }
     
