@@ -304,6 +304,31 @@
       open();
     });
 
+    cfg.input.addEventListener("keydown", (e) => {
+      if (e.key === "Enter") {
+        e.preventDefault();
+        e.stopPropagation();
+
+        const query = cfg.input.value.trim();
+        if (!query) return;
+
+        // Try to find exact match in current items
+        const match = items.find((it) => cfg.searchText(it).toLowerCase() === query.toLowerCase());
+        if (match) {
+          if (!selected.has(String(match.id))) {
+            selected.set(String(match.id), match);
+            cfg.input.value = "";
+            renderChips();
+            renderDropdown("");
+            if (cfg.onChange) cfg.onChange();
+          }
+        } else if (cfg.onCreate) {
+          // Allow creation of new items (e.g. for Categories)
+          cfg.onCreate(query);
+        }
+      }
+    });
+
     cfg.dropdown.addEventListener("click", (e) => {
       const opt = e.target.closest(".lm-option");
       if (!opt) return;
@@ -316,6 +341,7 @@
       renderChips();
       renderDropdown("");
       cfg.input.focus();
+      if (cfg.onChange) cfg.onChange();
     });
 
     cfg.chips.addEventListener("click", (e) => {
@@ -326,6 +352,7 @@
       const id = chip.getAttribute("data-id");
       selected.delete(String(id));
       renderChips();
+      if (cfg.onChange) cfg.onChange();
     });
 
     document.addEventListener("click", (e) => {
@@ -348,6 +375,11 @@
         });
         renderChips();
       },
+      addSelectedItem(it) {
+        if (!it) return;
+        selected.set(String(it.id), it);
+        renderChips();
+      },
       clear() {
         selected.clear();
         renderChips();
@@ -363,6 +395,7 @@
     optionLabel: (d) => `${d.department_code} — ${d.department_name}`,
     chipLabel: (d) => d.department_code || d.department_name,
     searchText: (d) => `${d.department_code} ${d.department_name}`,
+    onChange: () => updateCancelButtonUX(),
   });
 
   const catMulti = multiSelect({
@@ -373,6 +406,30 @@
     optionLabel: (c) => c.name,
     chipLabel: (c) => c.name,
     searchText: (c) => c.name,
+    onChange: () => updateCancelButtonUX(),
+    onCreate: async (name) => {
+      const btn = els.catMulti.input;
+      btn.disabled = true;
+      try {
+        const json = await fetchJSON("./api/add_category.php", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ name }),
+        });
+        const newCat = json.category;
+        cache.categories = [...cache.categories, newCat].sort((a, b) => String(a.name).localeCompare(String(b.name)));
+        populateSelect(els.catFilter, cache.categories, (c) => c.name);
+        catMulti.setItems(cache.categories);
+        catMulti.addSelectedItem(newCat);
+        els.catMulti.input.value = "";
+        updateCancelButtonUX();
+      } catch (e) {
+        els.bookError.textContent = e.message || "Failed to create category";
+      } finally {
+        btn.disabled = false;
+        btn.focus();
+      }
+    }
   });
 
   const tagsState = {
