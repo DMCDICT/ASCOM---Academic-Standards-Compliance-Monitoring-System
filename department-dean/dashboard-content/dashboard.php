@@ -224,6 +224,50 @@ try {
             $totalFaculty = 0;
         }
         
+        // Calculate compliance stats
+        $compliantCourses = 0;
+        $nonCompliantCourses = 0;
+        try {
+            $currentYear = date('Y');
+            $fiveYearsAgo = $currentYear - 4;
+            
+            // Get department ID from department code
+            $deptIdQuery = "SELECT id FROM departments WHERE department_code = ? LIMIT 1";
+            $deptIdStmt = $pdo->prepare($deptIdQuery);
+            $deptIdStmt->execute([$deanDepartmentCode]);
+            $deptRow = $deptIdStmt->fetch(PDO::FETCH_ASSOC);
+            $deptId = $deptRow['id'] ?? null;
+            
+            if ($deptId) {
+                $complianceQuery = "
+                    SELECT 
+                        c.id,
+                        COUNT(br.id) as total_references,
+                        COUNT(CASE WHEN br.publication_year >= ? AND br.publication_year IS NOT NULL THEN 1 END) as compliant_count
+                    FROM courses c
+                    LEFT JOIN book_references br ON c.id = br.course_id
+                    WHERE c.program_id IN (
+                        SELECT id FROM programs WHERE department_id = ?
+                    )
+                    GROUP BY c.id
+                ";
+                $complianceStmt = $pdo->prepare($complianceQuery);
+                $complianceStmt->execute([$fiveYearsAgo, $deptId]);
+                $complianceResults = $complianceStmt->fetchAll(PDO::FETCH_ASSOC);
+                
+                foreach ($complianceResults as $course) {
+                    $compliantCount = intval($course['compliant_count'] ?? 0);
+                    if ($compliantCount >= 5) {
+                        $compliantCourses++;
+                    } else {
+                        $nonCompliantCourses++;
+                    }
+                }
+            }
+        } catch (Exception $e) {
+            // Keep default values on error
+        }
+        
         // Fetch recent activities (if activity_logs table exists) filtered by selected term
         try {
             $activitiesQuery = "
@@ -1584,6 +1628,22 @@ html[data-theme="dark"] .collapse-btn:hover {
         <span class="box-label">Faculty Members</span>
         <span class="amount"><?php echo $totalFaculty; ?></span>
         <span class="amount-sub">Enrolled teachers</span>
+    </div>
+  </button>
+  <button type="button" class="box box-link" onclick="showComplianceSection()" aria-label="View compliance status">
+    <div class="box-icon" style="background: rgba(76, 175, 80, 0.1); color: #4CAF50;"><i data-lucide="check-circle"></i></div>
+    <div class="box-content">
+        <span class="box-label">Compliant Courses</span>
+        <span class="amount" style="color: #4CAF50;"><?php echo $compliantCourses; ?></span>
+        <span class="amount-sub">5+ compliant books</span>
+    </div>
+  </button>
+  <button type="button" class="box box-link" onclick="showNonCompliantCourses()" aria-label="View non-compliant courses">
+    <div class="box-icon" style="background: rgba(244, 67, 54, 0.1); color: #f44336;"><i data-lucide="alert-circle"></i></div>
+    <div class="box-content">
+        <span class="box-label">Non-Compliant</span>
+        <span class="amount" style="color: #f44336;"><?php echo $nonCompliantCourses; ?></span>
+        <span class="amount-sub">Needs attention</span>
     </div>
   </button>
 </div>
@@ -3871,7 +3931,223 @@ function toggleSection() {
         // Pass term as URL parameter
         window.location.href = 'content.php?page=course-details&program=' + encodeURIComponent(programCode) + '&term_id=' + encodeURIComponent(selectedTermId);
     }
+    
+    // Function to show compliance section
+    function showComplianceSection() {
+        // Scroll to compliance section or show modal
+        const modal = document.getElementById('complianceModal');
+        if (modal) {
+            modal.style.display = 'flex';
+        }
+    }
+    
+    // Function to show non-compliant courses
+    function showNonCompliantCourses() {
+        loadNonCompliantCourses();
+        const modal = document.getElementById('nonCompliantCoursesModal');
+        if (modal) {
+            modal.style.display = 'flex';
+        }
+    }
+    
+    // Load non-compliant courses
+    let nonCompliantCourses = [];
+    
+    async function loadNonCompliantCourses() {
+        try {
+            const response = await fetch('api/get_non_compliant_courses.php');
+            const result = await response.json();
+            
+            if (result.success) {
+                nonCompliantCourses = result.data;
+                displayNonCompliantCourses();
+            }
+        } catch (error) {
+            console.error('Error loading non-compliant courses:', error);
+        }
+    }
+    
+    function displayNonCompliantCourses() {
+        const container = document.getElementById('nonCompliantCoursesList');
+        if (!container) return;
+        
+        if (nonCompliantCourses.length === 0) {
+            container.innerHTML = '<div style="text-align: center; padding: 40px; color: #666;"><p>All courses are compliant! 🎉</p></div>';
+            return;
+        }
+        
+        container.innerHTML = nonCompliantCourses.map(course => {
+            const courseCode = encodeURIComponent(course.course_code || '');
+            const courseTitle = encodeURIComponent(course.course_title || '');
+            return `
+                <div class="non-compliant-course-card" style="border: 1px solid #0c4b3424; border-radius: 12px; padding: 16px; margin-bottom: 12px; background: #fff;">
+                    <div style="display: flex; justify-content: space-between; align-items: start;">
+                        <div>
+                            <h4 style="margin: 0 0 4px 0; color: #333;">${course.course_code}</h4>
+                            <p style="margin: 0 0 8px 0; color: #666; font-size: 14px;">${course.course_title}</p>
+                            <div style="font-size: 13px; color: #888;">
+                                <span style="color: ${course.compliant_count > 0 ? '#f44336' : '#999'};">${course.compliant_count || 0}/5 compliant</span>
+                                <span style="margin: 0 8px;">|</span>
+                                <span>${course.total_references} total references</span>
+                            </div>
+                        </div>
+                        <button type="button" class="btn-primary" onclick="openMaterialRequestModal(${course.id}, '${courseCode}', '${courseTitle}')" style="padding: 8px 16px; font-size: 13px;">
+                            <i data-lucide="send" style="width: 14px; height: 14px;"></i>
+                            Request
+                        </button>
+                    </div>
+                </div>
+            `;
+        }).join('');
+        
+        // Re-initialize Lucide icons
+        if (typeof lucide !== 'undefined') {
+            lucide.createIcons();
+        }
+    }
+    
+    // Open material request modal
+    function openMaterialRequestModal(courseId, courseCode, courseTitle) {
+        document.getElementById('mrCourseId').value = courseId;
+        document.getElementById('mrCourseInfo').textContent = decodeURIComponent(courseCode) + ' - ' + decodeURIComponent(courseTitle);
+        
+        const modal = document.getElementById('materialRequestModal');
+        if (modal) {
+            modal.style.display = 'flex';
+        }
+    }
+    
+    // Close material request modal
+    function closeMaterialRequestModal() {
+        const modal = document.getElementById('materialRequestModal');
+        if (modal) {
+            modal.style.display = 'none';
+        }
+        document.getElementById('materialRequestForm').reset();
+    }
+    
+    // Submit material request
+    async function submitMaterialRequest(event) {
+        event.preventDefault();
+        
+        const submitBtn = document.getElementById('mrSubmitBtn');
+        submitBtn.disabled = true;
+        submitBtn.textContent = 'Submitting...';
+        
+        const formData = {
+            course_id: document.getElementById('mrCourseId').value,
+            book_title: document.getElementById('mrBookTitle').value.trim(),
+            author: document.getElementById('mrAuthor').value.trim(),
+            isbn: document.getElementById('mrIsbn').value.trim(),
+            publisher: document.getElementById('mrPublisher').value.trim(),
+            edition: document.getElementById('mrEdition').value.trim(),
+            publication_year: document.getElementById('mrPublicationYear').value.trim(),
+            justification: document.getElementById('mrJustification').value.trim()
+        };
+        
+        try {
+            const response = await fetch('api/submit_material_request.php', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(formData)
+            });
+            
+            const result = await response.json();
+            
+            if (result.success) {
+                alert('Material request submitted successfully!');
+                closeMaterialRequestModal();
+                // Refresh the non-compliant courses list
+                loadNonCompliantCourses();
+            } else {
+                alert('Error: ' + result.message);
+            }
+        } catch (error) {
+            console.error('Error submitting request:', error);
+            alert('Failed to submit request. Please try again.');
+        } finally {
+            submitBtn.disabled = false;
+            submitBtn.textContent = 'Submit Request';
+        }
+    }
 </script>
+
+<!-- Non-Compliant Courses Modal -->
+<div id="nonCompliantCoursesModal" class="modal" style="display: none; z-index: 10009;">
+    <div class="modal-content" style="max-width: 700px; max-height: 80vh; overflow-y: auto;">
+        <div class="modal-header">
+            <h2 style="font-size: 20px; font-weight: 700;">Non-Compliant Courses</h2>
+            <span class="close" onclick="document.getElementById('nonCompliantCoursesModal').style.display='none';">&times;</span>
+        </div>
+        <div class="modal-body" style="padding: 20px;">
+            <p style="margin-bottom: 16px; color: #666;">These courses need at least 5 compliant book references (published within 5 years). Click "Request" to send a material request to the librarian.</p>
+            <div id="nonCompliantCoursesList">
+                <!-- Non-compliant courses will be loaded here -->
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Material Request Modal -->
+<div id="materialRequestModal" class="modal" style="display: none; z-index: 10010;">
+    <div class="modal-content" style="max-width: 550px;">
+        <div class="modal-header">
+            <h2 style="font-size: 20px; font-weight: 700;">Submit Material Request</h2>
+            <span class="close" onclick="closeMaterialRequestModal();">&times;</span>
+        </div>
+        <div class="modal-body" style="padding: 20px;">
+            <form id="materialRequestForm" onsubmit="submitMaterialRequest(event)">
+                <input type="hidden" id="mrCourseId" value="">
+                
+                <div style="background: #f5f5f5; padding: 12px; border-radius: 8px; margin-bottom: 20px;">
+                    <strong>Course:</strong> <span id="mrCourseInfo"></span>
+                </div>
+                
+                <div style="margin-bottom: 16px;">
+                    <label style="display: block; margin-bottom: 6px; font-weight: 600;">Book Title <span style="color: red;">*</span></label>
+                    <input type="text" id="mrBookTitle" required style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 8px; font-family: inherit;">
+                </div>
+                
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 16px;">
+                    <div>
+                        <label style="display: block; margin-bottom: 6px; font-weight: 600;">Author</label>
+                        <input type="text" id="mrAuthor" style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 8px; font-family: inherit;">
+                    </div>
+                    <div>
+                        <label style="display: block; margin-bottom: 6px; font-weight: 600;">ISBN</label>
+                        <input type="text" id="mrIsbn" style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 8px; font-family: inherit;">
+                    </div>
+                </div>
+                
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 16px;">
+                    <div>
+                        <label style="display: block; margin-bottom: 6px; font-weight: 600;">Publisher</label>
+                        <input type="text" id="mrPublisher" style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 8px; font-family: inherit;">
+                    </div>
+                    <div>
+                        <label style="display: block; margin-bottom: 6px; font-weight: 600;">Edition</label>
+                        <input type="text" id="mrEdition" style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 8px; font-family: inherit;">
+                    </div>
+                </div>
+                
+                <div style="margin-bottom: 16px;">
+                    <label style="display: block; margin-bottom: 6px; font-weight: 600;">Publication Year</label>
+                    <input type="number" id="mrPublicationYear" min="1900" max="2100" style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 8px; font-family: inherit;">
+                </div>
+                
+                <div style="margin-bottom: 20px;">
+                    <label style="display: block; margin-bottom: 6px; font-weight: 600;">Justification <span style="color: red;">*</span></label>
+                    <textarea id="mrJustification" required rows="3" style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 8px; font-family: inherit; resize: vertical;" placeholder="Why is this book needed for the course?"></textarea>
+                </div>
+                
+                <div style="display: flex; gap: 12px; justify-content: flex-end;">
+                    <button type="button" onclick="closeMaterialRequestModal()" style="padding: 10px 20px; border: 1px solid #ddd; background: white; border-radius: 8px; cursor: pointer; font-weight: 600;">Cancel</button>
+                    <button type="submit" id="mrSubmitBtn" style="padding: 10px 20px; background: #0f7a53; color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: 600;">Submit Request</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
 
 <!-- Delete Confirmation Modal -->
 <div id="deleteConfirmationModal" class="modal" style="display: none; z-index: 10008;">

@@ -60,7 +60,10 @@ if ($deanDepartmentCode && $programCode) {
         $programMajor = $directResult['major'] ?? '';
     }
     
-// Now get courses
+// Now get courses with compliance calculation
+    $currentYear = date('Y');
+    $fiveYearsAgo = $currentYear - 4;
+    
     $coursesQuery = "
         SELECT 
             c.id as course_id,
@@ -73,7 +76,8 @@ if ($deanDepartmentCode && $programCode) {
             c.term,
             c.academic_year,
             c.year_level,
-            COUNT(br.id) as book_references_count
+            COUNT(br.id) as total_references,
+            COUNT(CASE WHEN br.publication_year >= :five_years_ago AND br.publication_year IS NOT NULL THEN 1 END) as compliant_count
         FROM 
             courses c
         JOIN 
@@ -100,7 +104,7 @@ if ($deanDepartmentCode && $programCode) {
     ";
     
     $coursesStmt = $pdo->prepare($coursesQuery);
-    $coursesStmt->execute([':dept_code' => $deanDepartmentCode, ':prog_code' => $programCode]);
+    $coursesStmt->execute([':dept_code' => $deanDepartmentCode, ':prog_code' => $programCode, ':five_years_ago' => $fiveYearsAgo]);
     $courses = $coursesStmt->fetchAll(PDO::FETCH_ASSOC);
 }
 
@@ -908,14 +912,36 @@ html[data-theme="dark"] .section-header h3 {
                             <td><?php echo htmlspecialchars($course['year_level'] ?? 'N/A'); ?></td>
                             <td>
                                 <?php 
-                                $compliantCount = intval($course['book_references_count']);
-                                $targetCount = 5; // Default target, QA will set this later
+                                $totalRefs = intval($course['total_references'] ?? 0);
+                                $compliantCount = intval($course['compliant_count'] ?? 0);
+                                $targetCount = 5;
                                 $isCompliant = $compliantCount >= $targetCount;
-                                $displayColor = $isCompliant ? '#2e7d32' : '#FF4C4C'; // Green if compliant, Red if not
+                                $percentage = $targetCount > 0 ? round(($compliantCount / $targetCount) * 100) : 0;
+                                $percentage = min(100, $percentage); // Cap at 100%
+                                
+                                // Determine color based on percentage
+                                if ($percentage >= 100) {
+                                    $bgColor = '#d1fae5';
+                                    $textColor = '#059669';
+                                    $statusText = 'Compliant';
+                                } elseif ($percentage >= 60) {
+                                    $bgColor = '#fef3c7';
+                                    $textColor = '#d97706';
+                                    $statusText = 'Partial';
+                                } else {
+                                    $bgColor = '#fee2e2';
+                                    $textColor = '#dc2626';
+                                    $statusText = 'Non-Compliant';
+                                }
                                 ?>
-                                <span class="book-references-count" style="background: <?php echo $isCompliant ? '#e8f5e8' : '#ffeaea'; ?>; color: <?php echo $displayColor; ?>;">
-                                    <?php echo $compliantCount; ?>/<?php echo $targetCount; ?>
-                                </span>
+                                <div class="compliance-display" style="display: flex; flex-direction: column; align-items: center; gap: 4px;">
+                                    <div class="compliance-bar-container" style="width: 60px; height: 6px; background: #e5e7eb; border-radius: 3px; overflow: hidden;">
+                                        <div class="compliance-bar" style="width: <?php echo $percentage; ?>%; height: 100%; background: <?php echo $textColor; ?>; border-radius: 3px; transition: width 0.3s ease;"></div>
+                                    </div>
+                                    <span class="compliance-text" style="font-size: 11px; font-weight: 600; color: <?php echo $textColor; ?>;">
+                                        <?php echo $compliantCount; ?>/<?php echo $targetCount; ?> (<?php echo $percentage; ?>%)
+                                    </span>
+                                </div>
                         </td>
                             <td class="actions-cell" onclick="event.stopPropagation();">
                                 <div class="action-menu-container">
