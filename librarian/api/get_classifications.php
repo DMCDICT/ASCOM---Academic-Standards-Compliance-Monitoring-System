@@ -86,17 +86,17 @@ try {
     $stmt->execute();
     $classifications = $stmt->fetchAll(PDO::FETCH_ASSOC);
     
-    // Count books for each classification (optional enhancement)
+    // Count books for each classification (from library_books table)
     foreach ($classifications as &$classification) {
         $rangeParts = explode('-', $classification['call_number_range']);
         $minRange = isset($rangeParts[0]) ? intval($rangeParts[0]) : 0;
         $maxRange = isset($rangeParts[1]) ? intval($rangeParts[1]) : 999;
         
-        // Count books in this range (fetch all and filter in PHP for accuracy)
+        // Count books in this range from library_books table
         try {
             $countQuery = "
                 SELECT call_number
-                FROM book_references
+                FROM library_books
                 WHERE call_number IS NOT NULL 
                 AND call_number != ''
             ";
