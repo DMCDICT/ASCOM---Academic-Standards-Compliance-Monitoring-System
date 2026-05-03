@@ -22,6 +22,7 @@ ascom_require_role('librarian', '../user_login.php');
 <link rel="stylesheet" href="./styles/modal-add-book.css">
 <link rel="stylesheet" href="./styles/librarian-dashboard.css">
 <link rel="stylesheet" href="./styles/library-management.css">
+<link rel="stylesheet" href="./styles/shelf-view.css">
 <link rel="stylesheet" href="../super_admin-mis/styles/notifications.css">
 
 <!-- Lucide Icons (CDN) -->

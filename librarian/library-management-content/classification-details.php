@@ -74,351 +74,111 @@ try {
 $totalBooks = count($bookReferences);
 ?>
 
-<div class="back-navigation">
-    <button class="back-button" onclick="window.history.back()">
-        <img src="../src/assets/icons/go-back-icon.png" alt="Back">
-        Back to Dashboard
-    </button>
-</div>
+<div class="shelf-view-container">
+    <div class="back-navigation" style="margin-bottom: 24px;">
+        <button class="btn-primary" onclick="window.history.back()" style="background: transparent; color: #0C4B34; border: 1px solid rgba(12, 75, 52, 0.2); padding: 8px 16px;">
+            <i data-lucide="arrow-left" style="width: 18px; height: 18px;"></i>
+            Back to Dashboard
+        </button>
+    </div>
 
-<div class="course-details-container">
-    <div class="course-header">
-        <div class="course-title-section">
-            <h1><?php echo htmlspecialchars($classificationName); ?></h1>
-            <div class="course-meta">
-                <span class="classification-badge" style="background-color: #4CAF50; color: white; padding: 8px 16px; border-radius: 8px; font-weight: 600; font-size: 14px;">
-                    <?php echo htmlspecialchars($classificationRange); ?>
-                </span>
+    <div class="shelf-header-premium">
+        <div class="section-header">
+            <div class="label-bar"></div>
+            <div>
+                <h3><?php echo htmlspecialchars($classificationName); ?></h3>
+                <p>Browsing books in classification range: <strong><?php echo htmlspecialchars($classificationRange); ?></strong></p>
             </div>
         </div>
-        <div class="course-stats">
-            <div class="stat-item">
-                <span class="stat-label">Total Books</span>
-                <span class="stat-value"><?php echo $totalBooks; ?></span>
+
+        <div class="shelf-stats-row">
+            <div class="shelf-stat-card">
+                <div class="shelf-stat-icon">
+                    <i data-lucide="book-open"></i>
+                </div>
+                <div class="shelf-stat-info">
+                    <span class="shelf-stat-label">Total Books</span>
+                    <span class="shelf-stat-value"><?php echo $totalBooks; ?></span>
+                </div>
+            </div>
+            <div class="shelf-stat-card">
+                <div class="shelf-stat-icon">
+                    <i data-lucide="layers"></i>
+                </div>
+                <div class="shelf-stat-info">
+                    <span class="shelf-stat-label">Range</span>
+                    <span class="shelf-stat-value"><?php echo htmlspecialchars($classificationRange); ?></span>
+                </div>
+            </div>
+            <div class="shelf-stat-card">
+                <div class="shelf-stat-icon" style="background: rgba(21, 101, 192, 0.08); color: #1565C0;">
+                    <i data-lucide="map-pin"></i>
+                </div>
+                <div class="shelf-stat-info">
+                    <span class="shelf-stat-label">System</span>
+                    <span class="shelf-stat-value">DDC</span>
+                </div>
             </div>
         </div>
     </div>
 
-    <div class="course-info-section">
-        <div class="section-title">
-            <h2>Book References</h2>
-            <div class="section-line"></div>
-        </div>
-
+    <div class="shelves-container">
         <?php if (!empty($bookReferences)): ?>
-            <div class="book-references-grid">
-                <?php foreach ($bookReferences as $book): ?>
-                    <div class="book-reference-card">
-                        <div class="book-header">
-                            <div class="book-title-section">
-                                <h3 class="book-title"><?php echo htmlspecialchars($book['book_title'] ?? 'N/A'); ?></h3>
-                                <?php if (!empty($book['author'])): ?>
-                                    <p class="book-author"><?php echo htmlspecialchars($book['author']); ?></p>
-                                <?php endif; ?>
-                            </div>
-                            <div class="book-meta">
-                                <?php if (!empty($book['call_number'])): ?>
-                                    <div class="call-number-badge" style="background: #e3f2fd; color: #1976d2; padding: 6px 12px; border-radius: 6px; font-weight: 600; font-size: 13px;">
-                                        <?php echo htmlspecialchars($book['call_number']); ?>
+            <?php 
+            // Chunk books into groups of 5 for visual "shelves"
+            $shelves = array_chunk($bookReferences, 5);
+            foreach ($shelves as $shelfIndex => $booksInShelf): 
+            ?>
+                <div class="shelf-row">
+                    <div class="shelf-books-grid">
+                        <?php foreach ($booksInShelf as $book): ?>
+                            <div class="book-spine-card" onclick="window.location.href='content.php?page=course-details&course_code=<?php echo urlencode($book['course_code'] ?? ''); ?>'">
+                                <div>
+                                    <h3 class="book-spine-title"><?php echo htmlspecialchars($book['book_title'] ?? 'Untitled'); ?></h3>
+                                    <p class="book-spine-author"><?php echo htmlspecialchars($book['author'] ?? 'Unknown Author'); ?></p>
+                                    
+                                    <div class="book-spine-meta">
+                                        <?php if (!empty($book['call_number'])): ?>
+                                            <span class="book-spine-badge">
+                                                <i data-lucide="hash" style="width: 10px; height: 10px; display: inline-block; margin-right: 2px;"></i>
+                                                <?php echo htmlspecialchars($book['call_number']); ?>
+                                            </span>
+                                        <?php endif; ?>
+                                        
+                                        <?php if (!empty($book['location'])): ?>
+                                            <span class="book-spine-badge" style="background: rgba(21, 101, 192, 0.06); color: #1565C0; border-color: rgba(21, 101, 192, 0.1);">
+                                                <i data-lucide="map-pin" style="width: 10px; height: 10px; display: inline-block; margin-right: 2px;"></i>
+                                                <?php echo htmlspecialchars($book['location']); ?>
+                                            </span>
+                                        <?php endif; ?>
                                     </div>
-                                <?php endif; ?>
+                                </div>
+                                
+                                <div class="book-spine-footer">
+                                    <span class="book-spine-year"><?php echo htmlspecialchars($book['publication_year'] ?? 'N/A'); ?></span>
+                                    <div style="color: #0C4B34;">
+                                        <i data-lucide="chevron-right" style="width: 16px; height: 16px;"></i>
+                                    </div>
+                                </div>
                             </div>
-                        </div>
-                        
-                        <div class="book-details">
-                            <?php if (!empty($book['course_code'])): ?>
-                                <div class="book-detail-item">
-                                    <span class="detail-label">Course:</span>
-                                    <span class="detail-value"><?php echo htmlspecialchars($book['course_code']); ?> - <?php echo htmlspecialchars($book['course_title'] ?? ''); ?></span>
-                                </div>
-                            <?php endif; ?>
-                            
-                            <?php if (!empty($book['isbn'])): ?>
-                                <div class="book-detail-item">
-                                    <span class="detail-label">ISBN:</span>
-                                    <span class="detail-value"><?php echo htmlspecialchars($book['isbn']); ?></span>
-                                </div>
-                            <?php endif; ?>
-                            
-                            <?php if (!empty($book['publisher'])): ?>
-                                <div class="book-detail-item">
-                                    <span class="detail-label">Publisher:</span>
-                                    <span class="detail-value"><?php echo htmlspecialchars($book['publisher']); ?></span>
-                                </div>
-                            <?php endif; ?>
-                            
-                            <?php if (!empty($book['publication_year'])): ?>
-                                <div class="book-detail-item">
-                                    <span class="detail-label">Year:</span>
-                                    <span class="detail-value"><?php echo htmlspecialchars($book['publication_year']); ?></span>
-                                </div>
-                            <?php endif; ?>
-                            
-                            <?php if (!empty($book['edition'])): ?>
-                                <div class="book-detail-item">
-                                    <span class="detail-label">Edition:</span>
-                                    <span class="detail-value"><?php echo htmlspecialchars($book['edition']); ?></span>
-                                </div>
-                            <?php endif; ?>
-                            
-                            <?php if (!empty($book['no_of_copies'])): ?>
-                                <div class="book-detail-item">
-                                    <span class="detail-label">Copies:</span>
-                                    <span class="detail-value"><?php echo htmlspecialchars($book['no_of_copies']); ?></span>
-                                </div>
-                            <?php endif; ?>
-                            
-                            <?php if (!empty($book['location'])): ?>
-                                <div class="book-detail-item">
-                                    <span class="detail-label">Location:</span>
-                                    <span class="detail-value"><?php echo htmlspecialchars($book['location']); ?></span>
-                                </div>
-                            <?php endif; ?>
-                        </div>
-                        
-                        <?php if (!empty($book['course_code'])): ?>
-                            <div class="book-card-footer">
-                                <a href="content.php?page=course-details&course_code=<?php echo urlencode($book['course_code']); ?>" class="view-course-btn">
-                                    View Course
-                                </a>
-                            </div>
-                        <?php endif; ?>
+                        <?php endforeach; ?>
                     </div>
-                <?php endforeach; ?>
-            </div>
+                </div>
+            <?php endforeach; ?>
         <?php else: ?>
-            <div style="text-align: center; padding: 60px 20px; color: #666;">
-                <div style="font-size: 48px; margin-bottom: 16px;">📚</div>
-                <h3 style="font-family: 'TT Interphases', sans-serif; font-size: 18px; color: #333; margin-bottom: 8px;">No Books Found</h3>
-                <p style="font-family: 'TT Interphases', sans-serif; font-size: 14px; color: #666;">
-                    No books have been cataloged with call numbers in the range <?php echo htmlspecialchars($classificationRange); ?>.
-                </p>
+            <div class="empty-state" style="padding: 100px 20px;">
+                <i data-lucide="library" style="width: 64px; height: 64px; margin-bottom: 24px; color: rgba(12, 75, 52, 0.2);"></i>
+                <h3 style="font-size: 20px; color: #111827; margin-bottom: 8px;">Empty Shelf</h3>
+                <p>No books have been cataloged in this classification range yet.</p>
             </div>
         <?php endif; ?>
     </div>
 </div>
 
-<style>
-.course-details-container {
-    max-width: 1200px;
-    margin: 0 auto;
-    padding: 24px;
-}
-
-.back-navigation {
-    margin-bottom: 20px;
-}
-
-.back-button {
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-    padding: 10px 16px;
-    background: #1976d2;
-    border: none;
-    color: white;
-    font-size: 16px;
-    font-weight: 600;
-    cursor: pointer;
-    border-radius: 8px;
-    text-decoration: none;
-    transition: background-color 0.2s;
-    font-family: 'TT Interphases', sans-serif;
-}
-
-.back-button:hover {
-    background: #1565c0;
-}
-
-.back-button img {
-    width: 20px;
-    height: 20px;
-}
-
-.course-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: flex-start;
-    margin-bottom: 32px;
-    padding-bottom: 24px;
-    border-bottom: 2px solid #e0e0e0;
-}
-
-.course-title-section h1 {
-    font-family: 'TT Interphases', sans-serif;
-    font-size: 32px;
-    color: #333;
-    margin: 0 0 12px 0;
-}
-
-.course-meta {
-    display: flex;
-    gap: 12px;
-    align-items: center;
-}
-
-.course-stats {
-    display: flex;
-    gap: 24px;
-}
-
-.stat-item {
-    text-align: center;
-}
-
-.stat-label {
-    display: block;
-    font-family: 'TT Interphases', sans-serif;
-    font-size: 12px;
-    color: #666;
-    margin-bottom: 4px;
-}
-
-.stat-value {
-    display: block;
-    font-family: 'TT Interphases', sans-serif;
-    font-size: 24px;
-    font-weight: 600;
-    color: #333;
-}
-
-.section-title {
-    margin-bottom: 24px;
-}
-
-.section-title h2 {
-    font-family: 'TT Interphases', sans-serif;
-    font-size: 24px;
-    color: #333;
-    margin: 0 0 8px 0;
-}
-
-.section-line {
-    height: 3px;
-    width: 60px;
-    background: #4CAF50;
-    border-radius: 2px;
-}
-
-.book-references-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
-    gap: 20px;
-    align-items: start;
-}
-
-.book-reference-card {
-    background: white;
-    border: 1px solid #e0e0e0;
-    border-radius: 12px;
-    padding: 20px;
-    transition: all 0.2s ease;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
-    display: flex;
-    flex-direction: column;
-    height: auto;
-}
-
-.book-reference-card:hover {
-    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-    transform: translateY(-2px);
-}
-
-.book-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: flex-start;
-    margin-bottom: 16px;
-}
-
-.book-title-section {
-    flex: 1;
-}
-
-.book-title {
-    font-family: 'TT Interphases', sans-serif;
-    font-size: 18px;
-    font-weight: 600;
-    color: #333;
-    margin: 0 0 6px 0;
-    line-height: 1.4;
-}
-
-.book-author {
-    font-family: 'TT Interphases', sans-serif;
-    font-size: 14px;
-    color: #666;
-    margin: 0;
-}
-
-.book-meta {
-    margin-left: 12px;
-}
-
-.book-details {
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-    flex: 1;
-}
-
-.book-detail-item {
-    display: flex;
-    font-family: 'TT Interphases', sans-serif;
-    font-size: 14px;
-}
-
-.detail-label {
-    font-weight: 600;
-    color: #666;
-    min-width: 80px;
-}
-
-.detail-value {
-    color: #333;
-}
-
-.call-number-badge {
-    font-family: 'TT Interphases', sans-serif;
-}
-
-.book-card-footer {
-    margin-top: auto;
-    padding-top: 16px;
-    border-top: 1px solid #e0e0e0;
-    display: flex;
-    justify-content: flex-end;
-}
-
-.view-course-btn {
-    display: inline-block;
-    padding: 8px 16px;
-    background: #1976d2;
-    color: white;
-    text-decoration: none;
-    border-radius: 6px;
-    font-family: 'TT Interphases', sans-serif;
-    font-size: 14px;
-    font-weight: 600;
-    transition: all 0.2s ease;
-    text-align: center;
-}
-
-.view-course-btn:hover {
-    background: #1565c0;
-    transform: translateY(-1px);
-    box-shadow: 0 2px 8px rgba(25, 118, 210, 0.3);
-}
-
-@media (max-width: 768px) {
-    .book-references-grid {
-        grid-template-columns: 1fr;
+<script>
+    // Initialize Lucide icons
+    if (typeof lucide !== 'undefined') {
+        lucide.createIcons();
     }
-    
-    .course-header {
-        flex-direction: column;
-        gap: 16px;
-    }
-}
-</style>
+</script>
 
