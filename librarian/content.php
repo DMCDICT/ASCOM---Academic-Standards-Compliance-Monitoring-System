@@ -20,6 +20,8 @@ ascom_require_role('librarian', '../user_login.php');
 <link rel="stylesheet" href="../super_admin-mis/styles/school-calendar.css">
 <link rel="stylesheet" href="../super_admin-mis/styles/settings.css">
 <link rel="stylesheet" href="./styles/modal-add-book.css">
+<link rel="stylesheet" href="./styles/librarian-dashboard.css">
+<link rel="stylesheet" href="./styles/library-management.css">
 <link rel="stylesheet" href="../super_admin-mis/styles/notifications.css">
 
 <!-- Lucide Icons (CDN) -->
@@ -228,6 +230,7 @@ if ($hasOtherRoles) {
 <script src="../super_admin-mis/scripts/dashboard.js"></script>
 <!-- <script src="./scripts/modal-add-book.js"></script> -->
 <script src="./js/notifications.js"></script>
+<script src="./js/library-management.js"></script>
 
 <script>
 // Back to Top functionality is handled by dashboard.js

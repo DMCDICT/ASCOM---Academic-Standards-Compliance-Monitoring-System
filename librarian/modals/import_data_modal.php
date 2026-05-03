@@ -637,16 +637,7 @@ function handleFile(file) {
             // STORE ORIGINAL DETECTED COURSES LOCALLY (with books arrays!)
             originalDetectedCourses = detectedCourses;
             
-            // Verify books are stored - check first few courses
-            const sampleCourses = Object.values(originalDetectedCourses).slice(0, 3);
-            sampleCourses.forEach((course, idx) => {
-                    course_code: course.course_code,
-                    program_code: course.program_code,
-                    books_count: course.books ? course.books.length : 0,
-                    years_count: course.years ? course.years.length : 0,
-                    first_book: course.books && course.books.length > 0 ? course.books[0].book_title : 'none'
-                });
-            });
+            // Original detected courses stored above with books arrays intact
             
             // Send parsed data to server for program code matching and course checking
     fetch('api/parse_excel.php', {

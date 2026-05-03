@@ -2,20 +2,12 @@
 // get_library_data.php - Fetch library data from database
 // session_start(); // Removed to avoid header issues
 
-// Database connection
-if (getenv('DOCKER_ENV') === 'true' || file_exists('/.dockerenv')) {
-    $servername = "db";
-} else {
-    $servername = "localhost";
-}
-$username = "root";
-$password = "";
-$database = "ascom_db";
+// Database connection - use centralized bootstrap
+require_once dirname(__FILE__) . '/../bootstrap/database.php';
 
 try {
-    $pdo = new PDO("mysql:host=$servername;dbname=$database", $username, $password);
-    $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-} catch(PDOException $e) {
+    $pdo = ascom_get_pdo();
+} catch(Exception $e) {
     http_response_code(500);
     echo json_encode(['success' => false, 'message' => 'Database connection failed: ' . $e->getMessage()]);
     exit;
@@ -37,6 +29,28 @@ if (is_string($programs) && $programs !== 'all') {
 }
 
 // Build the base query
+// Check if book_references table exists first
+$bookRefsExists = false;
+try {
+    $stmt = $pdo->query("SHOW TABLES LIKE 'book_references'");
+    if ($stmt->rowCount() > 0) {
+        $bookRefsExists = true;
+    }
+} catch (Exception $e) {
+    $bookRefsExists = false;
+}
+
+// Also check if publication_year column exists and is numeric
+$publicationYearNumeric = false;
+if ($bookRefsExists) {
+    try {
+        $stmt = $pdo->query("SELECT COUNT(*) as cnt FROM book_references WHERE publication_year REGEXP '^[0-9]+$' LIMIT 1");
+        $publicationYearNumeric = true;
+    } catch (Exception $e) {
+        $publicationYearNumeric = false;
+    }
+}
+
 $query = "
     SELECT 
         c.id,
@@ -46,7 +60,7 @@ $query = "
         c.year_level,
         c.term,
         c.academic_year,
-        COALESCE(sy.school_year_label, CONCAT('A.Y. ', sy.year_start, ' - ', sy.year_end)) as academic_year_label,
+        COALESCE(sy.school_year_label, CONCAT('A.Y. ', YEAR(sy.start_date), ' - ', YEAR(sy.end_date))) as academic_year_label,
         c.status,
         c.created_at,
         COALESCE(d.department_name, 'N/A') as department_name,
@@ -58,21 +72,59 @@ $query = "
     LEFT JOIN programs p ON c.program_id = p.id
     LEFT JOIN departments d ON p.department_id = d.id
     LEFT JOIN school_years sy ON c.academic_year = sy.id
+";
+
+if ($bookRefsExists) {
+    $query .= "
     LEFT JOIN (
         SELECT course_id, COUNT(*) as book_count 
         FROM book_references 
         GROUP BY course_id
     ) book_counts ON c.id = book_counts.course_id
+    ";
+    
+    if ($publicationYearNumeric) {
+        $query .= "
     LEFT JOIN (
         SELECT 
             course_id, 
             COUNT(*) AS compliant_count
         FROM book_references
-        WHERE (YEAR(CURDATE()) - CAST(publication_year AS UNSIGNED)) < 5
+        WHERE publication_year IS NOT NULL 
+        AND publication_year != ''
+        AND CAST(publication_year AS UNSIGNED) > 0
+        AND (YEAR(CURDATE()) - CAST(publication_year AS UNSIGNED)) < 5
         GROUP BY course_id
     ) compliant_counts ON c.id = compliant_counts.course_id
-    WHERE 1=1
-";
+        ";
+    } else {
+        $query .= "
+    LEFT JOIN (
+        SELECT 
+            course_id, 
+            COUNT(*) AS compliant_count
+        FROM book_references
+        WHERE 1=0
+        GROUP BY course_id
+    ) compliant_counts ON c.id = compliant_counts.course_id
+        ";
+    }
+} else {
+    $query .= "
+    LEFT JOIN (
+        SELECT course_id, 0 as book_count 
+        FROM (SELECT 1 as course_id) t
+        WHERE 1=0
+    ) book_counts ON c.id = book_counts.course_id
+    LEFT JOIN (
+        SELECT course_id, 0 as compliant_count
+        FROM (SELECT 1 as course_id) t
+        WHERE 1=0
+    ) compliant_counts ON c.id = compliant_counts.course_id
+    ";
+}
+
+$query .= " WHERE 1=1";
 
 $params = [];
 
