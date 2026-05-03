@@ -23,12 +23,17 @@ $courses = $coursesStmt->fetchAll(PDO::FETCH_ASSOC);
        <form id="addBookForm" class="form-grid" method="post" autocomplete="off" novalidate>
             <div class="form-row">
         <div class="form-group" style="flex:1; min-width: 160px;">
-          <label for="location">Location <span style="color: red;">*</span></label>
-          <select name="location" id="location" required>
-            <option value="">Select Location</option>
-            <option value="Main Library">Main Library</option>
-            <option value="Buenavista Library">Buenavista Library</option>
-          </select>
+          <label>Location <span style="color: red;">*</span></label>
+          <div class="location-checkboxes" style="display: flex; gap: 16px; margin-top: 8px;">
+            <label style="display: flex; align-items: center; gap: 6px; cursor: pointer;">
+              <input type="checkbox" name="location[]" value="Main Library" id="location_main" style="width: 18px; height: 18px; cursor: pointer;">
+              <span>Main Library</span>
+            </label>
+            <label style="display: flex; align-items: center; gap: 6px; cursor: pointer;">
+              <input type="checkbox" name="location[]" value="Buenavista Library" id="location_buenavista" style="width: 18px; height: 18px; cursor: pointer;">
+              <span>Buenavista Library</span>
+            </label>
+          </div>
         </div>
       </div>
       <div class="form-row">
@@ -402,6 +407,12 @@ document.addEventListener('DOMContentLoaded', function() {
         // Single book submission
         function handleSingleSubmit() {
             const formData = new FormData(addBookForm);
+            
+            // Get checkbox values for location
+            const locationCheckboxes = document.querySelectorAll('input[name="location[]"]:checked');
+            const locationValues = Array.from(locationCheckboxes).map(cb => cb.value);
+            const locationString = locationValues.join(', ');
+            
             const bookData = {
                 course_id: formData.get('course_id'),
                 call_number: formData.get('call_no'),
@@ -412,7 +423,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 edition: formData.get('edition'),
                 authors: formData.get('authors'),                  // maps to author
                 publisher: formData.get('publisher'),
-                location: formData.get('location')
+                location: locationString
             };
             
             
@@ -497,7 +508,7 @@ document.addEventListener('DOMContentLoaded', function() {
         // Add validation event listeners to form fields
     setTimeout(function() {
 
-        const formFields = ['course_search', 'course_id', 'call_no', 'book_title', 'copyright', 'edition', 'authors', 'publisher', 'isbn', 'no_of_copies', 'location'];
+        const formFields = ['course_search', 'course_id', 'call_no', 'book_title', 'copyright', 'edition', 'authors', 'publisher', 'isbn', 'no_of_copies'];
         formFields.forEach(fieldId => {
             const field = document.getElementById(fieldId);
             if (field) {
@@ -512,6 +523,14 @@ document.addEventListener('DOMContentLoaded', function() {
                     validateAddBookButton();
                 });
             }
+        });
+        
+        // Add event listeners for location checkboxes
+        const locationCheckboxes = document.querySelectorAll('input[name="location[]"]');
+        locationCheckboxes.forEach(checkbox => {
+            checkbox.addEventListener('change', function() {
+                validateAddBookButton();
+            });
         });
         
         // Force initial validation
@@ -616,7 +635,6 @@ function validateAddBookButton() {
     const copyright = document.getElementById('copyright');
     const authors = document.getElementById('authors');
     const publisher = document.getElementById('publisher');
-    const location = document.getElementById('location');
     
     const courseSearchValue = courseSearch?.value?.trim() || '';
     const courseIdValue = courseId?.value?.trim() || '';
@@ -625,7 +643,10 @@ function validateAddBookButton() {
     const copyrightValue = copyright?.value?.trim() || '';
     const authorsValue = authors?.value?.trim() || '';
     const publisherValue = publisher?.value?.trim() || '';
-    const locationValue = location?.value?.trim() || '';
+    
+    // Get checkbox values for location
+    const locationCheckboxes = document.querySelectorAll('input[name="location[]"]:checked');
+    const locationValue = Array.from(locationCheckboxes).map(cb => cb.value).join(', ');
     
     // Find the button using ID
     const button = document.getElementById('addBookBtn');
@@ -698,10 +719,14 @@ function addBookToBatchList() {
     const callNo = document.getElementById('call_no')?.value.trim();
     const edition = document.getElementById('edition')?.value.trim();
     const noOfCopies = document.getElementById('no_of_copies')?.value || 1;
-    const location = document.getElementById('location')?.value || '';
     
-    if (!bookTitle || !copyright || !location) {
-        alert('Please fill in Book Title, Copyright, and Location.');
+    // Get checkbox values for location
+    const locationCheckboxes = document.querySelectorAll('input[name="location[]"]:checked');
+    const locationValues = Array.from(locationCheckboxes).map(cb => cb.value);
+    const locationString = locationValues.join(', ');
+    
+    if (!bookTitle || !copyright || !locationString) {
+        alert('Please fill in Book Title, Copyright, and select at least one Location.');
         return;
     }
     
@@ -715,7 +740,7 @@ function addBookToBatchList() {
         call_number: callNo || '',
         edition: edition || '',
         no_of_copies: parseInt(noOfCopies) || 1,
-        location: location
+        location: locationString
     };
     
     batchBooks.push(book);

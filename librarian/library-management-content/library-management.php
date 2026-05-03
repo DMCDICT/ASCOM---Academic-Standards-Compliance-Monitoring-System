@@ -207,7 +207,16 @@
         </div>
         <div class="lm-field">
           <label for="lmLocation">Location</label>
-          <input id="lmLocation" type="text" placeholder="e.g., Main Library" />
+          <div class="lm-location-checkboxes" style="display: flex; gap: 16px; margin-top: 8px;">
+            <label style="display: flex; align-items: center; gap: 6px; cursor: pointer;">
+              <input type="checkbox" name="lmLocation[]" value="Main Library" id="lmLocationMain" style="width: 18px; height: 18px; cursor: pointer;">
+              <span>Main Library</span>
+            </label>
+            <label style="display: flex; align-items: center; gap: 6px; cursor: pointer;">
+              <input type="checkbox" name="lmLocation[]" value="Buenavista Library" id="lmLocationBuenavista" style="width: 18px; height: 18px; cursor: pointer;">
+              <span>Buenavista Library</span>
+            </label>
+          </div>
         </div>
 
         <div class="lm-section span-3">
