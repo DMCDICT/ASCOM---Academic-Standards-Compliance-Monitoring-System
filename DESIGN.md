@@ -244,6 +244,30 @@ html[data-theme="dark"] .icon-container {
 }
 ```
 
+### 3.2.1 Navigation Icon Sizing (Lucide)
+
+Sidebar and top-nav icons must be **visually consistent** across all portals. When using Lucide (`data-lucide`), always size the generated SVGs explicitly to avoid oversized icons when global rules change.
+
+```css
+/* Icon wrapper provides layout consistency */
+.nav-icon-wrapper {
+  min-width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Normalize Lucide SVG size in navigation */
+.side-navbar .nav-icon-wrapper [data-lucide],
+.side-navbar .nav-icon-wrapper svg {
+  width: 20px;
+  height: 20px;
+  display: block;
+  flex-shrink: 0;
+}
+```
+
 ### 3.3 Section Headers
 
 Every content section uses a consistent label pattern:
@@ -463,10 +487,15 @@ html[data-theme="dark"] .btn-primary {
   position: fixed;
   inset: 0;
   background-color: rgba(0, 0, 0, 0.8);
-  display: flex;
+  display: none; /* hidden by default */
   align-items: center;
   justify-content: center;
   z-index: 2000;
+}
+
+/* Open state (set via JS or server-rendered state) */
+.modal-overlay.is-open {
+  display: flex;
 }
 ```
 
@@ -486,7 +515,12 @@ html[data-theme="dark"] .btn-primary {
 }
 ```
 
-### 5.3 Premium Modal (Department Details style)
+### 5.3 Modal Visibility Rules
+
+- Never hardcode `display: flex !important;` on a specific modal id (e.g., `#addClassificationModal`) because it will override the intended hidden state and cause the modal to appear on page load.
+- Keep modal CSS inside a `<style>` tag or stylesheet. Raw CSS accidentally placed in the HTML body will render as visible “gibberish” text.
+
+### 5.4 Premium Modal (Department Details style)
 
 For larger, detail-heavy modals:
 
@@ -505,7 +539,7 @@ For larger, detail-heavy modals:
 }
 ```
 
-### 5.4 Modal Header
+### 5.5 Modal Header
 
 ```css
 .modal-header {
@@ -526,7 +560,7 @@ For larger, detail-heavy modals:
 }
 ```
 
-### 5.5 Modal Close Button
+### 5.6 Modal Close Button
 
 ```css
 .modal-close {
@@ -560,7 +594,7 @@ For larger, detail-heavy modals:
 }
 ```
 
-### 5.6 Modal Content Sections
+### 5.7 Modal Content Sections
 
 ```css
 .modal-section {

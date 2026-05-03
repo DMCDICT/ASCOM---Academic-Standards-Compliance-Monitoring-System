@@ -1,0 +1,223 @@
+/*
+ * librarian-global.css
+ * Dedicated global overrides for the Librarian portal.
+ * Extends global.css with premium UI components and modernized layouts.
+ */
+
+:root {
+    --librarian-primary: #0C4B34;
+    --librarian-secondary: #0F7A53;
+    --librarian-accent: #FACC15;
+    --librarian-sidebar-width: 280px;
+    --librarian-sidebar-collapsed: 80px;
+    --topbar-height: 72px;
+}
+
+/* --- TOP NAVBAR MODERNIZATION --- */
+.top-navbar {
+    height: var(--topbar-height) !important;
+    background: rgba(12, 75, 52, 0.92) !important;
+    backdrop-filter: blur(12px) !important;
+    -webkit-backdrop-filter: blur(12px) !important;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1) !important;
+    padding: 0 24px !important;
+}
+
+.search-bar {
+    background: rgba(255, 255, 255, 0.08) !important;
+    border: 1px solid rgba(255, 255, 255, 0.1) !important;
+    border-radius: 12px !important;
+    height: 44px !important;
+    padding: 0 16px !important;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+}
+
+.search-bar:focus-within {
+    background: rgba(255, 255, 255, 0.12) !important;
+    border-color: rgba(255, 255, 255, 0.3) !important;
+    box-shadow: 0 0 0 4px rgba(255, 255, 255, 0.05) !important;
+    transform: translateY(-1px);
+}
+
+.search-bar input {
+    font-weight: 500 !important;
+    letter-spacing: 0.3px;
+}
+
+.search-bar input::placeholder {
+    color: rgba(255, 255, 255, 0.5) !important;
+}
+
+.notification-icon {
+    width: 44px !important;
+    height: 44px !important;
+    background: rgba(255, 255, 255, 0.05) !important;
+    border: 1px solid rgba(255, 255, 255, 0.1) !important;
+    margin-right: 0 !important;
+}
+
+.notification-icon:hover {
+    background: rgba(255, 255, 255, 0.1) !important;
+    border-color: rgba(255, 255, 255, 0.2) !important;
+}
+
+/* --- SIDEBAR MODERNIZATION --- */
+.side-navbar {
+    width: var(--librarian-sidebar-width) !important;
+    background: var(--librarian-primary) !important;
+    border-right: 1px solid rgba(255, 255, 255, 0.05) !important;
+    padding: 24px 16px !important;
+    height: calc(100vh - var(--topbar-height)) !important;
+    top: var(--topbar-height) !important;
+}
+
+.side-navbar.collapsed {
+    width: var(--librarian-sidebar-collapsed) !important;
+}
+
+.nav-buttons {
+    gap: 12px !important;
+}
+
+.nav-button {
+    height: 52px !important;
+    border-radius: 14px !important;
+    padding: 0 16px !important;
+    font-weight: 600 !important;
+    font-size: 15px !important;
+    color: rgba(255, 255, 255, 0.8) !important;
+    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1) !important;
+    border: 1px solid transparent !important;
+}
+
+.nav-button:hover {
+    background: rgba(255, 255, 255, 0.06) !important;
+    color: #fff !important;
+    transform: translateX(4px);
+}
+
+.nav-button.active {
+    background: var(--librarian-secondary) !important;
+    color: #fff !important;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1) !important;
+    border-color: rgba(255, 255, 255, 0.1) !important;
+}
+
+.nav-icon-wrapper {
+    min-width: 32px !important;
+    margin-right: 12px !important;
+}
+
+.side-navbar .nav-icon-wrapper [data-lucide],
+.side-navbar .nav-icon-wrapper svg {
+    width: 20px !important;
+    height: 20px !important;
+    display: block !important;
+    flex-shrink: 0;
+}
+
+.side-navbar .nav-icon-wrapper svg {
+    stroke-width: 2.25px;
+}
+
+.side-navbar.collapsed .nav-icon-wrapper {
+    margin-right: 0 !important;
+}
+
+.side-navbar.collapsed .nav-button:hover {
+    transform: none !important;
+}
+
+/* Premium CTA Button */
+.new-account-button {
+    background: linear-gradient(135deg, #A99F30 0%, #8E8628 100%) !important;
+    border: 1px solid rgba(255, 255, 255, 0.2) !important;
+    box-shadow: 0 4px 12px rgba(169, 159, 48, 0.3) !important;
+    margin-bottom: 20px !important;
+}
+
+.new-account-button:hover {
+    background: linear-gradient(135deg, #B9AE35 0%, #A99F30 100%) !important;
+    box-shadow: 0 6px 16px rgba(169, 159, 48, 0.4) !important;
+}
+
+/* User Profile Section */
+.sidebar-profile {
+    margin-top: auto;
+    padding: 16px;
+    background: rgba(255, 255, 255, 0.04);
+    border-radius: 16px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 12px;
+    transition: all 0.3s ease;
+}
+
+.side-navbar.collapsed .sidebar-profile {
+    padding: 8px;
+    justify-content: center;
+}
+
+.profile-avatar {
+    width: 40px;
+    height: 40px;
+    background: var(--librarian-secondary);
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #fff;
+    font-weight: 700;
+    flex-shrink: 0;
+}
+
+.profile-info {
+    overflow: hidden;
+    transition: opacity 0.3s ease;
+}
+
+.side-navbar.collapsed .profile-info {
+    display: none;
+}
+
+.profile-name {
+    display: block;
+    font-size: 14px;
+    font-weight: 700;
+    color: #fff;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    overflow: hidden;
+}
+
+.profile-role {
+    display: block;
+    font-size: 12px;
+    color: rgba(255, 255, 255, 0.5);
+    font-weight: 500;
+    text-transform: capitalize;
+}
+
+/* Logout Button styling */
+.logout-button {
+    background: rgba(239, 68, 68, 0.1) !important;
+    color: #ef4444 !important;
+    border: 1px solid rgba(239, 68, 68, 0.2) !important;
+}
+
+.logout-button:hover {
+    background: rgba(239, 68, 68, 0.2) !important;
+    color: #f87171 !important;
+}
+
+/* Content Wrapper adjustments */
+.content-wrapper {
+    margin-left: var(--librarian-sidebar-width) !important;
+    margin-top: var(--topbar-height) !important;
+    padding: 32px !important;
+}
+
+.side-navbar.collapsed ~ .content-wrapper {
+    margin-left: var(--librarian-sidebar-collapsed) !important;
+}

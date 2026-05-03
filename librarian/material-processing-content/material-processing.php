@@ -11,24 +11,24 @@ $departmentColor = '#C41E3A'; // Default red color
 ?>
 
 <!-- Material Processing - View All Page -->
-<div class="back-navigation">
-    <button class="back-button" onclick="window.history.back()">
-        <img src="../src/assets/icons/go-back-icon.png" alt="Back">
+<div class="back-navigation" style="margin-bottom: 32px;">
+    <button class="back-button" onclick="window.history.back()" style="display: flex; align-items: center; gap: 10px; background: #fff; border: 1px solid var(--primary-border); color: var(--text-muted); padding: 10px 20px; border-radius: 12px; font-weight: 700; cursor: pointer; transition: all 0.3s ease;">
+        <i data-lucide="arrow-left" style="width: 18px; height: 18px;"></i>
         Back to Dashboard
     </button>
 </div>
 
-    <div class="header-section">
-        <div class="header-content">
-            <h1 class="main-page-title">Material Processing</h1>
-            <p class="page-description">View and manage all materials currently being processed for library cataloging</p>
-        </div>
-        <div class="filter-buttons">
-            <button class="filter-btn active" onclick="filterMaterials('PROCESSING')">Processing</button>
-            <button class="filter-btn" onclick="filterMaterials('COMPLETED')">Completed</button>
-            <button class="filter-btn" onclick="filterMaterials('DRAFTED')">Drafted</button>
-        </div>
+<div class="header-section" style="margin-bottom: 32px; display: flex; justify-content: space-between; align-items: flex-end; border-bottom: 1px solid var(--primary-border); padding-bottom: 24px;">
+    <div class="header-content">
+        <h1 class="main-page-title" style="font-size: 28px; font-weight: 800; color: #111827; margin-bottom: 8px;">Material Processing</h1>
+        <p class="page-description" style="color: var(--text-muted); font-size: 15px; font-weight: 500;">Manage materials and finalize cataloging for the library collection.</p>
     </div>
+    <div class="filter-buttons" style="display: flex; gap: 8px; background: rgba(0,0,0,0.03); padding: 6px; border-radius: 14px;">
+        <button class="filter-btn active" onclick="filterMaterials('PROCESSING')" style="padding: 10px 20px; border-radius: 10px; border: none; font-weight: 700; cursor: pointer; transition: all 0.3s ease;">Processing</button>
+        <button class="filter-btn" onclick="filterMaterials('COMPLETED')" style="padding: 10px 20px; border-radius: 10px; border: none; font-weight: 700; cursor: pointer; transition: all 0.3s ease;">Completed</button>
+        <button class="filter-btn" onclick="filterMaterials('DRAFTED')" style="padding: 10px 20px; border-radius: 10px; border: none; font-weight: 700; cursor: pointer; transition: all 0.3s ease;">Drafted</button>
+    </div>
+</div>
 
 <div class="material-processing-container">
     <div class="material-processing-grid" id="materialProcessingGrid">
@@ -37,35 +37,60 @@ $departmentColor = '#C41E3A'; // Default red color
 </div>
 
 <!-- Complete Cataloging Modal -->
-<div id="completeCatalogingModal" style="display: none;">
-    <div class="modal-overlay" onclick="closeCompleteCatalogingModal()"></div>
-    <div class="modal-content" style="max-width: 500px;">
+<div id="completeCatalogingModal" class="modal-overlay" style="display: none;">
+    <div class="modal-box" style="max-width: 520px;">
         <div class="modal-header">
-            <h2 style="margin: 0; font-family: 'TT Interphases', sans-serif;">Complete Cataloging</h2>
-            <button class="modal-close" onclick="closeCompleteCatalogingModal()">&times;</button>
+            <div class="modal-title-wrapper" style="display: flex; align-items: center; gap: 12px;">
+                <div class="modal-icon-header" style="background: var(--primary-tint); color: var(--primary); width: 40px; height: 40px; border-radius: 10px; display: flex; align-items: center; justify-content: center;">
+                    <i data-lucide="book-open-check"></i>
+                </div>
+                <h2 class="modal-title">Complete Cataloging</h2>
+            </div>
+            <button class="modal-close" onclick="closeCompleteCatalogingModal()">
+                <i data-lucide="x"></i>
+            </button>
         </div>
-        <div class="modal-body">
+        
+        <div class="modal-body" style="padding: 24px;">
+            <p style="font-size: 14px; color: var(--text-muted); margin-bottom: 24px; font-weight: 600;">Finalize the book details to add it to the inventory.</p>
+            
             <form id="completeCatalogingForm">
                 <input type="hidden" id="completingBookId" value="">
-                <div style="margin-bottom: 16px;">
-                    <label style="display: block; margin-bottom: 8px; font-weight: 600; font-family: 'TT Interphases', sans-serif;">Call Number <span style="color: red;">*</span></label>
-                    <input type="text" id="callNumberInput" required style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 6px; font-family: 'TT Interphases', sans-serif;">
+                
+                <div class="form-group" style="margin-bottom: 20px;">
+                    <label class="form-label">Call Number <span style="color: var(--danger);">*</span></label>
+                    <div class="input-wrapper" style="position: relative;">
+                        <i data-lucide="hash" style="position: absolute; left: 14px; top: 50%; transform: translateY(-50%); width: 16px; height: 16px; color: var(--text-faint);"></i>
+                        <input type="text" id="callNumberInput" required class="form-input" placeholder="e.g. 004.16 B64 2023" style="padding-left: 42px; width: 100%; height: 48px; border-radius: 10px; border: 1px solid var(--primary-border); font-family: 'TT Interphases', sans-serif;">
+                    </div>
                 </div>
-                <div style="margin-bottom: 16px;">
-                    <label style="display: block; margin-bottom: 8px; font-weight: 600; font-family: 'TT Interphases', sans-serif;">Number of Copies <span style="color: red;">*</span></label>
-                    <input type="number" id="noOfCopiesInput" value="1" min="1" required style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 6px; font-family: 'TT Interphases', sans-serif;">
+
+                <div class="form-group" style="margin-bottom: 20px;">
+                    <label class="form-label">Number of Copies <span style="color: var(--danger);">*</span></label>
+                    <div class="input-wrapper" style="position: relative;">
+                        <i data-lucide="layers" style="position: absolute; left: 14px; top: 50%; transform: translateY(-50%); width: 16px; height: 16px; color: var(--text-faint);"></i>
+                        <input type="number" id="noOfCopiesInput" value="1" min="1" required class="form-input" style="padding-left: 42px; width: 100%; height: 48px; border-radius: 10px; border: 1px solid var(--primary-border); font-family: 'TT Interphases', sans-serif;">
+                    </div>
                 </div>
-                <div style="margin-bottom: 16px;">
-                    <label style="display: block; margin-bottom: 8px; font-weight: 600; font-family: 'TT Interphases', sans-serif;">Location <span style="color: red;">*</span></label>
-                    <select id="locationInput" required style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 6px; font-family: 'TT Interphases', sans-serif;">
-                        <option value="">Select Location</option>
-                        <option value="Main Library">Main Library</option>
-                        <option value="Buenavista Library">Buenavista Library</option>
-                    </select>
+
+                <div class="form-group" style="margin-bottom: 28px;">
+                    <label class="form-label">Library Location <span style="color: var(--danger);">*</span></label>
+                    <div class="input-wrapper" style="position: relative;">
+                        <i data-lucide="map-pin" style="position: absolute; left: 14px; top: 50%; transform: translateY(-50%); width: 16px; height: 16px; color: var(--text-faint); pointer-events: none;"></i>
+                        <select id="locationInput" required class="form-input" style="padding-left: 42px; width: 100%; height: 48px; border-radius: 10px; border: 1px solid var(--primary-border); font-family: 'TT Interphases', sans-serif; background: #fff; appearance: none;">
+                            <option value="">Select Location</option>
+                            <option value="Main Library">Main Library</option>
+                            <option value="Buenavista Library">Buenavista Library</option>
+                        </select>
+                        <i data-lucide="chevron-down" style="position: absolute; right: 14px; top: 50%; transform: translateY(-50%); width: 16px; height: 16px; color: var(--text-faint); pointer-events: none;"></i>
+                    </div>
                 </div>
-                <div style="display: flex; gap: 10px; justify-content: flex-end; margin-top: 24px;">
-                    <button type="button" onclick="closeCompleteCatalogingModal()" style="padding: 10px 20px; border: 1px solid #ddd; background: white; border-radius: 6px; cursor: pointer; font-family: 'TT Interphases', sans-serif; font-weight: 600;">Cancel</button>
-                    <button type="submit" id="completeCatalogingBtn" disabled style="padding: 10px 20px; border: none; background: #6c757d; color: white; border-radius: 6px; cursor: not-allowed; font-family: 'TT Interphases', sans-serif; font-weight: 600; opacity: 0.5;">Complete</button>
+
+                <div class="modal-footer" style="display: flex; gap: 12px; justify-content: flex-end; margin-top: 12px;">
+                    <button type="button" class="btn-secondary" onclick="closeCompleteCatalogingModal()" style="padding: 12px 24px; background: #fff; border: 1px solid var(--primary-border); border-radius: 10px; cursor: pointer; font-weight: 700; color: var(--text-muted); font-family: 'TT Interphases', sans-serif;">Cancel</button>
+                    <button type="submit" id="completeCatalogingBtn" class="btn-primary" disabled style="padding: 12px 24px; border-radius: 10px; opacity: 0.5; cursor: not-allowed; min-width: 140px;">
+                        Complete
+                    </button>
                 </div>
             </form>
         </div>
@@ -73,51 +98,54 @@ $departmentColor = '#C41E3A'; // Default red color
 </div>
 
 <!-- Success Modal for Cataloging Completion -->
-<div id="catalogingSuccessModal" class="modal-overlay" style="display: none; align-items: center; justify-content: center; z-index: 10000;">
-    <div class="modal-content" style="max-width: 400px; text-align: center; background: white; border-radius: 12px; box-shadow: 0 8px 32px rgba(0,0,0,0.18); padding: 32px 24px; position: relative;">
-        <div style="display: flex; justify-content: center; align-items: center; width: 100%; margin-bottom: 20px;">
-            <div style="width: 80px; height: 80px; background: #e8f5e9; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto;">
-                <span style="font-size: 48px;">✅</span>
-            </div>
+<div id="catalogingSuccessModal" class="modal-overlay" style="display: none;">
+    <div class="modal-box" style="max-width: 420px; text-align: center; padding: 40px 32px;">
+        <div class="success-icon-wrapper" style="width: 80px; height: 80px; background: #ECFDF5; color: #10B981; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 24px;">
+            <i data-lucide="check-circle-2" style="width: 48px; height: 48px;"></i>
         </div>
-        <h2 style="color: #4CAF50; margin-bottom: 12px; font-size: 1.5em; font-family: 'TT Interphases', sans-serif; margin-top: 0;">Success!</h2>
-        <p id="catalogingSuccessMessage" style="font-family: 'TT Interphases', sans-serif; margin-bottom: 24px; color: #222; font-size: 1em; line-height: 1.5;"></p>
-        <button type="button" onclick="closeCatalogingSuccessModal()" style="margin: 0 auto; display: block; background: #4CAF50; color: #fff; border: none; border-radius: 8px; padding: 10px 32px; font-size: 1em; font-weight: 600; cursor: pointer; font-family: 'TT Interphases', sans-serif;">OK</button>
+        <h2 style="font-size: 24px; font-weight: 800; color: #111827; margin-bottom: 12px;">Success!</h2>
+        <p id="catalogingSuccessMessage" style="font-size: 15px; color: #4B5563; line-height: 1.6; margin-bottom: 32px;"></p>
+        <button type="button" onclick="closeCatalogingSuccessModal()" class="btn-primary" style="width: 100%; height: 48px; border-radius: 10px; font-weight: 700;">Continue</button>
     </div>
 </div>
 
 <!-- Error Modal for Cataloging Completion -->
-<div id="catalogingErrorModal" class="modal-overlay" style="display: none; align-items: center; justify-content: center; z-index: 10000;">
-    <div class="modal-content" style="max-width: 400px; text-align: center; background: white; border-radius: 12px; box-shadow: 0 8px 32px rgba(0,0,0,0.18); padding: 32px 24px; position: relative;">
-        <div style="display: flex; justify-content: center; align-items: center; width: 100%; margin-bottom: 20px;">
-            <div style="width: 80px; height: 80px; background: #ffebee; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto;">
-                <span style="font-size: 48px;">❌</span>
-            </div>
+<div id="catalogingErrorModal" class="modal-overlay" style="display: none;">
+    <div class="modal-box" style="max-width: 420px; text-align: center; padding: 40px 32px;">
+        <div class="error-icon-wrapper" style="width: 80px; height: 80px; background: #FEF2F2; color: #EF4444; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 24px;">
+            <i data-lucide="alert-circle" style="width: 48px; height: 48px;"></i>
         </div>
-        <h2 style="color: #f44336; margin-bottom: 12px; font-size: 1.5em; font-family: 'TT Interphases', sans-serif; margin-top: 0;">Error</h2>
-        <p id="catalogingErrorMessage" style="font-family: 'TT Interphases', sans-serif; margin-bottom: 24px; color: #222; font-size: 1em; line-height: 1.5;"></p>
-        <button type="button" onclick="closeCatalogingErrorModal()" style="margin: 0 auto; display: block; background: #f44336; color: #fff; border: none; border-radius: 8px; padding: 10px 32px; font-size: 1em; font-weight: 600; cursor: pointer; font-family: 'TT Interphases', sans-serif;">OK</button>
+        <h2 style="font-size: 24px; font-weight: 800; color: #111827; margin-bottom: 12px;">Error</h2>
+        <p id="catalogingErrorMessage" style="font-size: 15px; color: #4B5563; line-height: 1.6; margin-bottom: 32px;"></p>
+        <button type="button" onclick="closeCatalogingErrorModal()" class="btn-primary" style="width: 100%; height: 48px; border-radius: 10px; font-weight: 700; background: #EF4444;">Close</button>
     </div>
 </div>
 
 <!-- Draft Request Modal -->
-<div id="draftRequestModal" style="display: none;">
-    <div class="modal-overlay" onclick="closeDraftRequestModal()"></div>
-    <div class="modal-content" style="max-width: 500px;">
+<div id="draftRequestModal" class="modal-overlay" style="display: none;">
+    <div class="modal-box" style="max-width: 520px;">
         <div class="modal-header">
-            <h2 style="margin: 0; font-family: 'TT Interphases', sans-serif;">Draft Request</h2>
-            <button class="modal-close" onclick="closeDraftRequestModal()">&times;</button>
+            <div class="modal-title-wrapper" style="display: flex; align-items: center; gap: 12px;">
+                <div class="modal-icon-header" style="background: #FFFBEB; color: #D97706; width: 40px; height: 40px; border-radius: 10px; display: flex; align-items: center; justify-content: center;">
+                    <i data-lucide="sticky-note"></i>
+                </div>
+                <h2 class="modal-title">Draft Request</h2>
+            </div>
+            <button class="modal-close" onclick="closeDraftRequestModal()">
+                <i data-lucide="x"></i>
+            </button>
         </div>
-        <div class="modal-body">
+        <div class="modal-body" style="padding: 24px;">
+            <p style="font-size: 14px; color: var(--text-muted); margin-bottom: 24px; font-weight: 600;">Move this request to draft status with a reason.</p>
             <form id="draftRequestForm">
                 <input type="hidden" id="draftingBookId" value="">
-                <div style="margin-bottom: 16px;">
-                    <label style="display: block; margin-bottom: 8px; font-weight: 600; font-family: 'TT Interphases', sans-serif;">Reason <span style="color: red;">*</span></label>
-                    <textarea id="draftReasonInput" required rows="4" style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 6px; font-family: 'TT Interphases', sans-serif; resize: vertical;" placeholder="Enter reason for drafting this request (e.g., Out of stock, budget constraints, etc.)"></textarea>
+                <div class="form-group" style="margin-bottom: 24px;">
+                    <label class="form-label">Reason <span style="color: var(--danger);">*</span></label>
+                    <textarea id="draftReasonInput" required rows="4" class="form-input" style="width: 100%; border-radius: 10px; border: 1px solid var(--primary-border); font-family: 'TT Interphases', sans-serif; padding: 12px 14px; resize: vertical;" placeholder="e.g. Budget constraints, out of stock..."></textarea>
                 </div>
-                <div style="display: flex; gap: 10px; justify-content: flex-end; margin-top: 24px;">
-                    <button type="button" onclick="closeDraftRequestModal()" style="padding: 10px 20px; border: 1px solid #ddd; background: white; border-radius: 6px; cursor: pointer; font-family: 'TT Interphases', sans-serif; font-weight: 600;">Cancel</button>
-                    <button type="submit" style="padding: 10px 20px; border: none; background: #ff9800; color: white; border-radius: 6px; cursor: pointer; font-family: 'TT Interphases', sans-serif; font-weight: 600;">Draft</button>
+                <div class="modal-footer" style="display: flex; gap: 12px; justify-content: flex-end;">
+                    <button type="button" class="btn-secondary" onclick="closeDraftRequestModal()" style="padding: 12px 24px; background: #fff; border: 1px solid var(--primary-border); border-radius: 10px; cursor: pointer; font-weight: 700; color: var(--text-muted);">Cancel</button>
+                    <button type="submit" class="btn-primary" style="padding: 12px 24px; border-radius: 10px; background: #D97706;">Move to Draft</button>
                 </div>
             </form>
         </div>
@@ -125,211 +153,54 @@ $departmentColor = '#C41E3A'; // Default red color
 </div>
 
 <style>
-.modal-overlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: rgba(0, 0, 0, 0.5);
-    z-index: 9998;
-}
-
-.modal-content {
-    position: fixed;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    background: white;
-    border-radius: 8px;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
-    z-index: 9999;
-}
-
-.modal-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 20px 24px;
-    border-bottom: 1px solid #e0e0e0;
-}
-
-.modal-close {
-    background: none;
-    border: none;
-    font-size: 28px;
-    cursor: pointer;
-    color: #666;
-    line-height: 1;
-    padding: 0;
-    width: 30px;
-    height: 30px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
-.modal-close:hover {
-    color: #333;
-}
-
-.modal-body {
-    padding: 24px;
-}
-
-.modal-body label {
-    display: block;
-    margin-bottom: 8px;
-    font-weight: 600;
-    font-family: 'TT Interphases', sans-serif;
-}
-
-.modal-body input[type="text"],
-.modal-body input[type="number"],
-.modal-body textarea,
-.modal-body select {
-    width: 100%;
-    padding: 10px;
-    border: 1px solid #ddd;
-    border-radius: 6px;
-    font-family: 'TT Interphases', sans-serif;
-}
-
-.modal-body input:focus,
-.modal-body textarea:focus,
-.modal-body select:focus {
-    outline: none;
-    border-color: #1976d2;
-    box-shadow: 0 0 0 3px rgba(25, 118, 210, 0.1);
-}
-</style>
-<style>
-    /* Back navigation styling to match All Courses page */
-        .back-navigation {
-            margin-bottom: 20px;
-        }
-
-        .back-button {
-            background: #1976d2;
-            color: white;
-            border: none;
-            padding: 10px 20px;
-            border-radius: 6px;
-            font-size: 14px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: background-color 0.3s ease;
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .back-button:hover {
-            background: #1565c0;
-        }
-
-        .back-button img {
-            width: 16px;
-            height: 16px;
-        }
-
-    /* Header section with filter buttons */
-    .header-section {
-        display: flex;
-        justify-content: space-between;
-        align-items: flex-start;
-        margin-bottom: 0px;
-    }
-
-    .header-content {
-        flex: 1;
-    }
-
-    .main-page-title {
-        font-size: 20px;
-        font-weight: 600;
-        color: #333;
-        margin: 0 !important;
-        padding: 0 !important;
-        font-family: 'TT Interphases', sans-serif;
-    }
-
-    .page-description {
-        font-size: 14px;
-        color: #666;
-        margin: 5px 0 0px 0;
-        font-family: 'TT Interphases', sans-serif;
-        line-height: 1.4;
-    }
-
-    .filter-buttons {
-        display: flex;
-        gap: 10px;
-        align-items: center;
-    }
-
-    .filter-btn {
-        padding: 8px 16px;
-        border: 2px solid #e0e0e0;
-        background: white;
-        color: #666;
-        border-radius: 6px;
-        font-weight: 600;
-        cursor: pointer;
-        transition: all 0.2s ease;
-        font-family: 'TT Interphases', sans-serif;
-        font-size: 14px;
-    }
-
-    .filter-btn:hover {
-        border-color: #1976d2;
-        color: #1976d2;
-    }
-
-    .filter-btn.active {
-        background: #1976d2;
-        border-color: #1976d2;
-        color: white;
-    }
-
-    /* Container styling */
-    .material-processing-container {
-        max-width: none;
-    }
-    
+    /* Premium Material Card Styling */
     .material-processing-grid {
         display: grid;
-        grid-template-columns: repeat(4, 1fr);
-        gap: 20px;
-        margin-top: 20px;
-        margin-bottom: 40px;
-        width: 100%;
+        grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+        gap: 24px;
+        margin-top: 24px;
+        animation: fadeSlideUp 0.6s ease-out;
     }
 
-    /* Material card styling */
     .material-card {
-        background: white;
-        border-radius: 12px;
-        padding: 20px 20px 10px 20px;
-        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-        border: 1px solid #e0e0e0;
-        transition: all 0.3s ease;
+        background: #fff;
+        border-radius: 20px;
+        border: 1px solid var(--primary-border);
+        padding: 24px;
+        transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
         display: flex;
         flex-direction: column;
-        min-height: 280px;
-        justify-content: space-between;
+        position: relative;
+        overflow: hidden;
     }
 
     .material-card:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 4px 16px rgba(0,0,0,0.15);
+        transform: translateY(-8px);
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.08);
+        border-color: var(--primary-tint);
+    }
+
+    .material-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 4px;
+        background: var(--primary);
+        opacity: 0;
+        transition: opacity 0.3s ease;
+    }
+
+    .material-card:hover::before {
+        opacity: 1;
     }
 
     .material-header {
         display: flex;
         justify-content: space-between;
         align-items: flex-start;
-        margin-bottom: 15px;
+        margin-bottom: 20px;
     }
 
     .requester-info {
@@ -337,197 +208,125 @@ $departmentColor = '#C41E3A'; // Default red color
     }
 
     .requester-name {
-        font-weight: 600;
-        color: #333;
-        font-size: 14px;
-        margin-bottom: 2px;
+        font-weight: 800;
+        color: #111827;
+        font-size: 16px;
+        margin-bottom: 4px;
     }
 
     .requester-role {
         font-size: 12px;
-        font-weight: 600;
+        font-weight: 700;
         text-transform: uppercase;
-        margin-bottom: 2px;
-        font-family: 'TT Interphases', sans-serif;
+        letter-spacing: 0.5px;
+        opacity: 0.8;
     }
 
     .material-status {
-        padding: 4px 12px;
-        border-radius: 12px;
-        font-size: 12px;
-        font-weight: 600;
+        padding: 6px 12px;
+        border-radius: 10px;
+        font-size: 11px;
+        font-weight: 800;
         text-transform: uppercase;
+        letter-spacing: 0.5px;
     }
 
-    .status-processing {
-        background: #fff3e0;
-        color: #f57c00;
-    }
-
-    .status-completed {
-        background: #e8f5e9;
-        color: #4CAF50;
-    }
-
-    .status-drafted {
-        background: #f5f5f5;
-        color: #757575;
-    }
+    .status-processing { background: #FFF7ED; color: #EA580C; }
+    .status-completed { background: #ECFDF5; color: #059669; }
+    .status-drafted { background: #F3F4F6; color: #4B5563; }
 
     .course-info {
-        margin-bottom: 12px;
+        background: #F9FAFB;
+        border-radius: 12px;
+        padding: 12px 16px;
         display: flex;
         align-items: center;
-        gap: 8px;
-        background: #f5f5f5;
-        padding: 8px 12px;
-        border-radius: 6px;
+        gap: 12px;
+        margin-bottom: 16px;
+        border: 1px solid rgba(0,0,0,0.03);
     }
 
     .course-code {
-        background: #1976d2;
-        color: white;
+        background: var(--primary);
+        color: #fff;
         padding: 4px 8px;
-        border-radius: 4px;
-        font-size: 12px;
-        font-weight: 600;
-        font-family: 'TT Interphases', sans-serif;
+        border-radius: 6px;
+        font-size: 11px;
+        font-weight: 800;
     }
 
     .course-name {
         font-size: 13px;
-        color: #666;
-        font-family: 'TT Interphases', sans-serif;
-        flex: 1;
-    }
-
-    .request-summary {
-        margin-bottom: 12px;
-    }
-
-    .request-type {
-        font-size: 11px;
-        color: #666;
-        margin-bottom: 8px;
-        font-family: 'TT Interphases', sans-serif;
-        text-transform: uppercase;
-        letter-spacing: 0.5px;
-        background: #f0f0f0;
-        padding: 4px 8px;
-        border-radius: 4px;
-        display: inline-block;
+        font-weight: 600;
+        color: #4B5563;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
     }
 
     .material-title {
-        font-size: 13px;
-        color: #333;
-        line-height: 1.5;
+        font-size: 15px;
+        color: #1F2937;
+        line-height: 1.6;
+        font-weight: 600;
+        margin-bottom: 24px;
         font-style: italic;
-        font-family: 'TT Interphases', sans-serif;
     }
-
 
     .material-actions {
         display: flex;
-        gap: 8px;
+        gap: 12px;
         margin-top: auto;
-        margin-bottom: 8px;
     }
 
     .action-btn {
         flex: 1;
-        padding: 8px 12px;
-        border: none;
-        border-radius: 6px;
-        font-size: 12px;
-        font-weight: 600;
+        height: 42px;
+        border-radius: 10px;
+        font-weight: 700;
+        font-size: 13px;
         cursor: pointer;
-        transition: all 0.2s ease;
-        font-family: 'TT Interphases', sans-serif;
-        text-align: center;
-        white-space: nowrap;
+        transition: all 0.3s ease;
+        border: none;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
     }
 
-    .catalog-btn {
-        flex: 1.5;
-    }
+    .catalog-btn { background: var(--primary); color: #fff; }
+    .catalog-btn:hover { background: var(--primary-shade); transform: translateY(-2px); }
 
-    .draft-btn {
-        flex: 0.8;
-        font-size: 11px;
-    }
+    .draft-btn { background: #FEF3C7; color: #B45309; }
+    .draft-btn:hover { background: #FDE68A; }
 
-    .process-btn {
-        background: #4caf50;
-        color: white;
-    }
-
-    .process-btn:hover {
-        background: #45a049;
-    }
-
-    .catalog-btn {
-        background: #2196f3;
-        color: white;
-    }
-
-    .catalog-btn:hover {
-        background: #1976d2;
-    }
-
-    .draft-btn {
-        background: #ff9800;
-        color: white;
-    }
-
-    .draft-btn:hover {
-        background: #f57c00;
-    }
-
-    .resume-btn {
-        background: #1976d2;
-        color: white;
-    }
-
-    .resume-btn:hover {
-        background: #1565c0;
-    }
+    .resume-btn { background: var(--primary); color: #fff; }
+    .process-btn { background: #EEF2FF; color: #4338CA; }
 
     .request-date {
-        font-size: 11px;
-        color: #999;
-        text-align: center;
-        margin-top: 4px;
-        margin-bottom: 4px;
+        margin-top: 16px;
+        font-size: 12px;
+        color: var(--text-faint);
+        display: flex;
+        align-items: center;
+        gap: 6px;
     }
 
-
-    /* Responsive design for different screen sizes */
-    @media (max-width: 1200px) {
-        .material-processing-grid {
-            grid-template-columns: repeat(2, 1fr);
-        }
-        .material-card {
-            min-width: 300px;
-        }
+    /* Filter Button Styling */
+    .filter-btn.active {
+        background: var(--primary) !important;
+        color: #fff !important;
+        box-shadow: 0 4px 12px rgba(12, 75, 52, 0.2);
     }
-    
-    @media (max-width: 768px) {
-        .header-section {
-            flex-direction: column;
-            gap: 20px;
-        }
 
-        .filter-buttons {
-            flex-wrap: wrap;
-        }
+    .filter-btn:not(.active):hover {
+        background: rgba(0,0,0,0.05);
+        color: #111827;
+    }
 
-        .material-processing-grid {
-            grid-template-columns: 1fr;
-        }
-        .material-card {
-            min-width: 100%;
-        }
+    @keyframes fadeSlideUp {
+        from { opacity: 0; transform: translateY(20px); }
+        to { opacity: 1; transform: translateY(0); }
     }
 </style>
 
@@ -647,16 +446,28 @@ function createMaterialCard(material) {
     let actionButtons = '';
     if (material.status === 'processing') {
         actionButtons = `
-            <button class="action-btn catalog-btn" onclick="startCataloging(${material.id})">Start Cataloging</button>
-            <button class="action-btn draft-btn" onclick="openDraftRequestModal(${material.id})">Draft</button>
+            <button class="action-btn catalog-btn" onclick="startCataloging(${material.id})">
+                <i data-lucide="book-plus"></i>
+                Start Cataloging
+            </button>
+            <button class="action-btn draft-btn" onclick="openDraftRequestModal(${material.id})">
+                <i data-lucide="sticky-note"></i>
+                Draft
+            </button>
         `;
     } else if (material.status === 'completed') {
         actionButtons = `
-            <button class="action-btn process-btn" onclick="navigateToCourseDetails('${material.courseCode}', ${material.id})">Navigate</button>
+            <button class="action-btn process-btn" onclick="navigateToCourseDetails('${material.courseCode}', ${material.id})">
+                <i data-lucide="external-link"></i>
+                Navigate
+            </button>
         `;
     } else if (material.status === 'drafted') {
         actionButtons = `
-            <button class="action-btn resume-btn" onclick="resumeProcessing(${material.id})">Resume</button>
+            <button class="action-btn resume-btn" onclick="resumeProcessing(${material.id})">
+                <i data-lucide="play"></i>
+                Resume
+            </button>
         `;
     }
 
@@ -675,19 +486,28 @@ function createMaterialCard(material) {
                 <div class="course-name">${material.courseName}</div>
             </div>
             
-            <div class="request-summary">
-                <div class="material-title">${material.materialTitle}</div>
-            </div>
-            
+            <div class="material-title">"${material.materialTitle}"</div>
             
             <div class="material-actions">
                 ${actionButtons}
             </div>
             
-            <div class="request-date">Submitted: ${formatDate(material.requestDate)}</div>
+            <div class="request-date">
+                <i data-lucide="clock" style="width: 14px; height: 14px;"></i>
+                <span>Submitted: ${formatDate(material.requestDate)}</span>
+            </div>
         </div>
     `;
 }
+
+// Wrap displayFilteredMaterials to refresh Lucide icons
+const originalDisplayFilteredMaterials = displayFilteredMaterials;
+displayFilteredMaterials = function(status) {
+    originalDisplayFilteredMaterials(status);
+    if (typeof lucide !== 'undefined') {
+        lucide.createIcons();
+    }
+};
 
 // Filter materials by status
 function filterMaterials(status) {
