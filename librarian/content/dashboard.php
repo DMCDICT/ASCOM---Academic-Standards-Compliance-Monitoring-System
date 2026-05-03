@@ -238,8 +238,9 @@ $currentDate = date('F j, Y');
             </div>
             <div class="header-actions">
                 <div class="filter-pills">
-                    <button type="button" class="filter-pill active" data-location="Main Library">Main Library</button>
-                    <button type="button" class="filter-pill" data-location="Buenavista Library">Buenavista Library</button>
+                    <button type="button" class="filter-pill active" data-location="all" onclick="filterClassificationsByLocation('all')">All</button>
+                    <button type="button" class="filter-pill" data-location="Main Library" onclick="filterClassificationsByLocation('Main Library')">Main Library</button>
+                    <button type="button" class="filter-pill" data-location="Buenavista Library" onclick="filterClassificationsByLocation('Buenavista Library')">Buenavista Library</button>
                 </div>
                 <button class="btn-primary" onclick="openAddClassificationModal()">
                     <i data-lucide="plus"></i>
@@ -1227,6 +1228,23 @@ function resumeProcessing(materialId) {
 // Classification Management Functions - Program Management Style
 let classificationLocationFilter = 'all';
 
+function filterClassificationsByLocation(location) {
+    classificationLocationFilter = location;
+    
+    // Update active state of filter pills
+    document.querySelectorAll('.filter-pill').forEach(pill => {
+        const pillLocation = pill.getAttribute('data-location');
+        if (pillLocation === location) {
+            pill.classList.add('active');
+        } else {
+            pill.classList.remove('active');
+        }
+    });
+    
+    // Re-render classifications
+    displayAllClassifications();
+}
+
 function displayAllClassifications() {
     const container = document.getElementById('classificationContainer');
     if (!container) return;
@@ -1236,23 +1254,69 @@ function displayAllClassifications() {
         toRender = allClassifications.filter(c => {
             // Support both API data (snake_case) and sample data (no location)
             const loc = c.location || c.library_location || null;
-            if (!loc) return classificationLocationFilter === 'all';
+            if (!loc) return false;
             return loc === classificationLocationFilter;
         });
     }
     
+    if (toRender.length === 0) {
+        container.innerHTML = `
+            <div style="text-align: center; padding: 40px; color: #666; display: flex; flex-direction: column; align-items: center; justify-content: center; width: 100%;">
+                <i data-lucide="tag" style="width: 48px; height: 48px; margin-bottom: 16px; color: #ccc;"></i>
+                <h3 style="margin-bottom: 8px;">No Classifications Found</h3>
+                <p style="margin-bottom: 16px;">No classifications for this library location yet.</p>
+                <button class="btn-primary" onclick="openAddClassificationModal()">
+                    <i data-lucide="plus"></i>
+                    Add Classification
+                </button>
+            </div>
+        `;
+        if (typeof lucide !== 'undefined') {
+            lucide.createIcons();
+        }
+        return;
+    }
+    
     container.innerHTML = toRender.map(classification => createClassificationCard(classification)).join('');
     
+    // Re-initialize Lucide icons for the new elements
+    if (typeof lucide !== 'undefined') {
+        lucide.createIcons();
+    }
 }
 
 function createClassificationCard(classification) {
+    const locationBadge = classification.location ? 
+        `<span class="location-badge" style="display: inline-block; padding: 4px 8px; background: #e3f2fd; color: #1565c0; border-radius: 4px; font-size: 12px; margin-left: 8px;">${classification.location}</span>` : '';
+    
+    const typeBadge = classification.type ? 
+        `<span style="display: inline-block; padding: 2px 6px; background: #f5f5f5; color: #666; border-radius: 3px; font-size: 11px;">${classification.type}</span>` : '';
+    
+    // Fix items count - use totalItems from API or fallback to 0
+    const itemsCount = classification.totalItems !== undefined && classification.totalItems !== null ? classification.totalItems : 0;
+    
     return `
-        <div class='department-card'>
-            <div class='dept-code' style='background-color: #4CAF50;'>${classification.callNumberRange}</div>
-            <h3>${classification.name}</h3>
-            <p style='font-weight: bold; color: #333;'>${classification.description}</p>
-            <div style='margin-top: 12px; text-align: right; padding-bottom: 8px;'>
-                <button class='view-details-btn' onclick="viewClassificationDetails('${classification.id}')">View Shelf</button>
+        <div class='department-card' style='border: 1px solid #0c4b3424;'>
+            <div class='dept-code' style='background-color: #4CAF50;'>${classification.callNumberRange || 'N/A'}</div>
+            <div style='display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px;'>
+                <h3 style='margin: 0; font-size: 18px;'>${classification.name || 'Unnamed'}</h3>
+                ${locationBadge}
+            </div>
+            <p style='font-weight: 500; color: #555; margin: 8px 0;'>${classification.description || 'No description'}</p>
+            <div style='display: flex; gap: 12px; margin-top: 12px; font-size: 13px; color: #666;'>
+                <span><i data-lucide="book" style="width: 14px; height: 14px;"></i> ${itemsCount} items</span>
+                <span>${typeBadge}</span>
+            </div>
+            <div style='margin-top: 12px; text-align: right; padding-bottom: 8px; display: flex; justify-content: space-between; align-items: center;'>
+                <button class='delete-classification-btn' onclick="deleteClassification('${classification.id}')" style='background: none; border: 1px solid #ffcdd2; padding: 6px 12px; border-radius: 6px; cursor: pointer; font-size: 13px; color: #c62828;'>
+                    <i data-lucide="trash-2" style="width: 14px; height: 14px;"></i> Delete
+                </button>
+                <div style='display: flex; gap: 8px;'>
+                    <button class='edit-classification-btn' onclick="editClassification('${classification.id}')" style='background: none; border: 1px solid #ddd; padding: 6px 12px; border-radius: 6px; cursor: pointer; font-size: 13px; color: #666;'>
+                        <i data-lucide="edit-2" style="width: 14px; height: 14px;"></i> Edit
+                    </button>
+                    <button class='view-details-btn' onclick="viewClassificationDetails('${classification.id}')">View Shelf</button>
+                </div>
             </div>
         </div>
     `;
@@ -1270,6 +1334,59 @@ function viewClassificationDetails(classificationId) {
     const range = encodeURIComponent(classification.callNumberRange);
     const name = encodeURIComponent(classification.name);
     window.location.href = `content.php?page=classification-details&range=${range}&name=${name}`;
+}
+
+function editClassification(classificationId) {
+    const classification = allClassifications.find(c => c.id == classificationId);
+    if (!classification) {
+        console.error('Classification not found:', classificationId);
+        return;
+    }
+    
+    // Populate the add classification form with existing data
+    document.getElementById('classificationName').value = classification.name || '';
+    document.getElementById('callNumberRange').value = classification.callNumberRange || '';
+    document.getElementById('classificationLocation').value = classification.location || '';
+    document.getElementById('classificationDescription').value = classification.description || '';
+    
+    // Store the ID being edited
+    document.getElementById('classificationName').dataset.editId = classificationId;
+    
+    // Change button text to indicate update
+    const submitBtn = document.getElementById('submitClassificationBtn');
+    submitBtn.textContent = 'Update Classification';
+    submitBtn.dataset.mode = 'edit';
+    
+    // Open the modal
+    openAddClassificationModal();
+}
+
+async function deleteClassification(classificationId) {
+    if (!confirm('Are you sure you want to delete this classification? This action cannot be undone.')) {
+        return;
+    }
+    
+    try {
+        const response = await fetch('api/delete_classification.php', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ id: classificationId })
+        });
+        
+        const result = await response.json();
+        
+        if (result.success) {
+            showClassificationSuccessModal('Classification deleted successfully!');
+            await loadClassificationsFromDatabase();
+        } else {
+            showClassificationErrorModal('Error: ' + result.message);
+        }
+    } catch (error) {
+        console.error('Error deleting classification:', error);
+        showClassificationErrorModal('Failed to delete classification. Please try again.');
+    }
 }
 
 function openAddClassificationModal() {
@@ -1295,6 +1412,14 @@ function closeAddClassificationModal() {
         modal.style.setProperty('display', 'none', 'important');
         // Reset form
         document.getElementById('addClassificationForm').reset();
+        
+        // Clear edit mode
+        const nameInput = document.getElementById('classificationName');
+        delete nameInput.dataset.editId;
+        
+        const submitBtn = document.getElementById('submitClassificationBtn');
+        submitBtn.dataset.mode = '';
+        submitBtn.textContent = 'Add Classification';
     }
 }
 
@@ -1334,8 +1459,11 @@ async function submitAddClassification(event) {
     
     const submitBtn = document.getElementById('submitClassificationBtn');
     const originalText = submitBtn.textContent;
+    const isEdit = submitBtn.dataset.mode === 'edit';
+    const editId = document.getElementById('classificationName').dataset.editId;
+    
     submitBtn.disabled = true;
-    submitBtn.textContent = 'Adding...';
+    submitBtn.textContent = isEdit ? 'Updating...' : 'Adding...';
     
     const formData = {
         name: document.getElementById('classificationName').value.trim(),
@@ -1347,32 +1475,61 @@ async function submitAddClassification(event) {
     };
     
     try {
-        const response = await fetch('api/add_classification.php', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify(formData)
-        });
+        let response, result;
         
-        const result = await response.json();
-        
-        if (result.success) {
-            closeAddClassificationModal();
-            showClassificationSuccessModal('Classification added successfully!');
-            // Reload classifications from database
-            await loadClassificationsFromDatabase();
+        if (isEdit && editId) {
+            // Update existing classification
+            formData.id = editId;
+            response = await fetch('api/update_classification.php', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(formData)
+            });
+            result = await response.json();
+            
+            if (result.success) {
+                closeAddClassificationModal();
+                showClassificationSuccessModal('Classification updated successfully!');
+                // Clear edit mode
+                submitBtn.dataset.mode = '';
+                submitBtn.textContent = 'Add Classification';
+                delete document.getElementById('classificationName').dataset.editId;
+            } else {
+                closeAddClassificationModal();
+                showClassificationErrorModal('Error: ' + result.message);
+            }
         } else {
-            closeAddClassificationModal();
-            showClassificationErrorModal('Error: ' + result.message);
+            // Add new classification
+            response = await fetch('api/add_classification.php', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(formData)
+            });
+            result = await response.json();
+            
+            if (result.success) {
+                closeAddClassificationModal();
+                showClassificationSuccessModal('Classification added successfully!');
+            } else {
+                closeAddClassificationModal();
+                showClassificationErrorModal('Error: ' + result.message);
+            }
         }
+        
+        // Reload classifications from database
+        await loadClassificationsFromDatabase();
+        
     } catch (error) {
-        console.error('Error adding classification:', error);
+        console.error('Error saving classification:', error);
         closeAddClassificationModal();
-        showClassificationErrorModal('Failed to add classification. Please try again.');
+        showClassificationErrorModal('Failed to save classification. Please try again.');
     } finally {
         submitBtn.disabled = false;
-        submitBtn.textContent = originalText;
+        submitBtn.textContent = isEdit ? 'Update Classification' : 'Add Classification';
     }
 }
 
