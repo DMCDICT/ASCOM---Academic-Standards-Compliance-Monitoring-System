@@ -24,6 +24,7 @@ ascom_require_role('librarian', '../user_login.php');
 <link rel="stylesheet" href="./styles/library-management.css">
 <link rel="stylesheet" href="./styles/shelf-view.css">
 <link rel="stylesheet" href="../super_admin-mis/styles/notifications.css">
+<link rel="stylesheet" href="./styles/librarian-global.css">
 
 <!-- Lucide Icons (CDN) -->
 <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
@@ -34,6 +35,10 @@ ascom_require_role('librarian', '../user_login.php');
 <?php 
 // Check if user has access to other roles (beyond librarian)
 $hasOtherRoles = false;
+$userFirstName = $_SESSION['user_first_name'] ?? 'Librarian';
+$userLastName = $_SESSION['user_last_name'] ?? '';
+$userRole = $_SESSION['user_role'] ?? 'Librarian';
+
 if (isset($_SESSION['user_id']) && isset($pdo)) {
   $userId = $_SESSION['user_id'];
   
@@ -116,12 +121,12 @@ if ($hasOtherRoles) {
       </div>
       <img src="../src/assets/images/ASCOM_Monitoring_System.png" alt="Logo" class="logo-img" />
       <div class="search-bar">
-        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="display: inline-block; vertical-align: middle; margin-right: 10px; opacity: 0.85; flex-shrink: 0;"><circle cx="11" cy="11" r="8"></circle><path d="m21 21-4.3-4.3"></path></svg>
-        <input type="text" placeholder="Search Here..." />
+        <i data-lucide="search"></i>
+        <input type="text" placeholder="Search resources..." />
       </div>
     </div>
     <div class="notification-icon" id="notificationIconBtn">
-      <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display: inline-block; vertical-align: middle;"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"></path><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"></path></svg>
+      <i data-lucide="bell"></i>
       <div class="notification-count">0</div>
       <div class="notification-dropdown" id="notificationDropdown">
         <h3>Notifications</h3>
@@ -135,7 +140,7 @@ if ($hasOtherRoles) {
   <div class="nav-buttons">
     <a href="#" class="nav-button new-account-button" id="newAccountBtn" onclick="lockPageScroll(); const m = document.getElementById('addBookModal'); if(m) { m.style.display='flex'; m.style.setProperty('overflow', 'hidden', 'important'); } setTimeout(function(){ if(typeof validateAddBookButton === 'function') validateAddBookButton(); }, 100);">
       <span class="nav-icon-wrapper">
-        <img src="../src/assets/icons/add-icon.png" alt="Add Icon" class="nav-icon" />
+        <i data-lucide="plus-circle"></i>
       </span>
       <span>Add Book</span>
     </a>
@@ -144,41 +149,49 @@ if ($hasOtherRoles) {
 
     <a href="content.php?page=dashboard" class="nav-button hoverable <?php if ($currentPage == 'dashboard' || $currentPage == 'material-processing' || $currentPage == 'classification-details') echo 'active'; ?>">
       <span class="nav-icon-wrapper">
-        <img src="../src/assets/icons/dashboard-icon.png" alt="Dashboard Icon" class="nav-icon" />
+        <i data-lucide="layout-dashboard"></i>
       </span>
       <span>Dashboard</span>
     </a>
 
     <a href="content.php?page=library-management" class="nav-button hoverable <?php if (
-      $currentPage == 'library-management' || $currentPage == 'course-details') echo 'active'; ?>" style="height: 76px;">
+      $currentPage == 'library-management' || $currentPage == 'course-details') echo 'active'; ?>">
       <span class="nav-icon-wrapper">
-        <img src="../src/assets/icons/library-icon.png" alt="Library Icon" class="nav-icon" />
+        <i data-lucide="library"></i>
       </span>
-      <span style="line-height: 1.2;">
-        Library<br />Management
-      </span>
+      <span>Library Management</span>
     </a>
 
     <a href="content.php?page=school-calendar" class="nav-button hoverable <?php if ($currentPage == 'school-calendar') echo 'active'; ?>">
       <span class="nav-icon-wrapper">
-        <img src="../src/assets/icons/calendar-icon.png" alt="Calendar Icon" class="nav-icon" />
+        <i data-lucide="calendar"></i>
       </span>
       <span>School Calendar</span>
     </a>
 
     <a href="content.php?page=settings" class="nav-button hoverable <?php if ($currentPage == 'settings') echo 'active'; ?>">
       <span class="nav-icon-wrapper">
-        <img src="../src/assets/icons/settings-icon.png" alt="Settings Icon" class="nav-icon" />
+        <i data-lucide="settings"></i>
       </span>
       <span>Settings</span>
     </a>
   </div>
 
   <div class="bottom-nav-buttons">
+    <div class="sidebar-profile">
+      <div class="profile-avatar">
+        <?php echo substr($userFirstName, 0, 1) . substr($userLastName, 0, 1); ?>
+      </div>
+      <div class="profile-info">
+        <span class="profile-name"><?php echo htmlspecialchars($userFirstName . ' ' . $userLastName); ?></span>
+        <span class="profile-role"><?php echo htmlspecialchars($userRole); ?></span>
+      </div>
+    </div>
+
     <?php if ($hasOtherRoles): ?>
-    <a href="#" class="nav-button switch-role-button" onclick="openSwitchRoleModal()" style="background-color: #1976d2;">
+    <a href="#" class="nav-button switch-role-button" onclick="openSwitchRoleModal()">
       <span class="nav-icon-wrapper">
-        <img src="../src/assets/icons/switch.png" alt="Switch Role Icon" class="nav-icon" />
+        <i data-lucide="refresh-cw"></i>
       </span>
       <span>Switch Role</span>
     </a>
@@ -186,7 +199,7 @@ if ($hasOtherRoles) {
 
     <a href="./logout.php" class="nav-button logout-button">
       <span class="nav-icon-wrapper">
-        <img src="../src/assets/icons/logout-icon.png" class="nav-icon" />
+        <i data-lucide="log-out"></i>
       </span>
       <span>Log Out</span>
     </a>

@@ -415,6 +415,8 @@ html[data-theme="dark"] {
     display: flex;
     align-items: flex-start;
     gap: 12px;
+    flex: 1;
+    min-width: 0;
 }
 
 .section-header h3 {
@@ -447,11 +449,75 @@ html[data-theme="dark"] {
     margin: 0;
 }
 
+.header-content {
+    min-width: 0;
+}
+
 .header-actions {
     display: flex;
     align-items: center;
     gap: 12px;
     margin-left: auto;
+}
+
+/* Collapsed Section Controls */
+.collapsed-controls {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-left: auto;
+}
+
+.request-count-badge {
+    height: 22px;
+    min-width: 22px;
+    padding: 0 8px;
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 11px;
+    font-weight: 800;
+    font-family: 'TT Interphases', sans-serif;
+    letter-spacing: 0.2px;
+}
+
+.collapsed-controls .expand-btn {
+    height: 32px;
+    padding: 0 14px;
+    background: var(--primary-tint);
+    border: 1px solid var(--primary-border);
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.collapsed-controls .expand-btn:hover {
+    background: var(--primary);
+}
+
+.collapsed-controls .expand-btn:hover span {
+    color: white;
+}
+
+.collapsed-controls .expand-btn:hover svg {
+    color: white;
+}
+
+.collapsed-controls .expand-btn span {
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--primary);
+    font-family: 'TT Interphases', sans-serif;
+    transition: color 0.2s ease;
+}
+
+.collapsed-controls .expand-btn svg {
+    color: var(--primary);
+    transition: color 0.2s ease;
 }
 
 /* Filter Pills - DESIGN.md premium pattern */
@@ -509,6 +575,61 @@ html[data-theme="dark"] {
 /* Material Processing Container - DESIGN.md section grid */
 .material-processing-container {
     padding: 24px 32px 32px;
+}
+
+.material-processing-container .empty-state {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+}
+
+.section-footer {
+    padding: 14px 24px;
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    gap: 10px;
+    background: rgba(12, 75, 52, 0.03);
+}
+
+.section-toggle-btn {
+    height: 40px;
+    padding: 0 14px;
+    border-radius: 999px;
+    border: 1px solid rgba(12, 75, 52, 0.18);
+    background: rgba(12, 75, 52, 0.06);
+    color: var(--primary);
+    font-weight: 800;
+    letter-spacing: 0.2px;
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    transition: all 0.22s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.section-toggle-btn:hover {
+    background: rgba(12, 75, 52, 0.12);
+    border-color: rgba(12, 75, 52, 0.28);
+    transform: translateY(-1px);
+}
+
+.section-toggle-btn:active {
+    transform: translateY(0) scale(0.99);
+}
+
+.section-toggle-btn:focus-visible {
+    outline: 3px solid rgba(12, 75, 52, 0.28);
+    outline-offset: 3px;
+}
+
+.section-toggle-btn .toggle-label {
+    line-height: 1;
+}
+
+.section-toggle-btn .toggle-icon {
+    transition: transform 0.22s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .material-processing-grid, .newly-acquired-container {
@@ -737,7 +858,7 @@ html[data-theme="dark"] {
     position: fixed;
     inset: 0;
     background-color: rgba(0, 0, 0, 0.8);
-    display: flex;
+    display: none;
     align-items: center;
     justify-content: center;
     z-index: 2000;
@@ -1092,16 +1213,7 @@ html[data-theme="dark"] .collapse-btn:hover {
 }
 
 html[data-theme="dark"] .section-footer {
-    border-top-color: #333;
-}
-
-/* Collapse/Expand Button - DESIGN.md premium pattern */
-.section-footer {
-    display: flex;
-    justify-content: center;
-    padding-top: 16px;
-    margin-top: 16px;
-    border-top: 1px solid rgba(12, 75, 52, 0.08);
+    background: rgba(255, 255, 255, 0.04);
 }
 
 .collapse-btn {
