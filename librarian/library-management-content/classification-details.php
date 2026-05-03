@@ -14,58 +14,94 @@ $rangeParts = explode('-', $classificationRange);
 $minRange = isset($rangeParts[0]) ? intval($rangeParts[0]) : 0;
 $maxRange = isset($rangeParts[1]) ? intval($rangeParts[1]) : 999;
 
-// Fetch book references based on call number classification
+// Fetch books based on call number classification (supports legacy book_references + new library_books)
 $bookReferences = [];
 try {
-    // First, get all books with call numbers (we'll filter in PHP for accuracy)
-    $query = "
-        SELECT 
-            br.id,
-            br.book_title,
-            br.author,
-            br.isbn,
-            br.publisher,
-            br.publication_year,
-            br.call_number,
-            br.no_of_copies,
-            br.edition,
-            br.location,
-            br.processing_status,
-            c.course_code,
-            c.course_title
-        FROM book_references br
-        LEFT JOIN courses c ON br.course_id = c.id
-        WHERE br.call_number IS NOT NULL 
-        AND br.call_number != ''
-        ORDER BY br.call_number ASC, br.book_title ASC
-    ";
-    
-    $stmt = $pdo->prepare($query);
-    $stmt->execute();
-    $allBooks = $stmt->fetchAll(PDO::FETCH_ASSOC);
-    
-    // Filter books based on call number classification in PHP
-    $bookReferences = array_filter($allBooks, function($book) use ($minRange, $maxRange) {
-        if (empty($book['call_number'])) {
+    $allBooks = [];
+
+    // Legacy source: book_references (course-linked)
+    $hasBookReferences = (bool) $pdo->query("SHOW TABLES LIKE 'book_references'")->fetchColumn();
+    if ($hasBookReferences) {
+        $legacyQuery = "
+            SELECT
+                br.id,
+                br.book_title,
+                br.author,
+                br.isbn,
+                br.publisher,
+                br.publication_year,
+                br.call_number,
+                br.no_of_copies,
+                br.edition,
+                br.location,
+                br.processing_status,
+                c.course_code,
+                c.course_title,
+                'book_reference' AS source_type
+            FROM book_references br
+            LEFT JOIN courses c ON br.course_id = c.id
+            WHERE br.call_number IS NOT NULL
+              AND br.call_number != ''
+            ORDER BY br.call_number ASC, br.book_title ASC
+        ";
+        $legacyStmt = $pdo->prepare($legacyQuery);
+        $legacyStmt->execute();
+        $allBooks = array_merge($allBooks, $legacyStmt->fetchAll(PDO::FETCH_ASSOC));
+    }
+
+    // New source: library_books (classification-linked)
+    // Note: classification range is derived from call_number, not classification_id,
+    // so we include all call-numbered books and filter in PHP for consistency.
+    $hasLibraryBooks = (bool) $pdo->query("SHOW TABLES LIKE 'library_books'")->fetchColumn();
+    if ($hasLibraryBooks) {
+        $libraryQuery = "
+            SELECT
+                lb.id,
+                lb.book_title,
+                lb.author,
+                lb.isbn,
+                lb.publisher,
+                lb.publication_year,
+                lb.call_number,
+                lb.no_of_copies,
+                lb.edition,
+                lb.location,
+                lb.status AS processing_status,
+                NULL AS course_code,
+                NULL AS course_title,
+                'library_book' AS source_type
+            FROM library_books lb
+            WHERE lb.call_number IS NOT NULL
+              AND lb.call_number != ''
+            ORDER BY lb.call_number ASC, lb.book_title ASC
+        ";
+        $libraryStmt = $pdo->prepare($libraryQuery);
+        $libraryStmt->execute();
+        $allBooks = array_merge($allBooks, $libraryStmt->fetchAll(PDO::FETCH_ASSOC));
+    }
+
+    // Filter books based on call number classification in PHP (tolerant parsing)
+    $bookReferences = array_values(array_filter($allBooks, function($book) use ($minRange, $maxRange) {
+        $callNumber = trim((string)($book['call_number'] ?? ''));
+        if ($callNumber === '') {
             return false;
         }
-        
-        // Extract first 3 digits from call number
-        // Handle formats like "004.6782 D569", "004 D569", "4.6782 D569", "4 D569"
-        preg_match('/^(\d{1,3})/', trim($book['call_number']), $matches);
-        if (isset($matches[1])) {
-            $firstDigits = intval($matches[1]);
-            // Pad to 3 digits for comparison (e.g., 4 -> 004, 04 -> 004)
-            $paddedDigits = str_pad($firstDigits, 3, '0', STR_PAD_LEFT);
-            $number = intval($paddedDigits);
-            return $number >= $minRange && $number <= $maxRange;
+
+        // Extract first 1–3 digit block, allowing optional prefixes like "CS 001.1"
+        // Examples matched:
+        // - "004.6782 D569"
+        // - "4.6782 D569"
+        // - "CS 001.1"
+        // - "DDC 050"
+        if (!preg_match('/^\D*(\d{1,3})/', $callNumber, $matches)) {
+            return false;
         }
-        
-        return false;
-    });
-    
-    // Re-index array after filtering
-    $bookReferences = array_values($bookReferences);
+
+        $firstDigits = intval($matches[1]);
+        $paddedDigits = str_pad($firstDigits, 3, '0', STR_PAD_LEFT);
+        $number = intval($paddedDigits);
+        return $number >= $minRange && $number <= $maxRange;
+    }));
     
 } catch (Exception $e) {
     $bookReferences = [];
@@ -130,38 +166,78 @@ $totalBooks = count($bookReferences);
             foreach ($shelves as $shelfIndex => $booksInShelf): 
             ?>
                 <div class="shelf-row">
-                    <div class="shelf-books-grid">
-                        <?php foreach ($booksInShelf as $book): ?>
-                            <div class="book-spine-card" onclick="window.location.href='content.php?page=course-details&course_code=<?php echo urlencode($book['course_code'] ?? ''); ?>'">
-                                <div>
-                                    <h3 class="book-spine-title"><?php echo htmlspecialchars($book['book_title'] ?? 'Untitled'); ?></h3>
-                                    <p class="book-spine-author"><?php echo htmlspecialchars($book['author'] ?? 'Unknown Author'); ?></p>
-                                    
-                                    <div class="book-spine-meta">
-                                        <?php if (!empty($book['call_number'])): ?>
-                                            <span class="book-spine-badge">
-                                                <i data-lucide="hash" style="width: 10px; height: 10px; display: inline-block; margin-right: 2px;"></i>
-                                                <?php echo htmlspecialchars($book['call_number']); ?>
+                    <div class="shelf-table-wrap">
+                        <table class="shelf-table">
+                            <thead>
+                                <tr>
+                                    <th>Title</th>
+                                    <th>Author</th>
+                                    <th>Call Number</th>
+                                    <th>Location</th>
+                                    <th>Year</th>
+                                    <th>Source</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+		                        <?php foreach ($booksInShelf as $book): ?>
+		                            <?php
+		                                $isCourseLinked = !empty($book['course_code']);
+		                                $courseUrl = $isCourseLinked
+		                                    ? "content.php?page=course-details&course_code=" . urlencode($book['course_code'])
+		                                    : null;
+                                    $rowClass = $isCourseLinked ? 'shelf-table-row is-clickable' : 'shelf-table-row is-static';
+                                    $rowLabel = ($book['book_title'] ?? 'Untitled') . ' by ' . ($book['author'] ?? 'Unknown Author');
+		                            ?>
+                                    <tr
+                                        class="<?php echo $rowClass; ?>"
+                                        <?php if ($courseUrl) echo 'role="link" tabindex="0" aria-label="' . htmlspecialchars($rowLabel) . '" onclick="window.location.href=' . htmlspecialchars(json_encode($courseUrl)) . '" onkeydown="if(event.key===\'Enter\'||event.key===\' \'){event.preventDefault();window.location.href=' . htmlspecialchars(json_encode($courseUrl)) . ';}"'; ?>
+                                    >
+                                        <td class="book-title-cell" data-label="Title">
+                                            <div class="book-title-main"><?php echo htmlspecialchars($book['book_title'] ?? 'Untitled'); ?></div>
+                                            <div class="book-title-sub">Catalog entry</div>
+                                        </td>
+                                        <td data-label="Author"><?php echo htmlspecialchars($book['author'] ?? 'Unknown Author'); ?></td>
+                                        <td data-label="Call Number">
+                                            <?php if (!empty($book['call_number'])): ?>
+                                                <span class="table-chip">
+                                                    <i data-lucide="hash" style="width: 10px; height: 10px;"></i>
+                                                    <?php echo htmlspecialchars($book['call_number']); ?>
+                                                </span>
+                                            <?php else: ?>
+                                                <span class="table-muted">No call number</span>
+                                            <?php endif; ?>
+                                        </td>
+                                        <td data-label="Location">
+                                            <?php if (!empty($book['location'])): ?>
+                                                <span class="table-chip alt">
+                                                    <i data-lucide="map-pin" style="width: 10px; height: 10px;"></i>
+                                                    <?php echo htmlspecialchars($book['location']); ?>
+                                                </span>
+                                            <?php else: ?>
+                                                <span class="table-muted">Unassigned</span>
+                                            <?php endif; ?>
+                                        </td>
+                                        <td data-label="Year"><?php echo htmlspecialchars($book['publication_year'] ?? 'N/A'); ?></td>
+                                        <td data-label="Source">
+                                            <span class="source-pill <?php echo $isCourseLinked ? 'course' : 'library'; ?>">
+                                                <?php echo $isCourseLinked ? 'Course-linked' : 'Library'; ?>
                                             </span>
-                                        <?php endif; ?>
-                                        
-                                        <?php if (!empty($book['location'])): ?>
-                                            <span class="book-spine-badge" style="background: rgba(21, 101, 192, 0.06); color: #1565C0; border-color: rgba(21, 101, 192, 0.1);">
-                                                <i data-lucide="map-pin" style="width: 10px; height: 10px; display: inline-block; margin-right: 2px;"></i>
-                                                <?php echo htmlspecialchars($book['location']); ?>
-                                            </span>
-                                        <?php endif; ?>
-                                    </div>
-                                </div>
-                                
-                                <div class="book-spine-footer">
-                                    <span class="book-spine-year"><?php echo htmlspecialchars($book['publication_year'] ?? 'N/A'); ?></span>
-                                    <div style="color: #0C4B34;">
-                                        <i data-lucide="chevron-right" style="width: 16px; height: 16px;"></i>
-                                    </div>
-                                </div>
-                            </div>
-                        <?php endforeach; ?>
+                                        </td>
+                                        <td class="action-cell" data-label="Action">
+                                            <?php if ($isCourseLinked): ?>
+                                                <span class="action-link">
+                                                    Open
+                                                    <i data-lucide="chevron-right" style="width: 14px; height: 14px;"></i>
+                                                </span>
+                                            <?php else: ?>
+                                                <span class="table-muted">View only</span>
+                                            <?php endif; ?>
+                                        </td>
+                                    </tr>
+		                        <?php endforeach; ?>
+                            </tbody>
+                        </table>
                     </div>
                 </div>
             <?php endforeach; ?>
@@ -181,4 +257,3 @@ $totalBooks = count($bookReferences);
         lucide.createIcons();
     }
 </script>
-

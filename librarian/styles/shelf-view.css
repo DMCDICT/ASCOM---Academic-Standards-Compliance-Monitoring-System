@@ -82,6 +82,7 @@
 .shelf-row {
     position: relative;
     padding-bottom: 12px;
+    padding: 18px;
     border-bottom: 8px solid #0C4B34; /* The shelf plank */
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 }
@@ -97,94 +98,142 @@
     filter: blur(2px);
 }
 
-.shelf-books-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-    gap: 24px;
-    padding: 0 8px;
-}
-
-/* 4. Book Card (Spine/Cover style) */
-.book-spine-card {
+.shelf-table-wrap {
+    overflow: hidden;
+    border-radius: 14px;
+    border: 1px solid rgba(17, 24, 39, 0.08);
     background: #ffffff;
-    border-radius: 8px 12px 12px 8px;
-    border: 1px solid rgba(12, 75, 52, 0.14);
-    border-left: 6px solid #0C4B34; /* The Spine */
-    padding: 20px;
-    min-height: 280px;
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-    box-shadow: 2px 4px 12px rgba(0, 0, 0, 0.06);
-    transition: all 0.28s cubic-bezier(.4, 0, .2, 1);
-    animation: fadeSlideUp 0.45s ease-out both;
-    cursor: pointer;
-    position: relative;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.05);
 }
 
-.book-spine-card:hover {
-    transform: translateY(-8px) scale(1.02);
-    box-shadow: 12px 16px 36px rgba(12, 75, 52, 0.18);
-    border-color: rgba(12, 75, 52, 0.3);
+.shelf-table {
+    width: 100%;
+    border-collapse: collapse;
+    table-layout: fixed;
 }
 
-.book-spine-card::before {
-    content: '';
-    position: absolute;
-    left: 4px;
+.shelf-table thead th {
+    position: sticky;
     top: 0;
-    width: 1px;
-    height: 100%;
-    background: rgba(255, 255, 255, 0.2);
+    z-index: 1;
+    background: linear-gradient(180deg, rgba(12, 75, 52, 0.06), rgba(12, 75, 52, 0.03)), #ffffff;
+    color: rgba(17, 24, 39, 0.72);
+    font-size: 11px;
+    font-weight: 800;
+    letter-spacing: 0.8px;
+    text-transform: uppercase;
+    text-align: left;
+    padding: 14px 16px;
+    border-bottom: 1px solid rgba(17, 24, 39, 0.08);
 }
 
-.book-spine-title {
-    font-size: 16px;
+.shelf-table tbody tr {
+    transition: background-color 0.18s ease, transform 0.18s ease, box-shadow 0.18s ease;
+}
+
+.shelf-table-row td {
+    padding: 14px 16px;
+    border-bottom: 1px solid rgba(17, 24, 39, 0.06);
+    vertical-align: middle;
+    font-size: 13px;
+    color: #111827;
+    word-break: break-word;
+}
+
+.shelf-table-row:nth-child(even) {
+    background: rgba(12, 75, 52, 0.02);
+}
+
+.shelf-table-row.is-clickable {
+    cursor: pointer;
+}
+
+.shelf-table-row.is-clickable:hover {
+    background: rgba(12, 75, 52, 0.06);
+}
+
+.shelf-table-row.is-clickable:focus-visible {
+    outline: 3px solid rgba(12, 75, 52, 0.22);
+    outline-offset: -3px;
+}
+
+.shelf-table-row.is-static {
+    cursor: default;
+}
+
+.book-title-cell {
+    min-width: 220px;
+}
+
+.book-title-main {
+    font-size: 14px;
     font-weight: 800;
     color: #111827;
-    margin-bottom: 8px;
-    line-height: 1.4;
-    display: -webkit-box;
-    -webkit-line-clamp: 3;
-    -webkit-box-orient: vertical;
-    overflow: hidden;
+    line-height: 1.35;
+    margin-bottom: 2px;
 }
 
-.book-spine-author {
-    font-size: 13px;
-    font-weight: 600;
-    color: rgba(17, 24, 39, 0.6);
-    margin-bottom: 12px;
-}
-
-.book-spine-meta {
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-}
-
-.book-spine-badge {
-    background: rgba(12, 75, 52, 0.06);
-    border: 1px solid rgba(12, 75, 52, 0.1);
-    padding: 4px 8px;
-    border-radius: 6px;
+.book-title-sub {
     font-size: 11px;
-    font-weight: 700;
-    color: #0C4B34;
-    align-self: flex-start;
+    color: rgba(17, 24, 39, 0.45);
+    font-weight: 600;
 }
 
-.book-spine-footer {
-    margin-top: 16px;
-    display: flex;
-    justify-content: space-between;
+.table-chip,
+.source-pill {
+    display: inline-flex;
     align-items: center;
+    gap: 6px;
+    padding: 4px 10px;
+    border-radius: 999px;
+    font-size: 11px;
+    font-weight: 800;
+    line-height: 1;
+    white-space: nowrap;
 }
 
-.book-spine-year {
+.table-chip {
+    background: rgba(12, 75, 52, 0.06);
+    border: 1px solid rgba(12, 75, 52, 0.10);
+    color: #0C4B34;
+}
+
+.table-chip.alt {
+    background: rgba(21, 101, 192, 0.06);
+    border-color: rgba(21, 101, 192, 0.10);
+    color: #1565C0;
+}
+
+.table-muted {
+    color: rgba(17, 24, 39, 0.45);
     font-size: 12px;
-    font-weight: 700;
-    color: rgba(17, 24, 39, 0.4);
+    font-weight: 600;
+}
+
+.source-pill {
+    border: 1px solid rgba(17, 24, 39, 0.10);
+    background: rgba(17, 24, 39, 0.04);
+    color: #111827;
+}
+
+.source-pill.course {
+    background: rgba(21, 101, 192, 0.06);
+    border-color: rgba(21, 101, 192, 0.12);
+    color: #1565C0;
+}
+
+.action-cell {
+    text-align: right;
+}
+
+.action-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    color: #0C4B34;
+    font-weight: 800;
+    font-size: 12px;
+    letter-spacing: 0.2px;
 }
 
 /* 5. Animations */
@@ -199,22 +248,45 @@
     }
 }
 
-/* Stagger delays */
-.book-spine-card:nth-child(1) { animation-delay: 0.05s; }
-.book-spine-card:nth-child(2) { animation-delay: 0.1s; }
-.book-spine-card:nth-child(3) { animation-delay: 0.15s; }
-.book-spine-card:nth-child(4) { animation-delay: 0.2s; }
-.book-spine-card:nth-child(5) { animation-delay: 0.25s; }
-.book-spine-card:nth-child(6) { animation-delay: 0.3s; }
-.book-spine-card:nth-child(7) { animation-delay: 0.35s; }
-.book-spine-card:nth-child(8) { animation-delay: 0.4s; }
-
 /* 6. Responsive */
 @media (max-width: 768px) {
     .shelf-stats-row {
         flex-direction: column;
     }
-    .shelf-books-grid {
-        grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+    .shelf-table {
+        table-layout: auto;
+    }
+
+    .shelf-table thead {
+        display: none;
+    }
+
+    .shelf-table,
+    .shelf-table tbody,
+    .shelf-table tr,
+    .shelf-table td {
+        display: block;
+        width: 100%;
+    }
+
+    .shelf-table-row {
+        padding: 8px 0;
+    }
+
+    .shelf-table-row td {
+        display: flex;
+        justify-content: space-between;
+        gap: 12px;
+        padding: 10px 14px;
+    }
+
+    .shelf-table-row td::before {
+        content: attr(data-label);
+        font-size: 11px;
+        font-weight: 800;
+        text-transform: uppercase;
+        letter-spacing: 0.6px;
+        color: rgba(17, 24, 39, 0.45);
+        flex: 0 0 120px;
     }
 }
