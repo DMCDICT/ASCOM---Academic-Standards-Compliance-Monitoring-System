@@ -21,24 +21,27 @@
 
 .notification-count {
     position: absolute;
-    top: -8px;
-    right: -8px;
-    background: #ff4444;
+    top: -6px;
+    right: -6px;
+    background: #ef4444;
     color: white;
-    border-radius: 50%;
-    width: 22px;
-    height: 22px;
+    border-radius: 5px;
+    min-width: 20px;
+    height: 20px;
+    padding: 0 6px;
     font-size: 11px;
-    font-weight: bold;
+    font-weight: 700;
     display: flex;
     align-items: center;
     justify-content: center;
-    min-width: 22px;
     border: 2px solid white;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.18);
     z-index: 10;
     line-height: 1;
     text-align: center;
+    font-family: 'TT Interphases', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    letter-spacing: -0.2px;
+    box-sizing: border-box;
 }
 
 .notification-dropdown {
@@ -209,186 +212,123 @@
     display: none;
 }
 
-.notification-count[data-count="1"] {
-    background: #ff4444;
-}
-
-.notification-count[data-count="2"] {
-    background: #ff6b35;
-}
-
-.notification-count[data-count="3"] {
-    background: #ff8c00;
-}
-
-.notification-count[data-count="4"] {
-    background: #ffa500;
-}
-
-.notification-count[data-count="5"] {
-    background: #ffb347;
-}
-
-.notification-count[data-count="6"] {
-    background: #ffc107;
-}
-
-.notification-count[data-count="7"] {
-    background: #ffd700;
-}
-
-.notification-count[data-count="8"] {
-    background: #ffeb3b;
-}
-
-.notification-count[data-count="9"] {
-    background: #ffff00;
-}
-
-.notification-count[data-count="10"] {
-    background: #4caf50;
-}
-
-.notification-count[data-count="11"] {
-    background: #2196f3;
-}
-
-.notification-count[data-count="12"] {
-    background: #9c27b0;
-}
-
-.notification-count[data-count="13"] {
-    background: #e91e63;
-}
-
-.notification-count[data-count="14"] {
-    background: #795548;
-}
-
-.notification-count[data-count="15"] {
-    background: #607d8b;
-}
-
-.notification-count[data-count="16"] {
-    background: #3f51b5;
-}
-
-.notification-count[data-count="17"] {
-    background: #009688;
-}
-
-.notification-count[data-count="18"] {
-    background: #8bc34a;
-}
-
-.notification-count[data-count="19"] {
-    background: #cddc39;
-}
-
-.notification-count[data-count="20"] {
-    background: #ff9800;
-}
-
-/* For counts above 20, use a gradient */
-.notification-count[data-count="21"] {
-    background: linear-gradient(45deg, #ff4444, #ff6b35, #ff8c00, #ffa500);
-}
-
-.notification-count[data-count="22"] {
-    background: linear-gradient(45deg, #ff6b35, #ff8c00, #ffa500, #ffb347);
-}
-
-.notification-count[data-count="23"] {
-    background: linear-gradient(45deg, #ff8c00, #ffa500, #ffb347, #ffc107);
-}
-
-.notification-count[data-count="24"] {
-    background: linear-gradient(45deg, #ffa500, #ffb347, #ffc107, #ffd700);
-}
-
-.notification-count[data-count="25"] {
-    background: linear-gradient(45deg, #ffb347, #ffc107, #ffd700, #ffeb3b);
-}
-
-/* For very high counts, use a special style */
-.notification-count[data-count="26"] {
-    background: linear-gradient(45deg, #ff4444, #ff6b35, #ff8c00, #ffa500, #ffb347, #ffc107, #ffd700, #ffeb3b);
-    animation: notificationPulse 0.8s ease-in-out infinite;
-}
-
-.notification-count[data-count="27"] {
-    background: linear-gradient(45deg, #ff6b35, #ff8c00, #ffa500, #ffb347, #ffc107, #ffd700, #ffeb3b, #ffff00);
-    animation: notificationPulse 0.8s ease-in-out infinite;
-}
-
-.notification-count[data-count="28"] {
-    background: linear-gradient(45deg, #ff8c00, #ffa500, #ffb347, #ffc107, #ffd700, #ffeb3b, #ffff00, #4caf50);
-    animation: notificationPulse 0.8s ease-in-out infinite;
-}
-
-.notification-count[data-count="29"] {
-    background: linear-gradient(45deg, #ffa500, #ffb347, #ffc107, #ffd700, #ffeb3b, #ffff00, #4caf50, #2196f3);
-    animation: notificationPulse 0.8s ease-in-out infinite;
-}
-
-.notification-count[data-count="30"] {
-    background: linear-gradient(45deg, #ffb347, #ffc107, #ffd700, #ffeb3b, #ffff00, #4caf50, #2196f3, #9c27b0);
-    animation: notificationPulse 0.8s ease-in-out infinite;
+/* For counts 1-99, use a simple red badge */
+.notification-count[data-count="1"],
+.notification-count[data-count="2"],
+.notification-count[data-count="3"],
+.notification-count[data-count="4"],
+.notification-count[data-count="5"],
+.notification-count[data-count="6"],
+.notification-count[data-count="7"],
+.notification-count[data-count="8"],
+.notification-count[data-count="9"],
+.notification-count[data-count="10"],
+.notification-count[data-count="11"],
+.notification-count[data-count="12"],
+.notification-count[data-count="13"],
+.notification-count[data-count="14"],
+.notification-count[data-count="15"],
+.notification-count[data-count="16"],
+.notification-count[data-count="17"],
+.notification-count[data-count="18"],
+.notification-count[data-count="19"],
+.notification-count[data-count="20"],
+.notification-count[data-count="21"],
+.notification-count[data-count="22"],
+.notification-count[data-count="23"],
+.notification-count[data-count="24"],
+.notification-count[data-count="25"],
+.notification-count[data-count="26"],
+.notification-count[data-count="27"],
+.notification-count[data-count="28"],
+.notification-count[data-count="29"],
+.notification-count[data-count="30"],
+.notification-count[data-count="31"],
+.notification-count[data-count="32"],
+.notification-count[data-count="33"],
+.notification-count[data-count="34"],
+.notification-count[data-count="35"],
+.notification-count[data-count="36"],
+.notification-count[data-count="37"],
+.notification-count[data-count="38"],
+.notification-count[data-count="39"],
+.notification-count[data-count="40"],
+.notification-count[data-count="41"],
+.notification-count[data-count="42"],
+.notification-count[data-count="43"],
+.notification-count[data-count="44"],
+.notification-count[data-count="45"],
+.notification-count[data-count="46"],
+.notification-count[data-count="47"],
+.notification-count[data-count="48"],
+.notification-count[data-count="49"],
+.notification-count[data-count="50"],
+.notification-count[data-count="51"],
+.notification-count[data-count="52"],
+.notification-count[data-count="53"],
+.notification-count[data-count="54"],
+.notification-count[data-count="55"],
+.notification-count[data-count="56"],
+.notification-count[data-count="57"],
+.notification-count[data-count="58"],
+.notification-count[data-count="59"],
+.notification-count[data-count="60"],
+.notification-count[data-count="61"],
+.notification-count[data-count="62"],
+.notification-count[data-count="63"],
+.notification-count[data-count="64"],
+.notification-count[data-count="65"],
+.notification-count[data-count="66"],
+.notification-count[data-count="67"],
+.notification-count[data-count="68"],
+.notification-count[data-count="69"],
+.notification-count[data-count="70"],
+.notification-count[data-count="71"],
+.notification-count[data-count="72"],
+.notification-count[data-count="73"],
+.notification-count[data-count="74"],
+.notification-count[data-count="75"],
+.notification-count[data-count="76"],
+.notification-count[data-count="77"],
+.notification-count[data-count="78"],
+.notification-count[data-count="79"],
+.notification-count[data-count="80"],
+.notification-count[data-count="81"],
+.notification-count[data-count="82"],
+.notification-count[data-count="83"],
+.notification-count[data-count="84"],
+.notification-count[data-count="85"],
+.notification-count[data-count="86"],
+.notification-count[data-count="87"],
+.notification-count[data-count="88"],
+.notification-count[data-count="89"],
+.notification-count[data-count="90"],
+.notification-count[data-count="91"],
+.notification-count[data-count="92"],
+.notification-count[data-count="93"],
+.notification-count[data-count="94"],
+.notification-count[data-count="95"],
+.notification-count[data-count="96"],
+.notification-count[data-count="97"],
+.notification-count[data-count="98"],
+.notification-count[data-count="99"] {
+    background: #ef4444;
 }
 
 /* For counts above 99, use a special pulsing style */
-.notification-count[data-count="100"] {
-    background: linear-gradient(45deg, #ff4444, #ff6b35, #ff8c00, #ffa500, #ffb347, #ffc107, #ffd700, #ffeb3b, #ffff00, #4caf50, #2196f3, #9c27b0, #e91e63, #795548, #607d8b, #3f51b5, #009688, #8bc34a, #cddc39, #ff9800);
-    animation: notificationPulse 0.5s ease-in-out infinite;
-    font-size: 10px;
-    width: 24px;
-    height: 24px;
-    min-width: 24px;
-}
-
-.notification-count[data-count="101"] {
-    background: linear-gradient(45deg, #ff6b35, #ff8c00, #ffa500, #ffb347, #ffc107, #ffd700, #ffeb3b, #ffff00, #4caf50, #2196f3, #9c27b0, #e91e63, #795548, #607d8b, #3f51b5, #009688, #8bc34a, #cddc39, #ff9800, #ff4444);
-    animation: notificationPulse 0.5s ease-in-out infinite;
-    font-size: 10px;
-    width: 24px;
-    height: 24px;
-    min-width: 24px;
-}
-
-.notification-count[data-count="102"] {
-    background: linear-gradient(45deg, #ff8c00, #ffa500, #ffb347, #ffc107, #ffd700, #ffeb3b, #ffff00, #4caf50, #2196f3, #9c27b0, #e91e63, #795548, #607d8b, #3f51b5, #009688, #8bc34a, #cddc39, #ff9800, #ff4444, #ff6b35);
-    animation: notificationPulse 0.5s ease-in-out infinite;
-    font-size: 10px;
-    width: 24px;
-    height: 24px;
-    min-width: 24px;
-}
-
-.notification-count[data-count="103"] {
-    background: linear-gradient(45deg, #ffa500, #ffb347, #ffc107, #ffd700, #ffeb3b, #ffff00, #4caf50, #2196f3, #9c27b0, #e91e63, #795548, #607d8b, #3f51b5, #009688, #8bc34a, #cddc39, #ff9800, #ff4444, #ff6b35, #ff8c00);
-    animation: notificationPulse 0.5s ease-in-out infinite;
-    font-size: 10px;
-    width: 24px;
-    height: 24px;
-    min-width: 24px;
-}
-
-.notification-count[data-count="104"] {
-    background: linear-gradient(45deg, #ffb347, #ffc107, #ffd700, #ffeb3b, #ffff00, #4caf50, #2196f3, #9c27b0, #e91e63, #795548, #607d8b, #3f51b5, #009688, #8bc34a, #cddc39, #ff9800, #ff4444, #ff6b35, #ff8c00, #ffa500);
-    animation: notificationPulse 0.5s ease-in-out infinite;
-    font-size: 10px;
-    width: 24px;
-    height: 24px;
-    min-width: 24px;
-}
-
+.notification-count[data-count="100"],
+.notification-count[data-count="101"],
+.notification-count[data-count="102"],
+.notification-count[data-count="103"],
+.notification-count[data-count="104"],
 .notification-count[data-count="105"] {
-    background: linear-gradient(45deg, #ffc107, #ffd700, #ffeb3b, #ffff00, #4caf50, #2196f3, #9c27b0, #e91e63, #795548, #607d8b, #3f51b5, #009688, #8bc34a, #cddc39, #ff9800, #ff4444, #ff6b35, #ff8c00, #ffa500, #ffb347);
+    background: linear-gradient(45deg, #ef4444, #f97316, #eab308);
     animation: notificationPulse 0.5s ease-in-out infinite;
     font-size: 10px;
-    width: 24px;
-    height: 24px;
     min-width: 24px;
+    height: 20px;
+    padding: 0 6px;
+    border-radius: 6px;
 }
 
 /* Three dots menu */

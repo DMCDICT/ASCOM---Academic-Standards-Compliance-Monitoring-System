@@ -411,21 +411,23 @@ html[data-theme="dark"] .content-card {
 
 .notification-count {
     position: absolute;
-    top: 5px;
-    right: 5px;
+    top: 4px;
+    right: 4px;
     background-color: #ef4444;
     color: white;
-    font-size: 10px;
-    min-width: 16px;
-    height: 16px;
-    padding: 0 4px;
-    border-radius: 8px;
+    font-size: 11px;
+    min-width: 18px;
+    height: 18px;
+    padding: 0 6px;
+    border-radius: 5px;
     display: flex;
     align-items: center;
     justify-content: center;
     font-weight: 800;
+    letter-spacing: -0.2px;
+    box-sizing: border-box;
     border: 2px solid #053423;
-    box-shadow: 0 0 10px rgba(239, 68, 68, 0.3);
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.18);
 }
 
 /* TOP-RIGHT anchor: dropdown positioned relative to .top-navbar (fixed) */

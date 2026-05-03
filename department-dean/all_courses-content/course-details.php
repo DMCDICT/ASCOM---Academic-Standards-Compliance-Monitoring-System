@@ -2328,13 +2328,30 @@ if (!$showProgramCourses && $courseDetails) {
                                         $compliantCount = 0;
                                     }
                                     
-                                    $targetCount = 5; // Default target, QA will set this later
-                                    $isCompliant = $compliantCount >= $targetCount;
-                                    $displayColor = $isCompliant ? '#2e7d32' : '#FF4C4C'; // Green if compliant, Red if not
+                                    $targetCount = 5;
+                                    $percentage = $targetCount > 0 ? round(($compliantCount / $targetCount) * 100) : 0;
+                                    $percentage = min(100, $percentage);
+                                    
+                                    // Determine color based on percentage
+                                    if ($percentage >= 100) {
+                                        $bgColor = '#d1fae5';
+                                        $textColor = '#059669';
+                                    } elseif ($percentage >= 60) {
+                                        $bgColor = '#fef3c7';
+                                        $textColor = '#d97706';
+                                    } else {
+                                        $bgColor = '#fee2e2';
+                                        $textColor = '#dc2626';
+                                    }
                                     ?>
-                                    <span style="background: <?php echo $isCompliant ? '#e8f5e8' : '#ffeaea'; ?>; color: <?php echo $displayColor; ?>; padding: 4px 8px; border-radius: 12px; font-size: 12px; font-weight: 600; font-family: 'TT Interphases', sans-serif;">
-                                        <?php echo $compliantCount; ?>/<?php echo $targetCount; ?>
-                                    </span>
+                                    <div style="display: flex; flex-direction: column; align-items: center; gap: 2px;">
+                                        <div style="width: 50px; height: 5px; background: #e5e7eb; border-radius: 3px; overflow: hidden;">
+                                            <div style="width: <?php echo $percentage; ?>%; height: 100%; background: <?php echo $textColor; ?>; border-radius: 3px;"></div>
+                                        </div>
+                                        <span style="font-size: 11px; font-weight: 600; color: <?php echo $textColor; ?>;">
+                                            <?php echo $compliantCount; ?>/<?php echo $targetCount; ?> (<?php echo $percentage; ?>%)
+                                        </span>
+                                    </div>
                                 </td>
                                 <td class="actions-cell" onclick="event.stopPropagation();" style="position: relative;">
                                     <div class="action-menu-container">
@@ -2493,6 +2510,58 @@ if (!$showProgramCourses && $courseDetails) {
                             ?>
                         </span>
                         <span style="font-size: 11px; color: #6c757d;"><?php echo htmlspecialchars($courseDetails['academic_year'] ?? 'N/A'); ?></span>
+                    </div>
+                </div>
+                <div class="info-item">
+                    <span class="info-label">Compliance</span>
+                    <?php 
+                    // Calculate compliance percentage
+                    $headerCompliantCount = 0;
+                    $currentYear = date('Y');
+                    try {
+                        $courseIdQuery = "SELECT id FROM courses WHERE course_code = ? LIMIT 1";
+                        $courseIdStmt = $pdo->prepare($courseIdQuery);
+                        $courseIdStmt->execute([$courseCode]);
+                        $courseData = $courseIdStmt->fetch(PDO::FETCH_ASSOC);
+                        
+                        if ($courseData) {
+                            $refCountQuery = "SELECT COUNT(*) as ref_count FROM book_references WHERE course_id = ? AND publication_year > 0 AND (? - publication_year) < 5";
+                            $refCountStmt = $pdo->prepare($refCountQuery);
+                            $refCountStmt->execute([$courseData['id'], $currentYear]);
+                            $refResult = $refCountStmt->fetch(PDO::FETCH_ASSOC);
+                            $headerCompliantCount = $refResult['ref_count'] ?? 0;
+                        }
+                    } catch (Exception $e) {
+                        $headerCompliantCount = 0;
+                    }
+                    
+                    $targetCount = 5;
+                    $percentage = $targetCount > 0 ? round(($headerCompliantCount / $targetCount) * 100) : 0;
+                    $percentage = min(100, $percentage);
+                    
+                    if ($percentage >= 100) {
+                        $barColor = '#059669';
+                        $statusText = 'Compliant';
+                    } elseif ($percentage >= 60) {
+                        $barColor = '#d97706';
+                        $statusText = 'Partial';
+                    } else {
+                        $barColor = '#dc2626';
+                        $statusText = 'Non-Compliant';
+                    }
+                    ?>
+                    <div class="info-value" style="display: flex; flex-direction: column; gap: 4px;">
+                        <div style="display: flex; align-items: center; gap: 6px;">
+                            <div style="width: 60px; height: 6px; background: #e5e7eb; border-radius: 3px; overflow: hidden;">
+                                <div style="width: <?php echo $percentage; ?>%; height: 100%; background: <?php echo $barColor; ?>; border-radius: 3px;"></div>
+                            </div>
+                            <span style="font-size: 11px; font-weight: 600; color: <?php echo $barColor; ?>;">
+                                <?php echo $headerCompliantCount; ?>/<?php echo $targetCount; ?>
+                            </span>
+                        </div>
+                        <span style="font-size: 10px; color: <?php echo $barColor; ?>; font-weight: 600;">
+                            <?php echo $statusText; ?> (<?php echo $percentage; ?>%)
+                        </span>
                     </div>
                 </div>
             </div>

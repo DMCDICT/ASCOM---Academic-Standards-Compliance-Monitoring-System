@@ -173,6 +173,7 @@ $currentDate = date('F j, Y');
                 </div>
             </div>
         </div>
+        </div>
         
         <div class="material-processing-container" id="materialProcessingContainer">
             <div class="material-processing-grid" id="materialProcessingGrid">
@@ -199,6 +200,37 @@ $currentDate = date('F j, Y');
                 <span class="toggle-label">Collapse</span>
                 <i data-lucide="chevron-up" class="toggle-icon" style="width: 16px; height: 16px;"></i>
             </button>
+        </div>
+    </div>
+
+    <!-- Material Requests from Deans Section -->
+    <div class="dashboard-section" style="margin-bottom: 40px;">
+        <div class="dashboard-section__top">
+            <div class="section-header">
+                <div class="label-bar" style="background: linear-gradient(180deg, #7C3AED 0%, #A78BFA 100%);"></div>
+                <div class="header-content">
+                    <h3>Material Requests from Deans</h3>
+                    <p>Book requests from department deans for non-compliant courses</p>
+                </div>
+            </div>
+            <div class="header-actions">
+                <div class="filter-buttons" style="display: flex; gap: 8px; background: rgba(0,0,0,0.03); padding: 6px; border-radius: 14px;">
+                    <button class="filter-btn active" onclick="filterMaterialRequests('pending')" id="mrPendingBtn" style="padding: 8px 16px; border-radius: 8px; border: none; font-weight: 600; cursor: pointer;">Pending</button>
+                    <button class="filter-btn" onclick="filterMaterialRequests('processing')" id="mrProcessingBtn" style="padding: 8px 16px; border-radius: 8px; border: none; font-weight: 600; cursor: pointer;">Processing</button>
+                    <button class="filter-btn" onclick="filterMaterialRequests('completed')" id="mrCompletedBtn" style="padding: 8px 16px; border-radius: 8px; border: none; font-weight: 600; cursor: pointer;">Completed</button>
+                </div>
+            </div>
+        </div>
+        
+        <div class="material-processing-container">
+            <div class="material-processing-grid" id="materialRequestsGrid">
+                <!-- Material requests will be dynamically generated here -->
+            </div>
+            <div id="materialRequestsEmptyState" class="empty-state" style="display: none;">
+                <i data-lucide="inbox" style="width: 48px; height: 48px; margin-bottom: 16px;"></i>
+                <h3>No Requests</h3>
+                <p>No material requests at the moment.</p>
+            </div>
         </div>
     </div>
 
@@ -1055,6 +1087,220 @@ async function updateProcessingStatus(bookId, status, callNumber = null, noOfCop
             throw new Error(result.message || 'Failed to update status');
         }
     } catch (error) {
+        console.error('Error updating processing status:', error);
+        throw error;
+    }
+}
+
+// Material Requests from Deans Functions
+let materialRequests = [];
+let currentMRStatus = 'pending';
+
+async function loadMaterialRequests() {
+    try {
+        const response = await fetch('api/get_material_requests.php?status=' + currentMRStatus);
+        const result = await response.json();
+        
+        if (result.success) {
+            materialRequests = result.data;
+            displayMaterialRequests();
+        } else {
+            console.error('Failed to load material requests:', result.message);
+        }
+    } catch (error) {
+        console.error('Error loading material requests:', error);
+    }
+}
+
+function filterMaterialRequests(status) {
+    currentMRStatus = status;
+    
+    // Update button states
+    document.querySelectorAll('.filter-buttons .filter-btn').forEach(btn => {
+        btn.classList.remove('active');
+    });
+    document.getElementById('mr' + status.charAt(0).toUpperCase() + status.slice(1) + 'Btn').classList.add('active');
+    
+    loadMaterialRequests();
+}
+
+function displayMaterialRequests() {
+    const container = document.getElementById('materialRequestsGrid');
+    const emptyState = document.getElementById('materialRequestsEmptyState');
+    
+    if (!container) return;
+    
+    if (materialRequests.length === 0) {
+        container.innerHTML = '';
+        if (emptyState) emptyState.style.display = 'block';
+        return;
+    }
+    
+    if (emptyState) emptyState.style.display = 'none';
+    
+    container.innerHTML = materialRequests.map(request => {
+        const statusBadge = getStatusBadge(request.status);
+        return `
+            <div class="material-card" style="border-left: 4px solid #7C3AED;">
+                <div class="material-header">
+                    <div class="requester-info">
+                        <div class="requester-name">${request.requester_name || 'Dean'}</div>
+                        <div class="requester-role" style="color: ${request.department_color || '#7C3AED'};">${request.department_code || 'Dean'} DEAN</div>
+                    </div>
+                    <div class="material-status" style="background: ${statusBadge.bg}; color: ${statusBadge.color};">${request.status}</div>
+                </div>
+                
+                <div class="course-info">
+                    <div class="course-code">${request.course_code || 'N/A'}</div>
+                    <div class="course-name">${request.course_title || 'N/A'}</div>
+                </div>
+                
+                <div class="request-summary">
+                    <div class="material-title">
+                        <strong>${request.book_title}</strong>
+                        ${request.author ? '<br><span style="color: #666; font-size: 13px;">by ' + request.author + '</span>' : ''}
+                        ${request.publication_year ? '<span style="color: #888; font-size: 12px;"> (' + request.publication_year + ')</span>' : ''}
+                    </div>
+                </div>
+                
+                ${request.justification ? '<div style="margin-top: 8px; padding: 8px; background: #f9f9f9; border-radius: 6px; font-size: 13px; color: #666;"><strong>Justification:</strong> ' + request.justification + '</div>' : ''}
+                
+                <div class="material-actions">
+                    ${getActionButtons(request)}
+                </div>
+                
+                <div class="request-date">Requested: ${formatDate(request.created_at)}</div>
+            </div>
+        `;
+    }).join('');
+    
+    // Re-initialize Lucide icons
+    if (typeof lucide !== 'undefined') {
+        lucide.createIcons();
+    }
+}
+
+function getStatusBadge(status) {
+    switch(status) {
+        case 'pending':
+            return { bg: '#FEF3C7', color: '#D97706' };
+        case 'processing':
+            return { bg: '#DBEAFE', color: '#2563EB' };
+        case 'completed':
+            return { bg: '#D1FAE5', color: '#059669' };
+        case 'rejected':
+            return { bg: '#FEE2E2', color: '#DC2626' };
+        default:
+            return { bg: '#F3F4F6', color: '#6B7280' };
+    }
+}
+
+function getActionButtons(request) {
+    if (request.status === 'pending') {
+        return `
+            <button class="action-btn process-btn" onclick="processMaterialRequest(${request.id})">Process</button>
+            <button class="action-btn draft-btn" onclick="rejectMaterialRequest(${request.id})">Reject</button>
+        `;
+    } else if (request.status === 'processing') {
+        return `
+            <button class="action-btn catalog-btn" onclick="completeMaterialRequest(${request.id})">Complete</button>
+        `;
+    } else {
+        return '';
+    }
+}
+
+async function processMaterialRequest(requestId) {
+    try {
+        const response = await fetch('api/update_material_request.php', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                id: requestId,
+                status: 'processing',
+                librarian_notes: 'Request is being processed'
+            })
+        });
+        
+        const result = await response.json();
+        
+        if (result.success) {
+            alert('Request marked as processing');
+            loadMaterialRequests();
+        } else {
+            alert('Error: ' + result.message);
+        }
+    } catch (error) {
+        console.error('Error processing request:', error);
+        alert('Failed to process request');
+    }
+}
+
+async function completeMaterialRequest(requestId) {
+    const notes = prompt('Add completion notes (optional):');
+    
+    try {
+        const response = await fetch('api/update_material_request.php', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                id: requestId,
+                status: 'completed',
+                librarian_notes: notes || 'Request completed'
+            })
+        });
+        
+        const result = await response.json();
+        
+        if (result.success) {
+            alert('Request completed successfully!');
+            loadMaterialRequests();
+        } else {
+            alert('Error: ' + result.message);
+        }
+    } catch (error) {
+        console.error('Error completing request:', error);
+        alert('Failed to complete request');
+    }
+}
+
+async function rejectMaterialRequest(requestId) {
+    const reason = prompt('Enter rejection reason:');
+    
+    if (!reason) {
+        alert('Rejection reason is required');
+        return;
+    }
+    
+    try {
+        const response = await fetch('api/update_material_request.php', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                id: requestId,
+                status: 'rejected',
+                librarian_notes: reason
+            })
+        });
+        
+        const result = await response.json();
+        
+        if (result.success) {
+            alert('Request rejected');
+            loadMaterialRequests();
+        } else {
+            alert('Error: ' + result.message);
+        }
+    } catch (error) {
+        console.error('Error rejecting request:', error);
+        alert('Failed to reject request');
+    }
+}
+
+// Initialize material requests on page load
+document.addEventListener('DOMContentLoaded', function() {
+    loadMaterialRequests();
+});
         console.error('Error updating processing status:', error);
         throw error;
     }
