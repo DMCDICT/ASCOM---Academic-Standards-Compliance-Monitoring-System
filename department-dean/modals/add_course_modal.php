@@ -6665,9 +6665,9 @@ window.openAddCourseModal = function() {
         
         // Pre-fill form fields if we have course selection context
         // Use setTimeout to ensure DOM is ready after form reset
-        setTimeout(() => {
-            if (window.courseSelectionContext) {
-                const context = window.courseSelectionContext;
+	        setTimeout(() => {
+	            if (window.courseSelectionContext) {
+	                const context = window.courseSelectionContext;
                 
                 // Add class to modal to trigger CSS hiding
                 const modal = document.getElementById('addCourseModal');
@@ -6686,10 +6686,9 @@ window.openAddCourseModal = function() {
                 
                 // Fields have been removed from the form
                 
-            }
-        }, 200);
-    }
-}
+	            }
+	        }, 200);
+	};
 
 // Functions moved to top of file for early availability
 

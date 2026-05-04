@@ -4,12 +4,25 @@
 
 require_once '../includes/db_connection.php';
 
-$department_id = $_GET['department_id'] ?? null;
+// Support both department_id and dept_code
+$department_id = null;
+
+if (isset($_GET['department_id'])) {
+    $department_id = (int)$_GET['department_id'];
+} elseif (isset($_GET['dept_code'])) {
+    // Get department ID from department code
+    $deptCode = $_GET['dept_code'];
+    $deptQuery = "SELECT id FROM departments WHERE department_code = ?";
+    $deptStmt = $pdo->prepare($deptQuery);
+    $deptStmt->execute([$deptCode]);
+    $deptRow = $deptStmt->fetch(PDO::FETCH_ASSOC);
+    $department_id = $deptRow['id'] ?? null;
+}
 
 header('Content-Type: application/json');
 
-if (!$department_id) {
-    echo json_encode(['success' => false, 'message' => 'Department ID is required']);
+if (!$department_id || $department_id <= 0) {
+    echo json_encode(['success' => false, 'message' => 'Invalid department']);
     exit;
 }
 
@@ -51,8 +64,27 @@ try {
         $roleConditions[] = '1=1';
     }
 
+    $selectFields = [
+        'u.id',
+        'u.employee_no',
+        'u.first_name',
+        'u.last_name',
+        'u.title',
+    ];
+
+    // Prefer institutional_email/mobile_no fields used by dean UI; fall back to email when needed.
+    if (ascom_table_has_column($pdo, 'users', 'institutional_email')) {
+        $selectFields[] = 'u.institutional_email';
+    } elseif (ascom_table_has_column($pdo, 'users', 'email')) {
+        $selectFields[] = 'u.email AS institutional_email';
+    }
+
+    if (ascom_table_has_column($pdo, 'users', 'mobile_no')) {
+        $selectFields[] = 'u.mobile_no';
+    }
+
     $query = "
-        SELECT DISTINCT u.id, u.employee_no, u.first_name, u.last_name, u.title, u.email
+        SELECT DISTINCT " . implode(', ', $selectFields) . "
         FROM users u
         " . implode("\n", $joins) . "
         WHERE u.department_id = ?
