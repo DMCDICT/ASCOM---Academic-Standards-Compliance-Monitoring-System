@@ -2680,6 +2680,8 @@ window.initializeFileDropZone = window.initializeFileDropZone || function initia
     // Test that the file input is accessible
     const fileInputStyle = window.getComputedStyle(fileInput);
     const parentStyle = fileInput.parentElement ? window.getComputedStyle(fileInput.parentElement) : null;
+    
+    console.log({
         id: fileInput.id,
         type: fileInput.type,
         multiple: fileInput.multiple,

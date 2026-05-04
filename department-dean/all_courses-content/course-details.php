@@ -2924,6 +2924,7 @@ if (!$showProgramCourses && $courseDetails) {
             const programCodeValue = '<?php echo htmlspecialchars($courseDetails['program_code'] ?? ''); ?>';
             const programColorValue = '<?php echo htmlspecialchars($courseDetails['color_code'] ?? ''); ?>';
             
+            console.log({
                 courseCode: courseCodeValue,
                 courseTitle: courseTitleValue,
                 units: unitsValue,
@@ -3673,7 +3674,7 @@ if (!$showProgramCourses && $courseDetails) {
             // Check if there are changes from original data
             const hasChanges = originalEditProgramData.program_name !== programName ||
                               originalEditProgramData.major !== major;
-
+            console.log({
                 isValid: isValid,
                 hasChanges: hasChanges,
                 programName: programName,

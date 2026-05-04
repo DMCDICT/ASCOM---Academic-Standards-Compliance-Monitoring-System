@@ -3,6 +3,7 @@
 // Searches for books by call number in library_books table
 
 header('Content-Type: application/json');
+ini_set('display_errors', 0);
 require_once dirname(__FILE__) . '/../session_config.php';
 require_once dirname(__FILE__) . '/includes/db_connection.php';
 
