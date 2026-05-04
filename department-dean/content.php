@@ -914,6 +914,13 @@ document.addEventListener('DOMContentLoaded', function() {
       </span>
     </a>
 
+    <a href="content.php?page=faculty-assignment" class="nav-button hoverable <?php if ($currentPage == 'faculty-assignment') echo 'active'; ?>">
+      <span class="nav-icon-wrapper">
+        <i data-lucide="user-plus" class="nav-icon" aria-hidden="true"></i>
+      </span>
+      <span>Faculty<br />Assignment</span>
+    </a>
+
     <a href="content.php?page=school-calendar" class="nav-button hoverable <?php if ($currentPage == 'school-calendar') echo 'active'; ?>">
       <span class="nav-icon-wrapper">
         <i data-lucide="calendar" class="nav-icon" aria-hidden="true"></i>
@@ -983,6 +990,9 @@ document.addEventListener('DOMContentLoaded', function() {
         break;
       case 'reference-requests':
         include './reference-requests-content/reference-requests.php';
+        break;
+      case 'faculty-assignment':
+        include './faculty-assignment-content/faculty-assignment.php';
         break;
       case 'course-proposals':
         include './course-proposals-content/course-proposals.php';

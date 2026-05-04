@@ -616,9 +616,9 @@ if (isset($pdo)) {
 }
 
 .action-icon {
-    font-size: 14px;
     width: 16px;
-    text-align: center;
+    height: 16px;
+    flex-shrink: 0;
 }
 
 .course-row {
@@ -1467,20 +1467,20 @@ if (isset($pdo)) {
                          </td>
                          <td class="actions-cell" onclick="event.stopPropagation();" style="width: 90px !important; max-width: 90px !important; min-width: 90px !important;">
                              <div class="action-menu-container">
-                                 <button class="action-menu-btn" onclick="toggleActionMenu(event, '<?php echo htmlspecialchars($course['course_code']); ?>', <?php echo !empty($course['faculty']) ? 'true' : 'false'; ?>)">
-                                     <span class="three-dots">⋯</span>
-                                 </button>
-                                 <div class="action-menu-dropdown" id="actionMenu-<?php echo htmlspecialchars($course['course_code']); ?>" style="display: none;">
-                                     <div class="action-menu-item" onclick="editCourse('<?php echo htmlspecialchars($course['course_code']); ?>')">
-                                         <span class="action-icon">✏️</span>
-                                         <span>Edit</span>
-                                     </div>
-<div class="action-menu-item" 
-                                           onclick="assignFaculty('<?php echo htmlspecialchars($course['course_code']); ?>', <?php echo intval($course['id']); ?>, '<?php echo htmlspecialchars($course['course_title']); ?>', '<?php echo htmlspecialchars(($course['program_code'] ?? 'N/A') . ' | ' . ($course['term'] ?? 'N/A') . ' | ' . ($course['year_level'] ?? 'N/A') . ' Year | ' . ($course['academic_year'] ?? 'N/A')); ?>');">
-                                          <span class="action-icon">👤</span>
-                                          <span>Assign</span>
+<button class="action-menu-btn" onclick="toggleActionMenu(event, '<?php echo htmlspecialchars($course['course_code']); ?>', <?php echo !empty($course['faculty']) ? 'true' : 'false'; ?>)">
+                                      <i data-lucide="more-horizontal" style="width: 20px; height: 20px;"></i>
+                                  </button>
+                                  <div class="action-menu-dropdown" id="actionMenu-<?php echo htmlspecialchars($course['course_code']); ?>" style="display: none;">
+                                      <div class="action-menu-item" onclick="editCourse('<?php echo htmlspecialchars($course['course_code']); ?>')">
+                                          <i data-lucide="pencil" class="action-icon"></i>
+                                          <span>Edit</span>
                                       </div>
-                                 </div>
+<div class="action-menu-item" 
+                                           onclick="window.location.href='content.php?page=faculty-assignment&course_id=<?php echo intval($course['id']); ?>&course_code=<?php echo urlencode($course['course_code']); ?>&course_title=<?php echo urlencode($course['course_title']); ?>'">
+                                           <i data-lucide="user-plus" class="action-icon"></i>
+                                           <span>Assign</span>
+                                       </div>
+                                  </div>
                              </div>
                          </td>
                     </tr>
