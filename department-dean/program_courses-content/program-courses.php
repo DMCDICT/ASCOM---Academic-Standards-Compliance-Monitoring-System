@@ -503,9 +503,9 @@ if ($deanDepartmentCode && $programCode) {
 }
 
 .action-icon {
-    font-size: 14px;
     width: 16px;
-    text-align: center;
+    height: 16px;
+    flex-shrink: 0;
 }
 
 .actions-cell {
@@ -946,38 +946,38 @@ html[data-theme="dark"] .section-header h3 {
                             <td class="actions-cell" onclick="event.stopPropagation();">
                                 <div class="action-menu-container">
                                     <button class="action-menu-btn" onclick="toggleActionMenu(event, '<?php echo htmlspecialchars($course['course_code']); ?>', <?php echo intval($course['course_id']); ?>, '<?php echo $courseStatus; ?>', <?php echo !empty($course['faculty_name']) && $course['faculty_name'] !== 'Unassigned' ? 'true' : 'false'; ?>)" title="Actions" aria-label="Actions menu">
-                                        <span class="three-dots" style="display: block; line-height: 0.5;">⋯</span>
+                                        <i data-lucide="more-horizontal" style="width: 20px; height: 20px;"></i>
                                     </button>
                                     <div class="action-menu-dropdown" id="actionMenu-<?php echo htmlspecialchars($course['course_code']); ?>" style="display: none;">
                                         <?php if ($courseStatus === 'pending'): ?>
                                             <div class="action-menu-item" onclick="viewCourseDetails('<?php echo htmlspecialchars($course['course_code']); ?>', <?php echo intval($course['course_id']); ?>)">
-                                                <span class="action-icon">👁️</span>
+                                                <i data-lucide="eye" class="action-icon"></i>
                                                 <span>View</span>
                                             </div>
                                             <div class="action-menu-item" onclick="editCourseFromProgram('<?php echo htmlspecialchars($course['course_code']); ?>', <?php echo intval($course['course_id']); ?>)">
-                                                <span class="action-icon">✏️</span>
+                                                <i data-lucide="pencil" class="action-icon"></i>
                                                 <span>Edit</span>
                                             </div>
                                             <div class="action-menu-item" onclick="approveCourse(<?php echo intval($course['course_id']); ?>)">
-                                                <span class="action-icon">✅</span>
+                                                <i data-lucide="check-circle" class="action-icon"></i>
                                                 <span>Approve</span>
                                             </div>
                                             <div class="action-menu-item" onclick="rejectCourse(<?php echo intval($course['course_id']); ?>)">
-                                                <span class="action-icon">❌</span>
+                                                <i data-lucide="x-circle" class="action-icon"></i>
                                                 <span>Reject</span>
                                             </div>
                                         <?php else: ?>
                                             <div class="action-menu-item" onclick="editCourseFromProgram('<?php echo htmlspecialchars($course['course_code']); ?>', <?php echo intval($course['course_id']); ?>)">
-                                                <span class="action-icon">✏️</span>
+                                                <i data-lucide="pencil" class="action-icon"></i>
                                                 <span>Edit</span>
                                             </div>
                                             <div class="action-menu-item <?php echo (!empty($course['faculty_name']) && $course['faculty_name'] !== 'Unassigned') ? 'disabled' : ''; ?>" 
-                                                 onclick="<?php echo (!empty($course['faculty_name']) && $course['faculty_name'] !== 'Unassigned') ? 'return false;' : 'assignFacultyFromProgram(\'' . htmlspecialchars($course['course_code']) . '\', ' . intval($course['course_id']) . ', \'' . htmlspecialchars($course['course_code']) . '\', \'Program: ' . htmlspecialchars($programCode ?? 'N/A') . "\');"; ?>">
-                                                <span class="action-icon">👤</span>
+                                                 onclick="<?php echo (!empty($course['faculty_name']) && $course['faculty_name'] !== 'Unassigned') ? 'return false;' : 'window.location.href=\'content.php?page=faculty-assignment&course_id=' . intval($course['course_id']) . '&course_code=' . urlencode($course['course_code']) . '&course_title=' . urlencode($course['course_code']) . '\''; ?>">
+                                                <i data-lucide="user-plus" class="action-icon"></i>
                                                 <span>Assign</span>
                                             </div>
                                             <div class="action-menu-item" onclick="viewCourseDetails('<?php echo htmlspecialchars($course['course_code']); ?>', <?php echo intval($course['course_id']); ?>)">
-                                                <span class="action-icon">👁️</span>
+                                                <i data-lucide="eye" class="action-icon"></i>
                                                 <span>View Details</span>
                                             </div>
                                         <?php endif; ?>
