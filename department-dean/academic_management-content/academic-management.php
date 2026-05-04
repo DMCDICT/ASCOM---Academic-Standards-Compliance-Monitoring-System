@@ -495,7 +495,7 @@ html[data-theme="dark"] .assign-course-btn:hover {
 			return;
 		}
 		try {
-			const res = await fetch('../super_admin-mis/api/get_department_teachers.php?dept_code=' + encodeURIComponent(deptCode), { cache: 'no-store' });
+			const res = await fetch('api/get_department_teachers.php?dept_code=' + encodeURIComponent(deptCode), { cache: 'no-store' });
 			const data = await res.json();
 			if (!data.success) {
 				tbody.innerHTML = '<tr><td colspan="7" style="padding:12px; color:#b00;">Failed to load faculty list.</td></tr>';

@@ -59,17 +59,37 @@ try {
 // Fetch all teachers/faculty for the department
 $teachers = [];
 try {
-    $teachersQuery = "
-        SELECT u.id, u.first_name, u.last_name, u.email, u.position
-        FROM users u
-        JOIN user_roles ur ON u.id = ur.user_id
-        JOIN roles r ON ur.role_id = r.id
-        WHERE r.name = 'teacher' AND u.status = 'active'
-        ORDER BY u.last_name ASC
-    ";
-    $teachersStmt = $pdo->prepare($teachersQuery);
-    $teachersStmt->execute();
-    $teachers = $teachersStmt->fetchAll(PDO::FETCH_ASSOC);
+    // Get department ID from department code
+    $deptQuery = "SELECT id FROM departments WHERE department_code = ?";
+    $deptStmt = $pdo->prepare($deptQuery);
+    $deptStmt->execute([$deanDepartmentCode]);
+    $deptRow = $deptStmt->fetch(PDO::FETCH_ASSOC);
+    $departmentId = $deptRow['id'] ?? null;
+    
+    if ($departmentId) {
+        // Teachers have role_id = 4, check both users.role and user_roles table
+        $teachersQuery = "
+            SELECT u.id, u.first_name, u.last_name, u.email, u.position, u.title
+            FROM users u
+            WHERE u.department_id = ? AND u.is_active = 1
+            AND (
+                u.role_id = 4
+                OR u.role = 'teacher'
+                OR u.role = 'faculty'
+                OR EXISTS (
+                    SELECT 1 FROM user_roles ur 
+                    JOIN roles r ON ur.role_id = r.id 
+                    WHERE ur.user_id = u.id 
+                    AND r.name IN ('teacher', 'faculty')
+                    AND ur.is_active = 1
+                )
+            )
+            ORDER BY u.last_name ASC
+        ";
+        $teachersStmt = $pdo->prepare($teachersQuery);
+        $teachersStmt->execute([$departmentId]);
+        $teachers = $teachersStmt->fetchAll(PDO::FETCH_ASSOC);
+    }
 } catch (Exception $e) {
 }
 ?>
