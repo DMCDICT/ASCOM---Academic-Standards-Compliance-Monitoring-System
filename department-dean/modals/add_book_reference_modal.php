@@ -24,39 +24,89 @@ if ($deanDepartmentCode) {
 ?>
 
 <div id="addBookReferenceModal" class="modal-overlay" style="display: none;">
-  <div class="modal-box" style="max-width: 600px; width: 90%; display: flex; flex-direction: column; max-height: 80vh; overflow: hidden; background-color: #EFEFEF;">
-    <div class="modal-header" style="flex-shrink: 0;">
-      <h2>Add Book Reference</h2>
-      <span class="close-button" id="closeBookRefModal" onclick="window.closeAddBookReferenceModal()">&times;</span>
+  <div class="modal-box" style="max-width: 720px; width: 95%; display: flex; flex-direction: column; max-height: 85vh; overflow: hidden; background-color: #ffffff; border-radius: 18px;">
+    <div class="modal-header" style="flex-shrink: 0; background: linear-gradient(0deg, rgba(12, 75, 52, 0.08), rgba(12, 75, 52, 0.08)), #ffffff; border-bottom: 1px solid rgba(12, 75, 52, 0.14); padding: 16px 24px;">
+      <h2 style="font-size: 18px; font-weight: 800; color: #111827; margin: 0; font-family: 'TT Interphases', sans-serif;">Add Book Reference</h2>
+      <span class="close-button" id="closeBookRefModal" onclick="window.closeAddBookReferenceModal()" style="width: 40px; height: 40px; border-radius: 12px; border: 1px solid rgba(12, 75, 52, 0.16); background: rgba(12, 75, 52, 0.06); color: #0C4B34; font-size: 26px; line-height: 1; cursor: pointer; display: grid; place-items: center;">&times;</span>
     </div>
     
     <!-- Scrollable form content -->
-    <div class="form-content" style="flex: 1; overflow-y: auto; padding: 16px 24px;">
+    <div class="form-content" style="flex: 1; overflow-y: auto; padding: 20px 24px;">
       <form id="addBookReferenceForm" class="form-grid" method="post" autocomplete="off" novalidate>
-      <input type="hidden" name="input_method" id="inputMethod" value="manual">
+      <input type="hidden" name="input_method" id="inputMethod" value="library">
       
-      <!-- Course Selection with Suggestions and By Batch Checkbox -->
-      <div class="form-row" style="margin-bottom: 12px;">
+      <!-- Course Selection -->
+      <div class="form-row" style="margin-bottom: 16px;">
         <div class="form-group" style="flex: 1; min-width: 200px; position: relative;">
-          <label>Course <span style="color: red;">*</span></label>
+          <label style="font-size: 12px; font-weight: 700; color: rgba(17, 24, 39, 0.5); text-transform: uppercase; letter-spacing: 0.6px;">Course <span style="color: #b91c1c;">*</span></label>
           <div class="autocomplete-container" style="position: relative;">
-            <input type="text" id="bookRefCourseSearch" name="course_search" placeholder="Type to search courses..." style="width: 100%; padding: 12px 16px; border: 1px solid #e0e0e0; border-radius: 8px; font-size: 16px; font-family: 'TT Interphases', sans-serif;">
+            <input type="text" id="bookRefCourseSearch" name="course_search" placeholder="Type to search courses..." style="width: 100%; padding: 12px 16px; border: 1px solid #e0e0e0; border-radius: 12px; font-size: 14px; font-family: 'TT Interphases', sans-serif; height: 50px; box-sizing: border-box;">
             <input type="hidden" id="bookRefCourseId" name="course_id">
-            <div class="suggestions-panel" id="bookRefCourseSuggestions" style="display: none; position: absolute; top: 100%; left: 0; right: 0; background: white; border: 1px solid #ddd; border-radius: 8px; box-shadow: 0 4px 8px rgba(0,0,0,0.1); z-index: 1000; max-height: 300px; overflow-y: auto; margin-top: 4px;">
-              <!-- Course suggestions will appear here when you type -->
+            <div class="suggestions-panel" id="bookRefCourseSuggestions" style="display: none; position: absolute; top: 100%; left: 0; right: 0; background: white; border: 1px solid rgba(12, 75, 52, 0.14); border-radius: 12px; box-shadow: 0 8px 24px rgba(12, 75, 52, 0.12); z-index: 1000; max-height: 250px; overflow-y: auto; margin-top: 4px;">
             </div>
           </div>
         </div>
-        <div class="form-group" style="flex: 0 0 auto; align-self: flex-end; padding-bottom: 0;">
-          <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
-            <input type="checkbox" id="byBatchCheckbox" style="width: 18px; height: 18px; cursor: pointer;">
-            <span>By Batch</span>
-          </label>
+      </div>
+      
+      <!-- Input Method Tabs -->
+      <div class="input-method-tabs" style="display: flex; border-bottom: 2px solid rgba(12, 75, 52, 0.08); margin-bottom: 20px; gap: 4px;">
+        <button type="button" class="tab-button active" onclick="switchBookInputMethod('library')" id="libraryTab" style="flex: 1; padding: 12px 16px; border: none; background: transparent; border-bottom: 3px solid #0C4B34; cursor: pointer; font-family: 'TT Interphases', sans-serif; font-size: 14px; font-weight: 700; color: #0C4B34; transition: all 0.2s ease;">
+          📚 Select from Library
+        </button>
+        <button type="button" class="tab-button" onclick="switchBookInputMethod('manual')" id="manualTab" style="flex: 1; padding: 12px 16px; border: none; background: transparent; border-bottom: 3px solid transparent; cursor: pointer; font-family: 'TT Interphases', sans-serif; font-size: 14px; font-weight: 600; color: rgba(17, 24, 39, 0.5); transition: all 0.2s ease;">
+          ✏️ Manual Entry
+        </button>
+      </div>
+      
+      <!-- Library Selection Section -->
+      <div id="librarySection" class="input-section" style="display: block;">
+        <!-- Search Bar -->
+        <div class="library-search" style="margin-bottom: 16px;">
+          <div class="search-bar" style="display: flex; align-items: center; background-color: #FFFFFF; height: 44px; padding: 0 14px; border-radius: 12px; border: 1px solid #e0e0e0; box-shadow: 0 2px 6px rgba(0,0,0,0.04);">
+            <svg style="width: 18px; height: 18px; color: rgba(17, 24, 39, 0.4); margin-right: 10px; flex-shrink: 0;" data-lucide="search" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+            <input type="text" id="libraryBookSearch" placeholder="Search books by title, author, ISBN, or call number..." style="border: none; outline: none; flex: 1; font-size: 14px; background: transparent; font-family: 'TT Interphases', sans-serif;">
+            <button type="button" onclick="loadLibraryBooks()" style="background: #0C4B34; color: white; border: none; padding: 8px 14px; border-radius: 8px; font-size: 13px; font-weight: 600; cursor: pointer; font-family: 'TT Interphases', sans-serif;">Search</button>
+          </div>
+        </div>
+        
+        <!-- Selected Books Count -->
+        <div id="selectedBooksCount" style="display: none; margin-bottom: 12px; padding: 10px 14px; background: rgba(12, 75, 52, 0.08); border-radius: 10px; border: 1px solid rgba(12, 75, 52, 0.14);">
+          <span style="font-size: 13px; font-weight: 600; color: #0C4B34;">
+            <span id="selectedCount">0</span> book(s) selected
+          </span>
+          <button type="button" onclick="clearSelectedBooks()" style="float: right; background: none; border: none; color: #b91c1c; font-size: 12px; font-weight: 600; cursor: pointer;">Clear All</button>
+        </div>
+        
+        <!-- Library Books List -->
+        <div class="library-books-container" style="max-height: 320px; overflow-y: auto; border: 1px solid rgba(12, 75, 52, 0.12); border-radius: 14px; background: #fafafa; position: relative;">
+          <!-- Loading state -->
+          <div id="libraryLoading" style="display: none; text-align: center; padding: 40px 20px; color: rgba(17, 24, 39, 0.5);">
+            <div style="font-size: 14px;">Loading library books...</div>
+          </div>
+          <!-- Empty state -->
+          <div id="libraryEmpty" style="display: none; text-align: center; padding: 40px 20px; color: rgba(17, 24, 39, 0.4);">
+            <div style="font-size: 32px; margin-bottom: 12px;">📚</div>
+            <div id="emptyMessageTitle" style="font-size: 14px; font-weight: 600;">No books found</div>
+            <div id="emptyMessageSubtitle" style="font-size: 12px; margin-top: 4px;">Try a different search term</div>
+          </div>
+          
+          <div id="libraryBooksList" style="padding: 8px;">
+            <!-- Books will be loaded here -->
+          </div>
+        </div>
+        
+        <!-- Pagination -->
+        <div id="libraryPagination" style="display: none; margin-top: 12px; text-align: center;">
+          <button type="button" onclick="changeLibraryPage(-1)" id="prevPageBtn" style="background: #fff; border: 1px solid #e0e0e0; padding: 8px 14px; border-radius: 8px; font-size: 13px; cursor: pointer; margin-right: 8px;">← Previous</button>
+          <span style="font-size: 13px; color: rgba(17, 24, 39, 0.6);">
+            Page <span id="currentPage">1</span> of <span id="totalPages">1</span>
+          </span>
+          <button type="button" onclick="changeLibraryPage(1)" id="nextPageBtn" style="background: #fff; border: 1px solid #e0e0e0; padding: 8px 14px; border-radius: 8px; font-size: 13px; cursor: pointer; margin-left: 8px;">Next →</button>
         </div>
       </div>
       
       <!-- Manual Input Section -->
-      <div id="manualInputSection" class="input-section" style="display: block;">
+      <div id="manualInputSection" class="input-section" style="display: none;">
         <div class="form-row">
           <div class="form-group" style="flex:1; min-width: 160px; position: relative;">
             <label for="call_number">Call Number</label>
@@ -870,8 +920,14 @@ const CURRENT_YEAR = new Date().getFullYear();
 // Initialize button text when modal opens
 function initializeButtonText() {
   const submitBtn = document.getElementById('submitBtn');
+  const inputMethod = document.getElementById('inputMethod').value;
+  
   if (submitBtn) {
-    submitBtn.textContent = 'Add Book';
+    if (inputMethod === 'library' && selectedLibraryBooks.length > 0) {
+      submitBtn.textContent = `Add ${selectedLibraryBooks.length} Book${selectedLibraryBooks.length > 1 ? 's' : ''}`;
+    } else {
+      submitBtn.textContent = 'Add Book';
+    }
   }
 }
 
@@ -1289,18 +1345,70 @@ document.addEventListener('DOMContentLoaded', function() {
     form.addEventListener('submit', function(e) {
       e.preventDefault();
       
+      const inputMethod = document.getElementById('inputMethod').value;
       const byBatchCheckbox = document.getElementById('byBatchCheckbox');
       
+      // Check if we're in library mode
+      if (inputMethod === 'library') {
+        handleLibrarySubmit();
+      }
       // Check if we're in batch mode
-      if (byBatchCheckbox && byBatchCheckbox.checked) {
+      else if (byBatchCheckbox && byBatchCheckbox.checked) {
         handleBatchSubmit();
       } else {
-        handleSingleSubmit();
+        handleManualSubmit();
       }
     });
     
-    // Single book submission
-    function handleSingleSubmit() {
+    // Library book selection submission
+    function handleLibrarySubmit() {
+      const courseId = document.getElementById('bookRefCourseId').value;
+      
+      if (!courseId) {
+        window.showErrorModal('Please select a course.');
+        return;
+      }
+      
+      if (selectedLibraryBooks.length === 0) {
+        window.showErrorModal('Please select at least one book from the library.');
+        return;
+      }
+      
+      // Submit all selected books at once using the library selection method
+      const formData = new FormData();
+      formData.append('course_id', courseId);
+      formData.append('input_method', 'library');
+      
+      // Add selected book IDs
+      selectedLibraryBooks.forEach((book, index) => {
+        formData.append('selected_library_books[' + index + ']', book.id);
+      });
+      
+      fetch('process_add_book_reference.php', {
+        method: 'POST',
+        body: formData
+      })
+      .then(response => response.json())
+      .then(data => {
+        if (data && data.success) {
+          window.closeAddBookReferenceModal();
+          window.showSuccessModal(data.message || `Successfully added ${selectedLibraryBooks.length} book reference(s) from library!`);
+          setTimeout(() => {
+            window.location.reload();
+          }, 1500);
+        } else {
+          const errorMsg = data && data.message ? data.message : 'Failed to add book references.';
+          window.showErrorModal(errorMsg);
+        }
+      })
+      .catch(error => {
+        console.error('Error:', error);
+        window.showErrorModal('An error occurred while adding book references. Please try again.');
+      });
+    }
+    
+    // Single book submission (manual mode)
+    function handleManualSubmit() {
       // Get form data
       const formData = new FormData(form);
       
@@ -1579,6 +1687,11 @@ window.openAddBookReferenceModal = function(courseId, courseCode) {
     setupCopyrightYearInput();
     setupFormValidation();
     initBookRefCourseAutocomplete(); // Re-initialize autocomplete
+    
+    // Load library books when modal opens (default tab)
+    if (typeof loadLibraryBooks === 'function') {
+      loadLibraryBooks(1);
+    }
   }, 100);
   
   // Load faculty members for requested_by dropdown
@@ -1626,6 +1739,259 @@ window.closeAddBookReferenceModal = function() {
   
   // Reset to manual input
   switchInputMethod('manual');
+  
+  // Reset library selection
+  selectedLibraryBooks = [];
+  document.getElementById('libraryBooksList').innerHTML = '';
+  document.getElementById('selectedBooksCount').style.display = 'none';
+  document.getElementById('libraryPagination').style.display = 'none';
+}
+
+// Library book selection variables
+let selectedLibraryBooks = [];
+let libraryBooksData = [];
+let currentLibraryPage = 1;
+let totalLibraryPages = 1;
+
+// Switch between library and manual input
+window.switchBookInputMethod = function(method) {
+  const libraryTab = document.getElementById('libraryTab');
+  const manualTab = document.getElementById('manualTab');
+  const librarySection = document.getElementById('librarySection');
+  const manualSection = document.getElementById('manualInputSection');
+  const inputMethod = document.getElementById('inputMethod');
+  
+  if (method === 'library') {
+    libraryTab.classList.add('active');
+    libraryTab.style.borderBottom = '3px solid #0C4B34';
+    libraryTab.style.color = '#0C4B34';
+    libraryTab.style.fontWeight = '700';
+    
+    manualTab.classList.remove('active');
+    manualTab.style.borderBottom = '3px solid transparent';
+    manualTab.style.color = 'rgba(17, 24, 39, 0.5)';
+    manualTab.style.fontWeight = '600';
+    
+    librarySection.style.display = 'block';
+    manualSection.style.display = 'none';
+    inputMethod.value = 'library';
+    
+    // Load library books if not loaded yet
+    if (libraryBooksData.length === 0) {
+      loadLibraryBooks();
+    }
+  } else {
+    manualTab.classList.add('active');
+    manualTab.style.borderBottom = '3px solid #0C4B34';
+    manualTab.style.color = '#0C4B34';
+    manualTab.style.fontWeight = '700';
+    
+    libraryTab.classList.remove('active');
+    libraryTab.style.borderBottom = '3px solid transparent';
+    libraryTab.style.color = 'rgba(17, 24, 39, 0.5)';
+    libraryTab.style.fontWeight = '600';
+    
+    manualSection.style.display = 'block';
+    librarySection.style.display = 'none';
+    inputMethod.value = 'manual';
+  }
+  
+  updateSubmitButton();
+}
+
+// Add Enter key search for library books
+document.addEventListener('DOMContentLoaded', function() {
+  const librarySearchInput = document.getElementById('libraryBookSearch');
+  if (librarySearchInput) {
+    librarySearchInput.addEventListener('keypress', function(e) {
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        loadLibraryBooks(1);
+      }
+    });
+  }
+  
+  // Also trigger search when typing stops (debounce)
+  let searchTimeout;
+  librarySearchInput.addEventListener('input', function() {
+    clearTimeout(searchTimeout);
+    searchTimeout = setTimeout(function() {
+      loadLibraryBooks(1);
+    }, 500);
+  });
+});
+
+// Load library books from API
+window.loadLibraryBooks = function(page = 1) {
+  const searchTerm = document.getElementById('libraryBookSearch').value;
+  const listContainer = document.getElementById('libraryBooksList');
+  const loadingEl = document.getElementById('libraryLoading');
+  const emptyEl = document.getElementById('libraryEmpty');
+  const paginationEl = document.getElementById('libraryPagination');
+  
+  // Show loading
+  listContainer.innerHTML = '';
+  loadingEl.style.display = 'block';
+  emptyEl.style.display = 'none';
+  paginationEl.style.display = 'none';
+  
+  // Build API URL
+  let apiUrl = 'api/get_library_books.php?page=' + page + '&limit=15';
+  if (searchTerm) {
+    apiUrl += '&search=' + encodeURIComponent(searchTerm);
+  }
+  
+  fetch(apiUrl)
+    .then(response => response.json())
+    .then(data => {
+      console.log('Library books API response:', data);
+      loadingEl.style.display = 'none';
+      
+      if (data.success && data.books && data.books.length > 0) {
+        libraryBooksData = data.books;
+        currentLibraryPage = data.page;
+        totalLibraryPages = data.totalPages;
+        renderLibraryBooks();
+        
+        // Show pagination if needed
+        if (data.totalPages > 1) {
+          paginationEl.style.display = 'block';
+          document.getElementById('currentPage').textContent = data.page;
+          document.getElementById('totalPages').textContent = data.totalPages;
+          document.getElementById('prevPageBtn').disabled = data.page <= 1;
+          document.getElementById('nextPageBtn').disabled = data.page >= data.totalPages;
+        }
+      } else {
+        // Show message if API returned error
+        if (data.message) {
+          document.getElementById('emptyMessageTitle').textContent = 'Error: ' + data.message;
+          document.getElementById('emptyMessageSubtitle').textContent = 'Please try again';
+        } else {
+          document.getElementById('emptyMessageTitle').textContent = 'No books found';
+          document.getElementById('emptyMessageSubtitle').textContent = 'Try a different search term';
+        }
+        emptyEl.style.display = 'block';
+      }
+    })
+    .catch(error => {
+      console.error('Error loading library books:', error);
+      loadingEl.style.display = 'none';
+      document.getElementById('emptyMessageTitle').textContent = 'Network Error';
+      document.getElementById('emptyMessageSubtitle').textContent = 'Please check your connection';
+      emptyEl.style.display = 'block';
+    });
+}
+
+// Render library books list
+window.renderLibraryBooks = function() {
+  const listContainer = document.getElementById('libraryBooksList');
+  listContainer.innerHTML = '';
+  
+  libraryBooksData.forEach(book => {
+    const isSelected = selectedLibraryBooks.some(b => b.id === book.id);
+    const bookCard = document.createElement('div');
+    bookCard.className = 'library-book-card';
+    bookCard.style.cssText = `
+      display: flex;
+      align-items: center;
+      padding: 12px 14px;
+      margin-bottom: 8px;
+      background: ${isSelected ? 'rgba(12, 75, 52, 0.08)' : '#ffffff'};
+      border: 1px solid ${isSelected ? '#0C4B34' : 'rgba(12, 75, 52, 0.12)'};
+      border-radius: 12px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    `;
+    bookCard.onclick = function() { toggleBookSelection(book); };
+    
+    bookCard.innerHTML = `
+      <div style="width: 24px; height: 24px; border-radius: 6px; border: 2px solid ${isSelected ? '#0C4B34' : '#ccc'}; background: ${isSelected ? '#0C4B34' : 'transparent'}; display: flex; align-items: center; justify-content: center; margin-right: 12px; flex-shrink: 0;">
+        ${isSelected ? '<svg style="width: 14px; height: 14px; color: white;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"></polyline></svg>' : ''}
+      </div>
+      <div style="flex: 1; min-width: 0;">
+        <div style="font-size: 14px; font-weight: 700; color: #111827; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${book.display_title}</div>
+        <div style="font-size: 12px; color: rgba(17, 24, 39, 0.6); margin-top: 2px;">${book.display_authors || 'Unknown Author'}</div>
+        <div style="font-size: 11px; color: rgba(17, 24, 39, 0.5); margin-top: 4px; display: flex; gap: 12px;">
+          <span>📅 ${book.display_year}</span>
+          <span>📍 ${book.call_number || 'N/A'}</span>
+          ${book.classification_code ? `<span>🏷️ ${book.classification_code}</span>` : ''}
+        </div>
+      </div>
+    `;
+    
+    listContainer.appendChild(bookCard);
+  });
+  
+  updateSelectedCount();
+}
+
+// Toggle book selection
+window.toggleBookSelection = function(book) {
+  const existingIndex = selectedLibraryBooks.findIndex(b => b.id === book.id);
+  
+  if (existingIndex >= 0) {
+    selectedLibraryBooks.splice(existingIndex, 1);
+  } else {
+    selectedLibraryBooks.push(book);
+  }
+  
+  renderLibraryBooks();
+  updateSubmitButton();
+}
+
+// Update selected books count display
+window.updateSelectedCount = function() {
+  const countEl = document.getElementById('selectedBooksCount');
+  const countSpan = document.getElementById('selectedCount');
+  
+  if (selectedLibraryBooks.length > 0) {
+    countEl.style.display = 'block';
+    countSpan.textContent = selectedLibraryBooks.length;
+  } else {
+    countEl.style.display = 'none';
+  }
+}
+
+// Clear all selected books
+window.clearSelectedBooks = function() {
+  selectedLibraryBooks = [];
+  renderLibraryBooks();
+  updateSubmitButton();
+}
+
+// Change library page
+window.changeLibraryPage = function(delta) {
+  const newPage = currentLibraryPage + delta;
+  if (newPage >= 1 && newPage <= totalLibraryPages) {
+    loadLibraryBooks(newPage);
+  }
+}
+
+// Update submit button based on selection
+function updateSubmitButton() {
+  const submitBtn = document.getElementById('submitBtn');
+  const courseId = document.getElementById('bookRefCourseId').value;
+  const inputMethod = document.getElementById('inputMethod').value;
+  
+  let isValid = false;
+  
+  if (inputMethod === 'library') {
+    // Library mode: need course and at least one book selected
+    isValid = courseId && selectedLibraryBooks.length > 0;
+  } else {
+    // Manual mode: need course and required fields filled
+    const title = document.getElementById('book_title')?.value;
+    const authors = document.getElementById('authors')?.value;
+    const publisher = document.getElementById('publisher')?.value;
+    isValid = courseId && title && authors && publisher;
+  }
+  
+  if (submitBtn) {
+    submitBtn.disabled = !isValid;
+    submitBtn.textContent = selectedLibraryBooks.length > 0 
+      ? `Add ${selectedLibraryBooks.length} Book${selectedLibraryBooks.length > 1 ? 's' : ''}` 
+      : 'Add Book';
+  }
 }
 
 // Confirmation Modal Functions

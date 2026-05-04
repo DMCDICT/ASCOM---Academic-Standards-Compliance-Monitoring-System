@@ -13,11 +13,16 @@ if (session_status() == PHP_SESSION_NONE) {
 
 $response = ['success' => false, 'message' => '', 'data' => null];
 
-// Book reference creation is now handled exclusively by the Librarian module.
-// Even if the dean is authenticated, this endpoint no longer allows writes.
-$response['message'] = 'Book reference creation and updates are now handled by the Librarian module. Please coordinate with the librarian for changes.';
-echo json_encode($response);
-exit;
+// Check if this is a library selection request - allow it for deans
+$inputMethod = $_POST['input_method'] ?? 'manual';
+
+// Library selection is now allowed for deans to select books from the library catalog
+// Manual entry and other methods are still handled by the Librarian module
+if ($inputMethod !== 'library') {
+    $response['message'] = 'For adding book references, please select books from the Library catalog or coordinate with the librarian for manual entries.';
+    echo json_encode($response);
+    exit;
+}
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     try {
@@ -179,10 +184,10 @@ function processLibrarySelection($data, $courseId, $createdBy) {
         $stmt = $pdo->prepare($insertQuery);
         $stmt->execute([
             $courseId,
-            $libraryBook['title'],
+            $libraryBook['book_title'],
             $libraryBook['isbn'],
             $libraryBook['publisher'],
-            $libraryBook['copyright_year'],
+            $libraryBook['publication_year'],
             $libraryBook['edition'],
             $libraryBook['location'],
             $libraryBook['call_number'],
@@ -192,7 +197,7 @@ function processLibrarySelection($data, $courseId, $createdBy) {
         
         $addedBooks[] = [
             'id' => $pdo->lastInsertId(),
-            'title' => $libraryBook['title'],
+            'title' => $libraryBook['book_title'],
             'source' => 'library'
         ];
     }
@@ -257,10 +262,10 @@ function processAutoGeneration($data, $courseId, $createdBy) {
         $stmt = $pdo->prepare($insertQuery);
         $stmt->execute([
             $courseId,
-            $book['title'],
+            $book['book_title'],
             $book['isbn'],
             $book['publisher'],
-            $book['copyright_year'],
+            $book['publication_year'],
             $book['edition'],
             $book['location'],
             $book['call_number'],
@@ -270,7 +275,7 @@ function processAutoGeneration($data, $courseId, $createdBy) {
         
         $addedBooks[] = [
             'id' => $pdo->lastInsertId(),
-            'title' => $book['title'],
+            'title' => $book['book_title'],
             'source' => 'auto_generated'
         ];
     }
