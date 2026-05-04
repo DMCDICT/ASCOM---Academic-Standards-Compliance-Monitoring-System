@@ -914,3 +914,141 @@ For displaying label-value pairs inside modals or detail views:
 3. All buttons must have `cursor: pointer`.
 4. Color contrast: ensure all text meets WCAG AA (4.5:1 for body, 3:1 for large text).
 5. Dark mode: always provide `html[data-theme="dark"]` overrides for new components.
+
+---
+
+## 14. Icon Usage (Lucide Icons - MANDATORY)
+
+### 14.1 Rule
+
+**All icons throughout the ASCOM system MUST use Lucide icons.** No other icon libraries (Font Awesome, Material Icons, etc.) are permitted. This ensures visual consistency across all portals.
+
+### 14.2 Implementation
+
+Lucide is loaded via CDN in the project:
+
+```html
+<script defer src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+```
+
+### 14.3 Usage
+
+Use the `data-lucide` attribute on any element:
+
+```html
+<!-- Basic icon -->
+<i data-lucide="book-open"></i>
+
+<!-- Icon with custom size -->
+<i data-lucide="search" style="width: 20px; height: 20px;"></i>
+
+<!-- Icon in button -->
+<button>
+  <i data-lucide="plus"></i>
+  Add Item
+</button>
+```
+
+### 14.4 Common Icons
+
+| Purpose | Icon Name |
+|---------|-----------|
+| Add / Create | `plus`, `circle-plus` |
+| Edit / Modify | `pencil`, `edit` |
+| Delete / Remove | `trash-2`, `x` |
+| Search | `search` |
+| View / Eye | `eye`, `eye-off` |
+| Check / Approve | `check`, `check-circle`, `circle-check` |
+| Reject / Cancel | `x`, `x-circle`, `circle-x` |
+| Back / Return | `arrow-left`, `chevron-left` |
+| Forward / Next | `arrow-right`, `chevron-right` |
+| Settings | `settings`, `cog` |
+| User / Profile | `user`, `users` |
+| Book / Library | `book-open`, `book`, `library` |
+| Calendar | `calendar`, `calendar-days` |
+| Download | `download` |
+| Upload | `upload` |
+| Filter | `filter`, `sliders-horizontal` |
+| Sort | `arrow-up-down`, `chevrons-up-down` |
+| Refresh | `refresh-cw`, `rotate-ccw` |
+| Loading | `loader-2`, `spinner` |
+| Warning | `alert-triangle`, `alert-circle` |
+| Info | `info`, `circle-help` |
+| Close modal | `x` (use in close buttons) |
+
+### 14.5 Sizing Rules
+
+- **Navigation icons:** 20px × 20px
+- **Button icons:** 16px × 16px (inline with text)
+- **Card icons:** 22px × 22px (in icon containers)
+- **Large/hero icons:** 32px × 32px or 48px × 48px
+
+Always set explicit sizes to avoid inconsistencies:
+
+```css
+/* Correct - explicit sizing */
+.icon-container i[data-lucide] {
+  width: 22px;
+  height: 22px;
+}
+
+/* Navigation sizing */
+.nav-icon-wrapper [data-lucide],
+.nav-icon-wrapper svg {
+  width: 20px;
+  height: 20px;
+}
+```
+
+### 14.6 Color Inheritance
+
+Lucide icons inherit color from their parent element's `color` property. Use CSS to control icon colors:
+
+```css
+/* Icon takes parent color */
+.button i[data-lucide] {
+  color: inherit;
+}
+
+/* Explicit icon color */
+.icon-container i[data-lucide] {
+  color: #0C4B34;
+}
+
+/* Dark mode */
+html[data-theme="dark"] .icon-container i[data-lucide] {
+  color: #81C784;
+}
+```
+
+### 14.7 Animations
+
+For loading/spinner animations:
+
+```css
+i[data-lucide].spin {
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+```
+
+### 14.8 Prohibited
+
+- ❌ Font Awesome (`<i class="fa fa-..."></i>`)
+- ❌ Material Icons (`<span class="material-icons">...</span>`)
+- ❌ Unicode characters as icons (⚠, ✓, ✕, etc.)
+- ❌ Emoji as icons (📚, 🔍, ➕, etc.)
+- ❌ Custom SVG images (unless no Lucide equivalent exists)
+
+### 14.9 Exceptions
+
+Only use custom SVGs or other icon sources when:
+1. No Lucide icon exists for the required symbol
+2. The icon is a brand logo (e.g., Google, Facebook)
+3. The icon is a specialized technical symbol not in Lucide
+
+When using custom SVGs, ensure they match the sizing and styling rules above.
