@@ -39,3 +39,23 @@
 - Role assignment complex (legacy roles vs user_roles table)
 - Multiple session cleanup points (login pages destroy existing sessions)
 - Timezone sensitive: last_activity comparisons
+
+## Development Rules
+
+### Icon Usage (MANDATORY)
+**All icons MUST use Lucide icons.** See DESIGN.md Section 14 for complete guidelines.
+
+- Use `data-lucide` attribute on `<i>` elements
+- Set explicit sizes (20px for nav, 16px for buttons, 22px for cards)
+- Icons inherit color from parent element
+- Never use Font Awesome, Material Icons, Unicode symbols, or emojis as icons
+
+Example:
+```html
+<!-- Correct -->
+<button><i data-lucide="plus"></i> Add</button>
+
+<!-- Incorrect -->
+<button><span class="fa fa-plus"></span> Add</button>
+<button>➕ Add</button>
+```
