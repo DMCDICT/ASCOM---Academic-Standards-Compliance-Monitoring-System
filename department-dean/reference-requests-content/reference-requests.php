@@ -1,26 +1,15 @@
 <?php
-// This file is included within the department dean system
-// No need to start session or check authentication as it's handled by the parent system
+// Book Request System - Dean View
+// Following DESIGN.md patterns
 
-// Initial statistics (these will be updated by JavaScript)
-$totalRequests = 11;
-$pendingRequests = 6;
-$approvedRequests = 4;
-$rejectedRequests = 1;
+$departmentCode = $_SESSION["selected_role"]["department_code"] ?? "CCS";
 ?>
 
-<!-- Review Course Material Requests - View All Page -->
-<div class="back-navigation">
-    <button class="back-button" onclick="window.history.back()">
-        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m12 19-7-7 7-7"/><path d="M19 12H5"/></svg>
-        Back to Dashboard
-    </button>
-</div>
-
+<!-- Page Header -->
 <div class="page-header-section">
     <div class="header-content">
-        <h1 class="main-page-title">Course Material Requests</h1>
-        <p class="page-description">Review and manage course material requests from faculty members</p>
+        <h1 class="main-page-title">Book Requests</h1>
+        <p class="page-description">Request books from the library to maintain department compliance</p>
     </div>
     
     <!-- Stats Pills -->
@@ -34,96 +23,176 @@ $rejectedRequests = 1;
             <strong id="pendingCount">0</strong>
         </div>
         <div class="stat-pill stat-approved">
-            <span class="stat-label">Approved</span>
-            <strong id="approvedCount">0</strong>
-        </div>
-        <div class="stat-pill stat-rejected">
-            <span class="stat-label">Rejected</span>
-            <strong id="rejectedCount">0</strong>
+            <span class="stat-label">Done</span>
+            <strong id="doneCount">0</strong>
         </div>
     </div>
 </div>
 
-<!-- Filter Tabs -->
-<div class="filter-tabs-container">
-    <div class="filter-tabs">
-        <button class="filter-tab active" onclick="filterRequests('PENDING')" data-status="PENDING">
-            <i data-lucide="clock" class="tab-icon"></i>
-            <span class="tab-label">Pending</span>
-            <span class="tab-count" id="pendingTabCount">0</span>
-        </button>
-        <button class="filter-tab" onclick="filterRequests('APPROVED')" data-status="APPROVED">
-            <i data-lucide="check-circle" class="tab-icon"></i>
-            <span class="tab-label">Approved</span>
-            <span class="tab-count" id="approvedTabCount">0</span>
-        </button>
-        <button class="filter-tab" onclick="filterRequests('REJECTED')" data-status="REJECTED">
-            <i data-lucide="x-circle" class="tab-icon"></i>
-            <span class="tab-label">Rejected</span>
-            <span class="tab-count" id="rejectedTabCount">0</span>
+<div class="main-page-content-container">
+    <!-- Action Bar -->
+    <div class="action-bar">
+        <button class="btn-primary" onclick="openRequestModal()">
+            <i data-lucide="plus"></i>
+            Request New Book
         </button>
     </div>
     
-    <!-- Search -->
-    <div class="search-container">
-        <div class="search-bar">
-            <i data-lucide="search" class="search-icon"></i>
-            <input type="text" id="requestSearchInput" placeholder="Search by course, title, or requester..." oninput="searchRequests(this.value)">
-            <button class="clear-search-btn" onclick="clearSearch()" style="display: none;" id="clearSearchBtn"><i data-lucide="x"></i></button>
+    <!-- Filter Tabs -->
+    <div class="filter-tabs-container">
+        <div class="filter-tabs">
+            <button class="filter-tab active" onclick="filterRequests('PENDING')" data-status="PENDING">
+                <i data-lucide="clock" class="tab-icon"></i>
+                <span class="tab-label">Pending</span>
+                <span class="tab-count" id="pendingTabCount">0</span>
+            </button>
+            <button class="filter-tab" onclick="filterRequests('DONE')" data-status="DONE">
+                <i data-lucide="check-circle" class="tab-icon"></i>
+                <span class="tab-label">Done</span>
+                <span class="tab-count" id="doneTabCount">0</span>
+            </button>
+        </div>
+    </div>
+    
+    <!-- Requests Grid -->
+    <div class="requests-container">
+        <div id="requestsGrid" class="requests-grid">
+            <!-- Requests will be displayed here -->
+        </div>
+        
+        <!-- Empty State -->
+        <div class="empty-state" id="requestsEmptyState" style="display: none;">
+            <div class="empty-icon-wrapper">
+                <i data-lucide="inbox" class="empty-icon"></i>
+            </div>
+            <h3>No requests found</h3>
+            <p id="emptyStateMessage">You don't have any pending requests.</p>
         </div>
     </div>
 </div>
 
-<div class="reference-requests-container">
-    <div class="reference-requests-grid" id="allRequestsGrid">
-        <!-- Requests will be displayed here -->
+<!-- Request Book Modal -->
+<div id="requestBookModal" class="modal-overlay" style="display: none;">
+    <div class="premium-modal">
+        <div class="modal-header">
+            <div style="display: flex; align-items: center; gap: 12px;">
+                <div class="icon-container" style="width: 40px; height: 40px; background: rgba(12, 75, 52, 0.08); color: #0C4B34; border-radius: 10px;">
+                    <i data-lucide="book-plus"></i>
+                </div>
+                <h2 class="modal-title" id="modalTitleText">Request New Book</h2>
+            </div>
+            <button class="modal-close" onclick="closeRequestModal()">
+                <i data-lucide="x"></i>
+            </button>
+        </div>
+        
+        <div class="modal-body" style="overflow-y: auto; padding: 28px;">
+            <p class="modal-description">Fill out the details below to request a new book. Our library team will review your request for department compliance requirements.</p>
+            
+            <form id="requestBookForm" onsubmit="submitBookRequest(event)">
+                <input type="hidden" id="editRequestId" name="request_id">
+                
+                <div class="form-group">
+                    <label class="required-field">Book Title</label>
+                    <input type="text" id="requestBookTitle" name="book_title" required placeholder="Enter the full title of the book">
+                </div>
+                
+                <div class="form-group">
+                    <label class="required-field">Primary Author</label>
+                    <input type="text" id="requestAuthor" name="author" required placeholder="Enter the main author's name">
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>ISBN (if known)</label>
+                        <input type="text" id="requestIsbn" name="isbn" placeholder="e.g., 978-0-123456-78-9">
+                    </div>
+                    <div class="form-group">
+                        <label>Publication Year</label>
+                        <input type="text" id="requestYear" name="publication_year" placeholder="e.g., 2024">
+                    </div>
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Publisher</label>
+                        <input type="text" id="requestPublisher" name="publisher" placeholder="Enter publisher name">
+                    </div>
+                    <div class="form-group">
+                        <label>Edition</label>
+                        <input type="text" id="requestEdition" name="edition" placeholder="e.g., 2nd Edition">
+                    </div>
+                </div>
+                
+                <div class="form-group" style="margin-bottom: 0;">
+                    <label class="required-field">Reason for Request</label>
+                    <textarea id="requestReason" name="reason" required rows="4" placeholder="Briefly explain why this book is needed for compliance or a specific course..."></textarea>
+                    <span class="form-hint">This helps prioritize requests based on academic needs.</span>
+                </div>
+                
+                <div class="modal-actions">
+                    <button type="button" class="btn-cancel" onclick="closeRequestModal()" style="height: 48px; min-width: 120px;">Cancel</button>
+                    <button type="submit" class="btn-create" id="submitBtnText" style="height: 48px; min-width: 160px;">Submit Request</button>
+                </div>
+            </form>
+        </div>
     </div>
-    
-    <!-- Empty State -->
-    <div class="empty-state" id="emptyState" style="display: none;">
-        <i data-lucide="book-open" class="empty-icon"></i>
-        <h3>No requests found</h3>
-        <p>There are no course material requests matching your criteria.</p>
+</div>
+
+<!-- Confirm Cancel Modal -->
+<div id="confirmCancelModal" class="modal-overlay" style="display: none;">
+    <div class="modal-box" style="max-width: 420px; width: 90%;">
+        <div class="modal-header">
+            <h2 class="modal-title">Cancel Request?</h2>
+            <button class="modal-close" onclick="closeConfirmCancelModal()">
+                <i data-lucide="x"></i>
+            </button>
+        </div>
+        <div class="modal-body">
+            <p>Are you sure you want to cancel this book request? This action cannot be undone.</p>
+            <input type="hidden" id="cancelRequestId">
+        </div>
+        <div class="modal-actions">
+            <button type="button" class="btn-cancel" onclick="closeConfirmCancelModal()">Keep Request</button>
+            <button type="button" class="btn-danger" onclick="confirmCancelRequest()">Yes, Cancel</button>
+        </div>
+    </div>
+</div>
+
+<!-- Success Modal -->
+<div id="successModal" class="modal-overlay" style="display: none;">
+    <div class="modal-box" style="max-width: 400px; width: 90%;">
+        <div class="modal-content-center">
+            <div class="success-icon-wrapper" style="margin-bottom: 20px;">
+                <div class="icon-container" style="width: 80px; height: 80px; margin: 0 auto; background: rgba(46, 125, 50, 0.1); border-radius: 50%;">
+                    <i data-lucide="check-circle" style="width: 40px; height: 40px; color: #2E7D32;"></i>
+                </div>
+            </div>
+            <h3 id="successTitle" style="font-size: 20px; font-weight: 800; color: #111827; margin: 0 0 10px 0;">Success!</h3>
+            <p id="successMessage" style="font-size: 15px; color: rgba(17, 24, 39, 0.6); margin: 0 0 30px 0; line-height: 1.5;">Request submitted successfully.</p>
+            <button class="btn-primary" onclick="closeSuccessModal()" style="width: 100%; justify-content: center; height: 48px;">Continue</button>
+        </div>
+    </div>
+</div>
+
+<!-- Error Modal -->
+<div id="errorModal" class="modal-overlay" style="display: none;">
+    <div class="modal-box" style="max-width: 380px; width: 90%;">
+        <div class="modal-content-center">
+            <div class="icon-container" style="width: 64px; height: 64px; margin: 0 auto 16px; background: rgba(185, 28, 28, 0.1);">
+                <i data-lucide="alert-circle" style="width: 32px; height: 32px; color: #b91c1c;"></i>
+            </div>
+            <h3 style="font-size: 18px; font-weight: 800; color: #111827; margin: 0 0 8px 0;">Error</h3>
+            <p id="errorMessage" style="font-size: 14px; color: rgba(17, 24, 39, 0.6); margin: 0 0 24px 0;">An error occurred.</p>
+            <button class="btn-cancel" onclick="closeErrorModal()">Close</button>
+        </div>
     </div>
 </div>
 
 <style>
     /* ====== DESIGN.md COMPLIANT STYLES ====== */
     
-    /* Back navigation - DESIGN.md btn-ghost pattern */
-    .back-navigation {
-        margin-bottom: 20px;
-    }
-
-    .back-button {
-        display: inline-flex;
-        align-items: center;
-        background: transparent;
-        border: none;
-        color: #0C4B34;
-        font-size: 13px;
-        font-weight: 700;
-        cursor: pointer;
-        padding: 0;
-        border-radius: 0;
-        text-decoration: none;
-        transition: all 0.2s ease;
-        font-family: 'TT Interphases', sans-serif;
-        gap: 6px;
-    }
-
-    .back-button:hover {
-        color: #0a3a28;
-        transform: translateX(-4px);
-        text-decoration: none;
-    }
-
-    .back-button svg {
-        width: 18px;
-        height: 18px;
-    }
-
-    /* Page Header Section - DESIGN.md Section Header pattern */
+    /* Page Header Section */
     .page-header-section {
         display: flex;
         justify-content: space-between;
@@ -132,12 +201,12 @@ $rejectedRequests = 1;
         gap: 20px;
         flex-wrap: wrap;
     }
-
+    
     .header-content {
         flex: 1;
         min-width: 250px;
     }
-
+    
     .main-page-title {
         font-size: 24px;
         font-weight: 800;
@@ -146,7 +215,7 @@ $rejectedRequests = 1;
         font-family: 'TT Interphases', sans-serif;
         letter-spacing: -0.5px;
     }
-
+    
     .page-description {
         font-size: 14px;
         color: rgba(17, 24, 39, 0.6);
@@ -154,69 +223,150 @@ $rejectedRequests = 1;
         font-family: 'TT Interphases', sans-serif;
         font-weight: 500;
     }
-
-    /* Header Stats - DESIGN.md Stat Pills pattern */
+    
+    /* Header Stats - DESIGN.md Section 3.4 */
     .header-stats {
         display: flex;
-        gap: 10px;
-        flex-wrap: wrap;
+        gap: 12px;
+        flex-shrink: 0;
     }
-
+    
     .stat-pill {
         background: rgba(12, 75, 52, 0.04);
         border: 1px solid rgba(12, 75, 52, 0.08);
         color: rgba(17, 24, 39, 0.6);
-        padding: 8px 14px;
-        border-radius: 10px;
-        font-size: 12px;
+        padding: 6px 14px;
+        border-radius: 12px;
+        font-size: 11px;
         font-weight: 600;
         display: flex;
+        align-items: center;
+        gap: 6px;
+        transition: all 0.22s ease;
+        font-family: 'TT Interphases', sans-serif;
+    }
+    
+    .stat-pill:hover {
+        background: rgba(12, 75, 52, 0.08);
+        transform: translateY(-1px);
+    }
+    
+    .stat-pill strong {
+        color: #0C4B34;
+        font-weight: 800;
+        font-size: 13px;
+    }
+    
+    .stat-pill.stat-pending {
+        border-color: rgba(230, 81, 0, 0.15);
+        background: rgba(230, 81, 0, 0.04);
+    }
+    
+    .stat-pill.stat-pending strong {
+        color: #e65100;
+    }
+    
+    .stat-pill.stat-approved {
+        border-color: rgba(46, 125, 50, 0.15);
+        background: rgba(46, 125, 50, 0.04);
+    }
+    
+    .stat-pill.stat-approved strong {
+        color: #2E7D32;
+    }
+    
+    /* Action Bar */
+    .action-bar {
+        margin-bottom: 24px;
+    }
+    
+    .btn-primary {
+        background: #0C4B34;
+        color: white;
+        border: none;
+        padding: 12px 24px;
+        border-radius: 10px;
+        cursor: pointer;
+        font-size: 14px;
+        font-weight: 700;
+        letter-spacing: 0.2px;
+        transition: all 0.22s cubic-bezier(.4,0,.2,1);
+        display: inline-flex;
         align-items: center;
         gap: 8px;
         font-family: 'TT Interphases', sans-serif;
     }
-
-    .stat-pill strong {
-        color: #0C4B34;
-        font-weight: 800;
+    
+    .btn-primary:hover {
+        background: #0a3a28;
+        transform: translateY(-1px);
+        box-shadow: 0 6px 18px rgba(12, 75, 52, 0.25);
+    }
+    
+    .btn-primary:active {
+        transform: translateY(0) scale(0.98);
+    }
+    
+    .btn-primary i[data-lucide] {
+        width: 18px;
+        height: 18px;
+    }
+    
+    /* Cancel Button */
+    .btn-cancel {
+        background-color: #C9C9C9;
+        color: black;
+        border: none;
+        padding: 12px 24px;
+        border-radius: 10px;
+        cursor: pointer;
         font-size: 14px;
+        font-weight: 700;
+        transition: background-color 0.3s;
+        font-family: 'TT Interphases', sans-serif;
     }
-
-    .stat-pill .stat-label {
-        color: rgba(17, 24, 39, 0.5);
-        text-transform: uppercase;
-        letter-spacing: 0.5px;
-        font-size: 10px;
+    
+    .btn-cancel:hover {
+        background-color: #B9B9B9;
     }
-
-    .stat-pill.stat-pending {
-        background: rgba(255, 165, 0, 0.1);
-        border-color: rgba(255, 165, 0, 0.2);
+    
+    /* Create/Submit Button */
+    .btn-create {
+        background-color: #0F7A53;
+        color: white;
+        border: none;
+        padding: 12px 24px;
+        border-radius: 10px;
+        cursor: pointer;
+        font-size: 14px;
+        font-weight: 700;
+        transition: background-color 0.3s;
+        font-family: 'TT Interphases', sans-serif;
     }
-
-    .stat-pill.stat-pending strong {
-        color: #e65100;
+    
+    .btn-create:hover:enabled {
+        background-color: #0a5f42;
     }
-
-    .stat-pill.stat-approved {
-        background: rgba(46, 125, 50, 0.1);
-        border-color: rgba(46, 125, 50, 0.2);
+    
+    /* Danger Button */
+    .btn-danger {
+        background-color: #b91c1c;
+        color: white;
+        border: none;
+        padding: 12px 24px;
+        border-radius: 10px;
+        cursor: pointer;
+        font-size: 14px;
+        font-weight: 700;
+        transition: background-color 0.3s;
+        font-family: 'TT Interphases', sans-serif;
     }
-
-    .stat-pill.stat-approved strong {
-        color: #2E7D32;
+    
+    .btn-danger:hover {
+        background-color: #991b1b;
     }
-
-    .stat-pill.stat-rejected {
-        background: rgba(185, 28, 28, 0.1);
-        border-color: rgba(185, 28, 28, 0.2);
-    }
-
-    .stat-pill.stat-rejected strong {
-        color: #b91c1c;
-    }
-
-    /* Filter Tabs Container */
+    
+    /* Filter Tabs - DESIGN.md Section 3.4 */
     .filter-tabs-container {
         display: flex;
         justify-content: space-between;
@@ -225,96 +375,93 @@ $rejectedRequests = 1;
         margin-bottom: 24px;
         flex-wrap: wrap;
     }
-
-    /* Filter Tabs - DESIGN.md tabs pattern */
+    
     .filter-tabs {
         display: flex;
-        gap: 4px;
+        gap: 6px;
         background: rgba(12, 75, 52, 0.04);
-        padding: 4px;
-        border-radius: 12px;
+        padding: 5px;
+        border-radius: 14px;
+        border: 1px solid rgba(12, 75, 52, 0.06);
     }
-
+    
     .filter-tab {
         display: flex;
         align-items: center;
         gap: 8px;
-        padding: 10px 18px;
+        padding: 10px 20px;
         border: none;
         background: transparent;
         color: rgba(17, 24, 39, 0.5);
-        border-radius: 10px;
+        border-radius: 11px;
         font-size: 13px;
         font-weight: 700;
         cursor: pointer;
-        transition: all 0.22s cubic-bezier(.4,0,.2,1);
+        transition: all 0.25s cubic-bezier(.4,0,.2,1);
         font-family: 'TT Interphases', sans-serif;
     }
-
+    
     .filter-tab:hover {
         color: #0C4B34;
         background: rgba(12, 75, 52, 0.06);
     }
-
+    
     .filter-tab.active {
         background: #0C4B34;
         color: white;
-        box-shadow: 0 4px 12px rgba(12, 75, 52, 0.25);
-    }
-
-    .filter-tab .tab-icon {
-        width: 16px;
-        height: 16px;
-        flex-shrink: 0;
+        box-shadow: 0 4px 15px rgba(12, 75, 52, 0.22);
     }
     
-    .filter-tab .tab-icon[data-lucide] {
-        color: inherit;
+    .filter-tab .tab-icon {
+        width: 17px;
+        height: 17px;
     }
-
+    
     .filter-tab .tab-count {
-        background: rgba(12, 75, 52, 0.1);
-        padding: 2px 8px;
+        background: rgba(12, 75, 52, 0.12);
+        padding: 2px 9px;
         border-radius: 12px;
         font-size: 11px;
         font-weight: 800;
+        color: #0C4B34;
     }
-
+    
     .filter-tab.active .tab-count {
         background: rgba(255, 255, 255, 0.2);
+        color: white;
     }
-
-    /* Search Bar - DESIGN.md search pattern */
+    
+    /* Search Bar - DESIGN.md Section 7.2 */
     .search-container {
         flex-shrink: 0;
     }
-
+    
     .search-bar {
         display: flex;
         align-items: center;
         background-color: #FFFFFF;
-        height: 44px;
-        padding: 0 14px;
-        border-radius: 12px;
-        border: 1px solid rgba(12, 75, 52, 0.14);
-        box-shadow: 0 2px 6px rgba(0,0,0,0.04);
-        transition: border-color 0.2s ease, box-shadow 0.2s ease;
-        min-width: 280px;
+        height: 48px;
+        padding: 0 16px;
+        border-radius: 14px;
+        border: 1px solid rgba(12, 75, 52, 0.12);
+        box-shadow: 0 4px 12px rgba(0,0,0,0.03);
+        transition: all 0.25s ease;
+        min-width: 300px;
     }
-
+    
     .search-bar:focus-within {
         border-color: #0C4B34;
-        box-shadow: 0 0 0 3px rgba(12, 75, 52, 0.1);
+        box-shadow: 0 8px 24px rgba(12, 75, 52, 0.1);
+        transform: translateY(-1px);
     }
-
+    
     .search-bar .search-icon {
         color: rgba(17, 24, 39, 0.4);
         margin-right: 10px;
-        flex-shrink: 0;
         width: 18px;
         height: 18px;
     }
-
+    
     .search-bar input {
         border: none;
         outline: none;
@@ -323,233 +470,221 @@ $rejectedRequests = 1;
         background: transparent;
         font-family: 'TT Interphases', sans-serif;
     }
-
-    .search-bar input::placeholder {
-        color: rgba(17, 24, 39, 0.4);
-    }
-
-    .clear-search-btn {
-        background: none;
-        border: none;
-        font-size: 16px;
-        color: rgba(17, 24, 39, 0.4);
-        cursor: pointer;
-        padding: 4px 8px;
-        border-radius: 4px;
-        transition: all 0.15s ease;
-    }
-
-    .clear-search-btn:hover {
-        background: rgba(12, 75, 52, 0.08);
-        color: #0C4B34;
-    }
-
-    /* Reference Requests Container */
-    .reference-requests-container {
+    
+    /* Requests Grid - DESIGN.md Section 3.1 Cards */
+    .requests-container {
         margin-top: 0;
-        width: 100%;
     }
-
-    .reference-requests-grid {
+    
+    .requests-grid {
         display: grid;
-        grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
-        gap: 18px;
-        width: 100%;
+        grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+        gap: 16px;
     }
-
-    /* Reference Request Card - DESIGN.md Card pattern */
-    .reference-request-card {
+    
+    /* Request Card - DESIGN.md Section 3.1 */
+    .request-card {
         background: #ffffff;
-        border-radius: 16px 18px;
-        border: 1px solid rgba(12, 75, 52, 0.14);
-        box-shadow: 0 4px 18px rgba(0, 0, 0, 0.04);
-        padding: 20px 22px;
+        border-radius: 14px;
+        border: 1px solid rgba(12, 75, 52, 0.12);
+        box-shadow: 0 4px 18px rgba(0, 0, 0, 0.03);
+        padding: 16px;
         transition: all 0.28s cubic-bezier(.4,0,.2,1);
-        display: flex;
-        flex-direction: column;
+        animation: fadeSlideUp 0.45s ease-out both;
         position: relative;
         overflow: hidden;
-        box-sizing: border-box;
-        animation: fadeSlideUp 0.45s ease-out both;
+        display: flex;
+        flex-direction: column;
     }
-
-    .reference-request-card::before {
-        content: '';
-        position: absolute;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 3px;
-        background: linear-gradient(90deg, #0C4B34 0%, #0F7A53 100%);
-        border-radius: 16px 18px 0 0;
+    
+    .request-card:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 14px 40px rgba(12, 75, 52, 0.12);
+        border-color: rgba(12, 75, 52, 0.22);
     }
-
-    .reference-request-card:hover {
-        transform: translateY(-3px);
-        box-shadow: 0 12px 36px rgba(12, 75, 52, 0.12);
-        border-color: rgba(12, 75, 52, 0.25);
-    }
-
-    /* Stagger animation for cards */
-    .reference-request-card:nth-child(1) { animation-delay: 0.08s; }
-    .reference-request-card:nth-child(2) { animation-delay: 0.16s; }
-    .reference-request-card:nth-child(3) { animation-delay: 0.24s; }
-    .reference-request-card:nth-child(4) { animation-delay: 0.32s; }
-    .reference-request-card:nth-child(5) { animation-delay: 0.40s; }
-    .reference-request-card:nth-child(6) { animation-delay: 0.48s; }
-    .reference-request-card:nth-child(7) { animation-delay: 0.56s; }
-    .reference-request-card:nth-child(8) { animation-delay: 0.64s; }
-
-    /* Request Header */
+    
+    /* Stagger animation - 80ms increments */
+    .request-card:nth-child(1) { animation-delay: 0.08s; }
+    .request-card:nth-child(2) { animation-delay: 0.16s; }
+    .request-card:nth-child(3) { animation-delay: 0.24s; }
+    .request-card:nth-child(4) { animation-delay: 0.32s; }
+    .request-card:nth-child(5) { animation-delay: 0.40s; }
+    .request-card:nth-child(6) { animation-delay: 0.48s; }
+    
     .request-header {
         display: flex;
-        justify-content: space-between;
-        align-items: flex-start;
-        margin-bottom: 14px;
-        padding-bottom: 12px;
-        border-bottom: 1px solid rgba(12, 75, 52, 0.08);
+        gap: 12px;
+        margin-bottom: 12px;
     }
-
-    .requester-info {
-        flex: 1;
-    }
-
-    .requester-name {
-        font-weight: 700;
-        color: #111827;
-        font-size: 14px;
-        margin-bottom: 4px;
-        font-family: 'TT Interphases', sans-serif;
-    }
-
-    .requester-role {
-        font-size: 11px;
+    
+    .request-icon-box {
+        width: 38px;
+        height: 38px;
+        border-radius: 10px;
+        background: rgba(12, 75, 52, 0.08);
         color: #0C4B34;
-        font-weight: 700;
-        text-transform: uppercase;
-        letter-spacing: 0.5px;
-        font-family: 'TT Interphases', sans-serif;
-    }
-
-    /* Status Badge */
-    .status-badge {
-        padding: 6px 12px;
-        border-radius: 8px;
-        font-size: 11px;
-        font-weight: 700;
-        text-transform: uppercase;
-        letter-spacing: 0.5px;
-        font-family: 'TT Interphases', sans-serif;
-    }
-
-    .status-badge.pending {
-        background: rgba(255, 165, 0, 0.12);
-        color: #e65100;
-        border: 1px solid rgba(255, 165, 0, 0.2);
-    }
-
-    .status-badge.approved {
-        background: rgba(46, 125, 50, 0.12);
-        color: #2E7D32;
-        border: 1px solid rgba(46, 125, 50, 0.2);
-    }
-
-    .status-badge.rejected {
-        background: rgba(185, 28, 28, 0.12);
-        color: #b91c1c;
-        border: 1px solid rgba(185, 28, 28, 0.2);
-    }
-
-    /* Course Info - DESIGN.md code badge pattern */
-    .course-info {
-        margin-bottom: 14px;
         display: flex;
         align-items: center;
-        gap: 10px;
-        background: rgba(12, 75, 52, 0.04);
-        padding: 10px 14px;
-        border-radius: 10px;
+        justify-content: center;
+        flex-shrink: 0;
+        transition: all 0.3s cubic-bezier(.4,0,.2,1);
+        border: 1px solid rgba(12, 75, 52, 0.05);
     }
-
-    .course-code {
-        display: inline-block;
-        background: #0C4B34;
-        color: white;
-        padding: 5px 10px;
-        border-radius: 8px;
-        font-size: 12px;
-        font-weight: 800;
-        letter-spacing: 0.6px;
-        text-transform: uppercase;
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-        font-family: 'TT Interphases', sans-serif;
+    
+    .request-card:hover .request-icon-box {
+        transform: scale(1.05) rotate(-3deg);
+        background: rgba(12, 75, 52, 0.12);
     }
-
-    .course-name {
-        font-size: 13px;
-        color: rgba(17, 24, 39, 0.7);
-        font-family: 'TT Interphases', sans-serif;
+    
+    .request-card.pending .request-icon-box {
+        background: rgba(230, 81, 0, 0.08);
+        color: #e65100;
+        border-color: rgba(230, 81, 0, 0.1);
+    }
+    
+    .request-card.done .request-icon-box {
+        background: rgba(46, 125, 50, 0.08);
+        color: #2E7D32;
+        border-color: rgba(46, 125, 50, 0.1);
+    }
+    
+    .request-icon-box i[data-lucide] {
+        width: 18px;
+        height: 18px;
+    }
+    
+    .request-info {
         flex: 1;
-        font-weight: 500;
+        min-width: 0;
     }
-
-    /* Request Summary */
-    .request-summary {
-        margin-bottom: 16px;
-        flex: 1;
-    }
-
-    .request-type {
-        font-size: 11px;
-        color: rgba(17, 24, 39, 0.5);
-        margin-bottom: 8px;
-        font-family: 'TT Interphases', sans-serif;
-        text-transform: uppercase;
-        letter-spacing: 0.6px;
-        font-weight: 700;
-    }
-
-    .material-title {
+    
+    .request-book-title {
         font-size: 14px;
+        font-weight: 800;
         color: #111827;
-        line-height: 1.5;
+        margin-bottom: 2px;
         font-family: 'TT Interphases', sans-serif;
-        font-weight: 500;
+        line-height: 1.2;
+        display: -webkit-box;
+        -webkit-line-clamp: 1;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: normal;
     }
-
-    .material-details {
+    
+    .request-author {
+        font-size: 12px;
+        color: rgba(17, 24, 39, 0.5);
+        font-family: 'TT Interphases', sans-serif;
+        font-weight: 700;
+        letter-spacing: 0.2px;
+    }
+    
+    /* Status Badge - DESIGN.md Section 3.4 */
+    .status-badge {
+        padding: 3px 8px;
+        border-radius: 20px;
+        font-size: 9px;
+        font-weight: 800;
+        text-transform: uppercase;
+        letter-spacing: 0.8px;
+        font-family: 'TT Interphases', sans-serif;
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+    }
+    
+    .status-badge.pending {
+        background: rgba(230, 81, 0, 0.1);
+        color: #e65100;
+        border: 1px solid rgba(230, 81, 0, 0.15);
+    }
+    
+    .status-badge.pending::before {
+        content: '';
+        width: 6px;
+        height: 6px;
+        background: #e65100;
+        border-radius: 50%;
+        animation: statusPulse 2s ease-in-out infinite;
+    }
+    
+    .status-badge.done {
+        background: rgba(46, 125, 50, 0.1);
+        color: #2E7D32;
+        border: 1px solid rgba(46, 125, 50, 0.15);
+    }
+    
+    .request-details {
         display: flex;
         flex-wrap: wrap;
         gap: 8px;
-        margin-top: 10px;
+        margin: 12px 0;
     }
-
-    .material-detail-item {
-        font-size: 11px;
+    
+    .request-detail-item {
+        font-size: 10px;
         color: rgba(17, 24, 39, 0.6);
         background: rgba(12, 75, 52, 0.04);
-        padding: 4px 8px;
+        padding: 3px 8px;
         border-radius: 6px;
-        border: 1px solid rgba(12, 75, 52, 0.08);
         font-family: 'TT Interphases', sans-serif;
+    }
+    
+    .request-reason {
+        font-size: 12px;
+        color: #374151;
+        font-family: 'TT Interphases', sans-serif;
+        margin: 12px 0;
+        padding: 10px 12px;
+        background: rgba(12, 75, 52, 0.03);
+        border-radius: 10px;
+        line-height: 1.4;
+        font-weight: 500;
+        position: relative;
+    }
+    
+    .request-reason-label {
+        font-size: 10px;
+        font-weight: 700;
+        color: rgba(17, 24, 39, 0.5);
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        margin-bottom: 4px;
+    }
+    
+    .request-date {
+        font-size: 11px;
+        color: rgba(17, 24, 39, 0.4);
+        font-family: 'TT Interphases', sans-serif;
+        text-align: right;
         font-weight: 600;
     }
-
-    /* Action Buttons - DESIGN.md button patterns */
-    .action-buttons {
+    
+    .processed-on {
+        font-size: 11px;
+        color: #2E7D32;
+        font-family: 'TT Interphases', sans-serif;
+        text-align: right;
+        font-weight: 700;
+        margin-top: 2px;
+    }
+    
+    /* Action Buttons */
+    .request-actions {
         display: flex;
-        gap: 10px;
-        margin-top: auto;
-        padding-top: 14px;
+        gap: 8px;
+        margin-top: 12px;
+        padding-top: 12px;
         border-top: 1px solid rgba(12, 75, 52, 0.08);
     }
-
-    .approve-btn, .reject-btn {
+    
+    .action-btn {
         flex: 1;
-        padding: 10px 16px;
-        border: none;
-        border-radius: 10px;
-        font-size: 13px;
+        padding: 8px 12px;
+        border-radius: 8px;
+        font-size: 12px;
         font-weight: 700;
         cursor: pointer;
         transition: all 0.22s cubic-bezier(.4,0,.2,1);
@@ -559,122 +694,275 @@ $rejectedRequests = 1;
         justify-content: center;
         gap: 6px;
     }
-
-    .approve-btn {
-        background: #0F7A53;
-        color: white;
+    
+    .action-btn i[data-lucide] {
+        width: 16px;
+        height: 16px;
     }
-
-    .approve-btn:hover {
-        background: #0a5f42;
-        transform: translateY(-1px);
-        box-shadow: 0 6px 18px rgba(15, 122, 83, 0.25);
+    
+    .edit-btn {
+        background: #fff;
+        color: #0C4B34;
+        border: 1px solid #0C4B34;
     }
-
-    .approve-btn:active {
-        transform: translateY(0) scale(0.98);
+    
+    .edit-btn:hover {
+        background: rgba(12, 75, 52, 0.05);
     }
-
-    .reject-btn {
+    
+    .cancel-btn-action {
+        background: #fff;
+        color: #b91c1c;
+        border: 1px solid #b91c1c;
+    }
+    
+    .cancel-btn-action:hover {
         background: #b91c1c;
         color: white;
     }
-
-    .reject-btn:hover {
-        background: #991b1b;
-        transform: translateY(-1px);
-        box-shadow: 0 6px 18px rgba(185, 28, 28, 0.25);
-    }
-
-    .reject-btn:active {
-        transform: translateY(0) scale(0.98);
-    }
-
-    /* Status Buttons (disabled) */
-    .status-approved-btn, .status-rejected-btn {
-        flex: 1;
-        padding: 10px 16px;
-        border-radius: 10px;
-        font-size: 13px;
-        font-weight: 700;
-        font-family: 'TT Interphases', sans-serif;
-        border: none;
-        cursor: default;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        gap: 6px;
-    }
-
-    .status-approved-btn {
+    
+    .done-btn {
         background: rgba(46, 125, 50, 0.12);
         color: #2E7D32;
         border: 1px solid rgba(46, 125, 50, 0.2);
+        cursor: default;
     }
-
-    .status-rejected-btn {
-        background: rgba(185, 28, 28, 0.12);
-        color: #b91c1c;
-        border: 1px solid rgba(185, 28, 28, 0.2);
+    
+    /* Modal Styles - DESIGN.md Section 5 */
+    .modal-overlay {
+        position: fixed;
+        inset: 0;
+        background-color: rgba(0, 0, 0, 0.5);
+        display: none;
+        align-items: center;
+        justify-content: center;
+        z-index: 2000;
+        padding: 20px;
     }
-
-    /* Request Date */
-    .request-date {
-        font-size: 11px;
-        color: rgba(17, 24, 39, 0.4);
-        font-family: 'TT Interphases', sans-serif;
-        text-align: center;
-        margin-top: 10px;
-        font-weight: 600;
+    
+    .modal-overlay.is-open {
+        display: flex;
     }
-
-    /* Empty State - DESIGN.md empty state pattern */
-    .empty-state {
-        text-align: center;
-        padding: 60px 20px;
-        color: rgba(17, 24, 39, 0.4);
+    
+    .modal-box {
+        background-color: #ffffff;
+        border-radius: 20px;
+        box-shadow: 0 20px 50px rgba(0, 0, 0, 0.25);
+        animation: modalPop 0.22s cubic-bezier(0.34, 1.56, 0.64, 1);
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+        border: 1px solid rgba(12, 75, 52, 0.1);
     }
-
-    .empty-state svg {
-        display: block;
-        margin: 0 auto 16px;
-        opacity: 0.3;
-        color: #0C4B34;
+    
+    .premium-modal {
+        width: min(720px, calc(100vw - 28px));
+        max-height: min(90vh, 850px);
+        background: #ffffff;
+        border: 1px solid rgba(12, 75, 52, 0.18);
+        border-radius: 20px;
+        overflow: hidden;
+        box-shadow: 0 22px 64px rgba(0, 0, 0, 0.28);
+        display: flex;
+        flex-direction: column;
+        animation: modalPop 0.22s cubic-bezier(0.34, 1.56, 0.64, 1);
     }
-
-    .empty-state h3 {
-        font-size: 16px;
+    
+    .modal-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 14px;
+        padding: 20px 28px;
+        background: linear-gradient(0deg, rgba(12, 75, 52, 0.05), rgba(12, 75, 52, 0.05)), #ffffff;
+        border-bottom: 1px solid rgba(12, 75, 52, 0.12);
+    }
+    
+    .modal-title {
+        font-size: 20px;
         font-weight: 800;
         color: #111827;
-        margin: 0 0 8px 0;
+        margin: 0;
+        letter-spacing: -0.3px;
+    }
+    
+    .modal-close {
+        width: 40px;
+        height: 40px;
+        border-radius: 12px;
+        border: 1px solid rgba(12, 75, 52, 0.16);
+        background: rgba(12, 75, 52, 0.06);
+        color: #0C4B34;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: background 0.15s ease;
+    }
+    
+    .modal-close:hover {
+        background: rgba(12, 75, 52, 0.1);
+    }
+    
+    .modal-close i[data-lucide] {
+        width: 20px;
+        height: 20px;
+    }
+    
+    .modal-body {
+        padding: 24px;
+    }
+    
+    .modal-description {
+        font-size: 14px;
+        color: rgba(17, 24, 39, 0.6);
+        margin: 0 0 20px 0;
         font-family: 'TT Interphases', sans-serif;
     }
-
-    .empty-state p {
-        font-size: 13px;
-        color: rgba(17, 24, 39, 0.6);
-        margin: 0;
+    
+    .modal-content-center {
+        text-align: center;
+        padding: 32px;
+    }
+    
+    .modal-actions {
+        display: flex;
+        justify-content: flex-end;
+        gap: 12px;
+        margin-top: 24px;
+        padding-top: 20px;
+        border-top: 1px solid rgba(12, 75, 52, 0.1);
+    }
+    
+    /* Form Styles - DESIGN.md Section 7 */
+    .form-group {
+        margin-bottom: 16px;
+    }
+    
+    .form-group label {
+        display: block;
+        font-size: 12px;
+        font-weight: 700;
+        color: rgba(17, 24, 39, 0.5);
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        margin-bottom: 6px;
         font-family: 'TT Interphases', sans-serif;
+    }
+    
+    .form-group label.required-field::after {
+        content: " *";
+        color: #b91c1c;
+    }
+    
+    .form-group input,
+    .form-group textarea {
+        background-color: #FFFFFF;
+        border: 1px solid #ccc;
+        border-radius: 12px;
+        height: 48px;
+        padding: 0 14px;
+        font-size: 14px;
+        font-family: 'TT Interphases', sans-serif;
+        box-sizing: border-box;
+        width: 100%;
+        transition: border-color 0.2s ease;
+    }
+    
+    .form-group textarea {
+        height: auto;
+        padding: 12px 14px;
+        resize: vertical;
+    }
+    
+    .form-group input:focus,
+    .form-group textarea:focus {
+        border-color: #0C4B34;
+        outline: none;
+    }
+    
+    .form-hint {
+        display: block;
+        font-size: 11px;
+        color: rgba(17, 24, 39, 0.5);
+        margin-top: 4px;
+        font-family: 'TT Interphases', sans-serif;
+    }
+    
+    .form-row {
+        display: flex;
+        gap: 16px;
+    }
+    
+    .form-row .form-group {
+        flex: 1;
+    }
+    
+    .empty-state {
+        padding: 80px 20px;
+        text-align: center;
+        background: rgba(12, 75, 52, 0.02);
+        border-radius: 20px;
+        border: 2px dashed rgba(12, 75, 52, 0.08);
+        margin-top: 20px;
+    }
+    
+    .empty-icon-wrapper {
+        width: 80px;
+        height: 80px;
+        background: rgba(12, 75, 52, 0.05);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 20px;
+        color: rgba(12, 75, 52, 0.2);
+    }
+    
+    .empty-icon {
+        width: 40px;
+        height: 40px;
+    }
+    
+    .empty-state h3 {
+        font-size: 18px;
+        font-weight: 800;
+        color: #111827;
+        margin: 0 0 10px 0;
+        font-family: 'TT Interphases', sans-serif;
+    }
+    
+    .empty-state p {
+        font-size: 14px;
+        color: rgba(17, 24, 39, 0.5);
+        margin: 0;
+        max-width: 300px;
+        margin: 0 auto;
+        line-height: 1.5;
         font-weight: 500;
     }
-
-    /* Responsive Design - DESIGN.md breakpoints */
-    @media (max-width: 1100px) {
-        .reference-requests-grid {
-            grid-template-columns: repeat(2, 1fr);
+        font-family: 'TT Interphases', sans-serif;
+    }
+    
+    /* Animations - DESIGN.md Section 2 */
+    @keyframes fadeSlideUp {
+        from {
+            opacity: 0;
+            transform: translateY(18px) scale(0.985);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0) scale(1);
         }
     }
-
+    
+    @keyframes statusPulse {
+        0%, 100% { opacity: 1; transform: scale(1); }
+        50% { opacity: 0.5; transform: scale(1.1); }
+    }
+    
+    /* Responsive */
     @media (max-width: 768px) {
-        .page-header-section {
-            flex-direction: column;
-            align-items: stretch;
-        }
-        
-        .header-stats {
-            justify-content: flex-start;
-        }
-        
         .filter-tabs-container {
             flex-direction: column;
             align-items: stretch;
@@ -693,175 +981,173 @@ $rejectedRequests = 1;
             min-width: 100%;
         }
         
-        .reference-requests-grid {
+        .form-row {
+            flex-direction: column;
+            gap: 0;
+        }
+        
+        .requests-grid {
             grid-template-columns: 1fr;
         }
     }
-
-    @media (max-width: 640px) {
-        .main-page-title {
-            font-size: 20px;
-        }
-        
-        .header-stats {
-            flex-direction: column;
-        }
-        
-        .stat-pill {
-            width: 100%;
-            justify-content: space-between;
-        }
-    }
-
-    /* ====== DARK MODE - DESIGN.md Section 1.2 ====== */
-    html[data-theme="dark"] .back-button {
-        color: #81C784;
-    }
-
-    html[data-theme="dark"] .back-button:hover {
-        color: #a5d6a7;
-    }
-
-    html[data-theme="dark"] .main-page-title {
-        color: #f0f0f0;
-    }
-
-    html[data-theme="dark"] .page-description {
-        color: #b0b0b0;
-    }
-
-    html[data-theme="dark"] .stat-pill {
-        background: rgba(255, 255, 255, 0.06);
-        border-color: rgba(255, 255, 255, 0.1);
-        color: #e0e0e0;
-    }
-
-    html[data-theme="dark"] .stat-pill strong {
-        color: #81C784;
-    }
-
-    html[data-theme="dark"] .stat-pill .stat-label {
-        color: #b0b0b0;
-    }
-
-    html[data-theme="dark"] .filter-tabs {
-        background: rgba(255, 255, 255, 0.04);
-    }
-
-    html[data-theme="dark"] .filter-tab {
-        color: #b0b0b0;
-    }
-
-    html[data-theme="dark"] .filter-tab:hover {
-        color: #81C784;
-        background: rgba(255, 255, 255, 0.06);
-    }
-
-    html[data-theme="dark"] .filter-tab.active {
-        background: #0F7A53;
-    }
-
-    html[data-theme="dark"] .filter-tab .tab-count {
-        background: rgba(255, 255, 255, 0.1);
-    }
-
-    html[data-theme="dark"] .search-bar {
-        background: #2d2d2d;
-        border-color: #404040;
-    }
-
-    html[data-theme="dark"] .search-bar input {
-        color: #e0e0e0;
-    }
-
-    html[data-theme="dark"] .search-bar .search-icon {
-        color: #808080;
-    }
-
-    html[data-theme="dark"] .reference-request-card {
+    
+    /* Dark Mode - DESIGN.md Section 1.2 */
+    html[data-theme="dark"] .request-card {
         background-color: #1e1e1e !important;
         border-color: #333 !important;
         box-shadow: 0 4px 18px rgba(0, 0, 0, 0.25) !important;
     }
-
-    html[data-theme="dark"] .reference-request-card:hover {
-        border-color: #444 !important;
-        box-shadow: 0 12px 36px rgba(0, 0, 0, 0.4) !important;
+    
+    html[data-theme="dark"] .search-bar {
+        background: #2d2d2d;
+        border-color: #404040;
     }
-
-    html[data-theme="dark"] .requester-name {
-        color: #f0f0f0;
-    }
-
-    html[data-theme="dark"] .requester-role {
-        color: #81C784;
-    }
-
-    html[data-theme="dark"] .course-info {
-        background: rgba(255, 255, 255, 0.04);
-    }
-
-    html[data-theme="dark"] .course-code {
-        background: #0F7A53;
-    }
-
-    html[data-theme="dark"] .course-name {
-        color: #b0b0b0;
-    }
-
-    html[data-theme="dark"] .request-type {
-        color: #b0b0b0;
-    }
-
-    html[data-theme="dark"] .material-title {
+    
+    html[data-theme="dark"] .search-bar input {
         color: #e0e0e0;
     }
-
-    html[data-theme="dark"] .material-detail-item {
-        background: rgba(255, 255, 255, 0.06);
+    
+    html[data-theme="dark"] .form-group input,
+    html[data-theme="dark"] .form-group textarea {
+        background: #2d2d2d;
         border-color: #404040;
-        color: #b0b0b0;
+        color: #e0e0e0;
     }
-
-    html[data-theme="dark"] .request-header {
+    
+    /* Main Content Container Wrapper */
+    .main-page-content-container {
+        background-color: #ffffff;
+        padding: 30px;
+        border-radius: 20px;
+        border: 1px solid rgba(12, 75, 52, 0.12);
+        box-shadow: 0 4px 24px rgba(0, 0, 0, 0.03);
+        margin-top: 10px;
+        animation: fadeSlideUp 0.45s ease-out both;
+    }
+    
+    html[data-theme="dark"] .main-page-content-container {
+        background-color: #1e1e1e !important;
+        border-color: #333 !important;
+        box-shadow: 0 4px 24px rgba(0, 0, 0, 0.2) !important;
+    }
+    
+    /* Adjustments for white container */
+    .filter-tabs-container {
+        margin-bottom: 28px;
+    }
+    
+    .action-bar {
+        margin-bottom: 28px;
+    }
+    
+    html[data-theme="dark"] .premium-modal {
+        background-color: #1e1e1e !important;
+        border-color: #333 !important;
+        box-shadow: 0 22px 64px rgba(0, 0, 0, 0.45) !important;
+    }
+    
+    html[data-theme="dark"] .modal-header {
+        background: linear-gradient(0deg, rgba(255, 255, 255, 0.03), rgba(255, 255, 255, 0.03)), #1e1e1e;
         border-bottom-color: #333;
     }
-
-    html[data-theme="dark"] .action-buttons {
-        border-top-color: #333;
-    }
-
-    html[data-theme="dark"] .request-date {
-        color: #808080;
-    }
-
-    html[data-theme="dark"] .empty-state svg {
-        color: #81C784;
-    }
-
-    html[data-theme="dark"] .empty-state h3 {
+    
+    html[data-theme="dark"] .modal-title {
         color: #f0f0f0;
     }
-
-    html[data-theme="dark"] .empty-state p {
-        color: #b0b0b0;
+    
+    html[data-theme="dark"] .stat-pill {
+        background: rgba(255, 255, 255, 0.04);
+        border-color: rgba(255, 255, 255, 0.08);
+        color: rgba(255, 255, 255, 0.6);
+    }
+    
+    html[data-theme="dark"] .stat-pill strong {
+        color: #81C784;
+    }
+    
+    html[data-theme="dark"] .request-icon-box {
+        background: rgba(255, 255, 255, 0.05);
+        color: #81C784;
+    }
+    
+    html[data-theme="dark"] .request-card.pending .request-icon-box {
+        color: #ffb74d;
+    }
+    
+    html[data-theme="dark"] .request-reason {
+        background: rgba(255, 255, 255, 0.03);
+        border-color: rgba(255, 255, 255, 0.05);
+    }
+    
+    html[data-theme="dark"] .empty-state {
+        background: rgba(255, 255, 255, 0.01);
+        border-color: rgba(255, 255, 255, 0.05);
+    }
+    
+    html[data-theme="dark"] .empty-icon-wrapper {
+        background: rgba(255, 255, 255, 0.03);
+        color: rgba(255, 255, 255, 0.1);
+    }
+    
+    html[data-theme="dark"] .status-badge.pending {
+        background: rgba(255, 183, 77, 0.1);
+        color: #ffb74d;
+        border-color: rgba(255, 183, 77, 0.2);
+    }
+    
+    html[data-theme="dark"] .status-badge.done {
+        background: rgba(129, 199, 132, 0.1);
+        color: #81C784;
+        border-color: rgba(129, 199, 132, 0.2);
+    }
+    
+    html[data-theme="dark"] .processed-on {
+        color: #81C784;
     }
 </style>
 
 <script>
     // Global variables
     let currentFilter = 'PENDING';
-    let searchQuery = '';
+    let allRequests = [];
     
-    // Load all requests data when this page is displayed
+    // Initialize
     document.addEventListener('DOMContentLoaded', function() {
-        displayAllRequests();
+        loadBookRequests();
     });
     
+    // Load book requests
+    function loadBookRequests(status = 'PENDING') {
+        fetch(`api/get_dean_book_requests.php?status=${status}`, {
+            credentials: 'same-origin'
+        })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    allRequests = data.data;
+                    updateStats(data.counts);
+                    renderRequests(allRequests);
+                }
+            })
+            .catch(error => {
+                console.error('Error loading requests:', error);
+            });
+    }
+    
+    // Update stats
+    function updateStats(counts) {
+        document.getElementById('totalCount').textContent = counts.total || 0;
+        document.getElementById('pendingCount').textContent = counts.pending || 0;
+        document.getElementById('doneCount').textContent = counts.done || 0;
+        
+        document.getElementById('pendingTabCount').textContent = counts.pending || 0;
+        document.getElementById('doneTabCount').textContent = counts.done || 0;
+    }
+    
+    // Filter requests
     function filterRequests(status) {
         currentFilter = status;
         
-        // Update active tab state
         document.querySelectorAll('.filter-tab').forEach(tab => {
             tab.classList.remove('active');
         });
@@ -871,109 +1157,18 @@ $rejectedRequests = 1;
             targetTab.classList.add('active');
         }
         
-        // Apply filter and search
-        applyFilters();
+        loadBookRequests(status);
     }
     
-    function searchRequests(query) {
-        searchQuery = query.trim().toLowerCase();
-        
-        // Show/hide clear button
-        const clearBtn = document.getElementById('clearSearchBtn');
-        clearBtn.style.display = searchQuery ? 'block' : 'none';
-        
-        // Apply filter and search
-        applyFilters();
+    // Apply filters
+    function applyRequestFilters() {
+        renderRequests(allRequests);
     }
     
-    function clearSearch() {
-        document.getElementById('requestSearchInput').value = '';
-        searchQuery = '';
-        document.getElementById('clearSearchBtn').style.display = 'none';
-        applyFilters();
-    }
-    
-    function applyFilters() {
-        // Make sure we have access to allRequests
-        if (!window.allRequests) {
-            console.error('No requests data available');
-            return;
-        }
-        
-        // Calculate 30 days ago
-        const thirtyDaysAgo = new Date();
-        thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
-        
-        // Filter requests by status and search query
-        let filteredRequests = window.allRequests.filter(request => {
-            // Status filter
-            if (request.status !== currentFilter) return false;
-            
-            // Date filter for approved/rejected
-            if (currentFilter === 'APPROVED' || currentFilter === 'REJECTED') {
-                const requestDate = new Date(request.request_date || new Date());
-                if (requestDate < thirtyDaysAgo) return false;
-            }
-            
-            // Search filter
-            if (searchQuery) {
-                const searchFields = [
-                    request.course_code,
-                    request.course_name,
-                    request.book_title,
-                    request.requester_name,
-                    request.author_last,
-                    request.isbn
-                ].map(f => (f || '').toLowerCase());
-                
-                const matchesSearch = searchFields.some(field => field.includes(searchQuery));
-                if (!matchesSearch) return false;
-            }
-            
-            return true;
-        });
-        
-        // Update stats
-        updateStats();
-        
-        // Render filtered requests
-        renderRequests(filteredRequests);
-    }
-    
-    function updateStats() {
-        if (!window.allRequests) return;
-        
-        const thirtyDaysAgo = new Date();
-        thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
-        
-        const total = window.allRequests.length;
-        const pending = window.allRequests.filter(r => r.status === 'PENDING').length;
-        const approved = window.allRequests.filter(r => {
-            if (r.status !== 'APPROVED') return false;
-            const requestDate = new Date(r.request_date || new Date());
-            return requestDate >= thirtyDaysAgo;
-        }).length;
-        const rejected = window.allRequests.filter(r => {
-            if (r.status !== 'REJECTED') return false;
-            const requestDate = new Date(r.request_date || new Date());
-            return requestDate >= thirtyDaysAgo;
-        }).length;
-        
-        // Update header stats
-        document.getElementById('totalCount').textContent = total;
-        document.getElementById('pendingCount').textContent = pending;
-        document.getElementById('approvedCount').textContent = approved;
-        document.getElementById('rejectedCount').textContent = rejected;
-        
-        // Update tab counts
-        document.getElementById('pendingTabCount').textContent = pending;
-        document.getElementById('approvedTabCount').textContent = approved;
-        document.getElementById('rejectedTabCount').textContent = rejected;
-    }
-    
+    // Render requests
     function renderRequests(requests) {
-        const grid = document.getElementById('allRequestsGrid');
-        const emptyState = document.getElementById('emptyState');
+        const grid = document.getElementById('requestsGrid');
+        const emptyState = document.getElementById('requestsEmptyState');
         
         if (!grid) return;
         
@@ -982,6 +1177,12 @@ $rejectedRequests = 1;
         if (requests.length === 0) {
             grid.style.display = 'none';
             emptyState.style.display = 'block';
+            
+            const messages = {
+                'PENDING': "You don't have any pending requests.",
+                'DONE': "You don't have any completed requests."
+            };
+            document.getElementById('emptyStateMessage').textContent = messages[currentFilter] || 'No requests found.';
             return;
         }
         
@@ -992,182 +1193,249 @@ $rejectedRequests = 1;
             const card = createRequestCard(request, index);
             grid.appendChild(card);
         });
+        
+        // Re-initialize icons
+        if (window.lucide) {
+            lucide.createIcons();
+        }
     }
     
+    // Create request card
     function createRequestCard(request, index) {
-        // Generate APA citation for display
-        let apaCitation = '';
-        if (request.author_first && request.author_last && request.publication_year) {
-            if (request.author_first === 'Various') {
-                apaCitation = `${request.author_last}, ${request.author_first}. (${request.publication_year}). ${request.book_title}.`;
-            } else {
-                const editionText = request.edition && request.edition !== 'Current' ? ` (${request.edition} ed.)` : '';
-                apaCitation = `${request.author_last}, ${request.author_first.charAt(0)}. (${request.publication_year}). ${request.book_title}${editionText}.`;
-            }
-        } else {
-            apaCitation = request.book_title || 'Unknown Title';
-        }
-        
-        // Get department info from session
-        const departmentCode = '<?php echo $_SESSION["selected_role"]["department_code"] ?? "CCS"; ?>';
-        
         const card = document.createElement('div');
-        card.className = 'reference-request-card';
-        card.setAttribute('data-request-id', request.id);
+        card.className = `request-card ${request.status.toLowerCase()}`;
         card.style.animationDelay = (index * 0.08) + 's';
         
-        // Format date
-        const requestDate = new Date(request.request_date || new Date());
-        const formattedDate = requestDate.toLocaleDateString('en-US', { 
-            year: 'numeric', 
+        const requestedDate = new Date(request.requested_at);
+        const formattedReqDate = requestedDate.toLocaleDateString('en-US', { 
             month: 'short', 
-            day: 'numeric' 
+            day: 'numeric',
+            year: 'numeric'
         });
         
-        // Status badge class
-        const statusClass = request.status.toLowerCase();
+        let processedHtml = '';
+        if (request.status === 'DONE' && request.processed_at) {
+            const procDate = new Date(request.processed_at);
+            const formattedProcDate = procDate.toLocaleDateString('en-US', {
+                month: 'short',
+                day: 'numeric',
+                year: 'numeric'
+            });
+            processedHtml = `<div class="processed-on">Processed: ${formattedProcDate}</div>`;
+        }
+        
+        let actionButtonsHtml = '';
+        if (request.status === 'PENDING') {
+            actionButtonsHtml = `
+                <div class="request-actions">
+                    <button class="action-btn edit-btn" onclick="openEditModal(${request.id})">
+                        <i data-lucide="pencil"></i>
+                        Edit
+                    </button>
+                    <button class="action-btn cancel-btn-action" onclick="openConfirmCancelModal(${request.id})">
+                        <i data-lucide="trash-2"></i>
+                        Remove
+                    </button>
+                </div>
+            `;
+        } else {
+            actionButtonsHtml = `
+                <div class="request-actions">
+                    <button class="action-btn done-btn" disabled>
+                        <i data-lucide="check-circle-2"></i>
+                        Request Completed
+                    </button>
+                </div>
+            `;
+        }
         
         card.innerHTML = `
             <div class="request-header">
-                <div class="requester-info">
-                    <div class="requester-name">${request.requester_name || 'Unknown Requester'}</div>
-                    <div class="requester-role">${departmentCode} Faculty</div>
+                <div class="request-icon-box">
+                    <i data-lucide="book-open"></i>
                 </div>
-                <span class="status-badge ${statusClass}">${request.status}</span>
-            </div>
-
-            <div class="course-info">
-                <span class="course-code">${request.course_code || 'N/A'}</span>
-                <span class="course-name">${request.course_name || 'Unknown Course'}</span>
+                <div class="request-info">
+                    <div class="request-book-title" title="${request.book_title}">${request.book_title}</div>
+                    <div class="request-author">by ${request.author}</div>
+                </div>
             </div>
             
-            <div class="request-summary">
-                <div class="request-type">Course Material Request</div>
-                <div class="material-title">${apaCitation}</div>
-                <div class="material-details">
-                    ${request.isbn ? `<span class="material-detail-item">ISBN: ${request.isbn}</span>` : ''}
-                    ${request.publication_year ? `<span class="material-detail-item">Year: ${request.publication_year}</span>` : ''}
-                    ${request.edition ? `<span class="material-detail-item">Edition: ${request.edition}</span>` : ''}
+            <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 12px; gap: 10px;">
+                <span class="status-badge ${request.status.toLowerCase()}">${request.status === 'DONE' ? 'Done' : 'Pending'}</span>
+                <div style="text-align: right;">
+                    <div class="request-date">Req: ${formattedReqDate}</div>
+                    ${processedHtml}
                 </div>
             </div>
-
-            ${request.status === 'PENDING' ? `
-                <div class="action-buttons">
-                    <button class="approve-btn" onclick="approveRequest(${request.id})">
-                        <i data-lucide="check"></i>
-                        Approve
-                    </button>
-                    <button class="reject-btn" onclick="rejectRequest(${request.id})">
-                        <i data-lucide="x"></i>
-                        Reject
-                    </button>
-                </div>
-                <div class="request-date">Requested on: ${formattedDate}</div>
-            ` : request.status === 'APPROVED' ? `
-                <div class="action-buttons">
-                    <button class="status-approved-btn" disabled>
-                        <i data-lucide="check-circle"></i>
-                        Approved
-                    </button>
-                </div>
-                <div class="request-date">Approved on: ${formattedDate}</div>
-            ` : `
-                <div class="action-buttons">
-                    <button class="status-rejected-btn" disabled>
-                        <i data-lucide="x-circle"></i>
-                        Rejected
-                    </button>
-                </div>
-                <div class="request-date">Rejected on: ${formattedDate}</div>
-            `}
+            
+            <div class="request-details">
+                ${request.isbn ? `<span class="request-detail-item">ISBN: ${request.isbn}</span>` : ''}
+                ${request.publication_year ? `<span class="request-detail-item">Year: ${request.publication_year}</span>` : ''}
+                ${request.publisher ? `<span class="request-detail-item">${request.publisher}</span>` : ''}
+                ${request.edition ? `<span class="request-detail-item">${request.edition}</span>` : ''}
+            </div>
+            
+            <div class="request-reason">
+                <div class="request-reason-label">Requirement Rationale</div>
+                ${request.reason}
+            </div>
+            
+            <div style="margin-top: auto;">
+                ${actionButtonsHtml}
+            </div>
         `;
         
         return card;
     }
     
-    function approveRequest(requestId) {
-        if (confirm('Are you sure you want to approve this course material request?')) {
-            // Here you would typically make an API call to update the database
-            // For now, just show success and refresh
-            showNotification('Request approved successfully!', 'success');
-            
-            // Update the request status locally
-            if (window.allRequests) {
-                const request = window.allRequests.find(r => r.id === requestId);
-                if (request) {
-                    request.status = 'APPROVED';
-                    request.request_date = new Date().toISOString();
+    // Open request modal (new request)
+    function openRequestModal() {
+        document.getElementById('editRequestId').value = '';
+        document.getElementById('modalTitleText').textContent = 'Request New Book';
+        document.getElementById('requestBookForm').reset();
+        document.getElementById('submitBtnText').textContent = 'Submit Request';
+        document.getElementById('requestBookModal').style.display = 'flex';
+    }
+    
+    // Open edit modal
+    function openEditModal(requestId) {
+        const request = allRequests.find(r => r.id === requestId);
+        if (!request) return;
+        
+        document.getElementById('editRequestId').value = requestId;
+        document.getElementById('modalTitleText').textContent = 'Edit Book Request';
+        document.getElementById('requestBookTitle').value = request.book_title;
+        document.getElementById('requestAuthor').value = request.author;
+        document.getElementById('requestIsbn').value = request.isbn || '';
+        document.getElementById('requestYear').value = request.publication_year || '';
+        document.getElementById('requestPublisher').value = request.publisher || '';
+        document.getElementById('requestEdition').value = request.edition || '';
+        document.getElementById('requestReason').value = request.reason || '';
+        
+        document.getElementById('submitBtnText').textContent = 'Save Changes';
+        document.getElementById('requestBookModal').style.display = 'flex';
+    }
+    
+    // Close request modal
+    function closeRequestModal() {
+        document.getElementById('requestBookModal').style.display = 'none';
+    }
+    
+    // Submit book request (new or edit)
+    function submitBookRequest(event) {
+        event.preventDefault();
+        
+        const editRequestId = document.getElementById('editRequestId').value;
+        const isEdit = editRequestId !== '';
+        
+        const formData = {
+            request_id: editRequestId,
+            book_title: document.getElementById('requestBookTitle').value,
+            author: document.getElementById('requestAuthor').value,
+            isbn: document.getElementById('requestIsbn').value,
+            publication_year: document.getElementById('requestYear').value,
+            publisher: document.getElementById('requestPublisher').value,
+            edition: document.getElementById('requestEdition').value,
+            reason: document.getElementById('requestReason').value
+        };
+        
+        const endpoint = isEdit ? 'api/update_book_request.php' : 'api/submit_book_request.php';
+        
+        fetch(endpoint, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            credentials: 'same-origin',
+            body: JSON.stringify(formData)
+        })
+        .then(response => {
+            console.log('Response status:', response.status);
+            return response.text();
+        })
+        .then(text => {
+            console.log('Response text:', text);
+            try {
+                const data = JSON.parse(text);
+                if (data.success) {
+                    closeRequestModal();
+                    showSuccessModal(isEdit ? 'Request Updated' : 'Request Submitted', data.message);
+                    loadBookRequests(currentFilter);
+                } else {
+                    showErrorModal(data.message);
                 }
+            } catch (e) {
+                console.error('JSON parse error:', e);
+                showErrorModal('Server error: ' + text.substring(0, 100));
             }
-            
-            // Refresh the display
-            applyFilters();
-        }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            showErrorModal('Failed to submit request. Please try again.');
+        });
     }
     
-    function rejectRequest(requestId) {
-        if (confirm('Are you sure you want to reject this course material request?')) {
-            // Here you would typically make an API call to update the database
-            // For now, just show success and refresh
-            showNotification('Request rejected successfully!', 'error');
-            
-            // Update the request status locally
-            if (window.allRequests) {
-                const request = window.allRequests.find(r => r.id === requestId);
-                if (request) {
-                    request.status = 'REJECTED';
-                    request.request_date = new Date().toISOString();
-                }
+    // Open confirm cancel modal
+    function openConfirmCancelModal(requestId) {
+        document.getElementById('cancelRequestId').value = requestId;
+        document.getElementById('confirmCancelModal').style.display = 'flex';
+    }
+    
+    // Close confirm cancel modal
+    function closeConfirmCancelModal() {
+        document.getElementById('confirmCancelModal').style.display = 'none';
+    }
+    
+    // Confirm cancel request
+    function confirmCancelRequest() {
+        const requestId = document.getElementById('cancelRequestId').value;
+        
+        fetch('api/cancel_book_request.php', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            credentials: 'same-origin',
+            body: JSON.stringify({ request_id: requestId })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                closeConfirmCancelModal();
+                showSuccessModal('Request Cancelled', data.message);
+                loadBookRequests(currentFilter);
+            } else {
+                showErrorModal(data.message);
             }
-            
-            // Refresh the display
-            applyFilters();
-        }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            showErrorModal('Failed to cancel request. Please try again.');
+        });
     }
     
-    function showNotification(message, type) {
-        // Create notification element
-        const notification = document.createElement('div');
-        notification.style.cssText = `
-            position: fixed;
-            top: 20px;
-            right: 20px;
-            padding: 16px 24px;
-            border-radius: 12px;
-            font-family: 'TT Interphases', sans-serif;
-            font-weight: 600;
-            font-size: 14px;
-            z-index: 10000;
-            animation: fadeSlideUp 0.3s ease-out;
-            ${type === 'success' ? 'background: #0F7A53; color: white; border: 1px solid #0a5f42;' : 'background: #b91c1c; color: white; border: 1px solid #991b1b;'}
-            box-shadow: 0 8px 24px rgba(0,0,0,0.2);
-        `;
-        notification.textContent = message;
-        
-        document.body.appendChild(notification);
-        
-        // Remove after 3 seconds
-        setTimeout(() => {
-            notification.style.animation = 'fadeSlideUp 0.3s ease-out reverse';
-            setTimeout(() => notification.remove(), 300);
-        }, 3000);
+    // Show success modal
+    function showSuccessModal(title, message) {
+        document.getElementById('successTitle').textContent = title;
+        document.getElementById('successMessage').textContent = message;
+        document.getElementById('successModal').style.display = 'flex';
+        if (window.lucide) lucide.createIcons();
     }
     
-    function displayAllRequests() {
-        // Initialize with empty array if not already set
-        if (!window.allRequests) {
-            window.allRequests = [];
-        }
-        
-        // Update stats
-        updateStats();
-        
-        // Set the Pending button as active and filter to show only pending requests
-        const pendingTab = document.querySelector('.filter-tab[data-status="PENDING"]');
-        if (pendingTab) {
-            pendingTab.classList.add('active');
-        }
-        
-        filterRequests('PENDING');
+    // Close success modal
+    function closeSuccessModal() {
+        document.getElementById('successModal').style.display = 'none';
+    }
+    
+    // Show error modal
+    function showErrorModal(message) {
+        document.getElementById('errorMessage').textContent = message;
+        document.getElementById('errorModal').style.display = 'flex';
+        if (window.lucide) lucide.createIcons();
+    }
+    
+    // Close error modal
+    function closeErrorModal() {
+        document.getElementById('errorModal').style.display = 'none';
     }
 </script>

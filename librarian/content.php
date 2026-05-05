@@ -162,6 +162,13 @@ if ($hasOtherRoles) {
       <span>Library Management</span>
     </a>
 
+    <a href="content.php?page=book-requests" class="nav-button hoverable <?php if ($currentPage == 'book-requests') echo 'active'; ?>">
+      <span class="nav-icon-wrapper">
+        <i data-lucide="book-marked"></i>
+      </span>
+      <span>Book Requests</span>
+    </a>
+
     <a href="content.php?page=school-calendar" class="nav-button hoverable <?php if ($currentPage == 'school-calendar') echo 'active'; ?>">
       <span class="nav-icon-wrapper">
         <i data-lucide="calendar"></i>
@@ -221,6 +228,9 @@ if ($hasOtherRoles) {
         break;
       case 'material-processing':
         include './material-processing-content/material-processing.php';
+        break;
+      case 'book-requests':
+        include './book-requests-content/book-requests.php';
         break;
       case 'school-calendar':
         $_GET['page'] = 'school-calendar';
