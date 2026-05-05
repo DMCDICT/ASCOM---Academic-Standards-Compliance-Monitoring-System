@@ -65,7 +65,7 @@ html[data-theme="dark"] {
 /* Base Styles - DESIGN.md section 1 */
 .librarian-dashboard {
     padding: 32px;
-    max-width: 1400px;
+    max-width: 100%;
     margin: 0 auto;
     font-family: 'TT Interphases', sans-serif;
     color: var(--text-primary);

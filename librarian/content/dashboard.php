@@ -10,56 +10,37 @@ $departmentColor = '#C41E3A'; // Default red color
 // Fetch dashboard statistics from database
 $stats = array(
     'total_books' => 0,
-    'compliant_courses' => 0,
-    'non_compliant_courses' => 0
+    'pending_requests' => 0,
+    'processed_this_month' => 0
 );
 
 try {
-    // Calculate statistics directly
-    // 1. Total Books - Count only compliant book references (within 5 years)
-    $totalBooksQuery = "
-        SELECT COUNT(*) as total_books
-        FROM book_references 
-        WHERE (YEAR(CURDATE()) - publication_year) < 5
-    ";
+    // 1. Total Books in Library
+    $totalBooksQuery = "SELECT COUNT(*) as total_books FROM library_books WHERE status = 'available'";
     $totalBooksStmt = $pdo->prepare($totalBooksQuery);
     $totalBooksStmt->execute();
     $totalBooksResult = $totalBooksStmt->fetch(PDO::FETCH_ASSOC);
     $stats['total_books'] = (int)$totalBooksResult['total_books'];
     
-    // 2. Compliant Courses - Count courses with 5 or more compliant books
-    $compliantCoursesQuery = "
-        SELECT COUNT(DISTINCT c.id) as compliant_courses
-        FROM courses c
-        INNER JOIN (
-            SELECT course_id, COUNT(*) as compliant_count
-            FROM book_references 
-            WHERE (YEAR(CURDATE()) - publication_year) < 5
-            GROUP BY course_id
-            HAVING compliant_count >= 5
-        ) compliant ON c.id = compliant.course_id
-    ";
-    $compliantCoursesStmt = $pdo->prepare($compliantCoursesQuery);
-    $compliantCoursesStmt->execute();
-    $compliantCoursesResult = $compliantCoursesStmt->fetch(PDO::FETCH_ASSOC);
-    $stats['compliant_courses'] = (int)$compliantCoursesResult['compliant_courses'];
+    // 2. Pending Book Requests from Deans
+    $pendingRequestsQuery = "SELECT COUNT(*) as pending_count FROM book_requests WHERE status = 'PENDING'";
+    $pendingRequestsStmt = $pdo->prepare($pendingRequestsQuery);
+    $pendingRequestsStmt->execute();
+    $pendingRequestsResult = $pendingRequestsStmt->fetch(PDO::FETCH_ASSOC);
+    $stats['pending_requests'] = (int)$pendingRequestsResult['pending_count'];
     
-    // 3. Non-Compliant Courses - Count courses with less than 5 compliant books
-    $nonCompliantCoursesQuery = "
-        SELECT COUNT(DISTINCT c.id) as non_compliant_courses
-        FROM courses c
-        LEFT JOIN (
-            SELECT course_id, COUNT(*) as compliant_count
-            FROM book_references 
-            WHERE (YEAR(CURDATE()) - publication_year) < 5
-            GROUP BY course_id
-        ) compliant ON c.id = compliant.course_id
-        WHERE COALESCE(compliant.compliant_count, 0) < 5
+    // 3. Processed This Month (completed book requests)
+    $processedThisMonthQuery = "
+        SELECT COUNT(*) as processed_count 
+        FROM book_requests 
+        WHERE status = 'DONE' 
+        AND MONTH(processed_at) = MONTH(CURDATE()) 
+        AND YEAR(processed_at) = YEAR(CURDATE())
     ";
-    $nonCompliantCoursesStmt = $pdo->prepare($nonCompliantCoursesQuery);
-    $nonCompliantCoursesStmt->execute();
-    $nonCompliantCoursesResult = $nonCompliantCoursesStmt->fetch(PDO::FETCH_ASSOC);
-    $stats['non_compliant_courses'] = (int)$nonCompliantCoursesResult['non_compliant_courses'];
+    $processedThisMonthStmt = $pdo->prepare($processedThisMonthQuery);
+    $processedThisMonthStmt->execute();
+    $processedThisMonthResult = $processedThisMonthStmt->fetch(PDO::FETCH_ASSOC);
+    $stats['processed_this_month'] = (int)$processedThisMonthResult['processed_count'];
     
 } catch (Exception $e) {
     // Use default values if database query fails
@@ -86,9 +67,6 @@ $currentDate = date('F j, Y');
                 <i data-lucide="calendar" style="width: 16px; height: 16px;"></i>
                 <?php echo $currentDate; ?>
             </div>
-            <div class="dept-badge">
-                <?php echo htmlspecialchars($departmentCode); ?> Librarian
-            </div>
         </div>
     </div>
 
@@ -96,45 +74,45 @@ $currentDate = date('F j, Y');
     <div class="dashboard-stats-grid">
         <div class="box">
             <div class="box-icon">
-                <i data-lucide="book-check"></i>
+                <i data-lucide="library"></i>
             </div>
             <div class="box-content">
-                <span class="box-label">Compliant Books</span>
+                <span class="box-label">Total Books</span>
                 <h3 class="amount"><?php echo number_format($stats['total_books']); ?></h3>
-                <span class="amount-sub">Within 5-year range</span>
+                <span class="amount-sub">In library collection</span>
             </div>
         </div>
         
         <div class="box">
             <div class="box-icon" style="background: rgba(21, 101, 192, 0.08); color: #1565C0;">
-                <i data-lucide="graduation-cap"></i>
+                <i data-lucide="shopping-cart"></i>
             </div>
             <div class="box-content">
-                <span class="box-label">Compliant Courses</span>
-                <h3 class="amount" style="color: #1565C0;"><?php echo number_format($stats['compliant_courses']); ?></h3>
-                <span class="amount-sub">5+ compliant books</span>
+                <span class="box-label">Pending Requests</span>
+                <h3 class="amount" style="color: #1565C0;"><?php echo number_format($stats['pending_requests']); ?></h3>
+                <span class="amount-sub">From department deans</span>
             </div>
         </div>
 
         <div class="box">
             <div class="box-icon" style="background: rgba(185, 28, 28, 0.08); color: #b91c1c;">
-                <i data-lucide="alert-circle"></i>
+                <i data-lucide="check-circle"></i>
             </div>
             <div class="box-content">
-                <span class="box-label">Non-Compliant</span>
-                <h3 class="amount" style="color: #b91c1c;"><?php echo number_format($stats['non_compliant_courses']); ?></h3>
-                <span class="amount-sub">Needs attention</span>
+                <span class="box-label">Processed This Month</span>
+                <h3 class="amount" style="color: #b91c1c;"><?php echo number_format($stats['processed_this_month']); ?></h3>
+                <span class="amount-sub">Book requests completed</span>
             </div>
         </div>
     </div>
 
     <!-- Quick Actions -->
     <div class="quick-actions">
-        <a href="content.php?page=library-management" class="quick-action">
+        <button class="quick-action" onclick="openAddBookModal()">
             <div class="qa-icon"><i data-lucide="plus"></i></div>
             <span>Add New Book</span>
-        </a>
-        <a href="content.php?page=material-processing" class="quick-action">
+        </button>
+        <a href="content.php?page=book-requests" class="quick-action">
             <div class="qa-icon"><i data-lucide="clipboard-list"></i></div>
             <span>Process Requests</span>
         </a>
@@ -142,120 +120,10 @@ $currentDate = date('F j, Y');
             <div class="qa-icon"><i data-lucide="tags"></i></div>
             <span>New Classification</span>
         </button>
-        <a href="content.php?page=reports" class="quick-action">
+        <button class="quick-action" onclick="openReportsModal()">
             <div class="qa-icon"><i data-lucide="file-text"></i></div>
-            <span>Generate Reports</span>
-        </a>
-    </div>
-
-    <!-- Material Processing Section -->
-    <div class="dashboard-section">
-        <div class="dashboard-section__top">
-            <div class="section-header">
-                <div class="label-bar"></div>
-                <div class="header-content">
-                    <h3>Material Processing</h3>
-                    <p>Books and materials currently being processed for library cataloging</p>
-                </div>
-            </div>
-            <div class="header-actions">
-                <a href="content.php?page=material-processing" class="view-all-btn">
-                    <i data-lucide="external-link" style="width: 14px; height: 14px;"></i>
-                    View All
-                </a>
-                <div class="nav-controls">
-                    <button class="nav-btn" id="prevBtn" onclick="showPreviousMaterials()">
-                        <i data-lucide="chevron-left"></i>
-                    </button>
-                    <button class="nav-btn" id="nextBtn" onclick="showNextMaterials()">
-                        <i data-lucide="chevron-right"></i>
-                    </button>
-                </div>
-            </div>
-        </div>
-        </div>
-        
-        <div class="material-processing-container" id="materialProcessingContainer">
-            <div class="material-processing-grid" id="materialProcessingGrid">
-                <!-- Material processing cards will be dynamically generated here -->
-            </div>
-            <!-- Empty state message -->
-            <div id="emptyStateMessage" class="empty-state" style="display: none;">
-                <i data-lucide="check-circle" style="width: 48px; height: 48px; margin-bottom: 16px;"></i>
-                <h3>All Caught Up!</h3>
-                <p>There are no pending materials to process at the moment.</p>
-            </div>
-        </div>
-        
-        <div class="section-footer">
-            <button
-                type="button"
-                id="materialSectionToggleBtn"
-                class="btn-ghost section-toggle-btn"
-                aria-controls="materialProcessingContainer"
-                aria-expanded="true"
-                onclick="toggleMaterialSection()"
-                title="Collapse/expand this section"
-            >
-                <span class="toggle-label">Collapse</span>
-                <i data-lucide="chevron-up" class="toggle-icon" style="width: 16px; height: 16px;"></i>
-            </button>
-        </div>
-    </div>
-
-    <!-- Material Requests from Deans Section -->
-    <div class="dashboard-section" style="margin-bottom: 40px;">
-        <div class="dashboard-section__top">
-            <div class="section-header">
-                <div class="label-bar" style="background: linear-gradient(180deg, #7C3AED 0%, #A78BFA 100%);"></div>
-                <div class="header-content">
-                    <h3>Material Requests from Deans</h3>
-                    <p>Book requests from department deans for non-compliant courses</p>
-                </div>
-            </div>
-            <div class="header-actions">
-                <div class="filter-buttons" style="display: flex; gap: 8px; background: rgba(0,0,0,0.03); padding: 6px; border-radius: 14px;">
-                    <button class="filter-btn active" onclick="filterMaterialRequests('pending')" id="mrPendingBtn" style="padding: 8px 16px; border-radius: 8px; border: none; font-weight: 600; cursor: pointer;">Pending</button>
-                    <button class="filter-btn" onclick="filterMaterialRequests('processing')" id="mrProcessingBtn" style="padding: 8px 16px; border-radius: 8px; border: none; font-weight: 600; cursor: pointer;">Processing</button>
-                    <button class="filter-btn" onclick="filterMaterialRequests('completed')" id="mrCompletedBtn" style="padding: 8px 16px; border-radius: 8px; border: none; font-weight: 600; cursor: pointer;">Completed</button>
-                </div>
-            </div>
-        </div>
-        
-        <div class="material-processing-container">
-            <div class="material-processing-grid" id="materialRequestsGrid">
-                <!-- Material requests will be dynamically generated here -->
-            </div>
-            <div id="materialRequestsEmptyState" class="empty-state" style="display: none;">
-                <i data-lucide="inbox" style="width: 48px; height: 48px; margin-bottom: 16px;"></i>
-                <h3>No Requests</h3>
-                <p>No material requests at the moment.</p>
-            </div>
-        </div>
-    </div>
-
-    <!-- Newly Acquired Books Section -->
-    <div class="dashboard-section">
-        <div class="dashboard-section__top">
-            <div class="section-header">
-                <div class="label-bar" style="background: linear-gradient(180deg, #1565C0 0%, #42A5F5 100%);"></div>
-                <div class="header-content">
-                    <h3>Newly Acquired Books</h3>
-                    <p>Recent additions to the collection from all library locations</p>
-                </div>
-            </div>
-        </div>
-
-        <div class="material-processing-container">
-            <div class="newly-acquired-container" id="newlyAcquiredBooksGrid">
-                <!-- Newly acquired book cards will be dynamically generated here -->
-            </div>
-            <div id="newlyAcquiredEmptyState" class="empty-state">
-                <i data-lucide="book" style="width: 48px; height: 48px; margin-bottom: 16px;"></i>
-                <h3>No New Additions</h3>
-                <p>Newly cataloged books will appear here for quick review.</p>
-            </div>
-        </div>
+            <span>View Reports</span>
+        </button>
     </div>
 
     <!-- Classification Management Section -->
@@ -307,6 +175,12 @@ $currentDate = date('F j, Y');
 
 
 <style>
+/* Loading Spinner Animation */
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
 /* Modal styles for Complete Cataloging */
 .modal-overlay {
     position: fixed;
@@ -657,17 +531,179 @@ $currentDate = date('F j, Y');
     </div>
 </div>
 
+<!-- Reports Modal -->
+<div id="reportsModal" class="modal-overlay" style="display: none;">
+    <div class="modal-box" style="max-width: 600px; width: 95%;">
+        <div class="modal-header">
+            <div class="modal-title-wrapper" style="display: flex; align-items: center; gap: 12px;">
+                <div class="modal-icon-header" style="background: var(--primary-tint); color: var(--primary); width: 40px; height: 40px; border-radius: 10px; display: flex; align-items: center; justify-content: center;">
+                    <i data-lucide="file-text"></i>
+                </div>
+                <h2 class="modal-title">Library Reports</h2>
+            </div>
+            <button class="modal-close" onclick="closeReportsModal()">
+                <i data-lucide="x"></i>
+            </button>
+        </div>
+        
+        <div class="modal-body" style="padding: 24px;">
+            <div class="reports-grid" style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; margin-bottom: 24px;">
+                <div class="report-card" onclick="generateReport('compliance')" style="padding: 20px; border: 1px solid var(--primary-border); border-radius: 12px; cursor: pointer; transition: all 0.2s; text-align: center;">
+                    <i data-lucide="shield-check" style="width: 32px; height: 32px; color: var(--primary); margin-bottom: 12px;"></i>
+                    <div style="font-weight: 700; color: #111827; margin-bottom: 4px;">Compliance Report</div>
+                    <div style="font-size: 12px; color: #666;">Course compliance status</div>
+                </div>
+                <div class="report-card" onclick="generateReport('books')" style="padding: 20px; border: 1px solid var(--primary-border); border-radius: 12px; cursor: pointer; transition: all 0.2s; text-align: center;">
+                    <i data-lucide="book-open" style="width: 32px; height: 32px; color: var(--primary); margin-bottom: 12px;"></i>
+                    <div style="font-weight: 700; color: #111827; margin-bottom: 4px;">Book Inventory</div>
+                    <div style="font-size: 12px; color: #666;">Complete book list</div>
+                </div>
+                <div class="report-card" onclick="generateReport('requests')" style="padding: 20px; border: 1px solid var(--primary-border); border-radius: 12px; cursor: pointer; transition: all 0.2s; text-align: center;">
+                    <i data-lucide="shopping-cart" style="width: 32px; height: 32px; color: var(--primary); margin-bottom: 12px;"></i>
+                    <div style="font-weight: 700; color: #111827; margin-bottom: 4px;">Request Summary</div>
+                    <div style="font-size: 12px; color: #666;">Book requests overview</div>
+                </div>
+                <div class="report-card" onclick="generateReport('classification')" style="padding: 20px; border: 1px solid var(--primary-border); border-radius: 12px; cursor: pointer; transition: all 0.2s; text-align: center;">
+                    <i data-lucide="tags" style="width: 32px; height: 32px; color: var(--primary); margin-bottom: 12px;"></i>
+                    <div style="font-weight: 700; color: #111827; margin-bottom: 4px;">Classification</div>
+                    <div style="font-size: 12px; color: #666;">Library classifications</div>
+                </div>
+            </div>
+            
+            <div id="reportContent" style="display: none; margin-top: 20px; padding: 16px; background: #f9fafb; border-radius: 12px;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+                    <h4 id="reportTitle" style="margin: 0; font-size: 16px; font-weight: 700; color: #111827;"></h4>
+                    <button onclick="downloadReport()" style="padding: 8px 16px; background: var(--primary); color: white; border: none; border-radius: 8px; font-weight: 600; cursor: pointer; font-size: 13px;">
+                        <i data-lucide="download" style="width: 14px; height: 14px; margin-right: 6px;"></i> Download
+                    </button>
+                </div>
+                <div id="reportData" style="font-size: 14px; color: #4b5563;"></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Process Material Request Modal -->
+<div id="processRequestModal" class="modal-overlay" style="display: none;">
+    <div class="modal-box" style="max-width: 520px;">
+        <div class="modal-header">
+            <div class="modal-title-wrapper" style="display: flex; align-items: center; gap: 12px;">
+                <div class="modal-icon-header" style="background: #EEF2FF; color: #4338CA; width: 40px; height: 40px; border-radius: 10px; display: flex; align-items: center; justify-content: center;">
+                    <i data-lucide="check-circle"></i>
+                </div>
+                <h2 class="modal-title">Process Request</h2>
+            </div>
+            <button class="modal-close" onclick="closeProcessRequestModal()">
+                <i data-lucide="x"></i>
+            </button>
+        </div>
+        <div class="modal-body" style="padding: 24px;">
+            <p style="font-size: 14px; color: var(--text-muted); margin-bottom: 20px; font-weight: 600;">Mark this material request as being processed.</p>
+            <input type="hidden" id="processingRequestId" value="">
+            <div class="form-group" style="margin-bottom: 20px;">
+                <label class="form-label">Notes (optional)</label>
+                <textarea id="processingNotes" rows="3" class="form-input" placeholder="Add any notes about this request..." style="width: 100%; border-radius: 10px; border: 1px solid var(--primary-border); font-family: 'TT Interphases', sans-serif; padding: 12px 14px; resize: vertical;"></textarea>
+            </div>
+            <div class="modal-footer" style="display: flex; gap: 12px; justify-content: flex-end;">
+                <button type="button" class="btn-secondary" onclick="closeProcessRequestModal()" style="padding: 12px 24px; background: #fff; border: 1px solid var(--primary-border); border-radius: 10px; cursor: pointer; font-weight: 700; color: var(--text-muted); font-family: 'TT Interphases', sans-serif;">Cancel</button>
+                <button type="button" onclick="confirmProcessRequest()" class="btn-primary" style="padding: 12px 24px; border-radius: 10px;">Process Request</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Complete Material Request Modal -->
+<div id="completeRequestModal" class="modal-overlay" style="display: none;">
+    <div class="modal-box" style="max-width: 520px;">
+        <div class="modal-header">
+            <div class="modal-title-wrapper" style="display: flex; align-items: center; gap: 12px;">
+                <div class="modal-icon-header" style="background: #ECFDF5; color: #059669; width: 40px; height: 40px; border-radius: 10px; display: flex; align-items: center; justify-content: center;">
+                    <i data-lucide="check-circle-2"></i>
+                </div>
+                <h2 class="modal-title">Complete Request</h2>
+            </div>
+            <button class="modal-close" onclick="closeCompleteRequestModal()">
+                <i data-lucide="x"></i>
+            </button>
+        </div>
+        <div class="modal-body" style="padding: 24px;">
+            <p style="font-size: 14px; color: var(--text-muted); margin-bottom: 20px; font-weight: 600;">Mark this material request as completed.</p>
+            <input type="hidden" id="completingRequestId" value="">
+            <div class="form-group" style="margin-bottom: 20px;">
+                <label class="form-label">Completion Notes</label>
+                <textarea id="completionNotes" rows="3" class="form-input" placeholder="Add completion notes..." style="width: 100%; border-radius: 10px; border: 1px solid var(--primary-border); font-family: 'TT Interphases', sans-serif; padding: 12px 14px; resize: vertical;"></textarea>
+            </div>
+            <div class="modal-footer" style="display: flex; gap: 12px; justify-content: flex-end;">
+                <button type="button" class="btn-secondary" onclick="closeCompleteRequestModal()" style="padding: 12px 24px; background: #fff; border: 1px solid var(--primary-border); border-radius: 10px; cursor: pointer; font-weight: 700; color: var(--text-muted); font-family: 'TT Interphases', sans-serif;">Cancel</button>
+                <button type="button" onclick="confirmCompleteRequest()" class="btn-primary" style="padding: 12px 24px; border-radius: 10px; background: #059669;">Complete</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Reject Material Request Modal -->
+<div id="rejectRequestModal" class="modal-overlay" style="display: none;">
+    <div class="modal-box" style="max-width: 520px;">
+        <div class="modal-header">
+            <div class="modal-title-wrapper" style="display: flex; align-items: center; gap: 12px;">
+                <div class="modal-icon-header" style="background: #FEF2F2; color: #DC2626; width: 40px; height: 40px; border-radius: 10px; display: flex; align-items: center; justify-content: center;">
+                    <i data-lucide="x-circle"></i>
+                </div>
+                <h2 class="modal-title">Reject Request</h2>
+            </div>
+            <button class="modal-close" onclick="closeRejectRequestModal()">
+                <i data-lucide="x"></i>
+            </button>
+        </div>
+        <div class="modal-body" style="padding: 24px;">
+            <p style="font-size: 14px; color: var(--text-muted); margin-bottom: 20px; font-weight: 600;">Please provide a reason for rejecting this request.</p>
+            <input type="hidden" id="rejectingRequestId" value="">
+            <div class="form-group" style="margin-bottom: 20px;">
+                <label class="form-label">Rejection Reason <span style="color: var(--danger);">*</span></label>
+                <textarea id="rejectionReason" rows="4" required class="form-input" placeholder="Enter reason for rejection..." style="width: 100%; border-radius: 10px; border: 1px solid var(--primary-border); font-family: 'TT Interphases', sans-serif; padding: 12px 14px; resize: vertical;"></textarea>
+            </div>
+            <div class="modal-footer" style="display: flex; gap: 12px; justify-content: flex-end;">
+                <button type="button" class="btn-secondary" onclick="closeRejectRequestModal()" style="padding: 12px 24px; background: #fff; border: 1px solid var(--primary-border); border-radius: 10px; cursor: pointer; font-weight: 700; color: var(--text-muted); font-family: 'TT Interphases', sans-serif;">Cancel</button>
+                <button type="button" onclick="confirmRejectRequest()" class="btn-primary" style="padding: 12px 24px; border-radius: 10px; background: #DC2626;">Reject Request</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Success Modal -->
+<div id="dashboardSuccessModal" class="modal-overlay" style="display: none;">
+    <div class="modal-box" style="max-width: 420px; text-align: center; padding: 40px 32px;">
+        <div class="success-icon-wrapper" style="width: 80px; height: 80px; background: #ECFDF5; color: #10B981; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 24px;">
+            <i data-lucide="check-circle-2" style="width: 48px; height: 48px;"></i>
+        </div>
+        <h2 style="font-size: 24px; font-weight: 800; color: #111827; margin-bottom: 12px;" id="dashboardSuccessTitle">Success!</h2>
+        <p id="dashboardSuccessMessage" style="font-size: 15px; color: #4B5563; line-height: 1.6; margin-bottom: 32px;">Operation completed successfully.</p>
+        <button type="button" onclick="closeDashboardSuccessModal()" class="btn-primary" style="width: 100%; height: 48px; border-radius: 10px; font-weight: 700;">Great!</button>
+    </div>
+</div>
+
+<!-- Error Modal -->
+<div id="dashboardErrorModal" class="modal-overlay" style="display: none;">
+    <div class="modal-box" style="max-width: 420px; text-align: center; padding: 40px 32px;">
+        <div class="error-icon-wrapper" style="width: 80px; height: 80px; background: #FEF2F2; color: #EF4444; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 24px;">
+            <i data-lucide="alert-circle" style="width: 48px; height: 48px;"></i>
+        </div>
+        <h2 style="font-size: 24px; font-weight: 800; color: #111827; margin-bottom: 12px;">Error</h2>
+        <p id="dashboardErrorMessage" style="font-size: 15px; color: #4B5563; line-height: 1.6; margin-bottom: 32px;">An error occurred.</p>
+        <button type="button" onclick="closeDashboardErrorModal()" class="btn-primary" style="width: 100%; height: 48px; border-radius: 10px; font-weight: 700; background: #EF4444;">Close</button>
+    </div>
+</div>
+
 
 <script>
-// Material Processing Variables
-let allMaterials = [];
-let currentPage = 0;
-let materialsPerPage = 4;
-
 // Classification Management Variables
 let allClassifications = [];
 let currentClassificationPage = 0;
 let classificationsPerPage = 3;
+let isLoadingClassifications = false;
+
+// Material Requests Variables
+let isLoadingMaterialRequests = false;
 
 
 // (Sample classification data removed – dashboard now shows only real DB data)
@@ -675,10 +711,6 @@ let classificationsPerPage = 3;
 
 // Initialize both sections
 document.addEventListener('DOMContentLoaded', function() {
-    
-    // Load processing materials from database
-    loadProcessingMaterials();
-    
     
     // Load classifications from database
     loadClassificationsFromDatabase();
@@ -716,760 +748,6 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 });
-
-function displayCurrentPage() {
-    const grid = document.getElementById('materialProcessingGrid');
-    const emptyStateMessage = document.getElementById('emptyStateMessage');
-    if (!grid) return;
-    
-    // allMaterials is already filtered to only include processing materials
-    const startIndex = currentPage * materialsPerPage;
-    const endIndex = startIndex + materialsPerPage;
-    const currentMaterials = allMaterials.slice(startIndex, endIndex);
-    
-    // Show empty state message if no materials and container is expanded
-    if (allMaterials.length === 0) {
-        grid.innerHTML = '';
-        const container = document.querySelector('.material-processing-container');
-        if (emptyStateMessage && container && container.style.display !== 'none') {
-            emptyStateMessage.style.display = 'block';
-        }
-    } else {
-        grid.innerHTML = currentMaterials.map(material => createMaterialCard(material)).join('');
-        if (emptyStateMessage) {
-            emptyStateMessage.style.display = 'none';
-        }
-    }
-    
-}
-
-function updateSectionState() {
-    const section = document.querySelector('.dashboard-section');
-    const container = section.querySelector('.material-processing-container');
-    const footer = section.querySelector('.section-footer');
-    const headerActions = section.querySelector('.header-actions');
-    const emptyStateMessage = document.getElementById('emptyStateMessage');
-    const existingCollapsedControls = section.querySelector('.collapsed-controls');
-    
-    // Remove any dynamically created collapsed controls
-    if (existingCollapsedControls) {
-        existingCollapsedControls.remove();
-    }
-    
-    if (allMaterials.length === 0) {
-        // Empty state: collapse and show badge + expand button in header actions area
-        container.style.display = 'none';
-        footer.style.display = 'none';
-        
-        // Hide navigation buttons and replace with collapsed controls
-        headerActions.style.display = 'none';
-        
-        // Create collapsed controls in header actions area
-        const collapsedControls = document.createElement('div');
-        collapsedControls.className = 'collapsed-controls';
-        collapsedControls.style.display = 'flex';
-        collapsedControls.innerHTML = `
-            <div class="request-count-badge" style="background: #95a5a6; color: white;">0</div>
-            <button class="expand-btn" onclick="toggleMaterialSection()">
-                <span>Expand</span>
-                <i data-lucide="chevron-down" style="width: 14px; height: 14px;"></i>
-            </button>
-        `;
-        
-        // Re-initialize Lucide icons for the newly injected content
-        if (typeof lucide !== 'undefined') {
-            lucide.createIcons({
-                attrs: {
-                    class: 'lucide'
-                },
-                nameAttr: 'data-lucide',
-                target: collapsedControls
-            });
-        }
-        
-        // Insert collapsed controls where header-actions was
-        const sectionHeader = section.querySelector('.section-header');
-        sectionHeader.appendChild(collapsedControls);
-    } else {
-        // Has materials: expand and show list
-        container.style.display = 'block';
-        footer.style.display = 'flex';
-        headerActions.style.display = 'flex';
-
-        const toggleBtn = document.getElementById('materialSectionToggleBtn');
-        if (toggleBtn) {
-            toggleBtn.setAttribute('aria-expanded', 'true');
-            const label = toggleBtn.querySelector('.toggle-label');
-            if (label) label.textContent = 'Collapse';
-        }
-        
-        // Hide empty state message
-        if (emptyStateMessage) {
-            emptyStateMessage.style.display = 'none';
-        }
-    }
-}
-
-function createMaterialCard(material) {
-    const statusClass = `status-${material.status}`;
-    const statusText = material.status.charAt(0).toUpperCase() + material.status.slice(1);
-    
-    // Get department color from material data
-    const departmentColor = material.departmentColor || '#C41E3A';
-    
-    // Create action buttons based on status
-    let actionButtons = '';
-    if (material.status === 'processing') {
-        actionButtons = `
-            <button class="action-btn catalog-btn" onclick="startCataloging(${material.id})">Start Cataloging</button>
-            <button class="action-btn draft-btn" onclick="draftRequest(${material.id})">Draft</button>
-        `;
-    } else if (material.status === 'completed') {
-        actionButtons = `
-            <button class="action-btn process-btn" onclick="navigateToCourseDetails('${material.courseCode}')">Navigate</button>
-        `;
-    } else if (material.status === 'drafted') {
-        actionButtons = `
-            <button class="action-btn resume-btn" onclick="resumeProcessing(${material.id})">Resume</button>
-        `;
-    }
-    
-    return `
-        <div class="material-card">
-            <div class="material-header">
-                <div class="requester-info">
-                    <div class="requester-name">${material.requesterName}</div>
-                    <div class="requester-role" style="color: ${departmentColor};">${material.requesterRole}</div>
-                </div>
-                <div class="material-status ${statusClass}">${material.status}</div>
-            </div>
-            
-            <div class="course-info">
-                <div class="course-code">${material.courseCode}</div>
-                <div class="course-name">${material.courseName}</div>
-            </div>
-            
-            <div class="request-summary">
-                <div class="material-title">${material.materialTitle}</div>
-            </div>
-            
-            
-            <div class="material-actions">
-                ${actionButtons}
-            </div>
-            
-            <div class="request-date">Submitted: ${formatDate(material.requestDate)}</div>
-        </div>
-    `;
-}
-
-function formatAPACitation(material) {
-    // APA 7th Edition format: Author, A. A. (Year). Title of work. Publisher.
-    const authorParts = material.author.split(' ');
-    const lastName = authorParts[authorParts.length - 1];
-    const firstName = authorParts.slice(0, -1).join(' ');
-    const initials = firstName.split(' ').map(name => name.charAt(0) + '.').join(' ');
-    
-    const year = new Date().getFullYear(); // Using current year as placeholder
-    const title = material.title;
-    
-    return `${lastName}, ${initials} (${year}). ${title}.`;
-}
-
-function formatDate(dateString) {
-    const date = new Date(dateString);
-    return date.toLocaleDateString('en-US', { 
-        year: 'numeric', 
-        month: 'short', 
-        day: 'numeric' 
-    });
-}
-
-function showPreviousMaterials() {
-    if (currentPage > 0) {
-        currentPage--;
-        displayCurrentPage();
-        updateNavigationButtons();
-    }
-}
-
-function showNextMaterials() {
-    const maxPage = Math.ceil(allMaterials.length / materialsPerPage) - 1;
-    if (currentPage < maxPage) {
-        currentPage++;
-        displayCurrentPage();
-        updateNavigationButtons();
-    }
-}
-
-function updateNavigationButtons() {
-    const prevBtn = document.getElementById('prevBtn');
-    const nextBtn = document.getElementById('nextBtn');
-    const totalMaterials = allMaterials.length;
-    const totalPages = Math.ceil(totalMaterials / materialsPerPage);
-
-    // Hide prev button on first page
-    if (currentPage === 0) {
-        prevBtn.style.display = 'none';
-    } else {
-        prevBtn.style.display = 'inline-flex';
-    }
-
-    // Hide next button on last page
-    if (currentPage >= totalPages - 1) {
-        nextBtn.style.display = 'none';
-    } else {
-        nextBtn.style.display = 'inline-flex';
-    }
-
-    // Hide both buttons if there's only one page or no materials
-    if (totalMaterials <= materialsPerPage) {
-        prevBtn.style.display = 'none';
-        nextBtn.style.display = 'none';
-    }
-}
-
-function toggleMaterialSection() {
-    
-    const section = document.querySelector('.dashboard-section');
-    const container = section.querySelector('.material-processing-container');
-    const footer = section.querySelector('.section-footer');
-    const collapseBtn = section.querySelector('.collapse-btn');
-    const headerActions = section.querySelector('.header-actions');
-    const emptyStateMessage = document.getElementById('emptyStateMessage');
-    const existingCollapsedControls = section.querySelector('.collapsed-controls');
-    
-    
-    
-    // Check if container is currently hidden
-    const isCurrentlyHidden = container.style.display === 'none';
-    
-    const toggleBtn = document.getElementById('materialSectionToggleBtn');
-    
-    if (isCurrentlyHidden) {
-        // Expand - show normal layout
-        container.style.display = 'block';
-        footer.style.display = 'flex';
-        
-        // Remove collapsed controls from header
-        if (existingCollapsedControls) {
-            existingCollapsedControls.remove();
-        }
-        
-        // Restore the navigation buttons
-        headerActions.style.display = 'flex';
-
-        // Update footer toggle button state
-        if (toggleBtn) {
-            toggleBtn.setAttribute('aria-expanded', 'true');
-            const label = toggleBtn.querySelector('.toggle-label');
-            if (label) label.textContent = 'Collapse';
-        }
-        
-        // Show empty state message if no materials
-        if (allMaterials.length === 0 && emptyStateMessage) {
-            emptyStateMessage.style.display = 'block';
-        }
-        
-    } else {
-        // Collapse - just replace navigation buttons with red badge + expand button
-        container.style.display = 'none';
-        footer.style.display = 'none';
-        
-        // Hide the navigation buttons
-        headerActions.style.display = 'none';
-
-        // Update footer toggle button state (even though footer is hidden)
-        if (toggleBtn) {
-            toggleBtn.setAttribute('aria-expanded', 'false');
-            const label = toggleBtn.querySelector('.toggle-label');
-            if (label) label.textContent = 'Expand';
-        }
-        
-        // Hide empty state message
-        if (emptyStateMessage) {
-            emptyStateMessage.style.display = 'none';
-        }
-        
-        // Create collapsed controls in header actions area
-        const totalMaterials = allMaterials.length;
-        const collapsedControls = document.createElement('div');
-        collapsedControls.className = 'collapsed-controls';
-        collapsedControls.style.display = 'flex';
-        const badgeColor = totalMaterials === 0 ? '#95a5a6' : '#ff4c4c';
-        collapsedControls.innerHTML = `
-            <div class="request-count-badge" style="background: ${badgeColor}; color: white;">${totalMaterials}</div>
-            <button class="expand-btn" type="button" aria-controls="materialProcessingContainer" aria-expanded="false" onclick="toggleMaterialSection()">
-                <span>Expand</span>
-                <i data-lucide="chevron-down" style="width: 14px; height: 14px;"></i>
-            </button>
-        `;
-        
-        // Re-initialize Lucide icons for the newly injected content
-        if (typeof lucide !== 'undefined') {
-            lucide.createIcons({
-                attrs: {
-                    class: 'lucide'
-                },
-                nameAttr: 'data-lucide',
-                target: collapsedControls
-            });
-        }
-        
-        // Insert the collapsed controls in the header (where header-actions was)
-        const sectionHeader = section.querySelector('.section-header');
-        sectionHeader.appendChild(collapsedControls);
-        
-    }
-}
-
-// Load processing materials from API
-async function loadProcessingMaterials() {
-    try {
-        
-        const response = await fetch('api/get_processing_materials.php?status=processing');
-        
-        if (!response.ok) {
-            throw new Error(`HTTP error! status: ${response.status}`);
-        }
-        
-        const result = await response.json();
-        
-        if (result.success) {
-            allMaterials = result.data;
-        } else {
-            console.error('Failed to load processing materials:', result.message);
-            // Fallback to empty array
-            allMaterials = [];
-        }
-        
-        // Display the first page
-        displayCurrentPage();
-        updateNavigationButtons();
-        
-        // Update section state (collapsed if empty, expanded if has items)
-        updateSectionState();
-    } catch (error) {
-        console.error('Error loading processing materials:', error);
-        // Fallback to empty array
-        allMaterials = [];
-        displayCurrentPage();
-        updateNavigationButtons();
-        
-        // Update section state (collapsed if empty)
-        updateSectionState();
-    }
-}
-
-// Helper function to update processing status via API (same as material-processing page)
-async function updateProcessingStatus(bookId, status, callNumber = null, noOfCopies = null, statusReason = null, location = null) {
-    try {
-        const response = await fetch('api/update_processing_status.php', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-                book_id: bookId,
-                status: status,
-                call_number: callNumber,
-                no_of_copies: noOfCopies,
-                status_reason: statusReason,
-                location: location
-            })
-        });
-        
-        const result = await response.json();
-        
-        if (result.success) {
-            return result;
-        } else {
-            throw new Error(result.message || 'Failed to update status');
-        }
-    } catch (error) {
-        console.error('Error updating processing status:', error);
-        throw error;
-    }
-}
-
-// Material Requests from Deans Functions
-let materialRequests = [];
-let currentMRStatus = 'pending';
-
-async function loadMaterialRequests() {
-    try {
-        const response = await fetch('api/get_material_requests.php?status=' + currentMRStatus);
-        const result = await response.json();
-        
-        if (result.success) {
-            materialRequests = result.data;
-            displayMaterialRequests();
-        } else {
-            console.error('Failed to load material requests:', result.message);
-        }
-    } catch (error) {
-        console.error('Error loading material requests:', error);
-    }
-}
-
-function filterMaterialRequests(status) {
-    currentMRStatus = status;
-    
-    // Update button states
-    document.querySelectorAll('.filter-buttons .filter-btn').forEach(btn => {
-        btn.classList.remove('active');
-    });
-    document.getElementById('mr' + status.charAt(0).toUpperCase() + status.slice(1) + 'Btn').classList.add('active');
-    
-    loadMaterialRequests();
-}
-
-function displayMaterialRequests() {
-    const container = document.getElementById('materialRequestsGrid');
-    const emptyState = document.getElementById('materialRequestsEmptyState');
-    
-    if (!container) return;
-    
-    if (materialRequests.length === 0) {
-        container.innerHTML = '';
-        if (emptyState) emptyState.style.display = 'block';
-        return;
-    }
-    
-    if (emptyState) emptyState.style.display = 'none';
-    
-    container.innerHTML = materialRequests.map(request => {
-        const statusBadge = getStatusBadge(request.status);
-        return `
-            <div class="material-card" style="border-left: 4px solid #7C3AED;">
-                <div class="material-header">
-                    <div class="requester-info">
-                        <div class="requester-name">${request.requester_name || 'Dean'}</div>
-                        <div class="requester-role" style="color: ${request.department_color || '#7C3AED'};">${request.department_code || 'Dean'} DEAN</div>
-                    </div>
-                    <div class="material-status" style="background: ${statusBadge.bg}; color: ${statusBadge.color};">${request.status}</div>
-                </div>
-                
-                <div class="course-info">
-                    <div class="course-code">${request.course_code || 'N/A'}</div>
-                    <div class="course-name">${request.course_title || 'N/A'}</div>
-                </div>
-                
-                <div class="request-summary">
-                    <div class="material-title">
-                        <strong>${request.book_title}</strong>
-                        ${request.author ? '<br><span style="color: #666; font-size: 13px;">by ' + request.author + '</span>' : ''}
-                        ${request.publication_year ? '<span style="color: #888; font-size: 12px;"> (' + request.publication_year + ')</span>' : ''}
-                    </div>
-                </div>
-                
-                ${request.justification ? '<div style="margin-top: 8px; padding: 8px; background: #f9f9f9; border-radius: 6px; font-size: 13px; color: #666;"><strong>Justification:</strong> ' + request.justification + '</div>' : ''}
-                
-                <div class="material-actions">
-                    ${getActionButtons(request)}
-                </div>
-                
-                <div class="request-date">Requested: ${formatDate(request.created_at)}</div>
-            </div>
-        `;
-    }).join('');
-    
-    // Re-initialize Lucide icons
-    if (typeof lucide !== 'undefined') {
-        lucide.createIcons();
-    }
-}
-
-function getStatusBadge(status) {
-    switch(status) {
-        case 'pending':
-            return { bg: '#FEF3C7', color: '#D97706' };
-        case 'processing':
-            return { bg: '#DBEAFE', color: '#2563EB' };
-        case 'completed':
-            return { bg: '#D1FAE5', color: '#059669' };
-        case 'rejected':
-            return { bg: '#FEE2E2', color: '#DC2626' };
-        default:
-            return { bg: '#F3F4F6', color: '#6B7280' };
-    }
-}
-
-function getActionButtons(request) {
-    if (request.status === 'pending') {
-        return `
-            <button class="action-btn process-btn" onclick="processMaterialRequest(${request.id})">Process</button>
-            <button class="action-btn draft-btn" onclick="rejectMaterialRequest(${request.id})">Reject</button>
-        `;
-    } else if (request.status === 'processing') {
-        return `
-            <button class="action-btn catalog-btn" onclick="completeMaterialRequest(${request.id})">Complete</button>
-        `;
-    } else {
-        return '';
-    }
-}
-
-async function processMaterialRequest(requestId) {
-    try {
-        const response = await fetch('api/update_material_request.php', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-                id: requestId,
-                status: 'processing',
-                librarian_notes: 'Request is being processed'
-            })
-        });
-        
-        const result = await response.json();
-        
-        if (result.success) {
-            alert('Request marked as processing');
-            loadMaterialRequests();
-        } else {
-            alert('Error: ' + result.message);
-        }
-    } catch (error) {
-        console.error('Error processing request:', error);
-        alert('Failed to process request');
-    }
-}
-
-async function completeMaterialRequest(requestId) {
-    const notes = prompt('Add completion notes (optional):');
-    
-    try {
-        const response = await fetch('api/update_material_request.php', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-                id: requestId,
-                status: 'completed',
-                librarian_notes: notes || 'Request completed'
-            })
-        });
-        
-        const result = await response.json();
-        
-        if (result.success) {
-            alert('Request completed successfully!');
-            loadMaterialRequests();
-        } else {
-            alert('Error: ' + result.message);
-        }
-    } catch (error) {
-        console.error('Error completing request:', error);
-        alert('Failed to complete request');
-    }
-}
-
-async function rejectMaterialRequest(requestId) {
-    const reason = prompt('Enter rejection reason:');
-    
-    if (!reason) {
-        alert('Rejection reason is required');
-        return;
-    }
-    
-    try {
-        const response = await fetch('api/update_material_request.php', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-                id: requestId,
-                status: 'rejected',
-                librarian_notes: reason
-            })
-        });
-        
-        const result = await response.json();
-        
-        if (result.success) {
-            alert('Request rejected');
-            loadMaterialRequests();
-        } else {
-            alert('Error: ' + result.message);
-        }
-    } catch (error) {
-        console.error('Error rejecting request:', error);
-        alert('Failed to reject request');
-    }
-}
-
-// Initialize material requests on page load
-document.addEventListener('DOMContentLoaded', function() {
-    loadMaterialRequests();
-});
-        console.error('Error updating processing status:', error);
-        throw error;
-    }
-}
-
-function closeCompleteCatalogingModal() {
-    document.getElementById('completeCatalogingModal').style.display = 'none';
-    document.getElementById('completeCatalogingForm').reset();
-    // Reset location dropdown explicitly
-    const locationInput = document.getElementById('locationInput');
-    if (locationInput) {
-        locationInput.value = '';
-    }
-    // Reset button state
-    const completeBtn = document.getElementById('completeCatalogingBtn');
-    if (completeBtn) {
-        completeBtn.disabled = true;
-        completeBtn.style.opacity = '0.5';
-        completeBtn.style.cursor = 'not-allowed';
-        completeBtn.style.background = '#6c757d';
-    }
-}
-
-function showCatalogingSuccessModal(message) {
-    const modal = document.getElementById('catalogingSuccessModal');
-    const messageElement = document.getElementById('catalogingSuccessMessage');
-    if (modal && messageElement) {
-        messageElement.textContent = message || 'Book reference completed successfully!';
-        modal.style.display = 'flex';
-    }
-}
-
-function closeCatalogingSuccessModal() {
-    const modal = document.getElementById('catalogingSuccessModal');
-    if (modal) {
-        modal.style.display = 'none';
-        // Reload materials to reflect the change
-        loadProcessingMaterials().then(() => {
-            // Update section state after reload
-            updateSectionState();
-        });
-    }
-}
-
-function showCatalogingErrorModal(message) {
-    const modal = document.getElementById('catalogingErrorModal');
-    const messageElement = document.getElementById('catalogingErrorMessage');
-    if (modal && messageElement) {
-        messageElement.textContent = message || 'An error occurred while completing cataloging.';
-        modal.style.display = 'flex';
-    }
-}
-
-function closeCatalogingErrorModal() {
-    const modal = document.getElementById('catalogingErrorModal');
-    if (modal) {
-        modal.style.display = 'none';
-    }
-}
-
-// Material processing action functions
-async function startCataloging(materialId) {
-    // Fetch book reference data from database
-    try {
-        const response = await fetch(`api/get_book_reference.php?id=${materialId}`);
-        const result = await response.json();
-        
-        if (result.success && result.data) {
-            const book = result.data;
-            
-            // Set the book ID
-            document.getElementById('completingBookId').value = materialId;
-            
-            // Pre-fill form fields with existing values if they exist
-            const callNumberInput = document.getElementById('callNumberInput');
-            const noOfCopiesInput = document.getElementById('noOfCopiesInput');
-            const locationInput = document.getElementById('locationInput');
-            
-            if (callNumberInput && book.call_number) {
-                callNumberInput.value = book.call_number;
-            }
-            
-            if (noOfCopiesInput && book.no_of_copies) {
-                noOfCopiesInput.value = book.no_of_copies;
-            }
-            
-            if (locationInput && book.location) {
-                locationInput.value = book.location;
-            }
-        } else {
-            // If fetch fails, still open modal but with empty fields
-            document.getElementById('completingBookId').value = materialId;
-        }
-    } catch (error) {
-        console.error('Error fetching book reference:', error);
-        // Still open modal even if fetch fails
-        document.getElementById('completingBookId').value = materialId;
-    }
-    
-    // Open modal
-    document.getElementById('completeCatalogingModal').style.display = 'block';
-    
-    // Setup validation for the Complete button
-    setTimeout(function() {
-        validateCompleteCatalogingButton();
-        
-        // Add event listeners to the three fields
-        const callNumberInput = document.getElementById('callNumberInput');
-        const noOfCopiesInput = document.getElementById('noOfCopiesInput');
-        const locationInput = document.getElementById('locationInput');
-        
-        if (callNumberInput) {
-            callNumberInput.addEventListener('input', validateCompleteCatalogingButton);
-            callNumberInput.addEventListener('change', validateCompleteCatalogingButton);
-        }
-        if (noOfCopiesInput) {
-            noOfCopiesInput.addEventListener('input', validateCompleteCatalogingButton);
-            noOfCopiesInput.addEventListener('change', validateCompleteCatalogingButton);
-        }
-        if (locationInput) {
-            locationInput.addEventListener('change', validateCompleteCatalogingButton);
-        }
-    }, 100);
-}
-
-// Validation function for Complete Cataloging button
-function validateCompleteCatalogingButton() {
-    const callNumber = document.getElementById('callNumberInput')?.value?.trim() || '';
-    const noOfCopies = document.getElementById('noOfCopiesInput')?.value?.trim() || '';
-    const location = document.getElementById('locationInput')?.value?.trim() || '';
-    const completeBtn = document.getElementById('completeCatalogingBtn');
-    
-    const allFilled = callNumber && noOfCopies && location;
-    
-    if (completeBtn) {
-        if (allFilled) {
-            completeBtn.disabled = false;
-            completeBtn.style.opacity = '1';
-            completeBtn.style.cursor = 'pointer';
-            completeBtn.style.background = '#4CAF50';
-        } else {
-            completeBtn.disabled = true;
-            completeBtn.style.opacity = '0.5';
-            completeBtn.style.cursor = 'not-allowed';
-            completeBtn.style.background = '#6c757d';
-        }
-    }
-}
-
-function navigateToCourseDetails(courseCode) {
-    // Navigate to course details page
-    window.location.href = `content.php?page=course-details&course_code=${courseCode}`;
-}
-
-function draftRequest(materialId) {
-    const material = allMaterials.find(m => m.id === materialId);
-    if (material) {
-        // Remove from dashboard when drafted
-        allMaterials = allMaterials.filter(m => m.id !== materialId);
-        displayCurrentPage();
-        updateNavigationButtons();
-        alert('Request has been drafted. Reason: Out of stock, budget constraints, or other issues.');
-    }
-}
-
-function resumeProcessing(materialId) {
-    // This function shouldn't be needed on dashboard since drafted materials don't show
-    // But kept for consistency with Material Processing page
-}
 
 // Classification Management Functions - Program Management Style
 let classificationLocationFilter = 'all';
@@ -1825,6 +1103,346 @@ document.addEventListener('click', function(e) {
         // Re-render classifications
         displayAllClassifications();
     }
+});
+
+// ===== Reports Modal Functions =====
+function openReportsModal() {
+    document.getElementById('reportsModal').style.display = 'flex';
+    document.getElementById('reportContent').style.display = 'none';
+    if (typeof lucide !== 'undefined') {
+        lucide.createIcons();
+    }
+}
+
+function closeReportsModal() {
+    document.getElementById('reportsModal').style.display = 'none';
+}
+
+async function generateReport(type) {
+    const reportTitle = document.getElementById('reportTitle');
+    const reportData = document.getElementById('reportData');
+    const reportContent = document.getElementById('reportContent');
+    
+    reportContent.style.display = 'block';
+    reportData.innerHTML = '<div style="text-align: center; padding: 20px;"><i data-lucide="loader-2" class="spin-icon" style="width: 24px; height: 24px; color: var(--primary);"></i><p>Loading report data...</p></div>';
+    
+    if (typeof lucide !== 'undefined') {
+        lucide.createIcons();
+    }
+    
+    try {
+        let data = {};
+        let title = '';
+        
+        switch(type) {
+            case 'compliance':
+                title = 'Course Compliance Report';
+                const complianceResponse = await fetch('api/get_dashboard_stats.php');
+                const complianceResult = await complianceResponse.json();
+                data = complianceResult;
+                break;
+            case 'books':
+                title = 'Book Inventory Report';
+                const booksResponse = await fetch('api/get_books.php?limit=100');
+                const booksResult = await booksResponse.json();
+                data = booksResult;
+                break;
+            case 'requests':
+                title = 'Book Requests Summary';
+                const requestsResponse = await fetch('api/get_pending_book_requests.php?status=PENDING');
+                const requestsResult = await requestsResponse.json();
+                data = requestsResult;
+                break;
+            case 'classification':
+                title = 'Classification Report';
+                const classResponse = await fetch('api/get_classifications.php');
+                const classResult = await classResponse.json();
+                data = classResult;
+                break;
+        }
+        
+        reportTitle.textContent = title;
+        
+        // Format the data based on type
+        let html = '';
+        if (type === 'compliance') {
+            html = `
+                <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-bottom: 16px;">
+                    <div style="padding: 16px; background: white; border-radius: 8px; text-align: center;">
+                        <div style="font-size: 24px; font-weight: 800; color: var(--primary);">${data.totalBooks || 0}</div>
+                        <div style="font-size: 12px; color: #666;">Compliant Books</div>
+                    </div>
+                    <div style="padding: 16px; background: white; border-radius: 8px; text-align: center;">
+                        <div style="font-size: 24px; font-weight: 800; color: #1565C0;">${data.compliantCourses || 0}</div>
+                        <div style="font-size: 12px; color: #666;">Compliant Courses</div>
+                    </div>
+                    <div style="padding: 16px; background: white; border-radius: 8px; text-align: center;">
+                        <div style="font-size: 24px; font-weight: 800; color: #b91c1c;">${data.nonCompliantCourses || 0}</div>
+                        <div style="font-size: 12px; color: #666;">Non-Compliant</div>
+                    </div>
+                </div>
+                <p style="font-size: 13px; color: #666;">Report generated on ${new Date().toLocaleDateString()}</p>
+            `;
+        } else if (type === 'books') {
+            const books = data.data || [];
+            html = `
+                <div style="padding: 12px; background: white; border-radius: 8px; margin-bottom: 12px;">
+                    <strong>Total Books:</strong> ${books.length}
+                </div>
+                <div style="max-height: 200px; overflow-y: auto;">
+                    ${books.slice(0, 10).map(book => `
+                        <div style="padding: 8px; border-bottom: 1px solid #eee; font-size: 13px;">
+                            <strong>${book.title || 'N/A'}</strong> - ${book.author || 'Unknown'}
+                        </div>
+                    `).join('')}
+                    ${books.length > 10 ? `<div style="padding: 8px; color: #666; font-size: 12px;">...and ${books.length - 10} more</div>` : ''}
+                </div>
+            `;
+        } else if (type === 'requests') {
+            const requests = data.data || [];
+            html = `
+                <div style="padding: 12px; background: white; border-radius: 8px; margin-bottom: 12px;">
+                    <strong>Pending Requests:</strong> ${requests.length}
+                </div>
+                <div style="max-height: 200px; overflow-y: auto;">
+                    ${requests.slice(0, 10).map(req => `
+                        <div style="padding: 8px; border-bottom: 1px solid #eee; font-size: 13px;">
+                            <strong>${req.book_title || 'N/A'}</strong> - ${req.department_code || ''}
+                        </div>
+                    `).join('')}
+                </div>
+            `;
+        } else if (type === 'classification') {
+            const classifications = data.data || [];
+            html = `
+                <div style="padding: 12px; background: white; border-radius: 8px; margin-bottom: 12px;">
+                    <strong>Total Classifications:</strong> ${classifications.length}
+                </div>
+                <div style="max-height: 200px; overflow-y: auto;">
+                    ${classifications.map(c => `
+                        <div style="padding: 8px; border-bottom: 1px solid #eee; font-size: 13px;">
+                            <strong>${c.name || 'N/A'}</strong> (${c.call_number_range || 'N/A'}) - ${c.location || 'No location'}
+                        </div>
+                    `).join('')}
+                </div>
+            `;
+        }
+        
+        reportData.innerHTML = html;
+        
+    } catch (error) {
+        reportData.innerHTML = `<div style="color: red; padding: 20px; text-align: center;">Error generating report: ${error.message}</div>`;
+    }
+    
+    if (typeof lucide !== 'undefined') {
+        lucide.createIcons();
+    }
+}
+
+function downloadReport() {
+    const reportTitle = document.getElementById('reportTitle').textContent;
+    const reportData = document.getElementById('reportData').innerText;
+    
+    // Simple text download
+    const blob = new Blob([`${reportTitle}\n\n${reportData}`], { type: 'text/plain' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `${reportTitle.toLowerCase().replace(/\s+/g, '-')}-${new Date().toISOString().split('T')[0]}.txt`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+}
+
+// ===== Add Book Modal Function =====
+function openAddBookModal() {
+    const m = document.getElementById('addBookModal');
+    if (m) {
+        m.style.display = 'flex';
+        m.style.setProperty('overflow', 'hidden', 'important');
+        setTimeout(function(){ 
+            if(typeof validateAddBookButton === 'function') validateAddBookButton(); 
+        }, 100);
+    }
+}
+
+// ===== Material Request Modal Functions =====
+let currentMaterialRequest = null;
+
+function openProcessRequestModal(requestId) {
+    document.getElementById('processingRequestId').value = requestId;
+    document.getElementById('processRequestModal').style.display = 'flex';
+}
+
+function closeProcessRequestModal() {
+    document.getElementById('processRequestModal').style.display = 'none';
+    document.getElementById('processingNotes').value = '';
+}
+
+async function confirmProcessRequest() {
+    const requestId = document.getElementById('processingRequestId').value;
+    const notes = document.getElementById('processingNotes').value;
+    
+    try {
+        const response = await fetch('api/update_material_request.php', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                id: requestId,
+                status: 'processing',
+                librarian_notes: notes || 'Request is being processed'
+            })
+        });
+        
+        const result = await response.json();
+        
+        if (result.success) {
+            closeProcessRequestModal();
+            showDashboardSuccessModal('Success', 'Request marked as processing');
+            loadMaterialRequests();
+        } else {
+            closeProcessRequestModal();
+            showDashboardErrorModal(result.message || 'Failed to process request');
+        }
+    } catch (error) {
+        closeProcessRequestModal();
+        showDashboardErrorModal('Failed to process request: ' + error.message);
+    }
+}
+
+function openCompleteRequestModal(requestId) {
+    document.getElementById('completingRequestId').value = requestId;
+    document.getElementById('completeRequestModal').style.display = 'flex';
+}
+
+function closeCompleteRequestModal() {
+    document.getElementById('completeRequestModal').style.display = 'none';
+    document.getElementById('completionNotes').value = '';
+}
+
+async function confirmCompleteRequest() {
+    const requestId = document.getElementById('completingRequestId').value;
+    const notes = document.getElementById('completionNotes').value;
+    
+    try {
+        const response = await fetch('api/update_material_request.php', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                id: requestId,
+                status: 'completed',
+                librarian_notes: notes || 'Request completed'
+            })
+        });
+        
+        const result = await response.json();
+        
+        if (result.success) {
+            closeCompleteRequestModal();
+            showDashboardSuccessModal('Success', 'Request completed successfully!');
+            loadMaterialRequests();
+        } else {
+            closeCompleteRequestModal();
+            showDashboardErrorModal(result.message || 'Failed to complete request');
+        }
+    } catch (error) {
+        closeCompleteRequestModal();
+        showDashboardErrorModal('Failed to complete request: ' + error.message);
+    }
+}
+
+function openRejectRequestModal(requestId) {
+    document.getElementById('rejectingRequestId').value = requestId;
+    document.getElementById('rejectRequestModal').style.display = 'flex';
+}
+
+function closeRejectRequestModal() {
+    document.getElementById('rejectRequestModal').style.display = 'none';
+    document.getElementById('rejectionReason').value = '';
+}
+
+async function confirmRejectRequest() {
+    const requestId = document.getElementById('rejectingRequestId').value;
+    const reason = document.getElementById('rejectionReason').value.trim();
+    
+    if (!reason) {
+        showDashboardErrorModal('Rejection reason is required');
+        return;
+    }
+    
+    try {
+        const response = await fetch('api/update_material_request.php', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                id: requestId,
+                status: 'rejected',
+                librarian_notes: reason
+            })
+        });
+        
+        const result = await response.json();
+        
+        if (result.success) {
+            closeRejectRequestModal();
+            showDashboardSuccessModal('Success', 'Request rejected');
+            loadMaterialRequests();
+        } else {
+            closeRejectRequestModal();
+            showDashboardErrorModal(result.message || 'Failed to reject request');
+        }
+    } catch (error) {
+        closeRejectRequestModal();
+        showDashboardErrorModal('Failed to reject request: ' + error.message);
+    }
+}
+
+// ===== Success/Error Modal Functions =====
+function showDashboardSuccessModal(title, message) {
+    document.getElementById('dashboardSuccessTitle').textContent = title || 'Success!';
+    document.getElementById('dashboardSuccessMessage').textContent = message || 'Operation completed successfully.';
+    document.getElementById('dashboardSuccessModal').style.display = 'flex';
+    if (typeof lucide !== 'undefined') {
+        lucide.createIcons();
+    }
+}
+
+function closeDashboardSuccessModal() {
+    document.getElementById('dashboardSuccessModal').style.display = 'none';
+}
+
+function showDashboardErrorModal(message) {
+    document.getElementById('dashboardErrorMessage').textContent = message || 'An error occurred.';
+    document.getElementById('dashboardErrorModal').style.display = 'flex';
+    if (typeof lucide !== 'undefined') {
+        lucide.createIcons();
+    }
+}
+
+function closeDashboardErrorModal() {
+    document.getElementById('dashboardErrorModal').style.display = 'none';
+}
+
+// ===== Update Material Request Action Buttons =====
+function updateMaterialRequestActions() {
+    // Override the old alert-based functions with modal-based ones
+    window.processMaterialRequest = function(requestId) {
+        openProcessRequestModal(requestId);
+    };
+    
+    window.completeMaterialRequest = function(requestId) {
+        openCompleteRequestModal(requestId);
+    };
+    
+    window.rejectMaterialRequest = function(requestId) {
+        openRejectRequestModal(requestId);
+    };
+}
+
+// Initialize on DOM ready
+document.addEventListener('DOMContentLoaded', function() {
+    updateMaterialRequestActions();
 });
 
 </script> 
