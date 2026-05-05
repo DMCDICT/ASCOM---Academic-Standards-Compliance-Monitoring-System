@@ -47,17 +47,71 @@ class NotificationSystem {
     
     async loadNotifications() {
         try {
-            const response = await fetch('../api/get_notifications.php?role=dean&limit=10');
+            // Load notifications from API
+            const response = await fetch('../api/get_notifications.php?role=librarian&limit=10');
             const data = await response.json();
             
+            let notifications = [];
+            let unreadCount = 0;
             
             if (data.success) {
-                this.notifications = data.data;
-                this.unreadCount = this.notifications.filter(n => !n.is_read).length;
-                this.updateUI();
-            } else {
-                console.error('🔔 Failed to load notifications:', data.error);
+                notifications = data.data;
+                unreadCount = notifications.filter(n => !n.is_read).length;
             }
+            
+            // Also fetch pending material requests and book requests for additional notifications
+            try {
+                const [materialResponse, bookResponse] = await Promise.all([
+                    fetch('api/get_material_requests.php?status=pending'),
+                    fetch('api/get_pending_book_requests.php?status=PENDING')
+                ]);
+                
+                const materialData = await materialResponse.json();
+                const bookData = await bookResponse.json();
+                
+                // Add material requests as notifications
+                if (materialData.success && materialData.data.length > 0) {
+                    materialData.data.forEach(req => {
+                        notifications.push({
+                            id: 'material-' + req.id,
+                            title: 'Material Request',
+                            message: `${req.book_title} - ${req.course_code}`,
+                            type: 'material_request',
+                            sender_name: req.requester_name || 'Dean',
+                            sender_role: 'dean',
+                            is_read: false,
+                            created_at: req.created_at ? new Date(req.created_at).toLocaleDateString() : 'Recent',
+                            is_system: true
+                        });
+                        unreadCount++;
+                    });
+                }
+                
+                // Add book requests as notifications
+                if (bookData.success && bookData.data.length > 0) {
+                    bookData.data.forEach(req => {
+                        notifications.push({
+                            id: 'book-' + req.id,
+                            title: 'Book Request',
+                            message: `${req.book_title} - ${req.department_code}`,
+                            type: 'book_request',
+                            sender_name: req.dean_name || 'Dean',
+                            sender_role: 'dean',
+                            is_read: false,
+                            created_at: req.requested_at ? new Date(req.requested_at).toLocaleDateString() : 'Recent',
+                            is_system: true
+                        });
+                        unreadCount++;
+                    });
+                }
+            } catch (e) {
+                console.warn('Could not load request notifications:', e);
+            }
+            
+            this.notifications = notifications;
+            this.unreadCount = unreadCount;
+            this.updateUI();
+            
         } catch (error) {
             console.error('🔔 Error loading notifications:', error);
         }
