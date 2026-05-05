@@ -156,7 +156,7 @@ if (isset($conn) && $conn instanceof mysqli && !$conn->connect_error) {
               <i data-lucide="x"></i>
             </button>
           </div>
-          <div class="field-help">@sccpag.edu.ph will be used for this account.</div>
+          <div class="field-help">Email must end with @sccpag.edu.ph.</div>
         </div>
         <div class="form-group">
           <label for="add_mobile_no">Mobile Number</label>
@@ -199,7 +199,7 @@ if (isset($conn) && $conn instanceof mysqli && !$conn->connect_error) {
       <!-- Actions -->
       <div class="add-user-actions">
         <button type="button" class="cancel-btn" onclick="closeAddUserModal()">Cancel</button>
-        <button type="submit" id="add_create_btn" class="create-btn" disabled>Create</button>
+        <button type="submit" id="add_create_btn" class="create-btn">Create</button>
       </div>
     </form>
   </div>
@@ -208,7 +208,7 @@ if (isset($conn) && $conn instanceof mysqli && !$conn->connect_error) {
 <!-- Success Modal for Teacher Account Creation -->
 <div id="addUserSuccessModal" class="modal-overlay" style="display: none; align-items: center; justify-content: center;">
   <div class="modal-box" style="max-width: 500px; text-align: center;">
-    <div class="modal-header">
+    <div class="modal-header" style="display: block; text-align: center; border-bottom: none; padding-bottom: 0; margin-bottom: 20px;">
       <img src="../src/assets/animated_icons/check-animated-icon.gif" alt="Success" style="width: 80px; height: 80px; margin: 0 auto 20px; display: block;">
       <h2 style="color: #28a745; margin-bottom: 10px;">Success!</h2>
     </div>
