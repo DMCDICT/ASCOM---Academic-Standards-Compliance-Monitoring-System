@@ -80,6 +80,46 @@ function hideAddUserValidation() {
     }
 }
 
+// Check form validity for button enable/disable
+function checkAddUserFormValidity() {
+    const createBtn = document.getElementById('add_create_btn');
+    if (!createBtn) return;
+    
+    const employeeNo = document.getElementById('add_employee_no');
+    const firstName = document.getElementById('add_first_name');
+    const lastName = document.getElementById('add_last_name');
+    const email = document.getElementById('add_institutional_email');
+    const password = document.getElementById('add_password');
+    const confirmPassword = document.getElementById('add_confirm_password');
+    const roleId = document.getElementById('add_role_id');
+    const departmentId = document.getElementById('add_department_id');
+    
+    // Check if required fields are filled
+    const isEmployeeNoValid = employeeNo?.value.trim().length >= 6;
+    const isFirstNameValid = firstName?.value.trim().length > 0;
+    const isLastNameValid = lastName?.value.trim().length > 0;
+    const isEmailValid = email?.value.trim().endsWith('@sccpag.edu.ph');
+    const isPasswordValid = password?.value.length >= 8;
+    const isConfirmPasswordValid = confirmPassword?.value === password?.value && confirmPassword?.value.length > 0;
+    const isRoleSelected = roleId?.value.length > 0;
+    
+    // Check department based on role
+    let isDepartmentValid = true;
+    if (roleId?.value) {
+        const departmentRequiredRoles = ['2', '3'];
+        if (departmentRequiredRoles.includes(roleId.value)) {
+            isDepartmentValid = departmentId?.value?.length > 0;
+        }
+    }
+    
+    // Enable button only if all validations pass
+    const isFormValid = isEmployeeNoValid && isFirstNameValid && isLastNameValid && 
+                        isEmailValid && isPasswordValid && isConfirmPasswordValid && 
+                        isRoleSelected && isDepartmentValid;
+    
+    createBtn.disabled = !isFormValid;
+}
+
 // Validate form
 function validateAddUserForm() {
     const form = document.getElementById('addUserForm');
@@ -276,6 +316,9 @@ window.closeAddUserErrorModal = closeAddUserErrorModal;
 document.addEventListener('DOMContentLoaded', function() {
     initAddUserLucide();
 
+    // Initial check for button state
+    checkAddUserFormValidity();
+
     const addUserForm = document.getElementById('addUserForm');
     const clearEmailBtn = document.getElementById('clear_add_email_btn');
     const addUserModal = document.getElementById('addUserModal');
@@ -370,7 +413,23 @@ document.addEventListener('DOMContentLoaded', function() {
                 this.value = this.value + '@sccpag.edu.ph';
             }
         });
+        // Real-time validation for button enable/disable
+        emailInput.addEventListener('input', checkAddUserFormValidity);
     }
+
+    // Add real-time validation listeners to all required fields
+    const firstNameInput = document.getElementById('add_first_name');
+    const lastNameInput = document.getElementById('add_last_name');
+    const roleSelect = document.getElementById('add_role_id');
+    const departmentSelect = document.getElementById('add_department_id');
+
+    if (employeeNoInput) employeeNoInput.addEventListener('input', checkAddUserFormValidity);
+    if (firstNameInput) firstNameInput.addEventListener('input', checkAddUserFormValidity);
+    if (lastNameInput) lastNameInput.addEventListener('input', checkAddUserFormValidity);
+    if (passwordInput) passwordInput.addEventListener('input', checkAddUserFormValidity);
+    if (confirmPasswordInput) confirmPasswordInput.addEventListener('input', checkAddUserFormValidity);
+    if (roleSelect) roleSelect.addEventListener('change', checkAddUserFormValidity);
+    if (departmentSelect) departmentSelect.addEventListener('change', checkAddUserFormValidity);
 
     if (addUserModal) {
         addUserModal.addEventListener('click', function(e) {
