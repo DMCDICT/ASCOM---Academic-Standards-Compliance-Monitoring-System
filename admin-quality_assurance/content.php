@@ -14,6 +14,9 @@ include './modals/switch_role_modal.php';
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Admin Quality Assurance - Content</title>
 
+<!-- Lucide icons (MANDATORY - DESIGN.md Section 14) -->
+<script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+
 <!-- Use shared styles from super_admin-mis -->
 <link rel="stylesheet" href="../super_admin-mis/styles/global.css">
 <link rel="stylesheet" href="../super_admin-mis/styles/modals.css">
@@ -22,6 +25,8 @@ include './modals/switch_role_modal.php';
 <link rel="stylesheet" href="../super_admin-mis/styles/school-calendar.css">
 <link rel="stylesheet" href="../super_admin-mis/styles/settings.css">
 <link rel="stylesheet" href="../super_admin-mis/styles/notifications.css">
+<!-- QA-specific overrides -->
+<link rel="stylesheet" href="./styles/dashboard.css">
 
 </head>
 <body>
@@ -38,12 +43,12 @@ include './modals/switch_role_modal.php';
       </div>
       <img src="../src/assets/images/ASCOM_Monitoring_System.png" alt="Logo" class="logo-img" />
       <div class="search-bar">
-        <img src="../src/assets/icons/search-icon.png" alt="Search Icon" />
+        <i data-lucide="search" aria-hidden="true"></i>
         <input type="text" placeholder="Search Here..." />
       </div>
     </div>
     <div class="notification-icon">
-      <img src="../src/assets/icons/notifications-icon.png" alt="Notifications" />
+      <i data-lucide="bell" aria-hidden="true"></i>
       <div class="notification-count">0</div>
       <div class="notification-dropdown" id="notificationDropdown">
         <h3>Notifications</h3>
@@ -198,6 +203,8 @@ function toggleSidebar() {
 
 // Restore sidebar state on page load
 document.addEventListener('DOMContentLoaded', function() {
+    if (window.lucide?.createIcons) window.lucide.createIcons();
+
     const sidebar = document.getElementById('sidebar');
     const contentWrapper = document.querySelector('.content-wrapper');
     const isCollapsed = localStorage.getItem('sidebarCollapsed') === 'true';

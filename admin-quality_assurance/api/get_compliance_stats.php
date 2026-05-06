@@ -161,7 +161,7 @@ try {
     
     if ($termFilter === 'all') {
         // Get current active school year
-        $currentYearQuery = "SELECT id, year_start, year_end FROM school_years WHERE status = 'Active' ORDER BY start_date DESC LIMIT 1";
+        $currentYearQuery = "SELECT id, year_start, year_end FROM school_years WHERE is_active = 1 ORDER BY start_date DESC LIMIT 1";
         $currentYearStmt = $pdo->prepare($currentYearQuery);
         $currentYearStmt->execute();
         $currentYear = $currentYearStmt->fetch(PDO::FETCH_ASSOC);
@@ -286,7 +286,7 @@ try {
         } else {
             // Term name directly provided - need to get current school year and term info
             // Get current active school year first
-            $currentYearQuery = "SELECT id, year_start, year_end FROM school_years WHERE status = 'Active' ORDER BY start_date DESC LIMIT 1";
+            $currentYearQuery = "SELECT id, year_start, year_end FROM school_years WHERE is_active = 1 ORDER BY start_date DESC LIMIT 1";
             $currentYearStmt = $pdo->prepare($currentYearQuery);
             $currentYearStmt->execute();
             $currentYear = $currentYearStmt->fetch(PDO::FETCH_ASSOC);
@@ -392,7 +392,7 @@ try {
         $yearQuery = "
             SELECT start_date, end_date
             FROM school_years 
-            WHERE status = 'Active' 
+            WHERE is_active = 1 
             ORDER BY start_date DESC 
             LIMIT 1
         ";

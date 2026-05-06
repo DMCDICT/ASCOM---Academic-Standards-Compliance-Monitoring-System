@@ -1,683 +1,44 @@
-<style>
-  /* Match department-dean dashboard card + header styling */
-  .dashboard-section {
-    margin-top: 30px;
-    background: #fff;
-    border-radius: 12px;
-    padding: 24px;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-    width: 100%;
-    box-sizing: border-box;
-  }
-
-  .section-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: flex-start;
-    margin-bottom: 0;
-    padding: 0;
-    transition: all 0.3s ease;
-    align-items: center;
-  }
-
-  .header-left h3 {
-    margin: 0 0 8px 0;
-    font-size: 1.5rem;
-    font-weight: 600;
-    color: #333;
-    font-family: 'TT Interphases', sans-serif;
-  }
-
-  .section-description {
-    color: #666;
-    font-size: 0.9rem;
-    margin: 0;
-    font-family: 'TT Interphases', sans-serif;
-  }
-
-  .header-actions {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    transition: all 0.3s ease;
-    align-self: flex-end;
-  }
-
-  .view-all-btn {
-    display: inline-block;
-    background: linear-gradient(135deg, #1976d2 0%, #1565c0 100%);
-    color: white;
-    text-decoration: none;
-    padding: 12px 24px;
-    border-radius: 8px;
-    font-weight: 600;
-    font-size: 14px;
-    transition: all 0.3s ease;
-    font-family: 'TT Interphases', sans-serif;
-    box-shadow: 0 4px 12px rgba(25, 118, 210, 0.3);
-    border: 1px solid rgba(255, 255, 255, 0.2);
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-    margin-top: 0px;
-    align-self: flex-start;
-  }
-
-  .view-all-btn:hover {
-    background: linear-gradient(135deg, #1565c0 0%, #0d47a1 100%);
-    color: white;
-    text-decoration: none;
-    transform: translateY(-2px);
-    box-shadow: 0 6px 16px rgba(25, 118, 210, 0.4);
-  }
-
-  .section-footer {
-    display: flex;
-    justify-content: flex-end;
-    align-items: center;
-    margin-top: 0px;
-    gap: 12px;
-    padding-top: 12px;
-    border-top: 1px solid #f0f0f0;
-  }
-
-  .collapse-btn {
-    background: #f5f5f5;
-    border: 1px solid #e0e0e0;
-    border-radius: 6px;
-    padding: 8px 16px;
-    font-size: 14px;
-    font-weight: 500;
-    color: #666;
-    cursor: pointer;
-    transition: all 0.2s ease;
-    font-family: 'TT Interphases', sans-serif;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    white-space: nowrap;
-  }
-
-  .collapse-btn:hover {
-    background: #1976d2;
-    color: white;
-    border-color: #1976d2;
-    transform: translateY(-1px);
-  }
-
-  .collapse-icon {
-    width: 14px;
-    height: 14px;
-    object-fit: contain;
-    filter: brightness(0) saturate(100%);
-    transition: filter 0.2s ease;
-  }
-
-  .collapse-btn:hover .collapse-icon,
-  .expand-btn:hover .collapse-icon {
-    filter: brightness(0) saturate(100%) invert(1);
-  }
-
-  .collapsed-controls {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    margin-top: 10px;
-  }
-
-  .request-count-badge {
-    background: #ff4c4c;
-    color: white;
-    border-radius: 50%;
-    width: 32px;
-    height: 32px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 14px;
-    font-weight: 700;
-    font-family: 'TT Interphases', sans-serif;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.2);
-  }
-
-  .expand-btn {
-    background: #f5f5f5;
-    border: 1px solid #e0e0e0;
-    border-radius: 6px;
-    padding: 8px 16px;
-    font-size: 14px;
-    font-weight: 500;
-    color: #666;
-    cursor: pointer;
-    transition: all 0.2s ease;
-    font-family: 'TT Interphases', sans-serif;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    white-space: nowrap;
-  }
-
-  .expand-btn:hover {
-    background: #1976d2;
-    color: white;
-    border-color: #1976d2;
-    transform: translateY(-1px);
-  }
-
-  /* Curriculum Review Card Styles */
-  .reference-requests-container {
-    margin-top: 20px;
-    width: 100%;
-    max-width: none;
-  }
-
-  .reference-requests-grid {
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: 15px;
-    margin-top: 20px;
-    width: 100%;
-  }
-
-  .reference-request-card {
-    width: 100%;
-    min-width: 250px;
-    padding: 20px;
-    background: white;
-    border: 1px solid #e0e0e0;
-    border-radius: 12px;
-    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
-    transition: all 0.3s ease;
-    display: flex;
-    flex-direction: column;
-    position: relative;
-    overflow: hidden;
-    box-sizing: border-box;
-  }
-
-  .reference-request-card:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
-    border-color: #1976d2;
-  }
-
-  .request-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: flex-start;
-    margin-bottom: 5px;
-    padding-bottom: 5px;
-  }
-
-  .requester-info {
-    flex: 1;
-  }
-
-  .requester-name {
-    font-weight: 600;
-    color: #333;
-    font-size: 14px;
-    margin-bottom: 4px;
-    font-family: 'TT Interphases', sans-serif;
-  }
-
-  .faculty-department {
-    font-size: 12px;
-    font-weight: 600;
-    text-transform: uppercase;
-    margin-bottom: 0px;
-    font-family: 'TT Interphases', sans-serif;
-    padding: 0;
-    display: inline-block;
-  }
-
-  .course-info {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    margin-bottom: 12px;
-    background: #f5f5f5;
-    padding: 12px;
-    border-radius: 6px;
-  }
-
-  .course-code {
-    background: #1976d2;
-    color: white;
-    padding: 4px 8px;
-    border-radius: 4px;
-    font-size: 12px;
-    font-weight: 600;
-    font-family: 'TT Interphases', sans-serif;
-  }
-
-  .course-name {
-    font-size: 13px;
-    color: #666;
-    font-family: 'TT Interphases', sans-serif;
-    flex: 1;
-  }
-
-  .request-summary {
-    margin-bottom: 12px;
-  }
-
-  .request-type {
-    font-size: 11px;
-    color: #666;
-    margin-bottom: 8px;
-    font-family: 'TT Interphases', sans-serif;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-    background: #f0f0f0;
-    padding: 4px 8px;
-    border-radius: 4px;
-    display: inline-block;
-  }
-
-  .material-title {
-    font-size: 13px;
-    color: #333;
-    line-height: 1.5;
-    font-style: italic;
-    font-family: 'TT Interphases', sans-serif;
-  }
-
-  .action-buttons {
-    display: flex;
-    gap: 8px;
-    margin-top: auto;
-    margin-bottom: 4px;
-  }
-
-  .approve-btn,
-  .reject-btn,
-  .status-approved-btn,
-  .status-rejected-btn {
-    flex: 1;
-    padding: 8px 12px;
-    border: none;
-    border-radius: 6px;
-    font-size: 12px;
-    font-weight: 600;
-    cursor: pointer;
-    transition: all 0.2s ease;
-    font-family: 'TT Interphases', sans-serif;
-    text-align: center;
-    white-space: nowrap;
-  }
-
-  .approve-btn {
-    background: #4CAF50;
-    color: white;
-  }
-
-  .approve-btn:hover {
-    background: #45a049;
-  }
-
-  .reject-btn {
-    background: #f44336;
-    color: white;
-  }
-
-  .reject-btn:hover {
-    background: #e53935;
-  }
-
-  .status-approved-btn {
-    background: #4CAF50;
-    color: white;
-  }
-
-  .status-rejected-btn {
-    background: #f44336;
-    color: white;
-  }
-
-  .request-date {
-    font-size: 11px;
-    color: #999;
-    text-align: center;
-    margin-top: 2px;
-    margin-bottom: 2px;
-  }
-
-  .view-details-btn {
-    width: 100%;
-    padding: 8px 12px;
-    background: #1976d2;
-    color: white;
-    border: none;
-    border-radius: 6px;
-    font-size: 12px;
-    font-weight: 600;
-    cursor: pointer;
-    transition: all 0.2s ease;
-    font-family: 'TT Interphases', sans-serif;
-    margin-top: 8px;
-    margin-bottom: 4px;
-  }
-
-  .view-details-btn:hover {
-    background: #1565c0;
-    transform: translateY(-1px);
-    box-shadow: 0 2px 8px rgba(25, 118, 210, 0.3);
-  }
-
-  /* Curriculum Details Modal Styles */
-  #curriculumDetailsModal {
-    display: none;
-    position: fixed;
-    z-index: 9999;
-    left: 0;
-    top: 0;
-    width: 100%;
-    height: 100%;
-    overflow: auto;
-    background-color: rgba(0, 0, 0, 0.6);
-    justify-content: center;
-    align-items: center;
-  }
-
-  #curriculumDetailsModal .modal-box {
-    background-color: #fff;
-    margin: auto;
-    padding: 0px;
-    border: none;
-    border-radius: 12px;
-    width: 90%;
-    max-width: 800px;
-    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
-    animation: fadeIn 0.3s;
-    max-height: 90vh;
-    display: flex;
-    flex-direction: column;
-    overflow: hidden;
-  }
-
-  #curriculumDetailsModal .modal-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 0px;
-    border-bottom: 1px solid #e0e0e0;
-    position: sticky;
-    top: 0;
-    background: transparent;
-    z-index: 10;
-    flex-shrink: 0;
-  }
-
-  #curriculumDetailsModal .modal-header > div {
-    padding: 0px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    width: 100%;
-    box-sizing: border-box;
-  }
-
-  #curriculumDetailsModal .modal-header h2 {
-    margin: 0;
-    padding: 0;
-    font-size: 24px;
-    font-weight: 700;
-    color: #333;
-    font-family: 'TT Interphases', sans-serif;
-  }
-
-  #curriculumDetailsModal .close-button {
-    color: #aaa;
-    font-size: 32px;
-    font-weight: 700;
-    cursor: pointer;
-    transition: color 0.2s;
-    line-height: 1;
-    background: none;
-    border: none;
-    padding: 0;
-    width: 32px;
-    height: 32px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-  }
-
-  #curriculumDetailsModal .close-button:hover {
-    color: #333;
-  }
-
-  #curriculumDetailsModal .modal-content {
-    padding: 0px;
-    overflow-y: auto;
-    flex: 1;
-    min-height: 0;
-  }
-
-  #curriculumDetailsModal .modal-content .review-section {
-    margin: 0px;
-  }
-
-  #curriculumDetailsModal .modal-footer {
-    padding: 20px 24px;
-    border-top: 1px solid #e0e0e0;
-    background: #fff;
-    position: sticky;
-    bottom: 0;
-    z-index: 10;
-    flex-shrink: 0;
-    display: flex;
-    justify-content: flex-end;
-    gap: 12px;
-  }
-
-  #curriculumDetailsModal .modal-footer-btn {
-    padding: 10px 24px;
-    border: none;
-    border-radius: 6px;
-    font-size: 14px;
-    font-weight: 600;
-    cursor: pointer;
-    transition: all 0.2s ease;
-    font-family: 'TT Interphases', sans-serif;
-  }
-
-  #curriculumDetailsModal .modal-footer-approve-btn {
-    background: #4CAF50;
-    color: white;
-  }
-
-  #curriculumDetailsModal .modal-footer-approve-btn:hover {
-    background: #45a049;
-  }
-
-  #curriculumDetailsModal .modal-footer-reject-btn {
-    background: #f44336;
-    color: white;
-  }
-
-  #curriculumDetailsModal .modal-footer-reject-btn:hover {
-    background: #e53935;
-  }
-
-  /* Attachment buttons styling */
-  #curriculumDetailsModal .attachment-item {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 8px 12px;
-    margin-bottom: 8px;
-    background: #f8f9fa;
-    border-radius: 6px;
-    border: 1px solid #e0e0e0;
-  }
-
-  #curriculumDetailsModal .attachment-item:last-child {
-    margin-bottom: 0;
-  }
-
-  #curriculumDetailsModal .attachment-name {
-    flex: 1;
-    font-size: 14px;
-    color: #333;
-    font-family: 'TT Interphases', sans-serif;
-  }
-
-  #curriculumDetailsModal .attachment-actions {
-    display: flex;
-    gap: 8px;
-  }
-
-  #curriculumDetailsModal .attachment-btn {
-    padding: 6px 12px;
-    border: none;
-    border-radius: 4px;
-    font-size: 12px;
-    font-weight: 600;
-    cursor: pointer;
-    transition: all 0.2s ease;
-    font-family: 'TT Interphases', sans-serif;
-  }
-
-  #curriculumDetailsModal .attachment-view-btn {
-    background: #1976d2;
-    color: white;
-  }
-
-  #curriculumDetailsModal .attachment-view-btn:hover {
-    background: #1565c0;
-  }
-
-  #curriculumDetailsModal .attachment-download-btn {
-    background: #4CAF50;
-    color: white;
-  }
-
-  #curriculumDetailsModal .attachment-download-btn:hover {
-    background: #45a049;
-  }
-
-  /* Review Section - Match department dean styling */
-  #curriculumDetailsModal .review-section {
-    background: #f8f9fa;
-    padding: 20px;
-    border-radius: 0px;
-    border: none;
-    border-top: 1px solid #e0e0e0;
-  }
-
-  #curriculumDetailsModal .review-item {
-    margin-bottom: 15px;
-    padding-bottom: 15px;
-    padding-left: 0px;
-    padding-right: 0px;
-    border-bottom: 1px solid #e0e0e0;
-  }
-
-  #curriculumDetailsModal .review-item:last-child {
-    border-bottom: none;
-    margin-bottom: 0;
-    padding-bottom: 0;
-  }
-
-  #curriculumDetailsModal .review-item.full-width {
-    display: flex;
-    flex-direction: column;
-  }
-
-  #curriculumDetailsModal .review-item strong {
-    display: block;
-    color: #333;
-    margin-bottom: 5px;
-    font-size: 14px;
-    font-family: 'TT Interphases', sans-serif;
-  }
-
-  #curriculumDetailsModal .review-item span {
-    color: #666;
-    font-size: 14px;
-    font-family: 'TT Interphases', sans-serif;
-  }
-
-  #curriculumDetailsModal .review-text {
-    color: #666;
-    font-size: 14px;
-    line-height: 1.6;
-    white-space: pre-wrap;
-    background: white;
-    padding: 10px;
-    border-radius: 4px;
-    margin-top: 5px;
-    font-family: 'TT Interphases', sans-serif;
-  }
-
-  #curriculumDetailsModal .detail-badge {
-    display: inline-block;
-    padding: 4px 12px;
-    border-radius: 4px;
-    font-size: 12px;
-    font-weight: 600;
-    font-family: 'TT Interphases', sans-serif;
-  }
-
-  #curriculumDetailsModal .badge-pending {
-    background: #fff3cd;
-    color: #856404;
-  }
-
-  #curriculumDetailsModal .badge-approved {
-    background: #d4edda;
-    color: #155724;
-  }
-
-  #curriculumDetailsModal .badge-rejected {
-    background: #f8d7da;
-    color: #721c24;
-  }
-
-  @keyframes fadeIn {
-    from {
-      opacity: 0;
-      transform: translateY(-20px);
-    }
-    to {
-      opacity: 1;
-      transform: translateY(0);
-    }
-  }
-</style>
-
-<div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 20px; margin-top: 0;">
-  <div>
-    <p style="color: #666; margin: 0;">
-      <span style="font-size: 24px; font-weight: bold; font-family: 'TT Interphases', sans-serif; color: #111;">Academic Standards Compliance Monitoring</span><br>
-      <span id="date-indicator" style="font-size: 16px;">Loading...</span>
-    </p>
+<!-- QA dashboard styling lives in `admin-quality_assurance/styles/dashboard.css` -->
+
+<!-- Header -->
+<div class="qa-dashboard-header">
+  <div class="qa-title-block">
+    <h1>Academic Standards Compliance Monitoring</h1>
+    <div class="qa-date-pill" aria-live="polite">
+      <i data-lucide="calendar" class="icon-lucide-16"></i>
+      <span id="date-indicator">Loading...</span>
+    </div>
   </div>
-  
-  <div style="display: flex; align-items: center; gap: 10px;">
-    <span style="font-weight: bold; color: #333;">Academic Term:</span>
-    <select id="academicTermSelect" style="padding: 8px 12px; border: 1px solid #ccc; border-radius: 4px; font-size: 14px;">
-      <option value="all">All Terms (Current Academic Year)</option>
-    </select>
-    <button id="currentTermBtn" style="background-color: #739AFF; color: white; border: none; padding: 8px 16px; border-radius: 6px; font-size: 14px; font-weight: bold; cursor: pointer;">Current Term</button>
+
+  <div class="qa-term-controls" aria-label="Academic term controls">
+    <label for="academicTermSelect">Academic Term</label>
+    <div class="qa-select-wrap">
+      <select id="academicTermSelect" class="qa-select">
+        <option value="all">All Terms (Current Academic Year)</option>
+      </select>
+      <i data-lucide="chevrons-up-down" class="icon-lucide-16"></i>
+    </div>
+    <button id="currentTermBtn" class="btn-primary" type="button">
+      <i data-lucide="target" class="icon-lucide-16"></i>
+      Current Term
+    </button>
   </div>
-</div> 
+</div>
 
 <!-- Compliance Status Card -->
-<div style="width: 100%; background: #fff; border-radius: 14px; box-shadow: 0 2px 8px rgba(0,0,0,0.07); padding: 20px 24px 18px 24px; margin-bottom: 30px; box-sizing: border-box;">
-  <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 12px;">
+<div class="qa-card qa-compliance" aria-label="Compliance status">
+  <div class="qa-compliance-top">
     <div>
-      <div id="compliance-status-title" style="font-size: 1.6rem; font-weight: bold; color: #111; font-family: 'TT Interphases', sans-serif;">All Terms (Current Academic Year) Compliance Status</div>
-      <div style="font-size: 1rem; color: #6b7280; font-family: 'TT Interphases', sans-serif; margin-top: 2px;">Academic standards compliance</div>
+      <h2 id="compliance-status-title">All Terms (Current Academic Year) Compliance Status</h2>
+      <p>Academic standards compliance</p>
     </div>
-    <div style="display: flex; flex-direction: column; align-items: flex-end; min-width: 90px;">
-      <span id="compliance-percentage" style="font-size: 2rem; font-weight: bold; color: #22c55e; font-family: 'TT Interphases', sans-serif; line-height: 1;">0%</span>
-      <span style="font-size: 1rem; color: #6b7280; font-family: 'TT Interphases', sans-serif; margin-top: 2px;">Compliant</span>
+    <div class="qa-compliance-metric">
+      <div id="compliance-percentage" class="value">0%</div>
+      <div class="qa-dept-sub">Compliant</div>
     </div>
   </div>
-  <div style="width: 100%; height: 14px; background: #f3f4f6; border-radius: 7px; overflow: hidden; margin-top: 8px;">
-    <div id="compliance-progress-bar" style="width: 0%; height: 100%; background: #111; border-radius: 7px; transition: width 1.2s cubic-bezier(0.4,0,0.2,1);"></div>
+  <div class="qa-progress">
+    <div id="compliance-progress-bar"></div>
   </div>
 </div>
 <script>
@@ -751,13 +112,13 @@
     // Update compliance percentage
     const compliancePercent = stats.compliancePercentage || 0;
     const isCompliant = compliancePercent >= 70; // Green if >= 70%, red otherwise
-    percentElem.style.color = isCompliant ? '#22c55e' : '#ef4444';
+    percentElem.style.color = isCompliant ? '#0F7A53' : '#b91c1c';
     percentElem.textContent = compliancePercent + '%';
     
     // Update progress bar
     setTimeout(function() {
       progressBar.style.width = compliancePercent + '%';
-      progressBar.style.background = isCompliant ? '#22c55e' : '#111';
+      progressBar.style.background = isCompliant ? '#0F7A53' : '#b91c1c';
     }, 200);
     
     // Animate numbers
@@ -792,14 +153,14 @@
           renderDepartmentCards(data.data);
         } else {
           console.error('Error fetching department compliance:', data.message);
-          document.getElementById('departmentCardsContainer').innerHTML = 
-            '<div style="width: 100%; text-align: center; padding: 20px; color: #ef4444; font-family: \'TT Interphases\', sans-serif;">Error loading department compliance data.</div>';
+          document.getElementById('departmentCardsContainer').innerHTML =
+            '<div class="qa-card qa-dept-card" style="text-align:center;"><div class="qa-dept-sub" style="color:#b91c1c;">Error loading department compliance data.</div></div>';
         }
       })
       .catch(error => {
         console.error('Error fetching department compliance:', error);
-        document.getElementById('departmentCardsContainer').innerHTML = 
-          '<div style="width: 100%; text-align: center; padding: 20px; color: #ef4444; font-family: \'TT Interphases\', sans-serif;">Error loading department compliance data.</div>';
+        document.getElementById('departmentCardsContainer').innerHTML =
+          '<div class="qa-card qa-dept-card" style="text-align:center;"><div class="qa-dept-sub" style="color:#b91c1c;">Error loading department compliance data.</div></div>';
       });
   }
   
@@ -808,35 +169,35 @@
     const container = document.getElementById('departmentCardsContainer');
     
     if (!departments || departments.length === 0) {
-      container.innerHTML = 
-        '<div style="width: 100%; text-align: center; padding: 20px; color: #6b7280; font-family: \'TT Interphases\', sans-serif;">No department data available for the selected term.</div>';
+      container.innerHTML =
+        '<div class="qa-card qa-dept-card" style="text-align:center;"><div class="qa-dept-sub">No department data available for the selected term.</div></div>';
       return;
     }
     
     container.innerHTML = departments.map(dept => {
       // Determine text color for department badge based on background color
-      const bgColor = dept.color_code || '#1976d2';
+      const bgColor = dept.color_code || '#0C4B34';
       // Simple check: if color is light, use dark text; otherwise use white text
       const rgb = hexToRgb(bgColor);
       const brightness = (rgb.r * 299 + rgb.g * 587 + rgb.b * 114) / 1000;
       const textColor = brightness > 128 ? '#111' : '#fff';
       
       const compliancePercent = dept.compliance_percentage || 0;
-      const progressBarColor = compliancePercent >= 70 ? '#22c55e' : '#111';
+      const progressBarColor = compliancePercent >= 70 ? '#0F7A53' : '#b91c1c';
       
       return `
-        <div style="background: #fff; border-radius: 12px; box-shadow: 0 1px 4px rgba(0,0,0,0.06); padding: 22px 28px 16px 28px; flex: 1 1 350px; max-width: 48%; display: flex; flex-direction: column; margin-bottom: 0;">
-          <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 8px;">
-            <div style="display: flex; align-items: center; gap: 16px;">
-              <span style="background: ${bgColor}; color: ${textColor}; font-weight: bold; font-size: 1rem; border-radius: 8px; padding: 4px 16px; font-family: 'TT Interphases', sans-serif;">${dept.department_code}</span>
-              <span style="font-size: 1.25rem; font-weight: bold; color: #111; font-family: 'TT Interphases', sans-serif;">${compliancePercent}% Compliant</span>
+        <div class="qa-card qa-dept-card">
+          <div class="qa-dept-top">
+            <div>
+              <span class="qa-dept-badge" style="background:${bgColor}; color:${textColor};">${dept.department_code}</span>
+              <div class="qa-dept-metric" style="margin-top:8px;">${compliancePercent}% Compliant</div>
             </div>
-            <div style="font-size: 1rem; color: #374151; font-family: 'TT Interphases', sans-serif; font-weight: 500;">${dept.compliant_courses}/${dept.total_courses} courses</div>
+            <div class="qa-dept-sub">${dept.compliant_courses}/${dept.total_courses} courses</div>
           </div>
-          <div style="width: 100%; height: 10px; background: #f3f4f6; border-radius: 5px; overflow: hidden; margin-bottom: 8px;">
-            <div style="width: ${compliancePercent}%; height: 100%; background: ${progressBarColor}; border-radius: 5px; transition: width 0.6s ease-in-out;"></div>
+          <div class="qa-dept-progress">
+            <div style="width:${compliancePercent}%; background:${progressBarColor};"></div>
           </div>
-          <div style="font-size: 1rem; color: #6b7280; font-family: 'TT Interphases', sans-serif;">${dept.courses_needing_attention} course${dept.courses_needing_attention !== 1 ? 's' : ''} need attention</div>
+          <div class="qa-dept-sub">${dept.courses_needing_attention} course${dept.courses_needing_attention !== 1 ? 's' : ''} need attention</div>
         </div>
       `;
     }).join('');
@@ -1046,24 +407,17 @@
     }
   }
 
-  // Create curriculum review card
+  // Create curriculum review card with Lucide icons
   function createCurriculumCard(request) {
     const card = document.createElement('div');
     card.className = 'reference-request-card';
-    // Store request data in the card element
+    card.setAttribute('data-proposal-id', request.proposal_id);
     card.setAttribute('data-request', JSON.stringify(request));
 
-    const departmentColor = request.department_color || '#1976d2';
+    const departmentColor = request.department_color || '#0C4B34';
     
-    // Get program code from programs array (first program)
-    let programCode = 'QA';
-    if (request.programs && request.programs.length > 0) {
-      programCode = request.programs[0].code || request.programs[0].program_code || 'QA';
-    } else if (request.program_code) {
-      programCode = request.program_code;
-    } else if (request.department_code) {
-      programCode = request.department_code;
-    }
+    // Get program code
+    let programCode = request.program_code || request.department_code || 'QA';
     
     // Get course type
     const courseType = request.course_type || request.type || 'New Course Proposal';
@@ -1078,24 +432,32 @@
     const displayCourseType = courseTypeMap[courseType] || courseType;
     
     // Count references and attachments
-    const referencesCount = request.references ? (Array.isArray(request.references) ? request.references.length : 0) : 0;
-    const attachmentsCount = request.attachments ? (Array.isArray(request.attachments) ? request.attachments.length : 0) : 0;
+    const referencesCount = request.references_count || 0;
+    const attachmentsCount = request.attachments_count || 0;
     
-    // Build summary with icons
+    // Build summary with Lucide icons (DESIGN.md Section 14 - MANDATORY)
     let summaryHTML = '<div style="display: flex; align-items: center; gap: 12px; margin-top: 8px; flex-wrap: wrap;">';
     if (referencesCount > 0) {
       summaryHTML += `<div style="display: flex; align-items: center; gap: 6px; font-size: 11px; color: #666;">
-        <span style="font-size: 14px;">📚</span>
+        <i data-lucide="book-open" class="icon-lucide-16" style="color: #666;"></i>
         <span>${referencesCount} reference${referencesCount !== 1 ? 's' : ''}</span>
       </div>`;
     }
     if (attachmentsCount > 0) {
       summaryHTML += `<div style="display: flex; align-items: center; gap: 6px; font-size: 11px; color: #666;">
-        <span style="font-size: 14px;">📎</span>
+        <i data-lucide="paperclip" class="icon-lucide-16" style="color: #666;"></i>
         <span>${attachmentsCount} attachment${attachmentsCount !== 1 ? 's' : ''}</span>
       </div>`;
     }
     summaryHTML += '</div>';
+
+    // Status display
+    const statusClass = request.status === 'APPROVED' ? 'badge-approved' : (request.status === 'REJECTED' ? 'badge-rejected' : 'badge-pending');
+    const statusText = request.status === 'APPROVED' ? 'Approved' : (request.status === 'REJECTED' ? 'Rejected' : 'Pending');
+    
+    // Date display
+    const dateDisplay = request.submitted_at || request.approved_at || request.rejected_at || new Date().toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' });
+    const dateLabel = request.status === 'APPROVED' ? 'Approved on' : (request.status === 'REJECTED' ? 'Rejected on' : 'Submitted on');
 
     card.innerHTML = `
       <div class="request-header">
@@ -1115,92 +477,178 @@
         ${summaryHTML}
       </div>
 
-      ${request.status === 'PENDING' ? `
+      ${request.status === 'PENDING' || request.status === 'Pending QA Review' ? `
         <div class="action-buttons">
-          <button class="approve-btn">Approve</button>
-          <button class="reject-btn">Reject</button>
+          <button class="approve-btn" onclick="handleApprove(${request.proposal_id}, this)">
+            <i data-lucide="check-circle" class="icon-lucide-16"></i> Approve
+          </button>
+          <button class="reject-btn" onclick="handleReject(${request.proposal_id}, this)">
+            <i data-lucide="x-circle" class="icon-lucide-16"></i> Reject
+          </button>
         </div>
       ` : request.status === 'APPROVED' ? `
         <div class="action-buttons">
-          <button class="status-approved-btn" disabled>Approved</button>
+          <button class="status-approved-btn" disabled>
+            <i data-lucide="check-circle" class="icon-lucide-16"></i> Approved
+          </button>
         </div>
       ` : `
         <div class="action-buttons">
-          <button class="status-rejected-btn" disabled>Rejected</button>
+          <button class="status-rejected-btn" disabled>
+            <i data-lucide="x-circle" class="icon-lucide-16"></i> Rejected
+          </button>
         </div>
       `}
 
-      <button class="view-details-btn" onclick="openCurriculumDetailsModal(this)">View Details</button>
+      <button class="view-details-btn" onclick="openCurriculumDetailsModal(this)">
+        <i data-lucide="eye" class="icon-lucide-16"></i> View Details
+      </button>
 
-      ${request.status === 'PENDING' ? `
-        <div class="request-date">Submitted on: ${request.date || new Date().toLocaleDateString()}</div>
-      ` : request.status === 'APPROVED' ? `
-        <div class="request-date">Approved on: ${request.date || new Date().toLocaleDateString()}</div>
-      ` : `
-        <div class="request-date">Rejected on: ${request.date || new Date().toLocaleDateString()}</div>
-      `}
+      <div class="request-date">${dateLabel}: ${dateDisplay}</div>
     `;
+
+    // Initialize Lucide icons for this card
+    setTimeout(() => {
+      if (typeof lucide !== 'undefined') {
+        lucide.createIcons();
+      }
+    }, 0);
 
     return card;
   }
 
-  // Load and display curriculum review cards
+  // Handle approve action
+  function handleApprove(proposalId, button) {
+    if (!confirm('Are you sure you want to approve this curriculum proposal?')) {
+      return;
+    }
+    
+    button.disabled = true;
+    button.innerHTML = '<i data-lucide="loader-2" class="icon-lucide-16 spin"></i> Approving...';
+    
+    fetch('api/approve_curriculum.php', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ proposal_id: proposalId })
+    })
+    .then(response => response.json())
+    .then(data => {
+      if (data.success) {
+        alert('Curriculum proposal approved successfully!');
+        loadCurriculumCards(); // Reload to show updated status
+      } else {
+        alert('Failed to approve: ' + (data.message || 'Unknown error'));
+        button.disabled = false;
+        button.innerHTML = '<i data-lucide="check-circle" class="icon-lucide-16"></i> Approve';
+      }
+    })
+    .catch(error => {
+      console.error('Error approving proposal:', error);
+      alert('Error approving proposal. Please try again.');
+      button.disabled = false;
+      button.innerHTML = '<i data-lucide="check-circle" class="icon-lucide-16"></i> Approve';
+    });
+  }
+
+  // Handle reject action
+  function handleReject(proposalId, button) {
+    const reason = prompt('Please enter the rejection reason:');
+    if (!reason || reason.trim() === '') {
+      alert('Rejection reason is required.');
+      return;
+    }
+    
+    button.disabled = true;
+    button.innerHTML = '<i data-lucide="loader-2" class="icon-lucide-16 spin"></i> Rejecting...';
+    
+    fetch('api/reject_curriculum.php', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ 
+        proposal_id: proposalId,
+        reason: reason.trim()
+      })
+    })
+    .then(response => response.json())
+    .then(data => {
+      if (data.success) {
+        alert('Curriculum proposal rejected.');
+        loadCurriculumCards(); // Reload to show updated status
+      } else {
+        alert('Failed to reject: ' + (data.message || 'Unknown error'));
+        button.disabled = false;
+        button.innerHTML = '<i data-lucide="x-circle" class="icon-lucide-16"></i> Reject';
+      }
+    })
+    .catch(error => {
+      console.error('Error rejecting proposal:', error);
+      alert('Error rejecting proposal. Please try again.');
+      button.disabled = false;
+      button.innerHTML = '<i data-lucide="x-circle" class="icon-lucide-16"></i> Reject';
+    });
+  }
+
+  // Load and display curriculum review cards from API
+  let curriculumRequests = [];
+  
   function loadCurriculumCards() {
     const grid = document.getElementById('qaCurriculumGrid');
     const emptyState = document.getElementById('qaCurriculumEmptyState');
     
     if (!grid) return;
 
-    // Dummy data for demonstration
-    const dummyCard = {
-      requester_name: 'Dr. Philipcris Encarnacion',
-      dean_name: 'Dr. Philipcris Encarnacion',
-      department_code: 'CS',
-      department_name: 'College of Computing Studies',
-      department_color: '#1976d2',
-      course_code: 'CS101',
-      course_name: 'Introduction to Computer Science',
-      units: '3',
-      lecture_hours: '2',
-      laboratory_hours: '3',
-      prerequisites: 'None',
-      year_level: '1st Year',
-      term: '1st Semester',
-      programs: [
-        { code: 'BSCS', name: 'Bachelor of Science in Computer Science' },
-        { code: 'BSIT', name: 'Bachelor of Science in Information Technology' }
-      ],
-      course_type: 'New Course Proposal',
-      references: [
-        { title: 'Introduction to Programming', author: 'Smith, J.' },
-        { title: 'Data Structures and Algorithms', author: 'Johnson, M.' }
-      ],
-      course_description: 'This course provides an introduction to the fundamental concepts of computer science, including programming basics, data structures, algorithms, and computer systems. Students will learn problem-solving techniques and develop programming skills using a modern programming language.',
-      learning_outcomes: '1. Understand basic programming concepts and syntax\n2. Design and implement simple algorithms\n3. Use data structures to organize information\n4. Debug and test programs effectively\n5. Apply computational thinking to solve problems',
-      course_outline: 'Week 1 (3 hrs)\n   Introduction to Computer Science\n\nWeek 2 (3 hrs)\n   Programming Fundamentals\n\nWeek 3 (3 hrs)\n   Variables and Data Types\n\nWeek 4 (3 hrs)\n   Control Structures\n\nWeek 5 (3 hrs)\n   Functions and Modules\n\nWeek 6 (3 hrs)\n   Arrays and Lists\n\nWeek 7 (3 hrs)\n   Object-Oriented Programming Basics\n\nWeek 8 (3 hrs)\n   File Handling\n\nWeek 9 (3 hrs)\n   Error Handling and Debugging\n\nWeek 10 (3 hrs)\n   Introduction to Algorithms\n\nWeek 11 (3 hrs)\n   Sorting and Searching\n\nWeek 12 (3 hrs)\n   Final Project',
-      assessment: 'Quizzes: 20%\nAssignments: 30%\nMidterm Exam: 20%\nFinal Project: 20%\nClass Participation: 10%',
-      materials: '[QA76.9] Introduction to Programming by Smith, J. (Pearson, 2023)\n[QA76.6] Data Structures and Algorithms by Johnson, M. (McGraw-Hill, 2022)',
-      attachments: [
-        { name: 'course_syllabus.pdf', url: '#', filename: 'course_syllabus.pdf' },
-        { name: 'sample_projects.zip', url: '#', filename: 'sample_projects.zip' },
-        { name: 'assessment_rubric.docx', url: '#', filename: 'assessment_rubric.docx' }
-      ],
-      justification: 'This course is essential for first-year students as it provides the foundational knowledge required for all subsequent computer science courses. The curriculum has been updated to include modern programming practices and aligns with industry standards. The course addresses the need for stronger programming fundamentals identified in our program review.',
-      summary: 'New course curriculum submission for review. Includes updated learning objectives and assessment methods.',
-      status: 'PENDING',
-      date: new Date().toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })
-    };
+    // Fetch real data from API
+    fetch('api/get_qa_curriculum.php?status=PENDING')
+      .then(response => {
+        if (!response.ok) {
+          throw new Error('Network response was not ok');
+        }
+        return response.json();
+      })
+      .then(data => {
+        // Clear existing cards
+        grid.innerHTML = '';
+        
+        if (data.success && data.data && data.data.length > 0) {
+          curriculumRequests = data.data;
+          
+          // Add cards for each proposal
+          data.data.forEach((request, index) => {
+            const cardElement = createCurriculumCard(request);
+            // Add staggered animation delay
+            cardElement.style.animationDelay = (0.08 + index * 0.08) + 's';
+            grid.appendChild(cardElement);
+          });
+          
+          // Hide empty state
+          if (emptyState) {
+            emptyState.style.display = 'none';
+          }
+        } else {
+          // Show empty state
+          if (emptyState) {
+            emptyState.style.display = 'block';
+          }
+        }
+        
+        // Update collapsed badge count
+        updateCurriculumBadgeCount(data.data?.length || 0);
+      })
+      .catch(error => {
+        console.error('Error loading curriculum cards:', error);
+        grid.innerHTML = '<div class="qa-card" style="text-align:center;"><div class="qa-dept-sub" style="color:#b91c1c;">Error loading curriculum data.</div></div>';
+      });
+  }
 
-    // Clear existing cards
-    grid.innerHTML = '';
-
-    // Add dummy card
-    const cardElement = createCurriculumCard(dummyCard);
-    grid.appendChild(cardElement);
-
-    // Hide empty state if cards exist
-    if (emptyState) {
-      emptyState.style.display = 'none';
+  // Update the collapsed badge count
+  function updateCurriculumBadgeCount(count) {
+    const badge = document.querySelector('.request-count-badge');
+    if (badge) {
+      badge.textContent = count;
     }
   }
 
@@ -1304,6 +752,8 @@
       // Restore the header actions (View All)
       headerActions.style.display = 'flex';
       if (toggleButton) toggleButton.textContent = 'Collapse';
+
+      if (window.lucide?.createIcons) window.lucide.createIcons();
     } else {
       // Collapse – hide list and footer, replace header actions with badge + expand
       container.style.display = 'none';
@@ -1319,10 +769,9 @@
       collapsedControls.className = 'collapsed-controls';
       collapsedControls.innerHTML = `
         <div class="request-count-badge">${totalItems}</div>
-        <button class="expand-btn" onclick="toggleCurriculumSection()">
+        <button class="btn-ghost expand-btn" type="button" onclick="toggleCurriculumSection()">
           <span>Expand</span>
-          <img src="../src/assets/icons/right-arrow-icon.png" alt="Expand" class="collapse-icon" style="transform: rotate(90deg);" onerror="this.style.display='none'; this.nextElementSibling.style.display='inline';">
-          <span style="display: none;">^</span>
+          <i data-lucide="chevron-down" class="icon-lucide-16"></i>
         </button>
       `;
       
@@ -1330,79 +779,92 @@
       if (sectionHeader) {
         sectionHeader.appendChild(collapsedControls);
       }
+
+      if (window.lucide?.createIcons) window.lucide.createIcons();
     }
   }
 </script> 
 
-<!-- Four Stats Cards Row -->
-<div style="width: 100%; display: flex; gap: 20px; margin-bottom: 24px; flex-wrap: wrap;">
-  <div style="flex: 1 1 200px; min-width: 180px; background: #fff; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.07); padding: 20px 18px; display: flex; flex-direction: column; align-items: flex-start;">
-    <div style="font-size: 18px; font-weight: bold; color: #111; font-family: 'TT Interphases', sans-serif; margin-bottom: 8px;">Compliant Courses</div>
-    <div style="font-size: 2rem; font-weight: bold; color: #22c55e; font-family: 'TT Interphases', sans-serif;" id="compliant-courses">0</div>
+<!-- Stats -->
+<div class="qa-stats-grid" aria-label="Compliance statistics">
+  <div class="qa-card qa-stat is-ok">
+    <div class="label">Compliant Courses</div>
+    <div class="number" id="compliant-courses">0</div>
   </div>
-  <div style="flex: 1 1 200px; min-width: 180px; background: #fff; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.07); padding: 20px 18px; display: flex; flex-direction: column; align-items: flex-start;">
-    <div style="font-size: 18px; font-weight: bold; color: #111; font-family: 'TT Interphases', sans-serif; margin-bottom: 8px;">Non-Compliant</div>
-    <div style="font-size: 2rem; font-weight: bold; color: #ef4444; font-family: 'TT Interphases', sans-serif;" id="non-compliant-courses">0</div>
+  <div class="qa-card qa-stat is-bad">
+    <div class="label">Non-Compliant</div>
+    <div class="number" id="non-compliant-courses">0</div>
   </div>
-  <div style="flex: 1 1 200px; min-width: 180px; background: #fff; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.07); padding: 20px 18px; display: flex; flex-direction: column; align-items: flex-start;">
-    <div style="font-size: 18px; font-weight: bold; color: #111; font-family: 'TT Interphases', sans-serif; margin-bottom: 8px;">Total Courses</div>
-    <div style="font-size: 2rem; font-weight: bold; color: #0C4B34; font-family: 'TT Interphases', sans-serif;" id="total-courses">0</div>
+  <div class="qa-card qa-stat is-neutral">
+    <div class="label">Total Courses</div>
+    <div class="number" id="total-courses">0</div>
   </div>
-  <div style="flex: 1 1 200px; min-width: 180px; background: #fff; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.07); padding: 20px 18px; display: flex; flex-direction: column; align-items: flex-start;">
-    <div style="font-size: 18px; font-weight: bold; color: #111; font-family: 'TT Interphases', sans-serif; margin-bottom: 8px;">Improvement</div>
-    <div style="font-size: 2rem; font-weight: bold; color: #3b82f6; font-family: 'TT Interphases', sans-serif;" id="improvement">0</div>
+  <div class="qa-card qa-stat is-info">
+    <div class="label">Improvement</div>
+    <div class="number" id="improvement">0</div>
   </div>
-</div> 
+</div>
 
-<!-- Curriculum Review and Approval Section -->
-<div class="dashboard-section" id="qaCurriculumSection">
-  <div class="section-header">
-    <div class="header-left">
-      <h3>Curriculum Review and Approval</h3>
-      <div class="section-description">
-        Review program curricula and course compliance before final Quality Assurance approval.
+<!-- Curriculum Review and Approval -->
+<div class="qa-card qa-section" id="qaCurriculumSection">
+  <div class="qa-section-header section-header">
+    <div class="left header-left">
+      <div class="label-bar"></div>
+      <div>
+        <h3>Curriculum Review and Approval</h3>
+        <p class="section-description">Review program curricula and course compliance before final Quality Assurance approval.</p>
       </div>
     </div>
     <div class="header-actions">
-      <a href="content.php?page=curriculum-review" class="view-all-btn">View All</a>
+      <a href="content.php?page=curriculum-review" class="btn-primary" style="text-decoration: none;">
+        <i data-lucide="arrow-right" class="icon-lucide-16"></i>
+        View All
+      </a>
     </div>
   </div>
 
   <div class="reference-requests-container" id="qaCurriculumContainer">
-    <div class="reference-requests-grid" id="qaCurriculumGrid">
+    <div class="qa-curriculum-grid reference-requests-grid" id="qaCurriculumGrid" aria-live="polite">
       <!-- Curriculum review cards will be dynamically generated here -->
     </div>
-    <div id="qaCurriculumEmptyState" style="text-align: center; padding: 40px 20px; color: #666;">
-      <div style="font-size: 40px; margin-bottom: 12px;">📄</div>
-      <h3 style="font-family: 'TT Interphases', sans-serif; font-size: 18px; color: #333; margin-bottom: 6px;">No Curriculum Items to Review</h3>
-      <p style="font-family: 'TT Interphases', sans-serif; font-size: 14px; color: #666;">
-        When departments submit curriculum changes or course compliance updates, they will appear here for your review.
-      </p>
+    <div id="qaCurriculumEmptyState" class="qa-empty-state" style="display:none;">
+      <div style="margin-bottom: 10px;">
+        <i data-lucide="file-text" class="icon-lucide-22" style="width: 48px; height: 48px; color: rgba(17,24,39,0.35);"></i>
+      </div>
+      <h3>No Curriculum Items to Review</h3>
+      <p>When departments submit curriculum changes or course compliance updates, they will appear here for your review.</p>
     </div>
   </div>
 
-  <div class="section-footer">
-    <button class="collapse-btn" onclick="toggleCurriculumSection()">
+  <div class="section-footer" style="margin-top: 14px; display:flex; justify-content:flex-end;">
+    <button class="btn-ghost collapse-btn" type="button" onclick="toggleCurriculumSection()">
       <span>Collapse</span>
-      <img src="../src/assets/icons/right-arrow-icon.png" alt="Collapse" class="collapse-icon" style="transform: rotate(-90deg);" onerror="this.style.display='none'; this.nextElementSibling.style.display='inline';">
-      <span style="display: none;">^</span>
+      <i data-lucide="chevron-up" class="icon-lucide-16"></i>
     </button>
   </div>
 </div>
 
-<!-- Department Compliance Status Section -->
-<div style="width: 100%; margin-top: 24px; margin-bottom: 30px;">
-  <div style="font-size: 24px; font-weight: bold; color: #111; font-family: 'TT Interphases', sans-serif; margin-bottom: 2px;">Department Compliance Status</div>
-  <div style="font-size: 1rem; color: #6b7280; font-family: 'TT Interphases', sans-serif; margin-bottom: 18px;">Compliance rates by department with detailed breakdown</div>
-
-  <div id="departmentCardsContainer" style="display: flex; flex-wrap: wrap; gap: 20px;">
-    <!-- Department cards will be dynamically inserted here -->
-    <div style="width: 100%; text-align: center; padding: 20px; color: #6b7280; font-family: 'TT Interphases', sans-serif;">Loading department compliance data...</div>
+<!-- Department Compliance Status -->
+<div class="qa-section" aria-label="Department compliance status">
+  <div class="qa-section-header">
+    <div class="left">
+      <div class="label-bar"></div>
+      <div>
+        <h3>Department Compliance Status</h3>
+        <p>Compliance rates by department with detailed breakdown</p>
+      </div>
+    </div>
   </div>
-</div> 
+
+  <div id="departmentCardsContainer" class="qa-dept-grid" aria-live="polite">
+    <div class="qa-card qa-dept-card" style="text-align:center;">
+      <div class="qa-dept-sub">Loading department compliance data...</div>
+    </div>
+  </div>
+</div>
 
 <!-- Curriculum Details Modal -->
-<div id="curriculumDetailsModal" class="modal-overlay" style="display: none;">
+<div id="curriculumDetailsModal" class="modal-overlay qa-modal" style="display: none;">
   <div class="modal-box">
     <div class="modal-header">
       <div>
@@ -1899,6 +1361,7 @@
     
     // Debug: log the data to see what we're working with (only if hours are missing)
     if (!formattedOutline.includes('hrs') && !formattedOutline.includes('hours')) {
+      console.log({
         courseOutline: courseOutline,
         courseOutlineHours: courseOutlineHours,
         formattedOutline: formattedOutline.substring(0, 200) + '...',

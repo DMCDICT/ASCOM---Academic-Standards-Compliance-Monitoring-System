@@ -290,11 +290,119 @@
       margin-top: 2px;
       margin-bottom: 2px;
   }
+
+  /* DESIGN.md Section 2.1 - fadeSlideUp animation */
+  @keyframes fadeSlideUp {
+    from {
+      opacity: 0;
+      transform: translateY(18px) scale(0.985);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0) scale(1);
+    }
+  }
+
+  /* Apply fadeSlideUp to cards with staggered delay */
+  .reference-request-card {
+    animation: fadeSlideUp 0.45s ease-out both;
+  }
+  
+  .reference-request-card:nth-child(1) { animation-delay: 0.08s; }
+  .reference-request-card:nth-child(2) { animation-delay: 0.16s; }
+  .reference-request-card:nth-child(3) { animation-delay: 0.24s; }
+  .reference-request-card:nth-child(4) { animation-delay: 0.32s; }
+  .reference-request-card:nth-child(5) { animation-delay: 0.40s; }
+  .reference-request-card:nth-child(6) { animation-delay: 0.48s; }
+  .reference-request-card:nth-child(7) { animation-delay: 0.56s; }
+  .reference-request-card:nth-child(8) { animation-delay: 0.64s; }
+
+  /* Lucide icon sizing - DESIGN.md Section 14.5 */
+  .icon-lucide-16 {
+    width: 16px;
+    height: 16px;
+  }
+  
+  .icon-lucide-20 {
+    width: 20px;
+    height: 20px;
+  }
+
+  /* Spin animation for loading */
+  i[data-lucide].spin {
+    animation: spin 1s linear infinite;
+  }
+
+  @keyframes spin {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+  }
 </style>
 
 <script>
-  // Placeholder data array; can be replaced with real API data later
+  // Curriculum requests data
   let curriculumRequests = [];
+  let currentFilter = 'PENDING';
+
+  // Load data from API
+  function loadCurriculumData() {
+    const grid = document.getElementById('curriculumRequestsGrid');
+    if (!grid) return;
+
+    grid.innerHTML = '<div style="width: 100%; text-align: center; padding: 40px 20px; color: #666; font-family: \'TT Interphases\', sans-serif;"><i data-lucide="loader-2" class="spin" style="width: 24px; height: 24px;"></i><br>Loading curriculum data...</div>';
+    
+    // Initialize Lucide for loading spinner
+    setTimeout(() => {
+      if (typeof lucide !== 'undefined') {
+        lucide.createIcons();
+      }
+    }, 0);
+
+    fetch('api/get_qa_curriculum.php?status=' + currentFilter)
+      .then(response => {
+        if (!response.ok) {
+          throw new Error('Network response was not ok');
+        }
+        return response.json();
+      })
+      .then(data => {
+        grid.innerHTML = '';
+        
+        if (data.success && data.data && data.data.length > 0) {
+          curriculumRequests = data.data;
+          
+          data.data.forEach((request, index) => {
+            const cardElement = createCurriculumCard(request);
+            cardElement.style.animationDelay = (0.08 + index * 0.08) + 's';
+            grid.appendChild(cardElement);
+          });
+          
+          // Initialize Lucide icons
+          setTimeout(() => {
+            if (typeof lucide !== 'undefined') {
+              lucide.createIcons();
+            }
+          }, 0);
+        } else {
+          grid.innerHTML = `
+            <div style="width: 100%; text-align: center; padding: 40px 20px; color: #666; font-family: 'TT Interphases', sans-serif;">
+              <i data-lucide="file-text" style="width: 48px; height: 48px; color: #999; margin-bottom: 12px;"></i>
+              <h3 style="font-size: 18px; color: #333; margin-bottom: 6px;">No Curriculum Items Found</h3>
+              <p style="font-size: 14px; color: #666;">No curriculum proposals found with status: ${currentFilter}</p>
+            </div>
+          `;
+          setTimeout(() => {
+            if (typeof lucide !== 'undefined') {
+              lucide.createIcons();
+            }
+          }, 0);
+        }
+      })
+      .catch(error => {
+        console.error('Error loading curriculum data:', error);
+        grid.innerHTML = '<div style="width: 100%; text-align: center; padding: 40px 20px; color: #ef4444; font-family: \'TT Interphases\', sans-serif;">Error loading curriculum data.</div>';
+      });
+  }
 
   function filterCurriculum(status) {
     // Update active button state
@@ -306,33 +414,20 @@
       targetButton.classList.add('active');
     }
 
-    const grid = document.getElementById('curriculumRequestsGrid');
-    if (!grid) return;
-    grid.innerHTML = '';
-
-    const filtered = curriculumRequests.filter(r => r.status === status);
-    filtered.forEach(request => {
-      grid.appendChild(createCurriculumCard(request));
-    });
+    currentFilter = status;
+    loadCurriculumData();
   }
 
   function createCurriculumCard(request) {
     const card = document.createElement('div');
     card.className = 'reference-request-card';
-    // Store request data in the card element
+    card.setAttribute('data-proposal-id', request.proposal_id);
     card.setAttribute('data-request', JSON.stringify(request));
 
     const departmentColor = request.department_color || '#1976d2';
     
-    // Get program code from programs array (first program)
-    let programCode = 'QA';
-    if (request.programs && request.programs.length > 0) {
-      programCode = request.programs[0].code || request.programs[0].program_code || 'QA';
-    } else if (request.program_code) {
-      programCode = request.program_code;
-    } else if (request.department_code) {
-      programCode = request.department_code;
-    }
+    // Get program code
+    let programCode = request.program_code || request.department_code || 'QA';
     
     // Get course type
     const courseType = request.course_type || request.type || 'New Course Proposal';
@@ -347,24 +442,28 @@
     const displayCourseType = courseTypeMap[courseType] || courseType;
     
     // Count references and attachments
-    const referencesCount = request.references ? (Array.isArray(request.references) ? request.references.length : 0) : 0;
-    const attachmentsCount = request.attachments ? (Array.isArray(request.attachments) ? request.attachments.length : 0) : 0;
+    const referencesCount = request.references_count || 0;
+    const attachmentsCount = request.attachments_count || 0;
     
-    // Build summary with icons
+    // Build summary with Lucide icons (DESIGN.md Section 14 - MANDATORY)
     let summaryHTML = '<div style="display: flex; align-items: center; gap: 12px; margin-top: 8px; flex-wrap: wrap;">';
     if (referencesCount > 0) {
       summaryHTML += `<div style="display: flex; align-items: center; gap: 6px; font-size: 11px; color: #666;">
-        <span style="font-size: 14px;">📚</span>
+        <i data-lucide="book-open" class="icon-lucide-16" style="color: #666;"></i>
         <span>${referencesCount} reference${referencesCount !== 1 ? 's' : ''}</span>
       </div>`;
     }
     if (attachmentsCount > 0) {
       summaryHTML += `<div style="display: flex; align-items: center; gap: 6px; font-size: 11px; color: #666;">
-        <span style="font-size: 14px;">📎</span>
+        <i data-lucide="paperclip" class="icon-lucide-16" style="color: #666;"></i>
         <span>${attachmentsCount} attachment${attachmentsCount !== 1 ? 's' : ''}</span>
       </div>`;
     }
     summaryHTML += '</div>';
+
+    // Date display
+    const dateDisplay = request.submitted_at || request.approved_at || request.rejected_at || new Date().toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' });
+    const dateLabel = request.status === 'APPROVED' ? 'Approved on' : (request.status === 'REJECTED' ? 'Rejected on' : 'Submitted on');
 
     card.innerHTML = `
       <div class="request-header">
@@ -384,79 +483,134 @@
         ${summaryHTML}
       </div>
 
-      ${request.status === 'PENDING' ? `
+      ${request.status === 'PENDING' || request.status === 'Pending QA Review' ? `
         <div class="action-buttons">
-          <button class="approve-btn">Approve</button>
-          <button class="reject-btn">Reject</button>
+          <button class="approve-btn" onclick="handleApprove(${request.proposal_id}, this)">
+            <i data-lucide="check-circle" class="icon-lucide-16"></i> Approve
+          </button>
+          <button class="reject-btn" onclick="handleReject(${request.proposal_id}, this)">
+            <i data-lucide="x-circle" class="icon-lucide-16"></i> Reject
+          </button>
         </div>
-        <button class="view-details-btn" onclick="openCurriculumDetailsModal(this)" style="width: 100%; padding: 8px 12px; background: #1976d2; color: white; border: none; border-radius: 6px; font-size: 12px; font-weight: 600; cursor: pointer; transition: all 0.2s ease; font-family: 'TT Interphases', sans-serif; margin-top: 8px; margin-bottom: 4px;">View Details</button>
-        <div class="request-date">Submitted on: ${request.date || new Date().toLocaleDateString()}</div>
+        <button class="view-details-btn" onclick="openCurriculumDetailsModal(this)" style="width: 100%; padding: 8px 12px; background: #1976d2; color: white; border: none; border-radius: 6px; font-size: 12px; font-weight: 600; cursor: pointer; transition: all 0.2s ease; font-family: 'TT Interphases', sans-serif; margin-top: 8px; margin-bottom: 4px;">
+          <i data-lucide="eye" class="icon-lucide-16"></i> View Details
+        </button>
+        <div class="request-date">${dateLabel}: ${dateDisplay}</div>
       ` : request.status === 'APPROVED' ? `
         <div class="action-buttons">
-          <button class="status-approved-btn" disabled>Approved</button>
+          <button class="status-approved-btn" disabled>
+            <i data-lucide="check-circle" class="icon-lucide-16"></i> Approved
+          </button>
         </div>
-        <button class="view-details-btn" onclick="openCurriculumDetailsModal(this)" style="width: 100%; padding: 8px 12px; background: #1976d2; color: white; border: none; border-radius: 6px; font-size: 12px; font-weight: 600; cursor: pointer; transition: all 0.2s ease; font-family: 'TT Interphases', sans-serif; margin-top: 8px; margin-bottom: 4px;">View Details</button>
-        <div class="request-date">Approved on: ${request.date || new Date().toLocaleDateString()}</div>
+        <button class="view-details-btn" onclick="openCurriculumDetailsModal(this)" style="width: 100%; padding: 8px 12px; background: #1976d2; color: white; border: none; border-radius: 6px; font-size: 12px; font-weight: 600; cursor: pointer; transition: all 0.2s ease; font-family: 'TT Interphases', sans-serif; margin-top: 8px; margin-bottom: 4px;">
+          <i data-lucide="eye" class="icon-lucide-16"></i> View Details
+        </button>
+        <div class="request-date">${dateLabel}: ${dateDisplay}</div>
       ` : `
         <div class="action-buttons">
-          <button class="status-rejected-btn" disabled>Rejected</button>
+          <button class="status-rejected-btn" disabled>
+            <i data-lucide="x-circle" class="icon-lucide-16"></i> Rejected
+          </button>
         </div>
-        <button class="view-details-btn" onclick="openCurriculumDetailsModal(this)" style="width: 100%; padding: 8px 12px; background: #1976d2; color: white; border: none; border-radius: 6px; font-size: 12px; font-weight: 600; cursor: pointer; transition: all 0.2s ease; font-family: 'TT Interphases', sans-serif; margin-top: 8px; margin-bottom: 4px;">View Details</button>
-        <div class="request-date">Rejected on: ${request.date || new Date().toLocaleDateString()}</div>
+        <button class="view-details-btn" onclick="openCurriculumDetailsModal(this)" style="width: 100%; padding: 8px 12px; background: #1976d2; color: white; border: none; border-radius: 6px; font-size: 12px; font-weight: 600; cursor: pointer; transition: all 0.2s ease; font-family: 'TT Interphases', sans-serif; margin-top: 8px; margin-bottom: 4px;">
+          <i data-lucide="eye" class="icon-lucide-16"></i> View Details
+        </button>
+        <div class="request-date">${dateLabel}: ${dateDisplay}</div>
       `}
     `;
 
     return card;
   }
 
-  document.addEventListener('DOMContentLoaded', function() {
-    // Dummy data for demonstration
-    curriculumRequests = [
-      {
-        requester_name: 'Dr. Philipcris Encarnacion',
-        dean_name: 'Dr. Philipcris Encarnacion',
-        department_code: 'CS',
-        department_name: 'College of Computing Studies',
-        department_color: '#1976d2',
-        course_code: 'CS101',
-        course_name: 'Introduction to Computer Science',
-        units: '3',
-        lecture_hours: '2',
-        laboratory_hours: '3',
-        prerequisites: 'None',
-        year_level: '1st Year',
-        term: '1st Semester',
-        programs: [
-          { code: 'BSCS', name: 'Bachelor of Science in Computer Science' },
-          { code: 'BSIT', name: 'Bachelor of Science in Information Technology' }
-        ],
-        course_type: 'New Course Proposal',
-        references: [
-          { title: 'Introduction to Programming', author: 'Smith, J.' },
-          { title: 'Data Structures and Algorithms', author: 'Johnson, M.' }
-        ],
-        attachments: [
-          { name: 'course_syllabus.pdf', url: '#', filename: 'course_syllabus.pdf' },
-          { name: 'sample_projects.zip', url: '#', filename: 'sample_projects.zip' },
-          { name: 'assessment_rubric.docx', url: '#', filename: 'assessment_rubric.docx' }
-        ],
-        status: 'PENDING',
-        date: new Date().toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })
-      }
-    ];
+  // Handle approve action
+  function handleApprove(proposalId, button) {
+    if (!confirm('Are you sure you want to approve this curriculum proposal?')) {
+      return;
+    }
     
-    // Load initial data
-    filterCurriculum('PENDING');
-  });
-  
-  // Note: The modal HTML and openCurriculumDetailsModal function should be included from dashboard.php
-  // For now, adding a basic implementation
-  function openCurriculumDetailsModal(button) {
-    // This function should open the curriculum details modal
-    // The modal HTML and full implementation are in dashboard.php
-    // For this page to work fully, include the modal from dashboard or create a shared modal component
-    alert('Modal functionality - Please include the modal from dashboard.php or create a shared component');
+    button.disabled = true;
+    button.innerHTML = '<i data-lucide="loader-2" class="icon-lucide-16 spin"></i> Approving...';
+    
+    fetch('api/approve_curriculum.php', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ proposal_id: proposalId })
+    })
+    .then(response => response.json())
+    .then(data => {
+      if (data.success) {
+        alert('Curriculum proposal approved successfully!');
+        loadCurriculumData(); // Reload to show updated status
+      } else {
+        alert('Failed to approve: ' + (data.message || 'Unknown error'));
+        button.disabled = false;
+        button.innerHTML = '<i data-lucide="check-circle" class="icon-lucide-16"></i> Approve';
+      }
+    })
+    .catch(error => {
+      console.error('Error approving proposal:', error);
+      alert('Error approving proposal. Please try again.');
+      button.disabled = false;
+      button.innerHTML = '<i data-lucide="check-circle" class="icon-lucide-16"></i> Approve';
+    });
   }
+
+  // Handle reject action
+  function handleReject(proposalId, button) {
+    const reason = prompt('Please enter the rejection reason:');
+    if (!reason || reason.trim() === '') {
+      alert('Rejection reason is required.');
+      return;
+    }
+    
+    button.disabled = true;
+    button.innerHTML = '<i data-lucide="loader-2" class="icon-lucide-16 spin"></i> Rejecting...';
+    
+    fetch('api/reject_curriculum.php', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ 
+        proposal_id: proposalId,
+        reason: reason.trim()
+      })
+    })
+    .then(response => response.json())
+    .then(data => {
+      if (data.success) {
+        alert('Curriculum proposal rejected.');
+        loadCurriculumData(); // Reload to show updated status
+      } else {
+        alert('Failed to reject: ' + (data.message || 'Unknown error'));
+        button.disabled = false;
+        button.innerHTML = '<i data-lucide="x-circle" class="icon-lucide-16"></i> Reject';
+      }
+    })
+    .catch(error => {
+      console.error('Error rejecting proposal:', error);
+      alert('Error rejecting proposal. Please try again.');
+      button.disabled = false;
+      button.innerHTML = '<i data-lucide="x-circle" class="icon-lucide-16"></i> Reject';
+    });
+  }
+
+  // Open curriculum details modal
+  function openCurriculumDetailsModal(button) {
+    const card = button.closest('.reference-request-card');
+    const requestData = card.getAttribute('data-request');
+    if (requestData) {
+      const request = JSON.parse(requestData);
+      alert('View Details for: ' + request.course_code + ' - ' + request.course_name + '\n\nFull implementation would show detailed modal with course information, references, and attachments.');
+    }
+  }
+
+  document.addEventListener('DOMContentLoaded', function() {
+    // Load initial data
+    loadCurriculumData();
+  });
 </script>
 
 <!-- Note: Include the Curriculum Details Modal from dashboard.php -->

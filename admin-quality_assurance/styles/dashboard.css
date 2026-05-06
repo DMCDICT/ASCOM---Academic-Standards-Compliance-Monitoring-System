@@ -1,0 +1,733 @@
+/*
+ * QA Dashboard styles
+ * Aligned with DESIGN.md theme tokens and component patterns.
+ */
+
+/* -------------------------------------- */
+/* 0. Animations (DESIGN.md)              */
+/* -------------------------------------- */
+@keyframes fadeSlideUp {
+  from { opacity: 0; transform: translateY(18px) scale(0.985); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+@keyframes modalPop {
+  from { opacity: 0; transform: translateY(10px) scale(0.985); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+/* -------------------------------------- */
+/* 1. Base card                            */
+/* -------------------------------------- */
+.qa-card {
+  background: #ffffff;
+  border-radius: 18px;
+  border: 1px solid rgba(12, 75, 52, 0.14);
+  box-shadow: 0 4px 18px rgba(0, 0, 0, 0.04);
+  padding: 22px 24px;
+  transition: all 0.28s cubic-bezier(.4,0,.2,1);
+  position: relative;
+  overflow: hidden;
+  animation: fadeSlideUp 0.45s ease-out both;
+}
+
+.qa-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 12px 36px rgba(12, 75, 52, 0.12);
+  border-color: rgba(12, 75, 52, 0.25);
+}
+
+.qa-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 3px;
+  background: linear-gradient(90deg, #0C4B34 0%, #0F7A53 100%);
+  border-radius: 18px 18px 0 0;
+}
+
+/* -------------------------------------- */
+/* 2. Header / toolbar                      */
+/* -------------------------------------- */
+.qa-dashboard-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+  margin: 0 0 22px 0;
+}
+
+.qa-title-block h1 {
+  margin: 0 0 6px 0;
+  font-size: 22px;
+  font-weight: 800;
+  color: #111827;
+  font-family: 'TT Interphases', sans-serif;
+  line-height: 1.25;
+}
+
+.qa-title-block p {
+  margin: 0;
+  font-size: 13px;
+  color: rgba(17, 24, 39, 0.55);
+  font-weight: 600;
+  letter-spacing: 0.2px;
+}
+
+.qa-date-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: rgba(12, 75, 52, 0.06);
+  border: 1px solid rgba(12, 75, 52, 0.12);
+  border-radius: 12px;
+  padding: 10px 14px;
+  font-size: 13px;
+  font-weight: 700;
+  color: #0C4B34;
+}
+
+.qa-term-controls {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+}
+
+.qa-term-controls label {
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 0.6px;
+  text-transform: uppercase;
+  color: rgba(17, 24, 39, 0.55);
+}
+
+.qa-select {
+  appearance: none;
+  padding: 10px 36px 10px 12px;
+  border: 1px solid rgba(12, 75, 52, 0.18);
+  border-radius: 12px;
+  font-size: 13px;
+  font-weight: 700;
+  background: #ffffff;
+  color: #111827;
+  font-family: 'TT Interphases', sans-serif;
+  cursor: pointer;
+}
+
+.qa-select-wrap {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+}
+
+.qa-select-wrap i[data-lucide] {
+  position: absolute;
+  right: 10px;
+  pointer-events: none;
+  color: rgba(17, 24, 39, 0.45);
+}
+
+/* -------------------------------------- */
+/* 3. Buttons (DESIGN.md-inspired)         */
+/* -------------------------------------- */
+.btn-primary {
+  background: #0C4B34;
+  color: #ffffff;
+  border: none;
+  padding: 10px 16px;
+  border-radius: 12px;
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 800;
+  letter-spacing: 0.2px;
+  transition: all 0.22s cubic-bezier(.4,0,.2,1);
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  white-space: nowrap;
+}
+
+.btn-primary:hover:enabled {
+  background: #0a3a28;
+  transform: translateY(-1px);
+  box-shadow: 0 6px 18px rgba(12, 75, 52, 0.25);
+}
+
+.btn-primary:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.btn-ghost {
+  background: transparent;
+  border: none;
+  color: #0C4B34;
+  font-size: 13px;
+  font-weight: 800;
+  cursor: pointer;
+  padding: 0;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  transition: all 0.2s ease;
+}
+
+.btn-ghost:hover {
+  color: #0a3a28;
+  transform: translateX(3px);
+}
+
+.btn-success {
+  background: #0F7A53;
+  color: #ffffff;
+  border: none;
+  border-radius: 12px;
+  padding: 10px 12px;
+  cursor: pointer;
+  font-size: 12px;
+  font-weight: 800;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  transition: all 0.22s cubic-bezier(.4,0,.2,1);
+}
+
+.btn-success:hover:enabled { background: #0a5f42; transform: translateY(-1px); }
+.btn-danger {
+  background: #b91c1c;
+  color: #ffffff;
+  border: none;
+  border-radius: 12px;
+  padding: 10px 12px;
+  cursor: pointer;
+  font-size: 12px;
+  font-weight: 800;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  transition: all 0.22s cubic-bezier(.4,0,.2,1);
+}
+
+.btn-danger:hover:enabled { background: #991b1b; transform: translateY(-1px); }
+
+/* -------------------------------------- */
+/* 4. Compliance card                       */
+/* -------------------------------------- */
+.qa-compliance {
+  margin-bottom: 22px;
+}
+
+.qa-compliance-top {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+  margin-bottom: 12px;
+}
+
+.qa-compliance-top h2 {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 800;
+  color: #111827;
+  font-family: 'TT Interphases', sans-serif;
+}
+
+.qa-compliance-top p {
+  margin: 4px 0 0 0;
+  font-size: 12px;
+  color: rgba(17, 24, 39, 0.5);
+  font-weight: 600;
+}
+
+.qa-compliance-metric {
+  text-align: right;
+  min-width: 140px;
+}
+
+.qa-compliance-metric .value {
+  font-size: 28px;
+  font-weight: 900;
+  line-height: 1;
+  color: #0F7A53;
+  font-family: 'TT Interphases', sans-serif;
+}
+
+.qa-progress {
+  width: 100%;
+  height: 12px;
+  background: #f3f4f6;
+  border-radius: 999px;
+  overflow: hidden;
+}
+
+.qa-progress > div {
+  width: 0%;
+  height: 100%;
+  background: #0C4B34;
+  border-radius: 999px;
+  transition: width 1.2s cubic-bezier(0.4,0,0.2,1);
+}
+
+/* -------------------------------------- */
+/* 5. Stats grid                            */
+/* -------------------------------------- */
+.qa-stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+  gap: 18px;
+  margin: 0 0 22px 0;
+}
+
+.qa-stat {
+  padding: 18px 18px 16px;
+}
+
+.qa-stat::before { height: 0; }
+
+.qa-stat .label {
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 0.6px;
+  text-transform: uppercase;
+  color: rgba(17, 24, 39, 0.55);
+  margin-bottom: 8px;
+}
+
+.qa-stat .number {
+  font-size: 28px;
+  font-weight: 900;
+  font-family: 'TT Interphases', sans-serif;
+  line-height: 1;
+}
+
+.qa-stat.is-ok .number { color: #0F7A53; }
+.qa-stat.is-bad .number { color: #b91c1c; }
+.qa-stat.is-neutral .number { color: #0C4B34; }
+.qa-stat.is-info .number { color: #1565C0; }
+
+/* -------------------------------------- */
+/* 6. Section header (DESIGN.md)            */
+/* -------------------------------------- */
+.qa-section {
+  margin-top: 26px;
+}
+
+.qa-section-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 14px;
+  margin-bottom: 14px;
+}
+
+.qa-section-header .left {
+  display: flex;
+  gap: 10px;
+}
+
+.qa-section-header .label-bar {
+  width: 4px;
+  height: 20px;
+  border-radius: 2px;
+  background: linear-gradient(180deg, #0C4B34 0%, #0F7A53 100%);
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+.qa-section-header h3 {
+  font-size: 16px;
+  font-weight: 800;
+  color: #0C4B34;
+  margin: 0 0 4px 0;
+  font-family: 'TT Interphases', sans-serif;
+}
+
+.qa-section-header p {
+  font-size: 12px;
+  color: rgba(17, 24, 39, 0.5);
+  margin: 0;
+  font-weight: 600;
+}
+
+/* -------------------------------------- */
+/* 7. Curriculum cards                      */
+/* -------------------------------------- */
+.qa-curriculum-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 16px;
+  width: 100%;
+}
+
+.reference-requests-container {
+  margin-top: 16px;
+  width: 100%;
+  max-width: none;
+}
+
+.reference-requests-grid {
+  width: 100%;
+}
+
+.reference-request-card {
+  border-radius: 18px;
+  border: 1px solid rgba(12, 75, 52, 0.14);
+  box-shadow: 0 4px 18px rgba(0, 0, 0, 0.04);
+}
+
+.reference-request-card:hover {
+  border-color: rgba(12, 75, 52, 0.25);
+  box-shadow: 0 12px 36px rgba(12, 75, 52, 0.12);
+}
+
+.reference-request-card .course-code {
+  background: #0C4B34;
+}
+
+.reference-request-card .request-type {
+  background: rgba(12, 75, 52, 0.06);
+  border: 1px solid rgba(12, 75, 52, 0.12);
+  color: rgba(17, 24, 39, 0.65);
+}
+
+.reference-request-card .view-details-btn {
+  background: #0C4B34;
+}
+
+.reference-request-card .view-details-btn:hover {
+  background: #0a3a28;
+}
+
+/* Card inner structure (ported from legacy inline CSS) */
+.request-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 6px;
+  padding-bottom: 6px;
+}
+
+.requester-name {
+  font-weight: 800;
+  color: #111827;
+  font-size: 13px;
+  margin-bottom: 4px;
+  font-family: 'TT Interphases', sans-serif;
+}
+
+.faculty-department {
+  font-size: 11px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
+  font-family: 'TT Interphases', sans-serif;
+  display: inline-block;
+}
+
+.course-info {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 12px;
+  background: rgba(12, 75, 52, 0.04);
+  border: 1px solid rgba(12, 75, 52, 0.10);
+  padding: 12px;
+  border-radius: 12px;
+}
+
+.course-code {
+  color: #ffffff;
+  padding: 6px 10px;
+  border-radius: 10px;
+  font-size: 11px;
+  font-weight: 900;
+  letter-spacing: 0.6px;
+  font-family: 'TT Interphases', sans-serif;
+  text-transform: uppercase;
+}
+
+.course-name {
+  font-size: 12px;
+  color: rgba(17, 24, 39, 0.6);
+  font-weight: 700;
+  font-family: 'TT Interphases', sans-serif;
+  flex: 1;
+}
+
+.request-summary { margin-bottom: 12px; }
+
+.request-type {
+  font-size: 11px;
+  font-family: 'TT Interphases', sans-serif;
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
+  border-radius: 10px;
+  display: inline-block;
+}
+
+.action-buttons {
+  display: flex;
+  gap: 10px;
+  margin-top: auto;
+}
+
+.approve-btn,
+.reject-btn,
+.status-approved-btn,
+.status-rejected-btn {
+  flex: 1;
+  border: none;
+  border-radius: 12px;
+  padding: 10px 12px;
+  font-size: 12px;
+  font-weight: 900;
+  cursor: pointer;
+  transition: all 0.22s cubic-bezier(.4,0,.2,1);
+  font-family: 'TT Interphases', sans-serif;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+}
+
+.approve-btn { background: #0F7A53; color: #ffffff; }
+.approve-btn:hover { background: #0a5f42; transform: translateY(-1px); }
+.reject-btn { background: #b91c1c; color: #ffffff; }
+.reject-btn:hover { background: #991b1b; transform: translateY(-1px); }
+.status-approved-btn { background: rgba(15, 122, 83, 0.12); color: #0F7A53; cursor: default; }
+.status-rejected-btn { background: rgba(185, 28, 28, 0.10); color: #b91c1c; cursor: default; }
+
+.request-date {
+  font-size: 11px;
+  color: rgba(17, 24, 39, 0.45);
+  text-align: center;
+  margin-top: 8px;
+  font-weight: 700;
+}
+
+.view-details-btn {
+  width: 100%;
+  padding: 10px 12px;
+  color: #ffffff;
+  border: none;
+  border-radius: 12px;
+  font-size: 12px;
+  font-weight: 900;
+  cursor: pointer;
+  transition: all 0.22s cubic-bezier(.4,0,.2,1);
+  font-family: 'TT Interphases', sans-serif;
+  margin-top: 10px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+}
+
+.view-details-btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 10px 24px rgba(12, 75, 52, 0.18);
+}
+
+.collapsed-controls {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.request-count-badge {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  font-weight: 900;
+  background: rgba(185, 28, 28, 0.10);
+  border: 1px solid rgba(185, 28, 28, 0.18);
+  color: #b91c1c;
+}
+
+.qa-empty-state {
+  text-align: center;
+  padding: 40px 18px;
+  color: rgba(17, 24, 39, 0.55);
+}
+
+.qa-empty-state h3 {
+  font-family: 'TT Interphases', sans-serif;
+  font-size: 16px;
+  color: #111827;
+  margin: 10px 0 6px;
+  font-weight: 800;
+}
+
+.qa-empty-state p {
+  font-family: 'TT Interphases', sans-serif;
+  font-size: 13px;
+  margin: 0;
+}
+
+/* -------------------------------------- */
+/* 8. Department cards                      */
+/* -------------------------------------- */
+.qa-dept-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: 16px;
+}
+
+.qa-dept-card {
+  padding: 18px 18px 16px;
+}
+
+.qa-dept-card::before { height: 0; }
+
+.qa-dept-top {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 10px;
+}
+
+.qa-dept-badge {
+  display: inline-block;
+  padding: 6px 10px;
+  border-radius: 10px;
+  font-weight: 900;
+  font-size: 11px;
+  letter-spacing: 0.6px;
+  text-transform: uppercase;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.12);
+}
+
+.qa-dept-metric {
+  font-size: 14px;
+  font-weight: 900;
+  color: #111827;
+}
+
+.qa-dept-sub {
+  font-size: 12px;
+  font-weight: 700;
+  color: rgba(17, 24, 39, 0.55);
+}
+
+.qa-dept-progress {
+  height: 10px;
+  background: #f3f4f6;
+  border-radius: 999px;
+  overflow: hidden;
+  margin-bottom: 8px;
+}
+
+.qa-dept-progress > div {
+  height: 100%;
+  width: 0%;
+  border-radius: 999px;
+  transition: width 0.6s ease-in-out;
+}
+
+/* -------------------------------------- */
+/* 9. Modal tweaks                          */
+/* -------------------------------------- */
+.qa-modal .modal-box {
+  animation: modalPop 0.18s ease-out;
+}
+
+/* Curriculum details modal (QA dashboard) */
+#curriculumDetailsModal.modal-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background-color: rgba(0, 0, 0, 0.6);
+  align-items: center;
+  justify-content: center;
+  z-index: 2000;
+}
+
+#curriculumDetailsModal .modal-box {
+  background-color: #ffffff;
+  border-radius: 15px;
+  width: min(900px, 92vw);
+  max-height: 90vh;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+#curriculumDetailsModal .modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 18px 20px;
+  border-bottom: 1px solid rgba(12, 75, 52, 0.12);
+  background: #ffffff;
+  position: sticky;
+  top: 0;
+  z-index: 2;
+}
+
+#curriculumDetailsModal .modal-header h2 {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 900;
+  color: #111827;
+  font-family: 'TT Interphases', sans-serif;
+}
+
+#curriculumDetailsModal .close-button {
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  width: 36px;
+  height: 36px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 10px;
+  color: rgba(17, 24, 39, 0.55);
+  font-size: 28px;
+  line-height: 1;
+  transition: all 0.2s ease;
+}
+
+#curriculumDetailsModal .close-button:hover {
+  color: #111827;
+  background: rgba(12, 75, 52, 0.06);
+}
+
+#curriculumDetailsModal .modal-content {
+  padding: 18px 20px 20px;
+  overflow-y: auto;
+}
+
+#curriculumDetailsModal .modal-footer {
+  padding: 14px 20px;
+  border-top: 1px solid rgba(12, 75, 52, 0.12);
+  background: #ffffff;
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  position: sticky;
+  bottom: 0;
+  z-index: 2;
+}
+
+
+/* Lucide icon sizing - DESIGN.md Section 14.5 */
+.icon-lucide-16 { width: 16px; height: 16px; }
+.icon-lucide-20 { width: 20px; height: 20px; }
+.icon-lucide-22 { width: 22px; height: 22px; }
+
+/* Utility */
+.spin { animation: spin 1s linear infinite; }
