@@ -65,14 +65,14 @@
       <div style="flex:0 0 340px; min-width:260px; max-width:360px;">
         <div style="display:flex; gap:18px; margin-bottom:24px; flex-wrap:wrap;">
           <div style="flex:1 1 120px; min-width:120px; background:#fafbfc; border-radius:8px; padding:16px 18px; display:flex; align-items:center; gap:10px; border:1px solid #ececec;">
-            <span style="font-size:22px; color:#888;">&#128193;</span>
+            <i data-lucide="building-2" style="width:22px; height:22px; color:#888;"></i>
             <div>
               <div style="font-size:14px; color:#666;">Department</div>
               <div id="modalDepartment" style="font-size:17px; font-weight:bold; color:#111;">CCS</div>
             </div>
           </div>
           <div style="flex:1 1 120px; min-width:120px; background:#fafbfc; border-radius:8px; padding:16px 18px; display:flex; align-items:center; gap:10px; border:1px solid #ececec;">
-            <span style="font-size:22px; color:#888;">&#128218;</span>
+            <i data-lucide="book-open" style="width:22px; height:22px; color:#888;"></i>
             <div>
               <div style="font-size:14px; color:#666;">References</div>
               <div id="modalReferences" style="font-size:17px; font-weight:bold; color:#111;"></div>
@@ -102,7 +102,7 @@
         <!-- Compliance Issues Card -->
         <div id="modalComplianceIssues" style="background:#fff; border:1.5px solid #ef4444; border-radius:10px; padding:18px 18px 12px 18px; margin-bottom: 0; display:none;">
           <div style="font-size:20px; font-weight:bold; color:#ef4444; font-family:'TT Interphases',sans-serif; display:flex; align-items:center; gap:8px; margin-bottom:10px;">
-            <span style='font-size:1.4em;'>&#9888;</span> Compliance Issues
+            <i data-lucide="alert-triangle" style="width:22px; height:22px; color:#ef4444;"></i> Compliance Issues
           </div>
           <ul id="modalComplianceIssuesList" style="margin:0; padding-left:22px;"></ul>
         </div>
@@ -563,7 +563,46 @@
     background: #1976d2;
     color: white;
     border-color: #1976d2;
-}
+  }
+
+  /* DESIGN.md Section 2.2 - modalPop animation */
+  @keyframes modalPop {
+    from {
+      opacity: 0;
+      transform: translateY(10px) scale(0.985);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0) scale(1);
+    }
+  }
+
+  /* Apply modalPop to modals */
+  #courseDetailsModal > div,
+  #notifyLibrarianModal {
+    animation: modalPop 0.18s ease-out;
+  }
+
+  /* Lucide icon sizing - DESIGN.md Section 14.5 */
+  .icon-lucide-16 {
+    width: 16px;
+    height: 16px;
+  }
+  
+  .icon-lucide-20 {
+    width: 20px;
+    height: 20px;
+  }
+
+  /* Spin animation for loading */
+  i[data-lucide].spin {
+    animation: spin 1s linear infinite;
+  }
+
+  @keyframes spin {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+  }
 </style>
 
 <script>
@@ -970,6 +1009,9 @@ function closeNotifyLibrarianModal() {
   document.getElementById('notifyLibrarianModal').style.display = 'none';
 }
 
+// Global variable to track current selected course for notify
+window.currentSelectedCourseId = null;
+
 // Initialize on page load
 document.addEventListener('DOMContentLoaded', function() {
     // NO FILTERING - Quality Assurance shows ALL courses
@@ -977,19 +1019,26 @@ document.addEventListener('DOMContentLoaded', function() {
     // Set up event delegation for page numbers - this WILL work
     const pageNumbers = document.getElementById('pageNumbers');
     if (pageNumbers) {
-        pageNumbers.addEventListener('click', function(e) {
-            if (e.target && e.target.classList.contains('page-number')) {
-                e.preventDefault();
-                e.stopPropagation();
-                const page = parseInt(e.target.getAttribute('data-page'));
-                if (!isNaN(page) && page >= 0 && page < totalPages) {
-                    goToPage(page);
-                }
-            }
-        });
+      pageNumbers.addEventListener('click', function(e) {
+        if (e.target && e.target.classList.contains('page-number')) {
+          e.preventDefault();
+          e.stopPropagation();
+          const page = parseInt(e.target.getAttribute('data-page'));
+          if (!isNaN(page) && page >= 0 && page < totalPages) {
+            goToPage(page);
+          }
+        }
+      });
     }
     
     loadCoursesData();
+    
+    // Initialize Lucide icons after a short delay to ensure DOM is ready
+    setTimeout(() => {
+      if (typeof lucide !== 'undefined') {
+        lucide.createIcons();
+      }
+    }, 100);
     
     // Modal close handlers
     const closeNotifyModal = document.getElementById('closeNotifyModal');
@@ -1008,11 +1057,56 @@ document.addEventListener('DOMContentLoaded', function() {
         };
     }
     
-    const notifyDueConfirmBtn = document.getElementById('notifyDueConfirmBtn');
+const notifyDueConfirmBtn = document.getElementById('notifyDueConfirmBtn');
     if (notifyDueConfirmBtn) {
-        notifyDueConfirmBtn.onclick = function() {
+      notifyDueConfirmBtn.onclick = function() {
+        // Get the selected course ID from the modal
+        const courseId = window.currentSelectedCourseId;
+        const dueDate = document.getElementById('notifyDueDate').value;
+        const notes = document.getElementById('notifyNotes').value;
+        
+        if (!courseId) {
+          alert('No course selected');
+          return;
+        }
+        
+        // Show loading state
+        notifyDueConfirmBtn.disabled = true;
+        notifyDueConfirmBtn.innerHTML = '<i data-lucide="loader-2" class="icon-lucide-16 spin"></i> Sending...';
+        
+        // Call the API
+        fetch('api/notify_librarian.php', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            course_id: courseId,
+            due_date: dueDate || null,
+            notes: notes || ''
+          })
+        })
+        .then(response => response.json())
+        .then(data => {
+          if (data.success) {
+            alert('Librarian has been notified successfully!\n\nCourse: ' + data.course.code + ' - ' + data.course.title + '\nLibrarian: ' + data.librarian.name);
             closeNotifyLibrarianModal();
-        };
+            // Clear the form
+            document.getElementById('notifyDueDate').value = '';
+            document.getElementById('notifyNotes').value = '';
+          } else {
+            alert('Failed to notify librarian: ' + (data.message || 'Unknown error'));
+          }
+        })
+        .catch(error => {
+          console.error('Error notifying librarian:', error);
+          alert('Error notifying librarian. Please try again.');
+        })
+        .finally(() => {
+          notifyDueConfirmBtn.disabled = false;
+          notifyDueConfirmBtn.innerHTML = 'Set Due Date';
+        });
+      };
     }
-});
+  });
 </script>

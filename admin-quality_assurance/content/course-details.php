@@ -527,10 +527,16 @@ if ($compliancePercentage > 100) $compliancePercentage = 100;
 </style>
 
 <div style="padding: 20px;">
-    <div class="back-navigation">
+    <div class="back-navigation" style="display: flex; justify-content: space-between; align-items: center;">
         <button class="back-button" onclick="window.location.href='content.php?page=academic-management'">
             ← Back to Academic Management
         </button>
+        <?php if (!$isCompliant): ?>
+        <button class="notify-librarian-btn" onclick="openNotifyLibrarianModal(<?php echo $courseDetails['id']; ?>)" style="background: #E63946; color: white; border: none; padding: 10px 20px; border-radius: 8px; font-size: 14px; font-weight: 600; cursor: pointer; display: flex; align-items: center; gap: 8px; font-family: 'TT Interphases', sans-serif;">
+            <i data-lucide="bell" style="width: 16px; height: 16px;"></i>
+            Notify Librarian
+        </button>
+        <?php endif; ?>
     </div>
 
     <?php if ($courseDetails): ?>
@@ -843,4 +849,98 @@ function switchTab(tabName) {
     }
     
 }
+
+// Notify Librarian Modal
+function openNotifyLibrarianModal(courseId) {
+    document.getElementById('notifyCourseId').value = courseId;
+    document.getElementById('notifyLibrarianModal').style.display = 'flex';
+    document.getElementById('notifyStep1').style.display = '';
+    document.getElementById('notifyStep2').style.display = 'none';
+}
+
+function closeNotifyLibrarianModal() {
+    document.getElementById('notifyLibrarianModal').style.display = 'none';
+    document.getElementById('notifyDueDate').value = '';
+    document.getElementById('notifyNotes').value = '';
+}
+
+function confirmNotifyLibrarian() {
+    document.getElementById('notifyStep1').style.display = 'none';
+    document.getElementById('notifyStep2').style.display = '';
+}
+
+function sendNotifyLibrarian() {
+    const courseId = document.getElementById('notifyCourseId').value;
+    const dueDate = document.getElementById('notifyDueDate').value;
+    const notes = document.getElementById('notifyNotes').value;
+    
+    const confirmBtn = document.getElementById('notifyDueConfirmBtn');
+    confirmBtn.disabled = true;
+    confirmBtn.innerHTML = '<i data-lucide="loader-2" class="spin" style="width: 16px; height: 16px;"></i> Sending...';
+    
+    fetch('api/notify_librarian.php', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+            course_id: courseId,
+            due_date: dueDate || null,
+            notes: notes || ''
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            alert('Librarian has been notified successfully!\n\nCourse: ' + data.course.code + ' - ' + data.course.title + '\nLibrarian: ' + data.librarian.name);
+            closeNotifyLibrarianModal();
+        } else {
+            alert('Failed to notify librarian: ' + (data.message || 'Unknown error'));
+        }
+    })
+    .catch(error => {
+        console.error('Error notifying librarian:', error);
+        alert('Error notifying librarian. Please try again.');
+    })
+    .finally(() => {
+        confirmBtn.disabled = false;
+        confirmBtn.innerHTML = 'Set Due Date';
+    });
+}
+
+// Initialize Lucide icons
+document.addEventListener('DOMContentLoaded', function() {
+    setTimeout(() => {
+        if (typeof lucide !== 'undefined') {
+            lucide.createIcons();
+        }
+    }, 100);
+});
 </script>
+
+<!-- Notify Librarian Modal -->
+<div id="notifyLibrarianModal" style="display:none; position:fixed; top:0; left:0; width:100vw; height:100vh; background:rgba(0,0,0,0.18); z-index:99999; align-items:center; justify-content:center;">
+    <input type="hidden" id="notifyCourseId" value="">
+    <div style="background:#fff; border-radius:12px; max-width:400px; width:95vw; margin:auto; box-shadow:0 8px 40px 8px rgba(0,0,0,0.22); padding:32px 32px 24px 32px; position:relative; pointer-events:auto;">
+        <button onclick="closeNotifyLibrarianModal()" style="position:absolute; top:18px; right:18px; background:none; border:none; font-size:32px; color:#888; cursor:pointer; padding:6px 16px;">&times;</button>
+        <div id="notifyStep1">
+            <div style="font-size:1.2rem; font-weight:bold; color:#111; font-family:'TT Interphases',sans-serif; margin-bottom:18px;">Notify Librarian</div>
+            <div style="font-size:16px; color:#222; font-family:'TT Interphases',sans-serif; margin-bottom:24px;">Would you like to Notify the Librarian about the Compliance Issues of this Course?</div>
+            <div style="display:flex; gap:16px; justify-content:flex-end;">
+                <button onclick="closeNotifyLibrarianModal()" style="background:#bdbdbd; color:#fff; border:none; border-radius:8px; padding:8px 22px; font-size:15px; font-family:'TT Interphases',sans-serif; font-weight:bold; cursor:pointer;">Cancel</button>
+                <button onclick="confirmNotifyLibrarian()" style="background:#E63946; color:#fff; border:none; border-radius:8px; padding:8px 22px; font-size:15px; font-family:'TT Interphases',sans-serif; font-weight:bold; cursor:pointer;">Yes, Notify</button>
+            </div>
+        </div>
+        <div id="notifyStep2" style="display:none;">
+            <div style="font-size:1.1rem; font-weight:bold; color:#111; font-family:'TT Interphases',sans-serif; margin-bottom:18px;">Set Due Date</div>
+            <div style="font-size:16px; color:#222; font-family:'TT Interphases',sans-serif; margin-bottom:18px;">When should the librarian complete this task?</div>
+            <input type="date" id="notifyDueDate" style="font-size:16px; padding:8px 12px; border-radius:6px; border:1px solid #ccc; font-family:'TT Interphases',sans-serif; margin-bottom:18px; width:100%;">
+            <div style="font-size:16px; color:#222; font-family:'TT Interphases',sans-serif; margin-bottom:8px;">Additional Notes (Optional):</div>
+            <textarea id="notifyNotes" placeholder="Add any specific notes or instructions for the librarian..." style="font-size:16px; padding:8px 12px; border-radius:6px; border:1px solid #ccc; font-family:'TT Interphases',sans-serif; margin-bottom:18px; width:100%; height:80px; resize:vertical; box-sizing:border-box;"></textarea>
+            <div style="display:flex; gap:16px; justify-content:flex-end;">
+                <button onclick="closeNotifyLibrarianModal()" style="background:#bdbdbd; color:#fff; border:none; border-radius:8px; padding:8px 22px; font-size:15px; font-family:'TT Interphases',sans-serif; font-weight:bold; cursor:pointer;">Cancel</button>
+                <button id="notifyDueConfirmBtn" onclick="sendNotifyLibrarian()" style="background:#E63946; color:#fff; border:none; border-radius:8px; padding:8px 22px; font-size:15px; font-family:'TT Interphases',sans-serif; font-weight:bold; cursor:pointer;">Set Due Date</button>
+            </div>
+        </div>
+    </div>
+</div>
