@@ -125,13 +125,6 @@ include './modals/switch_role_modal.php';
     }
     ?>
     
-    <a href="#" class="nav-button switch-role-button" onclick="openSwitchRoleModal(); return false;" style="background-color: #1976d2;">
-      <span class="nav-icon-wrapper">
-        <img src="../src/assets/icons/switch.png" class="nav-icon" />
-      </span>
-      <span>Switch Role</span>
-    </a>
-
     <a href="./logout.php" class="nav-button logout-button">
       <span class="nav-icon-wrapper">
         <img src="../src/assets/icons/logout-icon.png" class="nav-icon" />
