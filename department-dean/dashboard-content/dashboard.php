@@ -12,6 +12,10 @@ $departmentName = 'College of Computing Studies';
 $departmentCode = 'CCS';
 $departmentColor = '#C41E3A'; // Default red color
 
+// Initialize compliance stats with default values (before try block to prevent undefined variable warnings)
+$compliantCourses = 0;
+$nonCompliantCourses = 0;
+
 try {
 	if (isset($_SESSION['user_id'])) {
 		// Get dean's information from session data
@@ -61,6 +65,8 @@ try {
 $totalPrograms = 0;
 $totalCourses = 0;
 $totalFaculty = 0;
+$compliantCourses = 0;
+$nonCompliantCourses = 0;
 
 // Initialize programs array
 $programs = [];
@@ -132,170 +138,264 @@ try {
             }
         }
         
-        // If still no current term, use the first term (1st Semester)
-        if (!$currentAcademicTerm && !empty($academicTerms)) {
-            $currentAcademicTerm = $academicTerms[0];
-        }
-        
-        // Set selected term ID (from session or default to current term)
-        $selectedTermId = $currentAcademicTerm['id'] ?? null;
-    }
-} catch (Exception $e) {
-}
+	        // If still no current term, use the first term (1st Semester)
+	        if (!$currentAcademicTerm && !empty($academicTerms)) {
+	            $currentAcademicTerm = $academicTerms[0];
+	        }
+	        
+	        // Set selected term ID (from session or default to current term)
+	        $sessionSelectedTermId = $_SESSION['selectedTermId'] ?? null;
+	        if ($sessionSelectedTermId !== null && $sessionSelectedTermId !== '') {
+	            $selectedTermId = $sessionSelectedTermId;
+	        } else {
+	            $selectedTermId = $currentAcademicTerm['id'] ?? null;
+	        }
+
+	        // Validate selected term id against current academic year terms, unless "all"
+	        if ($selectedTermId !== 'all' && $selectedTermId !== null && $selectedTermId !== '') {
+	            $validTermIds = array_map(static function ($t) {
+	                return (string) ($t['id'] ?? '');
+	            }, $academicTerms);
+	            if (!in_array((string) $selectedTermId, $validTermIds, true)) {
+	                $selectedTermId = $currentAcademicTerm['id'] ?? null;
+	            }
+	        }
+	    }
+	} catch (Exception $e) {
+	}
 
 // --- DATABASE CODE FOR REAL DATA ---
+// Debug: Log what we're working with
+$debugLog = [];
+
 try {
     // Get the current dean's department code from session
     $deanDepartmentCode = $_SESSION['selected_role']['department_code'] ?? null;
+    $debugLog['department_code'] = $deanDepartmentCode;
     
     if ($deanDepartmentCode) {
-        // Fetch real programs from database with actual course counts filtered by selected term
-        $programsQuery = "
-            SELECT p.id, p.program_code, p.program_name, p.major, p.color_code, 
-                   COUNT(c.id) as course_count
-            FROM programs p
-            LEFT JOIN departments d ON p.department_id = d.id
-            LEFT JOIN courses c ON p.id = c.program_id
-            WHERE d.department_code = ?
-            " . ($selectedTermId ? "AND c.term_id = ?" : "") . "
-            GROUP BY p.id, p.program_code, p.program_name, p.major, p.color_code
-            ORDER BY p.created_at DESC
-        ";
+        $showAllTerms = ($selectedTermId === 'all' || $selectedTermId === null || $selectedTermId === '');
         
-        $programsStmt = $pdo->prepare($programsQuery);
-        if ($selectedTermId) {
-            $programsStmt->execute([$deanDepartmentCode, $selectedTermId]);
-        } else {
-            $programsStmt->execute([$deanDepartmentCode]);
+        // Get the term name from the selected term ID (if not "all")
+        $filterTermName = null;
+        if (!$showAllTerms && !empty($selectedTermId) && is_numeric($selectedTermId)) {
+            // Get the term name from the terms table
+            $termNameQuery = "SELECT name FROM terms WHERE id = ? LIMIT 1";
+            $termNameStmt = $pdo->prepare($termNameQuery);
+            $termNameStmt->execute([(int)$selectedTermId]);
+            $termNameRow = $termNameStmt->fetch(PDO::FETCH_ASSOC);
+            $filterTermName = $termNameRow['name'] ?? null;
         }
-        $programs = $programsStmt->fetchAll(PDO::FETCH_ASSOC);
+        $debugLog['showAllTerms'] = $showAllTerms;
+        $debugLog['filterTermName'] = $filterTermName;
+
+        // 1. Get department ID first
+        $deptIdQuery = "SELECT id, department_name FROM departments WHERE department_code = ? LIMIT 1";
+        $deptIdStmt = $pdo->prepare($deptIdQuery);
+        $deptIdStmt->execute([$deanDepartmentCode]);
+        $deptRow = $deptIdStmt->fetch(PDO::FETCH_ASSOC);
+        $deptId = $deptRow['id'] ?? null;
+        $debugLog['department_id'] = $deptId;
         
-        // Update overview counts
+        if (!$deptId) {
+            error_log("Dean dashboard: Could not find department for code: " . $deanDepartmentCode);
+        }
+
+        // 2. Fetch PROGRAMS for the department (with course_count filtered by term)
+        if ($showAllTerms) {
+            $programsListQuery = "
+                SELECT p.id, p.program_code, p.program_name, p.major, p.color_code,
+                       COUNT(c.id) as course_count
+                FROM programs p
+                LEFT JOIN courses c ON p.id = c.program_id
+                WHERE p.department_id = ?
+                GROUP BY p.id, p.program_code, p.program_name, p.major, p.color_code
+                ORDER BY p.created_at DESC
+            ";
+            $programsListStmt = $pdo->prepare($programsListQuery);
+            $programsListStmt->execute([$deptId]);
+        } else {
+            $programsListQuery = "
+                SELECT p.id, p.program_code, p.program_name, p.major, p.color_code,
+                       COUNT(CASE WHEN c.term = ? THEN c.id ELSE NULL END) as course_count
+                FROM programs p
+                LEFT JOIN courses c ON p.id = c.program_id
+                WHERE p.department_id = ?
+                GROUP BY p.id, p.program_code, p.program_name, p.major, p.color_code
+                ORDER BY p.created_at DESC
+            ";
+            $programsListStmt = $pdo->prepare($programsListQuery);
+            $programsListStmt->execute([$filterTermName, $deptId]);
+        }
+        $programs = $programsListStmt->fetchAll(PDO::FETCH_ASSOC);
         $totalPrograms = count($programs);
+        $debugLog['totalPrograms'] = $totalPrograms;
         
-        // Count unique courses for this department (not just sum of program counts)
-        $termName = $currentAcademicTerm['term_name'] ?? null;
-        if ($selectedTermId === 'all' || $selectedTermId === null) {
-            $uniqueCoursesQuery = "
-                SELECT COUNT(DISTINCT c.course_code) as unique_course_count
+        // 3. Count ACTIVE COURSES for the department (optionally filtered by term)
+        // Note: courses.term is VARCHAR (e.g., "1st Semester", "2nd Semester")
+        if ($showAllTerms) {
+            $coursesQuery = "
+                SELECT COUNT(DISTINCT c.id) as total_courses
                 FROM courses c
                 INNER JOIN programs p ON c.program_id = p.id
-                INNER JOIN departments d ON p.department_id = d.id
-                WHERE d.department_code = ?
+                WHERE p.department_id = ?
             ";
-            $uniqueCoursesStmt = $pdo->prepare($uniqueCoursesQuery);
-            $uniqueCoursesStmt->execute([$deanDepartmentCode]);
-            $totalCourses = $uniqueCoursesStmt->fetchColumn();
+            $coursesStmt = $pdo->prepare($coursesQuery);
+            $coursesStmt->execute([$deptId]);
         } else {
-            $uniqueCoursesQuery = "
-                SELECT COUNT(DISTINCT c.course_code) as unique_course_count
+            $coursesQuery = "
+                SELECT COUNT(DISTINCT c.id) as total_courses
                 FROM courses c
                 INNER JOIN programs p ON c.program_id = p.id
-                INNER JOIN departments d ON p.department_id = d.id
-                WHERE d.department_code = ? AND c.term = ?
+                WHERE p.department_id = ? AND c.term = ?
             ";
-            $uniqueCoursesStmt = $pdo->prepare($uniqueCoursesQuery);
-            $uniqueCoursesStmt->execute([$deanDepartmentCode, $termName]);
-            $totalCourses = $uniqueCoursesStmt->fetchColumn();
+            $coursesStmt = $pdo->prepare($coursesQuery);
+            $coursesStmt->execute([$deptId, $filterTermName]);
+        }
+        $coursesResult = $coursesStmt->fetch(PDO::FETCH_ASSOC);
+        $totalCourses = intval($coursesResult['total_courses'] ?? 0);
+        $debugLog['totalCourses'] = $totalCourses;
+        
+        // 4. Count FACULTY/TEACHERS for the department
+        // Teachers are users with role_id = 4 OR have teacher role in user_roles
+        $facultyQuery = "
+            SELECT COUNT(DISTINCT u.id) AS total_faculty 
+            FROM users u 
+            WHERE u.department_id = ? 
+              AND u.is_active = 1
+              AND (
+                  u.role_id = 4
+                  OR EXISTS (
+                      SELECT 1 FROM user_roles ur 
+                      WHERE ur.user_id = u.id 
+                        AND ur.role_name = 'teacher' 
+                        AND (ur.is_active = 1 OR ur.is_active IS NULL)
+                  )
+              )
+        ";
+        $facultyStmt = $pdo->prepare($facultyQuery);
+        $facultyStmt->execute([$deptId]);
+        $facultyResult = $facultyStmt->fetch(PDO::FETCH_ASSOC);
+        $totalFaculty = intval($facultyResult['total_faculty'] ?? 0);
+        $debugLog['totalFaculty'] = $totalFaculty;
+        
+        // 5. Calculate COMPLIANCE STATS
+        // Compliant = courses with 5+ book references from the last 5 years
+        // Non-compliant = courses with 1-4 book references from the last 5 years
+        // Courses with 0 references are counted as "needs attention" (non-compliant)
+        $currentYear = date('Y');
+        $fiveYearsAgo = $currentYear - 4;
+        
+        // Get the term filter - use term name for filtering courses.term column
+        $termFilter = null;
+        if (!$showAllTerms && !empty($selectedTermId) && is_numeric($selectedTermId)) {
+            // Get term name from terms table
+            $termStmt = $pdo->prepare("SELECT name FROM terms WHERE id = ? LIMIT 1");
+            $termStmt->execute([(int)$selectedTermId]);
+            $termRow = $termStmt->fetch(PDO::FETCH_ASSOC);
+            $termFilter = $termRow['name'] ?? null;
         }
         
-	        // Fetch total faculty count for this department (not filtered by academic term)
-	        // Faculty members remain the same across all academic terms
-	        // Teachers have role_id = 4, also check user_roles table
-	        try {
-	            $facultyQuery = "
-	                SELECT COUNT(DISTINCT u.id) AS total_faculty 
-	                FROM users u 
-	                JOIN departments d ON u.department_id = d.id 
-	                WHERE (
-	                    u.role_id = 4
-	                    OR EXISTS (
-	                        SELECT 1
-	                        FROM user_roles ur
-	                        WHERE ur.user_id = u.id
-	                          AND " . ascom_user_roles_role_predicate($pdo, 'ur', 'teacher') . "
-	                          AND " . ascom_user_roles_active_predicate($pdo, 'ur') . "
-	                    )
-	                )
-	                AND d.department_code = ? 
-	                AND u.is_active = 1
-	            ";
-	            $stmt = $pdo->prepare($facultyQuery);
-	            $stmt->execute([$deanDepartmentCode]);
-	            $facultyResult = $stmt->fetch(PDO::FETCH_ASSOC);
-            $totalFaculty = $facultyResult['total_faculty'];
-        } catch (Exception $e) {
-            $totalFaculty = 0;
+        // Get all courses for the department with their book reference counts
+        if ($termFilter) {
+            // Filter by specific term
+            $courseComplianceQuery = "
+                SELECT 
+                    c.id,
+                    c.course_code,
+                    c.course_title,
+                    COUNT(br.id) as total_references,
+                    SUM(CASE 
+                        WHEN br.publication_year IS NOT NULL 
+                        AND br.publication_year >= :fiveYearsAgo 
+                        AND br.publication_year <= :currentYear 
+                        THEN 1 
+                        ELSE 0 
+                    END) as recent_references
+                FROM courses c
+                INNER JOIN programs p ON c.program_id = p.id
+                LEFT JOIN book_references br ON c.id = br.course_id
+                WHERE p.department_id = :deptId AND c.term = :termFilter
+                GROUP BY c.id, c.course_code, c.course_title
+            ";
+            $courseComplianceStmt = $pdo->prepare($courseComplianceQuery);
+            $courseComplianceStmt->execute([
+                'deptId' => $deptId,
+                'termFilter' => $termFilter,
+                'fiveYearsAgo' => $fiveYearsAgo,
+                'currentYear' => $currentYear
+            ]);
+        } else {
+            // Get all courses (all terms)
+            $courseComplianceQuery = "
+                SELECT 
+                    c.id,
+                    c.course_code,
+                    c.course_title,
+                    COUNT(br.id) as total_references,
+                    SUM(CASE 
+                        WHEN br.publication_year IS NOT NULL 
+                        AND br.publication_year >= :fiveYearsAgo 
+                        AND br.publication_year <= :currentYear 
+                        THEN 1 
+                        ELSE 0 
+                    END) as recent_references
+                FROM courses c
+                INNER JOIN programs p ON c.program_id = p.id
+                LEFT JOIN book_references br ON c.id = br.course_id
+                WHERE p.department_id = :deptId
+                GROUP BY c.id, c.course_code, c.course_title
+            ";
+            $courseComplianceStmt = $pdo->prepare($courseComplianceQuery);
+            $courseComplianceStmt->execute([
+                'deptId' => $deptId,
+                'fiveYearsAgo' => $fiveYearsAgo,
+                'currentYear' => $currentYear
+            ]);
         }
         
-        // Calculate compliance stats
+        $courseComplianceResults = $courseComplianceStmt->fetchAll(PDO::FETCH_ASSOC);
+        
         $compliantCourses = 0;
         $nonCompliantCourses = 0;
-        try {
-            $currentYear = date('Y');
-            $fiveYearsAgo = $currentYear - 4;
+        
+        foreach ($courseComplianceResults as $course) {
+            $recentRefs = intval($course['recent_references'] ?? 0);
+            $totalRefs = intval($course['total_references'] ?? 0);
             
-            // Get department ID from department code
-            $deptIdQuery = "SELECT id FROM departments WHERE department_code = ? LIMIT 1";
-            $deptIdStmt = $pdo->prepare($deptIdQuery);
-            $deptIdStmt->execute([$deanDepartmentCode]);
-            $deptRow = $deptIdStmt->fetch(PDO::FETCH_ASSOC);
-            $deptId = $deptRow['id'] ?? null;
-            
-            if ($deptId) {
-                $complianceQuery = "
-                    SELECT 
-                        c.id,
-                        COUNT(br.id) as total_references,
-                        COUNT(CASE WHEN br.publication_year >= ? AND br.publication_year IS NOT NULL THEN 1 END) as compliant_count
-                    FROM courses c
-                    LEFT JOIN book_references br ON c.id = br.course_id
-                    WHERE c.program_id IN (
-                        SELECT id FROM programs WHERE department_id = ?
-                    )
-                    GROUP BY c.id
-                ";
-                $complianceStmt = $pdo->prepare($complianceQuery);
-                $complianceStmt->execute([$fiveYearsAgo, $deptId]);
-                $complianceResults = $complianceStmt->fetchAll(PDO::FETCH_ASSOC);
-                
-                foreach ($complianceResults as $course) {
-                    $compliantCount = intval($course['compliant_count'] ?? 0);
-                    if ($compliantCount >= 5) {
-                        $compliantCourses++;
-                    } else {
-                        $nonCompliantCourses++;
-                    }
-                }
+            // Course is compliant if it has 5+ references from the last 5 years
+            if ($recentRefs >= 5) {
+                $compliantCourses++;
+            } else {
+                // Has fewer than 5 recent references (including 0) - non-compliant
+                $nonCompliantCourses++;
             }
-        } catch (Exception $e) {
-            // Keep default values on error
         }
         
-        // Fetch recent activities (if activity_logs table exists) filtered by selected term
+        $debugLog['compliance_query_courses'] = count($courseComplianceResults);
+        $debugLog['compliantCourses'] = $compliantCourses;
+        $debugLog['nonCompliantCourses'] = $nonCompliantCourses;
+        
+        // 6. Fetch recent activities (if activity_logs table exists)
         try {
             $activitiesQuery = "
                 SELECT username, description, activity_timestamp
                 FROM activity_logs
-                WHERE department_id = (SELECT id FROM departments WHERE department_code = ?)
-                " . ($selectedTermId ? "AND term_id = ?" : "") . "
+                WHERE department_id = ?
                 ORDER BY activity_timestamp DESC
                 LIMIT 5
             ";
             $activitiesStmt = $pdo->prepare($activitiesQuery);
-            if ($selectedTermId) {
-                $activitiesStmt->execute([$deanDepartmentCode, $selectedTermId]);
-            } else {
-                $activitiesStmt->execute([$deanDepartmentCode]);
-            }
+            $activitiesStmt->execute([$deptId]);
             $recentActivities = $activitiesStmt->fetchAll(PDO::FETCH_ASSOC);
         } catch (Exception $e) {
-            // If activity_logs table doesn't exist, use empty array
             $recentActivities = [];
         }
+    } else {
+        error_log("Dean dashboard: No department_code in session");
     }
 } catch (Exception $e) {
-    // Keep default values if database query fails
+    error_log("Dean dashboard error: " . $e->getMessage());
 }
 
 
@@ -1621,11 +1721,11 @@ html[data-theme="dark"] .collapse-btn:hover {
   <button type="button" class="box box-link" onclick="navigateToAllCourses()" aria-label="View active courses">
     <div class="box-icon"><i data-lucide="book-open"></i></div>
     <div class="box-content">
-        <span class="box-label">Active Courses</span>
-        <span class="amount"><?php echo $totalCourses; ?></span>
-        <span class="amount-sub">This term</span>
-    </div>
-  </button>
+	        <span class="box-label">Active Courses</span>
+	        <span class="amount"><?php echo $totalCourses; ?></span>
+	        <span class="amount-sub">Selected term</span>
+	    </div>
+	  </button>
   <button type="button" class="box box-link" onclick="window.location.href='content.php?page=faculty-management'" aria-label="View faculty members">
     <div class="box-icon"><i data-lucide="users"></i></div>
     <div class="box-content">
@@ -1635,21 +1735,21 @@ html[data-theme="dark"] .collapse-btn:hover {
     </div>
   </button>
   <button type="button" class="box box-link" onclick="showComplianceSection()" aria-label="View compliance status">
-    <div class="box-icon" style="background: rgba(76, 175, 80, 0.1); color: #4CAF50;"><i data-lucide="check-circle"></i></div>
-    <div class="box-content">
-        <span class="box-label">Compliant Courses</span>
-        <span class="amount" style="color: #4CAF50;"><?php echo $compliantCourses; ?></span>
-        <span class="amount-sub">5+ compliant books</span>
-    </div>
-  </button>
-  <button type="button" class="box box-link" onclick="showNonCompliantCourses()" aria-label="View non-compliant courses">
-    <div class="box-icon" style="background: rgba(244, 67, 54, 0.1); color: #f44336;"><i data-lucide="alert-circle"></i></div>
-    <div class="box-content">
-        <span class="box-label">Non-Compliant</span>
-        <span class="amount" style="color: #f44336;"><?php echo $nonCompliantCourses; ?></span>
-        <span class="amount-sub">Needs attention</span>
-    </div>
-  </button>
+	    <div class="box-icon" style="background: rgba(76, 175, 80, 0.1); color: #4CAF50;"><i data-lucide="check-circle"></i></div>
+	    <div class="box-content">
+	        <span class="box-label">Compliant Courses</span>
+	        <span class="amount" style="color: #4CAF50;"><?php echo (int) ($compliantCourses ?? 0); ?></span>
+	        <span class="amount-sub">5+ compliant books</span>
+	    </div>
+	  </button>
+	  <button type="button" class="box box-link" onclick="showNonCompliantCourses()" aria-label="View non-compliant courses">
+	    <div class="box-icon" style="background: rgba(244, 67, 54, 0.1); color: #f44336;"><i data-lucide="alert-circle"></i></div>
+	    <div class="box-content">
+	        <span class="box-label">Non-Compliant</span>
+	        <span class="amount" style="color: #f44336;"><?php echo (int) ($nonCompliantCourses ?? 0); ?></span>
+	        <span class="amount-sub">Needs attention</span>
+	    </div>
+	  </button>
 </div>
 
 <div class="quick-actions" aria-label="Quick actions">
@@ -2217,33 +2317,22 @@ html[data-theme="dark"] .collapse-btn:hover {
         }
     }
     
-    // Function to update dashboard statistics
-    function updateDashboardStats(stats) {
-        
-        // Update programs count
-        const programsElement = document.querySelector('.stat-box:nth-child(1) .stat-amount');
-        if (programsElement) {
-            programsElement.textContent = stats.totalPrograms || 0;
-        } else {
-            console.error('Programs element not found!');
-        }
-        
-        // Update courses count
-        const coursesElement = document.querySelector('.stat-box:nth-child(2) .stat-amount');
-        if (coursesElement) {
-            coursesElement.textContent = stats.totalCourses || 0;
-        } else {
-            console.error('Courses element not found!');
-        }
-        
-        // Update faculty count
-        const facultyElement = document.querySelector('.stat-box:nth-child(3) .stat-amount');
-        if (facultyElement) {
-            facultyElement.textContent = stats.totalFaculty || 0;
-        } else {
-            console.error('Faculty element not found!');
-        }
-    }
+	    // Function to update dashboard statistics
+	    function updateDashboardStats(stats) {
+	        const grid = document.querySelector('.dashboard-stats-grid');
+	        if (!grid) return;
+
+	        const setAmount = (childIndex, value) => {
+	            const el = grid.querySelector(`.box:nth-child(${childIndex}) .amount`);
+	            if (el) el.textContent = (value ?? 0);
+	        };
+
+	        setAmount(1, stats.totalPrograms);
+	        setAmount(2, stats.totalCourses);
+	        setAmount(3, stats.totalFaculty);
+	        setAmount(4, stats.compliantCourses);
+	        setAmount(5, stats.nonCompliantCourses);
+	    }
     
     // Function to update Program & Courses Management section
     function updateProgramsSection(programs) {

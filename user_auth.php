@@ -61,8 +61,36 @@ try {
 
     $userRoles = [];
 
-    // If role is Dean (2) or Teacher (3), they get the Teacher role
-    if ((int) $user['role_id'] === 2 || (int) $user['role_id'] === 3) {
+    // If role is Teacher (3), they get the Teacher role
+    if ((int) $user['role_id'] === 3) {
+        $deptCode = null;
+        $deptName = null;
+        $deptId = null;
+        if (!empty($user['department_id'])) {
+            $deptQuery = $conn->prepare('SELECT id as department_id, department_code, department_name FROM departments WHERE id = ?');
+            $deptQuery->bind_param('i', $user['department_id']);
+            $deptQuery->execute();
+            $deptRes = $deptQuery->get_result();
+            if ($deptRes && $deptRes->num_rows > 0) {
+                $deptRow = $deptRes->fetch_assoc();
+                $deptCode = $deptRow['department_code'];
+                $deptName = $deptRow['department_name'];
+                $deptId = $deptRow['department_id'];
+            }
+            $deptQuery->close();
+        }
+
+        $userRoles[] = [
+            'type' => 'teacher',
+            'department_id' => $deptId,
+            'department_code' => $deptCode,
+            'department_name' => $deptName,
+            'assigned_at' => null,
+        ];
+    }
+    // If role is Dean (2), they also get the Teacher role (for teaching duties)
+    // Note: Dean role is also assigned via departments.dean_user_id below
+    elseif ((int) $user['role_id'] === 2) {
         $deptCode = null;
         $deptName = null;
         $deptId = null;
