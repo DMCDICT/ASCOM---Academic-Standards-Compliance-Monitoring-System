@@ -2011,32 +2011,6 @@ if (!$showProgramCourses && $courseDetails) {
 <body>
     <!-- Nested wrappers removed to fix offset bugs and structure -->
     <div class="course-details-container" style="margin: 0 auto !important; max-width: 90% !important; width: 90% !important;">
-        <!-- Back Navigation -->
-        <a href="content.php?page=<?php 
-            if ($showProgramCourses) {
-                echo 'dashboard';
-            } elseif (!empty($fromProgram)) {
-                echo 'course-details&program=' . urlencode($fromProgram);
-            } else {
-                echo 'all-courses';
-            }
-            // Preserve term_id parameter
-            if (isset($_GET['term_id'])) {
-                echo '&term_id=' . urlencode($_GET['term_id']);
-            }
-        ?>" class="back-button">
-            <img src="../src/assets/icons/go-back-icon.png" alt="Back" onerror="this.style.display='none'; this.nextSibling.style.display='inline';">
-            <span style="display: none;">←</span>
-            <?php 
-            if ($showProgramCourses) {
-                echo 'Back to Dashboard';
-            } elseif (!empty($fromProgram)) {
-                echo 'Back to ' . htmlspecialchars($fromProgram) . ' Courses';
-            } else {
-                echo 'Back to All Courses';
-            }
-            ?>
-        </a>
         
         
         <?php if ($showProgramCourses): ?>

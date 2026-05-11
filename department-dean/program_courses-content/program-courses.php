@@ -61,6 +61,8 @@ if ($deanDepartmentCode && $programCode) {
     }
     
 // Now get courses with compliance calculation
+    // Uses the same formula as dashboard.php and get_dashboard_data.php:
+    // compliant = publication_year within [currentYear-4, currentYear]
     $currentYear = date('Y');
     $fiveYearsAgo = $currentYear - 4;
     
@@ -77,7 +79,13 @@ if ($deanDepartmentCode && $programCode) {
             c.academic_year,
             c.year_level,
             COUNT(br.id) as total_references,
-            COUNT(CASE WHEN br.publication_year >= :five_years_ago AND br.publication_year IS NOT NULL THEN 1 END) as compliant_count
+            SUM(CASE 
+                WHEN br.publication_year IS NOT NULL 
+                AND br.publication_year >= :five_years_ago 
+                AND br.publication_year <= :current_year 
+                THEN 1 
+                ELSE 0 
+            END) as compliant_count
         FROM 
             courses c
         JOIN 
@@ -104,7 +112,7 @@ if ($deanDepartmentCode && $programCode) {
     ";
     
     $coursesStmt = $pdo->prepare($coursesQuery);
-    $coursesStmt->execute([':dept_code' => $deanDepartmentCode, ':prog_code' => $programCode, ':five_years_ago' => $fiveYearsAgo]);
+    $coursesStmt->execute([':dept_code' => $deanDepartmentCode, ':prog_code' => $programCode, ':five_years_ago' => $fiveYearsAgo, ':current_year' => $currentYear]);
     $courses = $coursesStmt->fetchAll(PDO::FETCH_ASSOC);
 }
 

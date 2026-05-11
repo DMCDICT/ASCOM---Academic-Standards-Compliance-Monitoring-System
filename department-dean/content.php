@@ -883,7 +883,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
     <?php $currentPage = isset($_GET['page']) ? $_GET['page'] : 'dashboard'; ?>
 
-    <a href="content.php?page=dashboard" class="nav-button hoverable <?php if ($currentPage == 'dashboard' || $currentPage == 'all-courses' || $currentPage == 'course-details' || $currentPage == 'program-courses') echo 'active'; ?>">
+    <a href="content.php?page=dashboard" class="nav-button hoverable <?php if ($currentPage == 'dashboard') echo 'active'; ?>">
       <span class="nav-icon-wrapper">
         <i data-lucide="layout-dashboard" class="nav-icon" aria-hidden="true"></i>
       </span>
@@ -898,7 +898,7 @@ document.addEventListener('DOMContentLoaded', function() {
       <span style="line-height: 1.2;">Reference<br />Requests</span>
     </a>
 
-    <a href="content.php?page=program-management" class="nav-button hoverable <?php if ($currentPage == 'program-management' || $currentPage == 'program-courses') echo 'active'; ?>">
+    <a href="content.php?page=program-management" class="nav-button hoverable <?php if ($currentPage == 'program-management' || $currentPage == 'program-courses' || $currentPage == 'all-courses' || $currentPage == 'course-details') echo 'active'; ?>">
       <span class="nav-icon-wrapper">
         <i data-lucide="folder-cog" class="nav-icon" aria-hidden="true"></i>
       </span>
